@@ -1,2 +1,3 @@
 // Aniwa Projesi - Providers Export
-export { Providers } from './providers' 
+export { Providers } from './providers'
+export { ThemeProvider } from './theme-provider' 
