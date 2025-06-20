@@ -151,7 +151,7 @@ export default function Home() {
                     <ListSkeleton count={3} />
                   </div>
                 </div>
-                <div>
+    <div>
                   <p className="text-sm mb-2 font-medium">Özel Skeleton</p>
                   <div className="p-4 border border-border rounded-lg space-y-3">
                     <div className="flex items-center space-x-3">

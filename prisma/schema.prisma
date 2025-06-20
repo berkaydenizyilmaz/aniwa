@@ -13,3 +13,66 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+// Kullanıcı Rollerini tanımlayan Enum
+enum UserRole {
+  USER
+  MODERATOR
+  EDITOR
+  ADMIN
+}
+
+// Log Seviyelerini tanımlayan Enum
+enum LogLevel {
+  ERROR
+  WARN
+  INFO
+  DEBUG
+}
+
+// Kullanıcı Bilgileri Modeli
+model User {
+  id             String                @id @default(auto()) @map("_id") @db.ObjectId
+  username       String                @unique
+  email          String                @unique
+  passwordHash   String
+  profilePicture String?
+  profileBanner  String?
+  bio            String?               @db.String
+  role           UserRole              @default(USER)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  userSettings   UserProfileSettings?
+  logs           Log[]
+}
+
+// Kullanıcıya Özel Ayarlar ve Tercihler Modeli
+model UserProfileSettings {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId                String   @unique @db.ObjectId
+  
+  themePreference       String   @default("system")
+  languagePreference    String   @default("tr")
+  
+  notificationPreferences Json?
+  privacySettings       Json?
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Log Modeli
+model Log {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  timestamp DateTime @default(now())
+  level     LogLevel
+  event     String
+  message   String
+  metadata  Json?
+
+  userId    String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id])
+}
