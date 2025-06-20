@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Aniwa",
-  description: "Aniwa - Anime Platformu",
+  description: " - Anime Takip Platformu",
 };
 
 export default function RootLayout({
@@ -29,6 +29,7 @@ export default function RootLayout({
     <html lang="tr" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <Providers>
           {children}

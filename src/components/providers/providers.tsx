@@ -14,22 +14,17 @@ interface ProvidersProps {
 }
 
 export function Providers({ children }: ProvidersProps) {
-  // React Query client'ı component içinde oluştur (SSR için)
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 60 * 1000, // 1 dakika
-            refetchOnWindowFocus: false,
-          },
-        },
-      })
-  )
+  // React Query client'ı state olarak tutuyoruz
+  const [queryClient] = useState(() => new QueryClient())
 
   return (
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
         {children}
         
         {/* Toast Notifications */}
@@ -37,10 +32,8 @@ export function Providers({ children }: ProvidersProps) {
           position="bottom-right"
           richColors
           closeButton
-          expand={false}
-          visibleToasts={4}
         />
-      </QueryClientProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   )
 } 
