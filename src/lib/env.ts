@@ -42,7 +42,7 @@ function validateEnv() {
       
       console.error('❌ Environment değişkenleri hatası:')
       missingVars.forEach(err => console.error(`  - ${err}`))
-      console.error('\n📝 .env.local dosyanızı kontrol edin\n')
+      console.error('\n📝 .env dosyanızı kontrol edin\n')
       
       // Development'ta uyarı ver, production'da hata fırlat
       if (process.env.NODE_ENV === 'production') {
