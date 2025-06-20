@@ -14,24 +14,10 @@ const getLogLevel = (): pino.Level => {
 
 /**
  * Environment'a göre transport'ları belirle
+ * Next.js API routes için basitleştirilmiş versiyon
  */
 const getTransports = () => {
-  const isDev = process.env.NODE_ENV === 'development'
-  
-  if (isDev) {
-    // Development'ta pretty print
-    return {
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-        translateTime: 'yyyy-mm-dd HH:MM:ss',
-        ignore: 'pid,hostname',
-        singleLine: true,
-      }
-    }
-  }
-  
-  // Production'da JSON format
+  // API routes'ta transport kullanmayalım - sadece basit JSON logging
   return undefined
 }
 
