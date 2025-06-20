@@ -24,9 +24,12 @@ const envSchema = z.object({
   CLOUDINARY_API_KEY: z.string().optional(),
   CLOUDINARY_API_SECRET: z.string().optional(),
   
-  // Rate Limiting
-  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
-  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+  // Rate Limiting (Vercel KV / Upstash Redis)
+  KV_URL: z.string().optional(),
+  KV_REST_API_URL: z.string().url().optional(),
+  KV_REST_API_TOKEN: z.string().optional(),
+  KV_REST_API_READ_ONLY_TOKEN: z.string().optional(),
+  REDIS_URL: z.string().optional(),
   
   // Email
   RESEND_API_KEY: z.string().optional(),
@@ -72,5 +75,5 @@ export const isProduction = env.NODE_ENV === 'production'
 // Servislerin aktif olup olmadığını kontrol et
 export const hasGoogleAuth = !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET)
 export const hasCloudinary = !!(env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SECRET)
-export const hasRateLimit = !!(env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN)
+export const hasRateLimit = !!(env.KV_REST_API_URL && env.KV_REST_API_TOKEN) || !!env.REDIS_URL
 export const hasEmail = !!env.RESEND_API_KEY 
