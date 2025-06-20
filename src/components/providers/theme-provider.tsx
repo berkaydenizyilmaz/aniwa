@@ -1,12 +1,12 @@
 // src/components/theme-provider.tsx
-'use client'; // Bu bir istemci bileşeni
+"use client"
 
-import * as React from 'react';
-import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import { type ComponentProps } from "react"
+import { ThemeProvider as NextThemesProvider } from "next-themes"
 
 export function ThemeProvider({
   children,
   ...props
-}: React.ComponentProps<typeof NextThemesProvider>) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+}: ComponentProps<typeof NextThemesProvider>) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
 }
