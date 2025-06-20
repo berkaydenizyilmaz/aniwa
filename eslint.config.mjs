@@ -14,7 +14,12 @@ const eslintConfig = [
   {
     ignores: [
       "src/generated/**/*"
-    ]
+    ],
+    rules: {
+      'prefer-const': 'error',
+      'no-unused-vars': 'warn',
+      'no-console': 'warn'
+    }
   }
 ];
 
