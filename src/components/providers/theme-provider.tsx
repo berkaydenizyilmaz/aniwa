@@ -1,9 +1,8 @@
-// Aniwa Projesi - Theme Provider
-// Bu component dark/light mode desteği sağlar
+// src/components/theme-provider.tsx
+'use client'; // Bu bir istemci bileşeni
 
-'use client'
-
-import { ThemeProvider as NextThemesProvider, type ThemeProviderProps } from 'next-themes'
+import * as React from 'react';
+import { ThemeProvider as NextThemesProvider, type ThemeProviderProps } from 'next-themes';
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
@@ -11,10 +10,11 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
       attribute="class"
       defaultTheme="system"
       enableSystem
+      storageKey="aniwa-theme"
       disableTransitionOnChange
       {...props}
     >
       {children}
     </NextThemesProvider>
-  )
-} 
+  );
+}
