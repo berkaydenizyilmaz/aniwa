@@ -26,7 +26,7 @@ export default function SignupPage() {
     
     // Username için özel sanitization
     if (name === 'username') {
-      const sanitizedValue = value.toLowerCase().replace(/[^a-z0-9_]/g, '')
+      const sanitizedValue = value.replace(/[^a-zA-Z0-9_]/g, '')
       setFormData(prev => ({
         ...prev,
         [name]: sanitizedValue
@@ -149,11 +149,11 @@ export default function SignupPage() {
               placeholder="kullaniciadi"
               minLength={3}
               maxLength={20}
-              pattern="[a-z0-9_]+"
-              title="Sadece küçük harf, rakam ve alt çizgi kullanabilirsiniz"
+              pattern="[a-zA-Z0-9_]+"
+              title="Sadece harf, rakam ve alt çizgi kullanabilirsiniz"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Sadece küçük harf, rakam ve alt çizgi (_) kullanabilirsiniz. 3-20 karakter.
+              Sadece harf, rakam ve alt çizgi (_) kullanabilirsiniz. 3-20 karakter.
             </p>
           </div>
 

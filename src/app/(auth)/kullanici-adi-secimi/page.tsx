@@ -101,7 +101,7 @@ export default function SetupUsernamePage() {
 
   // Username input değişikliği
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')
+    const value = e.target.value.replace(/[^a-zA-Z0-9_]/g, '')
     setUsername(value)
     setError('')
   }
@@ -179,7 +179,7 @@ export default function SetupUsernamePage() {
             )}
             
             <p className="mt-1 text-xs text-gray-500">
-              Sadece küçük harf, rakam ve alt çizgi (_) kullanabilirsin. 3-20 karakter.
+              Sadece harf, rakam ve alt çizgi (_) kullanabilirsin. 3-20 karakter.
             </p>
           </div>
 

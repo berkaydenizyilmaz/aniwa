@@ -24,9 +24,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Sadece alfanumerik ve alt çizgi kontrolü
-    if (!/^[a-z0-9_]+$/.test(username)) {
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
       return NextResponse.json(
-        { available: false, error: 'Username sadece küçük harf, rakam ve alt çizgi içerebilir' },
+        { available: false, error: 'Username sadece harf, rakam ve alt çizgi içerebilir' },
         { status: 400 }
       )
     }
