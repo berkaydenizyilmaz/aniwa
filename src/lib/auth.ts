@@ -2,7 +2,6 @@
 // Bu dosya kimlik doğrulama sistemini yönetir
 
 import { NextAuthOptions } from 'next-auth'
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from './prisma'
@@ -15,7 +14,6 @@ import { createOAuthPendingUser } from '@/services/auth/oauth.service'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     // Google OAuth Provider
     GoogleProvider({
