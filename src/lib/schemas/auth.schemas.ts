@@ -16,12 +16,14 @@ import {
   DEFAULT_THEME,
   LANGUAGE_PREFERENCES,
   DEFAULT_LANGUAGE,
+  TOKEN_MIN_LENGTH,
+  EMAIL_MIN_LENGTH,
 } from '../constants/auth'
 
 // Email şeması
 export const emailSchema = z
   .string()
-  .min(1, 'Email adresi gerekli')
+  .min(EMAIL_MIN_LENGTH, 'Email adresi gerekli')
   .regex(EMAIL_REGEX, 'Geçerli bir email adresi giriniz')
   .toLowerCase()
 
@@ -69,7 +71,7 @@ export const signupSchema = z.object({
 // Login şeması
 export const loginSchema = z.object({
   email: emailSchema,
-  password: z.string().min(1, 'Şifre gerekli'),
+  password: z.string().min(PASSWORD_MIN_LENGTH, 'Şifre gerekli'),
 })
 
 // Profil güncelleme şeması
@@ -83,9 +85,9 @@ export const updateProfileSchema = z.object({
 
 // Şifre güncelleme şeması
 export const updatePasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'Mevcut şifre gerekli'),
+  currentPassword: z.string().min(PASSWORD_MIN_LENGTH, 'Mevcut şifre gerekli'),
   newPassword: passwordSchema,
-  confirmPassword: z.string().min(1, 'Şifre onayı gerekli'),
+  confirmPassword: z.string().min(PASSWORD_MIN_LENGTH, 'Şifre onayı gerekli'),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: 'Şifreler eşleşmiyor',
   path: ['confirmPassword'],
@@ -101,7 +103,7 @@ export const userSettingsSchema = z.object({
 
 // Email doğrulama şeması
 export const verifyEmailSchema = z.object({
-  token: z.string().min(1, 'Doğrulama kodu gerekli'),
+  token: z.string().min(TOKEN_MIN_LENGTH, 'Doğrulama kodu gerekli'),
 })
 
 // Şifre sıfırlama şeması
@@ -111,9 +113,9 @@ export const resetPasswordSchema = z.object({
 
 // Şifre sıfırlama onay şeması
 export const confirmResetPasswordSchema = z.object({
-  token: z.string().min(1, 'Sıfırlama kodu gerekli'),
+  token: z.string().min(TOKEN_MIN_LENGTH, 'Sıfırlama kodu gerekli'),
   password: passwordSchema,
-  confirmPassword: z.string().min(1, 'Şifre onayı gerekli'),
+  confirmPassword: z.string().min(PASSWORD_MIN_LENGTH, 'Şifre onayı gerekli'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Şifreler eşleşmiyor',
   path: ['confirmPassword'],

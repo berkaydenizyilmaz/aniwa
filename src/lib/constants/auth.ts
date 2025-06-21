@@ -13,6 +13,8 @@ export const USERNAME_MAX_LENGTH = 20
 export const NAME_MIN_LENGTH = 2
 export const NAME_MAX_LENGTH = 50
 export const BIO_MAX_LENGTH = 500
+export const EMAIL_MIN_LENGTH = 3
+export const TOKEN_MIN_LENGTH = 32
 
 // Şifreleme ayarları
 export const BCRYPT_SALT_ROUNDS = 12
