@@ -12,7 +12,7 @@ declare global {
 // Prisma Client konfigürasyonu
 const createPrismaClient = () => {
   return new PrismaClient({
-    log: env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    log: ['error'],
     datasources: {
       db: {
         url: env.DATABASE_URL
