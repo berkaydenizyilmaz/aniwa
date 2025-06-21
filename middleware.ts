@@ -3,7 +3,7 @@
 
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
-import { PROTECTED_ROUTE_PATTERNS, PUBLIC_ROUTE_LIST, AUTH_ROUTES, API_ROUTES } from '@/lib/constants/routes'
+import { PROTECTED_ROUTE_PATTERNS, PUBLIC_ROUTE_LIST, AUTH_ROUTES, API_ROUTES, PUBLIC_ROUTES } from '@/lib/constants/routes'
 
 export default withAuth(
   function middleware(req) {
@@ -13,7 +13,7 @@ export default withAuth(
     // Admin rotaları için rol kontrolü
     if (pathname.startsWith(PROTECTED_ROUTE_PATTERNS.ADMIN)) {
       if (token?.role !== 'ADMIN') {
-        return NextResponse.redirect(new URL('/', req.url))
+        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
       }
     }
 
@@ -21,7 +21,7 @@ export default withAuth(
     if (pathname.startsWith(PROTECTED_ROUTE_PATTERNS.MODERATOR)) {
       const allowedRoles = ['ADMIN', 'MODERATOR']
       if (!token?.role || !allowedRoles.includes(token.role as string)) {
-        return NextResponse.redirect(new URL('/', req.url))
+        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
       }
     }
 
@@ -29,7 +29,7 @@ export default withAuth(
     if (pathname.startsWith(PROTECTED_ROUTE_PATTERNS.EDITOR)) {
       const allowedRoles = ['ADMIN', 'MODERATOR', 'EDITOR']
       if (!token?.role || !allowedRoles.includes(token.role as string)) {
-        return NextResponse.redirect(new URL('/', req.url))
+        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
       }
     }
 
@@ -37,7 +37,7 @@ export default withAuth(
     if (pathname.startsWith(AUTH_ROUTES.SETUP_USERNAME)) {
       // Setup sayfasına erişim için login gerekli ama username olmamalı
       if (!token || token.username) {
-        return NextResponse.redirect(new URL('/', req.url))
+        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
       }
     }
 
@@ -59,7 +59,7 @@ export default withAuth(
         }
 
         // Public route kontrolü
-        if (PUBLIC_ROUTE_LIST.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+                  if (PUBLIC_ROUTE_LIST.some(route => pathname === route || pathname.startsWith(route + '/'))) {
           return true
         }
 

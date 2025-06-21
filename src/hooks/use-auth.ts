@@ -13,7 +13,7 @@ import type {
   RequireAuthHookReturn, 
   RequireRoleHookReturn 
 } from '@/types/auth'
-import { API_ROUTES, AUTH_ROUTES } from '@/lib/constants/routes'
+import { API_ROUTES, AUTH_ROUTES, PUBLIC_ROUTES } from '@/lib/constants/routes'
 import { USER_ROLES } from '@/lib/constants/auth'
 
 /**
@@ -34,12 +34,12 @@ export function useAuth(): AuthHookReturn {
   }, [])
 
   const loginWithGoogle = useCallback(async () => {
-    await signIn('google', { callbackUrl: '/' })
+    await signIn('google', { callbackUrl: PUBLIC_ROUTES.HOME })
   }, [])
 
   const logout = useCallback(async () => {
     await signOut({ redirect: false })
-    router.push('/')
+    router.push(PUBLIC_ROUTES.HOME)
   }, [router])
 
   const setupUsername = useCallback(async (username: string) => {
@@ -68,7 +68,7 @@ export function useAuth(): AuthHookReturn {
     })
     
     // Ana sayfaya yönlendir
-    router.push('/')
+    router.push(PUBLIC_ROUTES.HOME)
     
     return result
   }, [session?.user?.email, router, update])
@@ -138,7 +138,7 @@ export function useRequireAuth(redirectTo = AUTH_ROUTES.SIGN_IN): RequireAuthHoo
  */
 export function useRequireRole(
   requiredRole: UserRole | UserRole[], 
-  redirectTo = '/'
+  redirectTo = PUBLIC_ROUTES.HOME
 ): RequireRoleHookReturn {
   const { isAuthenticated, isLoading } = useAuth()
   const { hasRole, hasAnyRole } = useRole()

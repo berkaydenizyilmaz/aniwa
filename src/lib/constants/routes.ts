@@ -1,59 +1,44 @@
 // Aniwa Projesi - Routes Constants
 // Bu dosya tüm site URL'lerini merkezi olarak yönetir
 
-// API rotaları
-// API endpoints
+// API rotaları (İngilizce endpoint'ler)
 export const API_ROUTES = {
-    AUTH: {
-      BASE: '/api/auth',
-      SETUP_USERNAME: '/api/auth/setup-username',
-      SIGNUP: '/api/auth/signup',
-    },
-  } as const
-
-// Auth sayfaları
-export const AUTH_ROUTES = {
-  SIGN_IN: '/auth/signin',
-  SIGN_UP: '/auth/signup',
-  ERROR: '/auth/error',
-  VERIFY_REQUEST: '/auth/verify-request',
-  SETUP_USERNAME: '/auth/setup-username',
+  AUTH: {
+    BASE: '/api/auth',
+    SETUP_USERNAME: '/api/auth/setup-username',
+    SIGNUP: '/api/auth/signup',
+  },
 } as const
 
-// Public sayfalar
+// Auth sayfaları (Türkçe URL'ler)
+export const AUTH_ROUTES = {
+  SIGN_IN: '/giris',
+  SIGN_UP: '/kayit',
+  ERROR: '/hata',
+  VERIFY_REQUEST: '/dogrulama',
+  SETUP_USERNAME: '/kullanici-adi-secimi',
+} as const
+
+// Public sayfalar (Türkçe URL'ler)
 export const PUBLIC_ROUTES = {
   HOME: '/',
-  ABOUT: '/about',
-  CONTACT: '/contact',
-  HELP: '/help',
+  ABOUT: '/hakkimizda',
+  CONTACT: '/iletisim',
+  HELP: '/yardim',
   ANIME: '/anime',
 } as const
 
-// Protected sayfalar (rol bazlı)
+// Protected sayfalar (rol bazlı - Türkçe URL'ler)
 export const PROTECTED_ROUTES = {
   ADMIN: {
-    BASE: '/admin',
-    DASHBOARD: '/admin/dashboard',
-    USERS: '/admin/users',
-    LOGS: '/admin/logs',
+    BASE: '/yonetim',
   },
   MODERATOR: {
-    BASE: '/moderation',
-    DASHBOARD: '/moderation/dashboard',
-    REPORTS: '/moderation/reports',
+    BASE: '/moderasyon',
   },
   EDITOR: {
-    BASE: '/editor',
-    DASHBOARD: '/editor/dashboard',
-    CONTENT: '/editor/content',
+    BASE: '/editör',
   },
-} as const
-
-// Genel uygulama sayfaları
-export const APP_ROUTES = {
-  PROFILE: '/profile',
-  SETTINGS: '/settings',
-  DASHBOARD: '/dashboard',
 } as const
 
 // Public route listesi (middleware için)
@@ -79,4 +64,3 @@ export type AuthRoute = typeof AUTH_ROUTES[keyof typeof AUTH_ROUTES]
 export type ApiRoute = typeof API_ROUTES[keyof typeof API_ROUTES]
 export type PublicRoute = typeof PUBLIC_ROUTES[keyof typeof PUBLIC_ROUTES]
 export type ProtectedRoute = typeof PROTECTED_ROUTES[keyof typeof PROTECTED_ROUTES]
-export type AppRoute = typeof APP_ROUTES[keyof typeof APP_ROUTES] 
