@@ -102,9 +102,14 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Şifre
-            </label>
+            <div className="flex justify-between items-center">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Şifre
+              </label>
+              <Link href="/sifremi-unuttum" className="text-sm text-blue-600 hover:text-blue-500">
+                Şifremi unuttum
+              </Link>
+            </div>
             <input
               id="password"
               name="password"

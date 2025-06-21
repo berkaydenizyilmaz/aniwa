@@ -4,7 +4,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { signupSchema } from '@/lib/schemas/auth.schemas'
 import { createUser } from '@/services/auth/auth.service'
-import { logError } from '@/lib/logger'
+import { createEmailVerificationToken } from '@/services/auth/email-verification.service'
+import { logError, logInfo } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 
 export async function POST(request: NextRequest) {
@@ -39,9 +40,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Email doğrulama token'ı oluştur ve email gönder
+    const baseUrl = request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const verificationResult = await createEmailVerificationToken(email, username, baseUrl)
+
+    if (!verificationResult.success) {
+      logError(LOG_EVENTS.AUTH_EMAIL_VERIFICATION_FAILED, 'Email doğrulama gönderim hatası', {
+        email,
+        username,
+        error: verificationResult.error
+      })
+      
+      // Kullanıcı oluşturuldu ama email gönderilemedi
+      return NextResponse.json({
+        success: true,
+        message: 'Hesabınız oluşturuldu ancak doğrulama emaili gönderilemedi. Lütfen tekrar deneyin.',
+        data: result.data,
+        warning: 'Email doğrulama gönderim hatası'
+      })
+    }
+
+    logInfo(LOG_EVENTS.AUTH_SIGNUP_SUCCESS, 'Kullanıcı kaydı ve email doğrulama tamamlandı', {
+      email,
+      username
+    })
+
     return NextResponse.json({
       success: true,
-      message: 'Hesabınız başarıyla oluşturuldu',
+      message: 'Hesabınız başarıyla oluşturuldu. Email adresinize gönderilen doğrulama bağlantısını kontrol edin.',
       data: result.data
     })
 

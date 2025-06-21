@@ -119,6 +119,33 @@ export const authOptions: NextAuthOptions = {
         token.provider = account.provider
       }
 
+      // Mevcut kullanıcı için oauthToken'ı temizle
+      if (token.oauthToken === 'existing_user') {
+        // Kullanıcı bilgilerini veritabanından güncelle
+        if (token.email) {
+          try {
+            const user = await prisma.user.findUnique({
+              where: { email: token.email as string }
+            })
+            
+            if (user) {
+              token.id = user.id
+              token.username = user.username
+              token.roles = user.roles
+              token.image = user.image || user.profilePicture
+            }
+          } catch (error) {
+            logError(LOG_EVENTS.AUTH_SESSION_ERROR, 'Mevcut kullanıcı bilgisi güncelleme hatası', {
+              error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+              email: token.email
+            })
+          }
+        }
+        
+        delete token.oauthToken
+        return token
+      }
+
       // OAuth token süresi kontrolü - pending user yoksa temizle
       if (token.oauthToken && token.oauthToken !== 'existing_user') {
         try {
@@ -126,18 +153,37 @@ export const authOptions: NextAuthOptions = {
             where: { token: token.oauthToken as string }
           })
           
-          // Pending user yoksa veya süresi dolmuşsa oauthToken'ı temizle
-          if (!pendingUser || pendingUser.expiresAt < new Date()) {
-            // Süresi dolmuş pending user'ı sil
-            if (pendingUser) {
-              await prisma.oAuthPendingUser.delete({ where: { id: pendingUser.id } })
+          // Pending user yoksa oauthToken'ı temizle (username setup tamamlanmış)
+          if (!pendingUser) {
+            // Kullanıcı bilgilerini veritabanından güncelle
+            if (token.sub) {
+              const user = await prisma.user.findUnique({
+                where: { email: token.email as string }
+              })
+              
+              if (user) {
+                token.id = user.id
+                token.username = user.username
+                token.roles = user.roles
+                token.image = user.image || user.profilePicture
+              }
             }
+            
+            logInfo(LOG_EVENTS.AUTH_OAUTH_SUCCESS, 'OAuth token temizlendi - kullanıcı oluşturulmuş', {
+              tokenPrefix: typeof token.oauthToken === 'string' ? token.oauthToken.substring(0, 8) + '...' : 'unknown'
+            })
+            delete token.oauthToken
+            return token
+          }
+          
+          // Token süresi dolmuşsa temizle
+          if (pendingUser.expiresAt < new Date()) {
+            await prisma.oAuthPendingUser.delete({ where: { id: pendingUser.id } })
             
             logWarn(LOG_EVENTS.AUTH_OAUTH_FAILED, 'OAuth token süresi doldu - oauthToken temizlendi', {
               tokenPrefix: typeof token.oauthToken === 'string' ? token.oauthToken.substring(0, 8) + '...' : 'unknown'
             })
             
-            // OAuth token'ı temizle - middleware'de kontrol edilecek
             delete token.oauthToken
             token.oauthExpired = true
           }

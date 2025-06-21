@@ -22,7 +22,7 @@ export const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye cinsinden)
 export const JWT_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye cinsinden)
 
 // Token süreleri
-export const OAUTH_TOKEN_EXPIRY_MINUTES = 60 // OAuth pending user token süresi
+export const OAUTH_TOKEN_EXPIRY_MINUTES = 1 // OAuth pending user token süresi
 export const EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS = 24 // Email doğrulama token süresi (24 saat)
 export const PASSWORD_RESET_TOKEN_EXPIRY_HOURS = 1 // Şifre sıfırlama token süresi (1 saat)
 

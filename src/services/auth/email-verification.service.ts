@@ -9,13 +9,20 @@ import {
   EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS,
   PASSWORD_RESET_TOKEN_EXPIRY_HOURS 
 } from '@/lib/constants/auth'
+import { 
+  sendVerificationEmail, 
+  sendPasswordResetEmail, 
+  sendPasswordChangedNotification 
+} from '@/services/api/email.service'
 import type { AuthApiResponse } from '@/types/auth'
 
 /**
- * Email doğrulama token'ı oluşturur
+ * Email doğrulama token'ı oluşturur ve doğrulama emaili gönderir
  */
 export async function createEmailVerificationToken(
-  email: string
+  email: string,
+  username: string,
+  baseUrl: string
 ): Promise<AuthApiResponse<{ token: string }>> {
   try {
     // Mevcut token'ları temizle
@@ -43,10 +50,31 @@ export async function createEmailVerificationToken(
       }
     })
 
-    logInfo(LOG_EVENTS.AUTH_EMAIL_VERIFICATION_SENT, 'Email doğrulama token\'ı oluşturuldu', {
+    // Email gönder
+    const verificationUrl = `${baseUrl}/dogrulama?token=${token}`
+    const emailResult = await sendVerificationEmail({
+      to: email.toLowerCase(),
+      username,
+      verificationUrl
+    })
+
+    if (!emailResult.success) {
+      // Email gönderilemezse token'ı sil
+      await prisma.verificationToken.delete({
+        where: { token }
+      })
+      
+      return {
+        success: false,
+        error: 'Doğrulama emaili gönderilemedi'
+      }
+    }
+
+    logInfo(LOG_EVENTS.AUTH_EMAIL_VERIFICATION_SENT, 'Email doğrulama token\'ı oluşturuldu ve email gönderildi', {
       email: email.toLowerCase(),
       tokenPrefix: token.substring(0, 8) + '...',
-      expiresAt: expiresAt.toISOString()
+      expiresAt: expiresAt.toISOString(),
+      emailId: emailResult.data?.id
     })
 
     return {
@@ -67,10 +95,11 @@ export async function createEmailVerificationToken(
 }
 
 /**
- * Şifre sıfırlama token'ı oluşturur
+ * Şifre sıfırlama token'ı oluşturur ve sıfırlama emaili gönderir
  */
 export async function createPasswordResetToken(
-  email: string
+  email: string,
+  baseUrl: string
 ): Promise<AuthApiResponse<{ token: string }>> {
   try {
     // Kullanıcının varlığını kontrol et
@@ -115,11 +144,32 @@ export async function createPasswordResetToken(
       }
     })
 
-    logInfo(LOG_EVENTS.AUTH_PASSWORD_RESET_REQUESTED, 'Şifre sıfırlama token\'ı oluşturuldu', {
+    // Email gönder
+    const resetUrl = `${baseUrl}/sifre-sifirlama?token=${token}`
+    const emailResult = await sendPasswordResetEmail({
+      to: email.toLowerCase(),
+      username: user.username || user.email.split('@')[0],
+      resetUrl
+    })
+
+    if (!emailResult.success) {
+      // Email gönderilemezse token'ı sil
+      await prisma.verificationToken.delete({
+        where: { token }
+      })
+      
+      return {
+        success: false,
+        error: 'Şifre sıfırlama emaili gönderilemedi'
+      }
+    }
+
+    logInfo(LOG_EVENTS.AUTH_PASSWORD_RESET_REQUESTED, 'Şifre sıfırlama token\'ı oluşturuldu ve email gönderildi', {
       email: email.toLowerCase(),
       userId: user.id,
       tokenPrefix: token.substring(0, 8) + '...',
-      expiresAt: expiresAt.toISOString()
+      expiresAt: expiresAt.toISOString(),
+      emailId: emailResult.data?.id
     }, user.id)
 
     return {
@@ -325,6 +375,12 @@ export async function resetPasswordWithToken(
     await prisma.verificationToken.delete({
       where: { token }
     })
+
+    // Şifre değişikliği bildirim emaili gönder
+    await sendPasswordChangedNotification(
+      email,
+      user.username || user.email.split('@')[0]
+    )
 
     logInfo(LOG_EVENTS.AUTH_PASSWORD_RESET_SUCCESS, 'Şifre başarıyla sıfırlandı', {
       email,

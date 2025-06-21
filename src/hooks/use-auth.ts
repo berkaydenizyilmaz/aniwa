@@ -62,14 +62,8 @@ export function useAuth(): AuthHookReturn {
       throw new Error(result.error || 'Username ayarlama başarısız')
     }
 
-    // Modern NextAuth session güncelleme
-    await update({
-      username: result.data.username,
-      id: result.data.id
-    })
-    
-    // Session güncellemesinin tamamlanmasını bekle
-    await new Promise(resolve => setTimeout(resolve, 100))
+    // Session'ı yenile
+    await update()
     
     // Ana sayfaya yönlendir
     router.push(PUBLIC_ROUTES.HOME)
