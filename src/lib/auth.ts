@@ -9,7 +9,7 @@ import { prisma } from './prisma'
 import { env } from './env'
 import { logInfo, logError, logWarn } from './logger'
 import { LOG_EVENTS } from './constants/logging'
-import { SESSION_MAX_AGE, JWT_MAX_AGE, AUTH_PAGES, OAUTH_PROVIDERS } from './constants/auth'
+import { SESSION_MAX_AGE, JWT_MAX_AGE, AUTH_PAGES, OAUTH_PROVIDERS, DEFAULT_THEME, DEFAULT_LANGUAGE } from './constants/auth'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
@@ -200,8 +200,8 @@ export const authOptions: NextAuthOptions = {
           await prisma.userProfileSettings.create({
             data: {
               userId: user.id,
-              themePreference: 'system',
-              languagePreference: 'tr'
+              themePreference: DEFAULT_THEME,
+              languagePreference: DEFAULT_LANGUAGE
             }
           })
         } catch (error) {

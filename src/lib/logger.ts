@@ -1,5 +1,5 @@
 import pino from 'pino'
-import { createLog } from '@/services/db/log.service'
+import { createLog } from '@/services/log/log.service'
 import type { LogLevel } from '@prisma/client'
 import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS, HTTP_STATUS_THRESHOLDS, LOG_LEVELS } from '@/lib/constants/logging'
 import type { LogMetadata, PerformanceMetadata, AuthMetadata } from '@/types/logging'
