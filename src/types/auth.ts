@@ -49,6 +49,7 @@ export type SessionUser = Pick<User, 'id' | 'role'> & {
   image?: string | null
   username?: string | null
   provider?: string
+  oauthToken?: string
 }
 
 // Kullanıcı listesi için sadece gerekli alanlar
