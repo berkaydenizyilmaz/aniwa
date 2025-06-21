@@ -87,6 +87,8 @@ model OAuthPendingUser {
   token      String   @unique // Random verification token
   expiresAt  DateTime
   createdAt  DateTime @default(now())
+
+  @@index([expiresAt], map: "oauth_pending_ttl")
 }
 
 // Log Modeli

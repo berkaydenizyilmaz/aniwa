@@ -21,7 +21,8 @@ export const BCRYPT_SALT_ROUNDS = 12
 export const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye cinsinden)
 export const JWT_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye cinsinden)
 
-
+// Token süresi (15 dakika)
+export const TOKEN_EXPIRY_MINUTES = 15
 
 
 

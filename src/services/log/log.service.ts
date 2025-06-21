@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db/prisma'
 import { Prisma, LogLevel, UserRole } from '@prisma/client'
 import { LOG_CLEANUP_DEFAULTS, LOG_LEVELS } from '@/lib/constants/logging'
 import { PAGINATION_DEFAULTS } from '@/lib/constants/app'

@@ -1,7 +1,7 @@
 // Aniwa Projesi - Auth Service
 // Bu dosya kimlik doğrulama işlemlerini işlevsel yaklaşımla yönetir
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db/prisma'
 import { logInfo, logError, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import { USER_ROLES, BCRYPT_SALT_ROUNDS } from '@/lib/constants/auth'

@@ -4,7 +4,7 @@
 import { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { prisma } from './prisma'
+import { prisma } from './db/prisma'
 import { env } from './env'
 import { logInfo, logError, logWarn } from './logger'
 import { LOG_EVENTS } from './constants/logging'

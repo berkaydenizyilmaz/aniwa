@@ -1,19 +1,16 @@
 // Aniwa Projesi - OAuth Service
 // Bu dosya OAuth geçici kullanıcı işlemlerini işlevsel yaklaşımla yönetir
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db/prisma'
 import { logInfo, logError, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
-import { USER_ROLES } from '@/lib/constants/auth'
+import { USER_ROLES, TOKEN_EXPIRY_MINUTES } from '@/lib/constants/auth'
 import { DEFAULT_THEME, DEFAULT_LANGUAGE } from '@/lib/constants/app'
 import type { 
   CreateOAuthPendingUserParams, 
   OAuthTokenVerificationParams,
   AuthApiResponse
 } from '@/types/auth'
-
-// Token süresi (15 dakika)
-const TOKEN_EXPIRY_MINUTES = 15
 
 /**
  * OAuth geçici kullanıcısı oluşturur
