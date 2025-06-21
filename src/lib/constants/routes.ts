@@ -7,6 +7,7 @@ export const API_ROUTES = {
     BASE: '/api/auth',
     SETUP_USERNAME: '/api/auth/setup-username',
     SIGNUP: '/api/auth/signup',
+    SIGN_OUT: '/api/auth/signout',
   },
 } as const
 
@@ -43,6 +44,7 @@ export const PROTECTED_ROUTES = {
 
 // Public route listesi (middleware için)
 export const PUBLIC_ROUTE_LIST = [
+  API_ROUTES.AUTH.SIGN_OUT,
   AUTH_ROUTES.SIGN_IN,
   AUTH_ROUTES.SIGN_UP,
   AUTH_ROUTES.ERROR,

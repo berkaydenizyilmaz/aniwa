@@ -5,7 +5,7 @@ import { createLog } from '@/services/log/log.service'
 import type { LogLevel } from '@prisma/client'
 import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS, LOG_LEVELS } from '@/lib/constants/logging'
 import { HTTP_STATUS_THRESHOLDS } from '@/lib/constants/app'
-import type { LogMetadata, PerformanceMetadata, AuthMetadata } from '@/types/logging'
+import type { LogMetadata, PerformanceMetadata } from '@/types/logging'
 import { Prisma } from '@prisma/client'
 
 /**
@@ -177,27 +177,5 @@ export const logPerformance = (
     logWarn(LOG_EVENTS.PERFORMANCE, `Slow operation: ${operation} (${duration}ms)`, performanceData)
   } else {
     logDebug(LOG_EVENTS.PERFORMANCE, `${operation} completed in ${duration}ms`, performanceData)
-  }
-}
-
-/**
- * Auth events için özel fonksiyon
- */
-export const logAuth = (
-  action: string,
-  success: boolean,
-  userId?: string,
-  metadata?: AuthMetadata
-) => {
-  const authData = {
-    action,
-    success,
-    ...metadata,
-  }
-  
-  if (success) {
-    logInfo(LOG_EVENTS.AUTH_LOGIN_SUCCESS, `Auth success: ${action}`, authData, userId)
-  } else {
-    logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, `Auth failed: ${action}`, authData, userId)
   }
 } 

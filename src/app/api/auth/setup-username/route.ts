@@ -41,8 +41,12 @@ export async function POST(request: NextRequest) {
 
     if (!oauthToken) {
       return NextResponse.json(
-        { success: false, error: 'OAuth token bulunamadı' },
-        { status: 400 }
+        { 
+          success: false, 
+          error: 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.',
+          errorCode: 'SESSION_EXPIRED'
+        },
+        { status: 401 }
       )
     }
 

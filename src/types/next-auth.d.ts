@@ -15,6 +15,7 @@ declare module 'next-auth' {
       roles: UserRole[]
       provider?: string
       oauthToken?: string
+      oauthExpired?: boolean
     } & DefaultSession['user']
   }
 
@@ -45,5 +46,6 @@ declare module 'next-auth/jwt' {
     roles: UserRole[]
     provider?: string
     oauthToken?: string
+    oauthExpired?: boolean
   }
 } 

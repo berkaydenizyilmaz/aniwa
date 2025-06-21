@@ -133,12 +133,13 @@ export const authOptions: NextAuthOptions = {
               await prisma.oAuthPendingUser.delete({ where: { id: pendingUser.id } })
             }
             
-            logWarn(LOG_EVENTS.AUTH_OAUTH_FAILED, 'OAuth token temizlendi - pending user bulunamadı', {
+            logWarn(LOG_EVENTS.AUTH_OAUTH_FAILED, 'OAuth token süresi doldu - oauthToken temizlendi', {
               tokenPrefix: typeof token.oauthToken === 'string' ? token.oauthToken.substring(0, 8) + '...' : 'unknown'
             })
             
-            // JWT'den oauthToken'ı temizle
+            // OAuth token'ı temizle - middleware'de kontrol edilecek
             delete token.oauthToken
+            token.oauthExpired = true
           }
         } catch (error) {
           // Hata durumunda oauthToken'ı temizle
@@ -162,6 +163,11 @@ export const authOptions: NextAuthOptions = {
         // OAuth token'ı varsa ekle
         if (token.oauthToken) {
           session.user.oauthToken = token.oauthToken
+        }
+        
+        // OAuth expired flag'i ekle
+        if (token.oauthExpired) {
+          session.user.oauthExpired = true
         }
       }
 

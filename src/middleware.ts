@@ -37,6 +37,15 @@ export default withAuth(
       }
     }
 
+    // 2.1. OAUTH EXPIRED - Token süresi dolmuş kullanıcıları sessiz çıkış yaptır
+    if (token && token.oauthExpired) {
+      // Sessiz çıkış yap ve ana sayfaya yönlendir (onay ekranı olmadan)
+      const signoutUrl = new URL(API_ROUTES.AUTH.SIGN_OUT, req.url)
+      signoutUrl.searchParams.set('callbackUrl', PUBLIC_ROUTES.HOME)
+      signoutUrl.searchParams.set('redirect', 'false')
+      return NextResponse.redirect(signoutUrl)
+    }
+
     // 3. USERNAME SETUP SAYFASI - Sadece OAuth kullanıcıları erişebilir
     if (pathname.startsWith(AUTH_ROUTES.SETUP_USERNAME)) {
       if (!token || !token.oauthToken) {
