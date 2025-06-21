@@ -29,14 +29,17 @@ enum LogLevel {
   DEBUG
 }
 
-// Token Doğrulama Modeli
+// Genel Doğrulama Token Modeli (Email doğrulama, şifre sıfırlama vb.)
 model VerificationToken {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   
+  token     String   @unique
+  type      String   // "email_verification", "password_reset", "email_change"
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  // TTL index - MongoDB otomatik silme için
+  @@index([expiresAt], map: "verification_ttl")
 }
 
 // Kullanıcı Bilgileri Modeli

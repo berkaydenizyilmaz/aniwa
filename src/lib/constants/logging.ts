@@ -55,6 +55,16 @@ export const LOG_EVENTS = {
   AUTH_USERNAME_CHECK: 'auth_username_check',
   AUTH_USERNAME_SETUP: 'auth_username_setup',
   AUTH_USERNAME_SETUP_ERROR: 'auth_username_setup_error',
+  
+  // Email verification events
+  AUTH_EMAIL_VERIFICATION_SENT: 'auth_email_verification_sent',
+  AUTH_EMAIL_VERIFICATION_SUCCESS: 'auth_email_verification_success',
+  AUTH_EMAIL_VERIFICATION_FAILED: 'auth_email_verification_failed',
+  
+  // Password reset events
+  AUTH_PASSWORD_RESET_REQUESTED: 'auth_password_reset_requested',
+  AUTH_PASSWORD_RESET_SUCCESS: 'auth_password_reset_success',
+  AUTH_PASSWORD_RESET_FAILED: 'auth_password_reset_failed',
 } as const
 
 // Log events tipini export et

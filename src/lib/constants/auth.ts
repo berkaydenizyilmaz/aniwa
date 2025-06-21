@@ -21,10 +21,18 @@ export const BCRYPT_SALT_ROUNDS = 12
 export const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye cinsinden)
 export const JWT_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye cinsinden)
 
-// Token süresi (15 dakika)
-export const TOKEN_EXPIRY_MINUTES = 1
+// Token süreleri
+export const OAUTH_TOKEN_EXPIRY_MINUTES = 60 // OAuth pending user token süresi
+export const EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS = 24 // Email doğrulama token süresi (24 saat)
+export const PASSWORD_RESET_TOKEN_EXPIRY_HOURS = 1 // Şifre sıfırlama token süresi (1 saat)
 
 
+
+// Verification Token Türleri
+export const VERIFICATION_TOKEN_TYPES = {
+  EMAIL_VERIFICATION: 'email_verification',
+  PASSWORD_RESET: 'password_reset',
+} as const
 
 // OAuth Provider'lar
 export const OAUTH_PROVIDERS = {
@@ -41,4 +49,5 @@ export const USER_ROLES = {
 
 // Tip tanımlamaları
 export type OAuthProvider = typeof OAUTH_PROVIDERS[keyof typeof OAUTH_PROVIDERS]
-export type UserRoleType = typeof USER_ROLES[keyof typeof USER_ROLES] 
+export type UserRoleType = typeof USER_ROLES[keyof typeof USER_ROLES]
+export type VerificationTokenType = typeof VERIFICATION_TOKEN_TYPES[keyof typeof VERIFICATION_TOKEN_TYPES] 
