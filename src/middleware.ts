@@ -26,6 +26,11 @@ export default withAuth(
 
     // 2. OAUTH KULLANICILAR - Username setup kontrolü
     if (token && token.oauthToken) {
+      // Mevcut kullanıcı özel durumu - ana sayfaya yönlendir
+      if (token.oauthToken === 'existing_user') {
+        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
+      }
+      
       // OAuth kullanıcısı username setup sayfasında değilse oraya yönlendir
       if (!pathname.startsWith(AUTH_ROUTES.SETUP_USERNAME) && !pathname.startsWith('/api/')) {
         return NextResponse.redirect(new URL(AUTH_ROUTES.SETUP_USERNAME, req.url))

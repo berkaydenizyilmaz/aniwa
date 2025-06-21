@@ -119,6 +119,36 @@ export const authOptions: NextAuthOptions = {
         token.provider = account.provider
       }
 
+      // OAuth token süresi kontrolü - pending user yoksa temizle
+      if (token.oauthToken && token.oauthToken !== 'existing_user') {
+        try {
+          const pendingUser = await prisma.oAuthPendingUser.findUnique({
+            where: { token: token.oauthToken as string }
+          })
+          
+          // Pending user yoksa veya süresi dolmuşsa oauthToken'ı temizle
+          if (!pendingUser || pendingUser.expiresAt < new Date()) {
+            // Süresi dolmuş pending user'ı sil
+            if (pendingUser) {
+              await prisma.oAuthPendingUser.delete({ where: { id: pendingUser.id } })
+            }
+            
+            logWarn(LOG_EVENTS.AUTH_OAUTH_FAILED, 'OAuth token temizlendi - pending user bulunamadı', {
+              tokenPrefix: typeof token.oauthToken === 'string' ? token.oauthToken.substring(0, 8) + '...' : 'unknown'
+            })
+            
+            // JWT'den oauthToken'ı temizle
+            delete token.oauthToken
+          }
+        } catch (error) {
+          // Hata durumunda oauthToken'ı temizle
+          delete token.oauthToken
+          logError(LOG_EVENTS.AUTH_OAUTH_FAILED, 'OAuth token kontrolü hatası', {
+            error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+          })
+        }
+      }
+
       return token
     },
 
