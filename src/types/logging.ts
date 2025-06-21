@@ -60,7 +60,7 @@ export type LogUserSelect = {
   id: true
   username: true
   email: true
-  role: true
+  roles: true
 }
 
 // Log ile kullanıcı bilgilerini birlikte getirmek için tip - Prisma include kullan
@@ -123,12 +123,12 @@ export type LogQueryOptions = Pick<LogFilters, 'limit' | 'offset'> &
 export type AdminLogView = Pick<LogWithUser, 'id' | 'level' | 'event' | 'message' | 'timestamp'> & {
   user?: {
     username: string | null
-    role: UserRole
+    roles: UserRole[]
   } | null
 }
 
 // Log export için tip
 export type LogExport = Omit<LogWithUser, 'user'> & {
   username?: string | null
-  userRole?: UserRole | null
+  userRoles?: UserRole[] | null
 } 

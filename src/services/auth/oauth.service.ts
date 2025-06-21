@@ -141,7 +141,7 @@ export async function verifyOAuthTokenAndCreateUser(
       data: {
         email: pendingUser.email,
         username,
-        role: USER_ROLES.USER,
+        roles: [USER_ROLES.USER],
         image: pendingUser.image,
         emailVerified: new Date() // OAuth kullanıcıları doğrulanmış sayılır
       }
@@ -172,7 +172,7 @@ export async function verifyOAuthTokenAndCreateUser(
         id: user.id,
         email: user.email,
         username: user.username,
-        role: user.role
+        roles: user.roles
       }
     }
   } catch (error) {

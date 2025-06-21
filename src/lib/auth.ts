@@ -71,7 +71,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             username: user.username,
             image: user.image || user.profilePicture,
-            role: user.role,
+            roles: user.roles,
           }
         } catch (error) {
           logError(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Giriş hatası', {
@@ -105,7 +105,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.username = user.username
-        token.role = user.role
+        token.roles = user.roles
         token.image = user.image
         
         // OAuth token'ı varsa ekle
@@ -126,7 +126,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id as string
         session.user.username = token.username as string | null
-        session.user.role = token.role
+        session.user.roles = token.roles
         session.user.provider = token.provider as string
         
         // OAuth token'ı varsa ekle

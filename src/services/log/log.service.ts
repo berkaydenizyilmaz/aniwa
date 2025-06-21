@@ -21,7 +21,7 @@ const USER_SELECT: { select: LogUserSelect } = {
     id: true,
     username: true,
     email: true,
-    role: true,
+    roles: true,
   }
 }
 
@@ -79,7 +79,7 @@ export async function getLogs(filters: LogFilters = {}): Promise<LogServiceRespo
     // Rol bazlı filtreleme
     if (userRoles && userRoles.length > 0) {
       where.user = {
-        role: userRoles.length === 1 ? userRoles[0] : { in: userRoles }
+        roles: { hasSome: userRoles }
       }
     }
     
@@ -235,32 +235,34 @@ export async function getLogStatsByRole(dateRange?: DateRange): Promise<LogServi
       include: {
         user: {
           select: {
-            role: true
+            roles: true
           }
         }
       }
     })
 
-    // Manuel olarak gruplama yap
+    // Manuel olarak gruplama yap - her kullanıcı birden fazla role sahip olabilir
     const roleMap = new Map<UserRole, RoleBasedLogStats>()
 
     logs.forEach(log => {
-      if (!log.user) return
+      if (!log.user || !log.user.roles) return
       
-      const role = log.user.role
       const level = log.level
       
-      if (!roleMap.has(role)) {
-        roleMap.set(role, {
-          role,
-          count: 0,
-          levels: {} as Record<LogLevel, number>
-        })
-      }
-      
-      const roleStat = roleMap.get(role)!
-      roleStat.count += 1
-      roleStat.levels[level] = (roleStat.levels[level] || 0) + 1
+      // Her rol için ayrı ayrı sayım yap
+      log.user.roles.forEach(role => {
+        if (!roleMap.has(role)) {
+          roleMap.set(role, {
+            role,
+            count: 0,
+            levels: {} as Record<LogLevel, number>
+          })
+        }
+        
+        const roleStat = roleMap.get(role)!
+        roleStat.count += 1
+        roleStat.levels[level] = (roleStat.levels[level] || 0) + 1
+      })
     })
 
     return { 

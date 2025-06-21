@@ -56,7 +56,7 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
         email: email.toLowerCase(),
         passwordHash,
         username,
-        role: USER_ROLES.USER,
+        roles: [USER_ROLES.USER],
       }
     })
 
@@ -81,7 +81,7 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
         id: user.id,
         email: user.email,
         username: user.username,
-        role: user.role
+        roles: user.roles
       }
     }
   } catch (error) {

@@ -100,13 +100,18 @@ export function useRole(): RoleHookReturn {
   const { user } = useAuth()
 
   const hasRole = useCallback(
-    (role: UserRole) => user?.role === role,
-    [user?.role]
+    (role: UserRole) => user?.roles?.includes(role) ?? false,
+    [user?.roles]
   )
 
   const hasAnyRole = useCallback(
-    (roles: UserRole[]) => user?.role && roles.includes(user.role),
-    [user?.role]
+    (roles: UserRole[]) => user?.roles ? roles.some(role => user.roles.includes(role)) : false,
+    [user?.roles]
+  )
+
+  const hasAllRoles = useCallback(
+    (roles: UserRole[]) => user?.roles ? roles.every(role => user.roles.includes(role)) : false,
+    [user?.roles]
   )
 
   const isAdmin = useCallback(() => hasRole(USER_ROLES.ADMIN), [hasRole])
@@ -114,9 +119,10 @@ export function useRole(): RoleHookReturn {
   const isEditor = useCallback(() => hasAnyRole([USER_ROLES.ADMIN, USER_ROLES.MODERATOR, USER_ROLES.EDITOR]), [hasAnyRole])
 
   return {
-    role: user?.role,
+    roles: user?.roles,
     hasRole,
     hasAnyRole,
+    hasAllRoles,
     isAdmin,
     isModerator,
     isEditor,
