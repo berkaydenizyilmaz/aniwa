@@ -47,6 +47,20 @@ async function sendEmail(params: SendEmailParams): Promise<AuthApiResponse<{ id:
       html,
     })
 
+    if (result.error) {
+      logError(LOG_EVENTS.API_CALL, 'Resend API hatası', {
+        error: result.error.message,
+        to,
+        subject,
+        provider: 'resend'
+      })
+      
+      return {
+        success: false,
+        error: `Email gönderim hatası: ${result.error.message}`
+      }
+    }
+
     logInfo(LOG_EVENTS.API_CALL, 'Email başarıyla gönderildi', {
       to,
       subject,
