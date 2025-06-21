@@ -1,0 +1,216 @@
+// Aniwa Projesi - NextAuth Konfigürasyonu
+// Bu dosya kimlik doğrulama sistemini yönetir
+
+import { NextAuthOptions } from 'next-auth'
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import GoogleProvider from 'next-auth/providers/google'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import { prisma } from './prisma'
+import { env } from './env'
+import { logInfo, logError, logWarn } from './logger'
+import { LOG_EVENTS } from './constants/logging'
+import bcrypt from 'bcryptjs'
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    // Google OAuth Provider
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID!,
+      clientSecret: env.GOOGLE_CLIENT_SECRET!,
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          username: profile.email.split('@')[0], // Email'den username türet
+          role: 'USER' as const,
+        }
+      },
+    }),
+
+    // Email/Password Provider
+    CredentialsProvider({
+      name: 'credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Eksik kimlik bilgileri')
+          return null
+        }
+
+        try {
+          // Kullanıcıyı email ile bul
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email.toLowerCase() }
+          })
+
+          if (!user || !user.passwordHash) {
+            logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Kullanıcı bulunamadı', {
+              email: credentials.email
+            })
+            return null
+          }
+
+          // Şifre kontrolü
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.passwordHash
+          )
+
+          if (!isPasswordValid) {
+            logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Geçersiz şifre', {
+              userId: user.id,
+              email: credentials.email
+            })
+            return null
+          }
+
+          logInfo(LOG_EVENTS.AUTH_LOGIN_SUCCESS, 'Başarılı giriş', {
+            userId: user.id,
+            email: user.email
+          }, user.id)
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            username: user.username,
+            image: user.image || user.profilePicture,
+            role: user.role,
+          }
+        } catch (error) {
+          logError(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Giriş hatası', {
+            error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+            email: credentials.email
+          })
+          return null
+        }
+      }
+    })
+  ],
+
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 gün
+  },
+
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 gün
+  },
+
+  pages: {
+    signIn: '/auth/signin',
+    error: '/auth/error',
+    verifyRequest: '/auth/verify-request',
+  },
+
+  callbacks: {
+    async jwt({ token, user, account }) {
+      // İlk giriş
+      if (user) {
+        token.id = user.id
+        token.username = user.username
+        token.role = user.role
+        token.image = user.image
+      }
+
+      // OAuth provider bilgilerini ekle
+      if (account) {
+        token.provider = account.provider
+      }
+
+      return token
+    },
+
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string
+        session.user.username = token.username as string | null
+        session.user.role = token.role
+        session.user.provider = token.provider as string
+      }
+
+      return session
+    },
+
+    async signIn({ user, account }) {
+      try {
+        // OAuth ile giriş yapılıyorsa
+        if (account?.provider === 'google') {
+          logInfo(LOG_EVENTS.AUTH_OAUTH_SUCCESS, 'Google OAuth başarılı', {
+            userId: user.id,
+            email: user.email,
+            provider: account.provider
+          })
+        }
+
+        return true
+      } catch (error) {
+        logError(LOG_EVENTS.AUTH_SIGNIN_ERROR, 'SignIn callback hatası', {
+          error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+          userId: user.id,
+          provider: account?.provider
+        })
+        return false
+      }
+    },
+
+    async redirect({ url, baseUrl }) {
+      // Relative URL'leri base URL ile birleştir
+      if (url.startsWith('/')) return `${baseUrl}${url}`
+      // Aynı origin'deyse izin ver
+      else if (new URL(url).origin === baseUrl) return url
+      // Varsayılan olarak base URL'e yönlendir
+      return baseUrl
+    }
+  },
+
+  events: {
+    async signIn({ user, account, isNewUser }) {
+      const eventData = {
+        userId: user.id,
+        email: user.email,
+        provider: account?.provider,
+        isNewUser
+      }
+
+      if (isNewUser) {
+        logInfo(LOG_EVENTS.AUTH_USER_CREATED, 'Yeni kullanıcı oluşturuldu', eventData, user.id)
+        
+        // Yeni kullanıcı için varsayılan ayarları oluştur
+        try {
+          await prisma.userProfileSettings.create({
+            data: {
+              userId: user.id,
+              themePreference: 'system',
+              languagePreference: 'tr'
+            }
+          })
+        } catch (error) {
+          logError(LOG_EVENTS.AUTH_USER_SETTINGS_ERROR, 'Kullanıcı ayarları oluşturulamadı', {
+            ...eventData,
+            error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+          }, user.id)
+        }
+      } else {
+        logInfo(LOG_EVENTS.AUTH_LOGIN_SUCCESS, 'Kullanıcı giriş yaptı', eventData, user.id)
+      }
+    },
+
+    async signOut({ session }) {
+      if (session?.user?.id) {
+        logInfo(LOG_EVENTS.AUTH_LOGOUT_SUCCESS, 'Kullanıcı çıkış yaptı', {
+          userId: session.user.id,
+          email: session.user.email
+        }, session.user.id)
+      }
+    },
+  },
+
+  debug: env.NODE_ENV === 'development',
+} 

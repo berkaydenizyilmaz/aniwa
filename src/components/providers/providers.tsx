@@ -7,6 +7,7 @@ import { type ReactNode, useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Toaster } from "sonner"
 import { ThemeProvider } from "./theme-provider"
+import { SessionProvider } from "./session-provider"
 
 interface ProvidersProps {
   children: ReactNode
@@ -17,22 +18,24 @@ export function Providers({ children }: ProvidersProps) {
   const [queryClient] = useState(() => new QueryClient())
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      >
-        {children}
-        
-        {/* Toast Notifications */}
-        <Toaster 
-          position="bottom-right"
-          richColors
-          closeButton
-        />
-      </ThemeProvider>
-    </QueryClientProvider>
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          
+          {/* Toast Notifications */}
+          <Toaster 
+            position="bottom-right"
+            richColors
+            closeButton
+          />
+        </ThemeProvider>
+      </QueryClientProvider>
+    </SessionProvider>
   )
 } 
