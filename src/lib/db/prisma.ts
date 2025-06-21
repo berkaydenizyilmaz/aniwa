@@ -2,7 +2,7 @@
 // Bu dosya Prisma client'ı optimize eder ve global instance yönetir
 
 import { PrismaClient } from '@prisma/client'
-import { env } from './env'
+import { env } from '@/lib/env'
 
 // Global Prisma instance için tip tanımı
 declare global {
