@@ -22,10 +22,21 @@ export default function SignupPage() {
 
   // Form değişikliklerini handle et
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }))
+    const { name, value } = e.target
+    
+    // Username için özel sanitization
+    if (name === 'username') {
+      const sanitizedValue = value.toLowerCase().replace(/[^a-z0-9_]/g, '')
+      setFormData(prev => ({
+        ...prev,
+        [name]: sanitizedValue
+      }))
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }))
+    }
   }
 
   // Email/Password ile kayıt

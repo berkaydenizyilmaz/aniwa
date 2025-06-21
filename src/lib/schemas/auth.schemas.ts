@@ -8,8 +8,6 @@ import {
   PASSWORD_MAX_LENGTH,
   USERNAME_MIN_LENGTH,
   USERNAME_MAX_LENGTH,
-  NAME_MIN_LENGTH,
-  NAME_MAX_LENGTH,
   BIO_MAX_LENGTH,
   TOKEN_MIN_LENGTH,
   EMAIL_MIN_LENGTH,
@@ -42,12 +40,7 @@ export const passwordSchema = z
   .min(PASSWORD_MIN_LENGTH, `Şifre en az ${PASSWORD_MIN_LENGTH} karakter olmalıdır`)
   .max(PASSWORD_MAX_LENGTH, `Şifre en fazla ${PASSWORD_MAX_LENGTH} karakter olmalıdır`)
 
-// Name şeması
-export const nameSchema = z
-  .string()
-  .min(NAME_MIN_LENGTH, `İsim en az ${NAME_MIN_LENGTH} karakter olmalıdır`)
-  .max(NAME_MAX_LENGTH, `İsim en fazla ${NAME_MAX_LENGTH} karakter olmalıdır`)
-  .trim()
+
 
 // Bio şeması
 export const bioSchema = z
