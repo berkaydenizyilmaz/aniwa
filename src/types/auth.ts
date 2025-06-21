@@ -40,10 +40,10 @@ export interface AuthApiResponse<T = unknown> {
 }
 
 // Login response tipi - User'dan sadece gerekli alanları al
-export type LoginResponse = Pick<User, 'id' | 'email' | 'username' | 'role'>
+export type LoginResponse = Pick<User, 'id' | 'email' | 'username' | 'roles'>
 
 // Session user tipi (NextAuth ile uyumlu) - User'dan türet
-export type SessionUser = Pick<User, 'id' | 'role'> & {
+export type SessionUser = Pick<User, 'id' | 'roles'> & {
   email?: string | null
   name?: string | null
   image?: string | null
@@ -53,7 +53,7 @@ export type SessionUser = Pick<User, 'id' | 'role'> & {
 }
 
 // Kullanıcı listesi için sadece gerekli alanlar
-export type UserListItem = Pick<User, 'id' | 'username' | 'email' | 'role' | 'createdAt'>
+export type UserListItem = Pick<User, 'id' | 'username' | 'email' | 'roles' | 'createdAt'>
 
 // Kullanıcı profil sayfası için gerekli alanlar
 export type UserProfile = Omit<User, 'passwordHash' | 'emailVerified'> & {
@@ -64,7 +64,7 @@ export type UserProfile = Omit<User, 'passwordHash' | 'emailVerified'> & {
 }
 
 // Admin paneli için kullanıcı yönetimi
-export type AdminUserView = Pick<User, 'id' | 'username' | 'email' | 'role' | 'createdAt' | 'updatedAt'>
+export type AdminUserView = Pick<User, 'id' | 'username' | 'email' | 'roles' | 'createdAt' | 'updatedAt'>
 
 // Kullanıcı arama sonuçları için minimal bilgi
 export type UserSearchResult = Pick<User, 'id' | 'username' | 'profilePicture'>
@@ -103,9 +103,10 @@ export interface AuthHookReturn {
 }
 
 export interface RoleHookReturn {
-  role: UserRole | undefined
+  roles: UserRole[] | undefined
   hasRole: (role: UserRole) => boolean
   hasAnyRole: (roles: UserRole[]) => boolean | undefined
+  hasAllRoles: (roles: UserRole[]) => boolean | undefined
   isAdmin: () => boolean | undefined
   isModerator: () => boolean | undefined
   isEditor: () => boolean | undefined

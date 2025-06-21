@@ -39,25 +39,23 @@ export default withAuth(
       }
     }
 
-    // 4. ADMIN SAYFALARI - Sadece ADMIN rolü
+    // 4. ADMIN SAYFALARI - ADMIN rolü gerekli
     if (pathname.startsWith(PROTECTED_ROUTE_PATTERNS.ADMIN)) {
-      if (!token || token.role !== USER_ROLES.ADMIN) {
+      if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.ADMIN)) {
         return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
       }
     }
 
-    // 5. MODERATOR SAYFALARI - ADMIN ve MODERATOR rolleri
+    // 5. MODERATOR SAYFALARI - MODERATOR rolü gerekli
     if (pathname.startsWith(PROTECTED_ROUTE_PATTERNS.MODERATOR)) {
-      const allowedRoles = [USER_ROLES.ADMIN, USER_ROLES.MODERATOR] as UserRole[]
-      if (!token || !allowedRoles.includes(token.role)) {
+      if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.MODERATOR)) {
         return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
       }
     }
 
-    // 6. EDITOR SAYFALARI - ADMIN, EDITOR rolleri
+    // 6. EDITOR SAYFALARI - EDITOR rolü gerekli
     if (pathname.startsWith(PROTECTED_ROUTE_PATTERNS.EDITOR)) {
-      const allowedRoles = [USER_ROLES.ADMIN, USER_ROLES.EDITOR] as UserRole[]
-      if (!token || !allowedRoles.includes(token.role)) {
+      if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.EDITOR)) {
         return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
       }
     }
