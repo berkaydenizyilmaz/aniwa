@@ -6,8 +6,22 @@ import type {
   LogServiceResponse, 
   LogWithUser, 
   LogListResponse,
-  RoleBasedLogStats
+  RoleBasedLogStats,
+  LogUserSelect,
+  LogStats,
+  CleanupResult,
+  DateRange
 } from '@/types/logging'
+
+// User select sabitini kullan - DRY prensibi
+const USER_SELECT: { select: LogUserSelect } = {
+  select: {
+    id: true,
+    username: true,
+    email: true,
+    role: true,
+  }
+}
 
 /**
  * Yeni log kaydı oluşturur
@@ -23,14 +37,7 @@ export async function createLog(params: CreateLogParams): Promise<LogServiceResp
         userId: params.userId,
       },
       include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-            role: true,
-          },
-        },
+        user: USER_SELECT,
       },
     })
 
@@ -44,54 +51,47 @@ export async function createLog(params: CreateLogParams): Promise<LogServiceResp
   }
 }
 
-  /**
-   * Logları filtreler ve listeler
-   */
-  export async function getLogs(filters: LogFilters = {}): Promise<LogServiceResponse<LogListResponse>> {
-    try {
-      const {
-        level,
-        event,
-        userId,
-        userRoles,
-        startDate,
-        endDate,
-        limit = 50,
-        offset = 0,
-      } = filters
+/**
+ * Logları filtreler ve listeler
+ */
+export async function getLogs(filters: LogFilters = {}): Promise<LogServiceResponse<LogListResponse>> {
+  try {
+    const {
+      level,
+      event,
+      userId,
+      userRoles,
+      startDate,
+      endDate,
+      limit = 50,
+      offset = 0,
+    } = filters
 
-      // Filtreleme koşullarını oluştur
-      const where: Prisma.LogWhereInput = {}
+    // Filtreleme koşullarını oluştur
+    const where: Prisma.LogWhereInput = {}
 
-      if (level) where.level = level
-      if (event) where.event = { contains: event, mode: 'insensitive' }
-      if (userId) where.userId = userId
-      
-      // Rol bazlı filtreleme
-      if (userRoles && userRoles.length > 0) {
-        where.user = {
-          role: userRoles.length === 1 ? userRoles[0] : { in: userRoles }
-        }
+    if (level) where.level = level
+    if (event) where.event = { contains: event, mode: 'insensitive' }
+    if (userId) where.userId = userId
+    
+    // Rol bazlı filtreleme
+    if (userRoles && userRoles.length > 0) {
+      where.user = {
+        role: userRoles.length === 1 ? userRoles[0] : { in: userRoles }
       }
-      
-      if (startDate || endDate) {
-        where.timestamp = {}
-        if (startDate) where.timestamp.gte = startDate
-        if (endDate) where.timestamp.lte = endDate
-      }
+    }
+    
+    if (startDate || endDate) {
+      where.timestamp = {}
+      if (startDate) where.timestamp.gte = startDate
+      if (endDate) where.timestamp.lte = endDate
+    }
 
     const [logs, total] = await Promise.all([
       prisma.log.findMany({
         where,
         include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              email: true,
-              role: true,
-            },
-          },
+          user: USER_SELECT,
         },
         orderBy: { timestamp: 'desc' },
         take: limit,
@@ -129,14 +129,7 @@ export async function getLogById(id: string): Promise<LogServiceResponse<LogWith
     const log = await prisma.log.findUnique({
       where: { id },
       include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-            role: true,
-          },
-        },
+        user: USER_SELECT,
       },
     })
 
@@ -157,7 +150,7 @@ export async function getLogById(id: string): Promise<LogServiceResponse<LogWith
 /**
  * Belirli tarihten eski logları siler (temizlik için)
  */
-export async function cleanOldLogs(olderThanDays: number = 30): Promise<LogServiceResponse<{ deletedCount: number }>> {
+export async function cleanOldLogs(olderThanDays: number = 30): Promise<LogServiceResponse<CleanupResult>> {
   try {
     const cutoffDate = new Date()
     cutoffDate.setDate(cutoffDate.getDate() - olderThanDays)
@@ -186,17 +179,14 @@ export async function cleanOldLogs(olderThanDays: number = 30): Promise<LogServi
 /**
  * Log seviyelerine göre istatistik getirir
  */
-export async function getLogStats(
-  startDate?: Date, 
-  endDate?: Date
-): Promise<LogServiceResponse<Record<LogLevel, number>>> {
+export async function getLogStats(dateRange?: DateRange): Promise<LogServiceResponse<LogStats>> {
   try {
     const where: Prisma.LogWhereInput = {}
     
-    if (startDate || endDate) {
+    if (dateRange?.startDate || dateRange?.endDate) {
       where.timestamp = {}
-      if (startDate) where.timestamp.gte = startDate
-      if (endDate) where.timestamp.lte = endDate
+      if (dateRange.startDate) where.timestamp.gte = dateRange.startDate
+      if (dateRange.endDate) where.timestamp.lte = dateRange.endDate
     }
 
     const stats = await prisma.log.groupBy({
@@ -210,7 +200,7 @@ export async function getLogStats(
     const formattedStats = stats.reduce((acc, stat) => {
       acc[stat.level] = stat._count.level
       return acc
-    }, {} as Record<LogLevel, number>)
+    }, {} as LogStats)
 
     return { success: true, data: formattedStats }
   } catch (error) {
@@ -225,19 +215,16 @@ export async function getLogStats(
 /**
  * Rol bazlı log istatistikleri getirir
  */
-export async function getLogStatsByRole(
-  startDate?: Date, 
-  endDate?: Date
-): Promise<LogServiceResponse<RoleBasedLogStats[]>> {
+export async function getLogStatsByRole(dateRange?: DateRange): Promise<LogServiceResponse<RoleBasedLogStats[]>> {
   try {
     const where: Prisma.LogWhereInput = {
       user: { isNot: null } // Sadece kullanıcı logları
     }
     
-    if (startDate || endDate) {
+    if (dateRange?.startDate || dateRange?.endDate) {
       where.timestamp = {}
-      if (startDate) where.timestamp.gte = startDate
-      if (endDate) where.timestamp.lte = endDate
+      if (dateRange.startDate) where.timestamp.gte = dateRange.startDate
+      if (dateRange.endDate) where.timestamp.lte = dateRange.endDate
     }
 
     // Tüm logları user ile birlikte getir
@@ -287,15 +274,15 @@ export async function getLogStatsByRole(
   }
 }
 
-// Hızlı kullanım için yardımcı fonksiyonlar
-export const logError = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string) =>
+// Hızlı kullanım için yardımcı fonksiyonlar - tip güvenli
+export const logError = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
   createLog({ level: 'ERROR', event, message, metadata, userId })
 
-export const logWarn = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string) =>
+export const logWarn = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
   createLog({ level: 'WARN', event, message, metadata, userId })
 
-export const logInfo = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string) =>
+export const logInfo = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
   createLog({ level: 'INFO', event, message, metadata, userId })
 
-export const logDebug = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string) =>
+export const logDebug = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
   createLog({ level: 'DEBUG', event, message, metadata, userId })

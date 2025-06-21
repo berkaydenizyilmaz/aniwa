@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Aniwa",
-  description: " - Anime Takip Platformu",
+  description: "Anime serilerini tek başlık altında takip edin. Topluluk ile paylaşın ve tartışın.",
 };
 
 export default function RootLayout({

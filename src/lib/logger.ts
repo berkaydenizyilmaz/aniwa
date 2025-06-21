@@ -3,6 +3,7 @@ import { createLog } from '@/services/db/log.service'
 import type { LogLevel } from '@prisma/client'
 import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS } from '@/lib/constants/logging'
 import type { LogMetadata, PerformanceMetadata, AuthMetadata } from '@/types/logging'
+import { Prisma } from '@prisma/client'
 
 /**
  * Environment'a göre log level'ı belirle
@@ -54,7 +55,7 @@ export const logToDatabase = async (
       level,
       event,
       message,
-      metadata: metadata || null,
+      metadata: metadata as Prisma.JsonValue || null,
       userId: userId || undefined,
     })
   } catch (error) {

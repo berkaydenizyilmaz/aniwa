@@ -2,15 +2,16 @@
  * Logging ile ilgili sabitler
  */
 
-// Log seviyeleri
+// Log seviyeleri - Prisma enum ile tutarlı
 export const LOG_LEVELS = {
-  TRACE: 'trace',
-  DEBUG: 'debug', 
-  INFO: 'info',
-  WARN: 'warn',
-  ERROR: 'error',
-  FATAL: 'fatal',
+  DEBUG: 'DEBUG',
+  INFO: 'INFO',
+  WARN: 'WARN',
+  ERROR: 'ERROR',
 } as const
+
+// Log levels tipini export et
+export type LogLevelType = typeof LOG_LEVELS[keyof typeof LOG_LEVELS]
 
 // Hassas veriler - redaction için
 export const SENSITIVE_FIELDS = [
@@ -26,6 +27,9 @@ export const SENSITIVE_FIELDS = [
   'req.headers.authorization',
   'req.headers.cookie',
 ] as const
+
+// Sensitive fields tipini export et
+export type SensitiveField = typeof SENSITIVE_FIELDS[number]
 
 // Log event türleri
 export const LOG_EVENTS = {
@@ -50,9 +54,22 @@ export const LOG_EVENTS = {
   AUTH_SESSION_ERROR: 'auth_session_error',
 } as const
 
+// Log events tipini export et
+export type LogEventType = typeof LOG_EVENTS[keyof typeof LOG_EVENTS]
+
 // Performance eşikleri (ms)
 export const PERFORMANCE_THRESHOLDS = {
   SLOW_OPERATION: 1000,
   VERY_SLOW_OPERATION: 5000,
   CRITICAL_OPERATION: 10000,
+} as const
+
+// Performance threshold tipini export et
+export type PerformanceThreshold = typeof PERFORMANCE_THRESHOLDS[keyof typeof PERFORMANCE_THRESHOLDS]
+
+// HTTP status code kategorileri
+export const HTTP_STATUS_CATEGORIES = {
+  SUCCESS: [200, 201, 202, 204],
+  CLIENT_ERROR: [400, 401, 403, 404, 422],
+  SERVER_ERROR: [500, 502, 503, 504],
 } as const 

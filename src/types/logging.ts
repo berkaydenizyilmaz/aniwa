@@ -36,17 +36,17 @@ export type CreateLogParams = Pick<Prisma.LogCreateInput, 'level' | 'event' | 'm
   userId?: string
 }
 
-// Log filtreleme parametreleri
-export interface LogFilters {
-  level?: LogLevel
-  event?: string
-  userId?: string
-  userRoles?: UserRole[]
-  startDate?: Date
-  endDate?: Date
-  limit?: number
-  offset?: number
-}
+// Log filtreleme parametreleri - Partial kullanarak opsiyonel hale getir
+export type LogFilters = Partial<{
+  level: LogLevel
+  event: string
+  userId: string
+  userRoles: UserRole[]
+  startDate: Date
+  endDate: Date
+  limit: number
+  offset: number
+}>
 
 // Log servisi yanıtları
 export interface LogServiceResponse<T = unknown> {
@@ -55,32 +55,41 @@ export interface LogServiceResponse<T = unknown> {
   error?: string
 }
 
+// User select için sabit tip - DRY prensibi
+export type LogUserSelect = {
+  id: true
+  username: true
+  email: true
+  role: true
+}
+
 // Log ile kullanıcı bilgilerini birlikte getirmek için tip - Prisma include kullan
 export type LogWithUser = Prisma.LogGetPayload<{
   include: {
     user: {
-      select: {
-        id: true
-        username: true
-        email: true
-        role: true
-      }
+      select: LogUserSelect
     }
   }
 }>
 
+// Sadece log bilgisi (user olmadan)
+export type LogOnly = Omit<LogWithUser, 'user'>
+
 // Log listesi için tip
 export interface LogListResponse {
   logs: LogWithUser[]
-  pagination: {
-    total: number
-    limit: number
-    offset: number
-    hasMore: boolean
-  }
+  pagination: PaginationInfo
 }
 
-// Rol bazlı log filtreleme için örnek kullanım tipleri
+// Pagination bilgisi için ayrı tip
+export type PaginationInfo = {
+  total: number
+  limit: number
+  offset: number
+  hasMore: boolean
+}
+
+// Rol bazlı log filtreleme için örnek kullanım tipleri - Union types kullan
 export type RoleBasedLogFilters = {
   // Tek rol filtreleme
   adminLogs: LogFilters & { userRoles: ['ADMIN'] }
@@ -96,4 +105,37 @@ export interface RoleBasedLogStats {
   role: UserRole
   count: number
   levels: Record<LogLevel, number>
+}
+
+// Log istatistikleri için tip - Utility types kullan
+export type LogStats = Record<LogLevel, number>
+
+// Log temizleme sonucu için tip
+export type CleanupResult = {
+  deletedCount: number
+}
+
+// Date range için tip
+export type DateRange = {
+  startDate?: Date
+  endDate?: Date
+}
+
+// Log query options - Pick ve Partial kombinasyonu
+export type LogQueryOptions = Pick<LogFilters, 'limit' | 'offset'> & 
+  Partial<Pick<LogFilters, 'level' | 'event' | 'userId' | 'userRoles'>> & 
+  DateRange
+
+// Admin log view için tip - sadece gerekli alanlar
+export type AdminLogView = Pick<LogWithUser, 'id' | 'level' | 'event' | 'message' | 'timestamp'> & {
+  user?: {
+    username: string | null
+    role: UserRole
+  } | null
+}
+
+// Log export için tip
+export type LogExport = Omit<LogWithUser, 'user'> & {
+  username?: string | null
+  userRole?: UserRole | null
 } 
