@@ -6,7 +6,6 @@ import { logInfo, logError, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import { USER_ROLES } from '@/lib/constants/auth'
 import { DEFAULT_THEME, DEFAULT_LANGUAGE } from '@/lib/constants/app'
-import crypto from 'crypto'
 import type { 
   CreateOAuthPendingUserParams, 
   OAuthTokenVerificationParams,
@@ -44,7 +43,9 @@ export async function createOAuthPendingUser(
     }
 
     // Benzersiz token oluştur
-    const token = crypto.randomBytes(32).toString('hex')
+    const tokenBytes = new Uint8Array(32)
+    crypto.getRandomValues(tokenBytes)
+    const token = Array.from(tokenBytes, byte => byte.toString(16).padStart(2, '0')).join('')
     const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000)
 
     // Mevcut pending user'ı temizle
