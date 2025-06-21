@@ -1,3 +1,5 @@
+import { Prisma, LogLevel, UserRole } from '@prisma/client'
+
 /**
  * Logging ile ilgili tip tanımları
  */
@@ -27,4 +29,78 @@ export interface PerformanceMetadata extends LogMetadata {
 export interface AuthMetadata extends LogMetadata {
   action: string
   success: boolean
+}
+
+// Log servisi için parametreler
+export interface CreateLogParams {
+  level: LogLevel
+  event: string
+  message: string
+  metadata?: Prisma.JsonValue
+  userId?: string
+}
+
+// Log filtreleme parametreleri
+export interface LogFilters {
+  level?: LogLevel
+  event?: string
+  userId?: string
+  userRoles?: UserRole[]
+  startDate?: Date
+  endDate?: Date
+  limit?: number
+  offset?: number
+}
+
+// Log servisi yanıtları
+export interface LogServiceResponse<T = unknown> {
+  success: boolean
+  data?: T
+  error?: string
+}
+
+// Log ile kullanıcı bilgilerini birlikte getirmek için tip
+export interface LogWithUser {
+  id: string
+  level: LogLevel
+  event: string
+  message: string
+  metadata: Prisma.JsonValue | null
+  timestamp: Date
+  userId: string | null
+  user?: {
+    id: string
+    username: string | null
+    email: string
+    role: UserRole
+  } | null
+}
+
+// Log listesi için tip
+export interface LogListResponse {
+  logs: LogWithUser[]
+  pagination: {
+    total: number
+    limit: number
+    offset: number
+    hasMore: boolean
+  }
+}
+
+// Rol bazlı log filtreleme için örnek kullanım tipleri
+export type RoleBasedLogFilters = {
+  // Tek rol filtreleme
+  adminLogs: LogFilters & { userRoles: ['ADMIN'] }
+  moderatorLogs: LogFilters & { userRoles: ['MODERATOR'] }
+  
+  // Çoklu rol filtreleme
+  staffLogs: LogFilters & { userRoles: ['ADMIN', 'MODERATOR', 'EDITOR'] }
+  nonUserLogs: LogFilters & { userRoles: ['ADMIN', 'MODERATOR'] }
+}
+
+// Rol bazlı istatistikler için tip
+export interface RoleBasedLogStats {
+  role: UserRole
+  count: number
+  levels: Record<LogLevel, number>
 } 
