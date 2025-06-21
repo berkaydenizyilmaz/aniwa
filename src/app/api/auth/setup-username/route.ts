@@ -5,8 +5,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { usernameSchema } from '@/lib/schemas/auth.schemas'
-import { prisma } from '@/lib/prisma'
-import { logInfo, logError } from '@/lib/logger'
+import { verifyOAuthTokenAndCreateUser } from '@/services/auth/oauth.service'
+import { logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 
 export async function POST(request: NextRequest) {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     // Session kontrolü
     const session = await getServerSession(authOptions)
     
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json(
         { success: false, error: 'Giriş yapmanız gerekli' },
         { status: 401 }
@@ -36,59 +36,33 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Kullanıcıyı session'dan al
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id }
-    })
+    // OAuth token'ı al
+    const oauthToken = session.user.oauthToken
 
-    if (!user) {
+    if (!oauthToken) {
       return NextResponse.json(
-        { success: false, error: 'Kullanıcı bulunamadı' },
-        { status: 404 }
-      )
-    }
-
-    // Eğer kullanıcının zaten username'i varsa
-    if (user.username) {
-      return NextResponse.json(
-        { success: false, error: 'Kullanıcının zaten username\'i var' },
+        { success: false, error: 'OAuth token bulunamadı' },
         { status: 400 }
       )
     }
 
-    // Username'in kullanımda olup olmadığını kontrol et
-    const existingUsername = await prisma.user.findUnique({
-      where: { username: usernameValidation.data }
-    })
-
-    if (existingUsername) {
-      return NextResponse.json(
-        { success: false, error: 'Bu kullanıcı adı zaten kullanımda' },
-        { status: 400 }
-      )
-    }
-
-    // Username'i güncelle
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data: { username: usernameValidation.data }
-    })
-
-    logInfo(LOG_EVENTS.AUTH_USER_CREATED, 'OAuth kullanıcısı username seçti', {
-      userId: user.id,
-      email: user.email,
+    // Token ile kullanıcı oluştur
+    const result = await verifyOAuthTokenAndCreateUser({
+      token: oauthToken,
       username: usernameValidation.data
-    }, user.id)
+    })
+
+    if (!result.success) {
+      return NextResponse.json(
+        { success: false, error: result.error },
+        { status: 400 }
+      )
+    }
 
     return NextResponse.json({
       success: true,
-      message: 'Username başarıyla ayarlandı',
-      data: {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        username: updatedUser.username,
-        role: updatedUser.role
-      }
+      message: 'Hesabınız başarıyla oluşturuldu',
+      data: result.data
     })
 
   } catch (error) {

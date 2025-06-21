@@ -33,17 +33,17 @@ export default withAuth(
       }
     }
 
-    // Username setup kontrolü - OAuth sonrası
-    if (pathname.startsWith(AUTH_ROUTES.SETUP_USERNAME)) {
-      // Setup sayfasına erişim için login gerekli ama username olmamalı
-      if (!token || token.username) {
-        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
-      }
+    // OAuth token kontrolü - OAuth sonrası username seçimi gerekiyor
+    if (token && token.oauthToken && !pathname.startsWith(AUTH_ROUTES.SETUP_USERNAME) && !pathname.startsWith('/api/')) {
+      return NextResponse.redirect(new URL(AUTH_ROUTES.SETUP_USERNAME, req.url))
     }
 
-    // Username eksik kullanıcıları setup sayfasına yönlendir
-    if (token && !token.username && !pathname.startsWith(AUTH_ROUTES.SETUP_USERNAME) && !pathname.startsWith('/api/')) {
-      return NextResponse.redirect(new URL(AUTH_ROUTES.SETUP_USERNAME, req.url))
+    // Username setup kontrolü - OAuth token'ı olan kullanıcılar için
+    if (pathname.startsWith(AUTH_ROUTES.SETUP_USERNAME)) {
+      // Setup sayfasına erişim için OAuth token gerekli
+      if (!token || !token.oauthToken) {
+        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
+      }
     }
 
     return NextResponse.next()

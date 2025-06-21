@@ -71,6 +71,20 @@ export type UserSearchResult = Pick<User, 'id' | 'username' | 'profilePicture'>
 // Güvenli kullanıcı tipi - hassas bilgiler hariç
 export type SafeUser = Omit<User, 'passwordHash' | 'emailVerified'>
 
+// OAuth geçici kullanıcı tipleri
+export interface CreateOAuthPendingUserParams {
+  email: string
+  provider: string
+  providerId: string
+  name?: string
+  image?: string
+}
+
+export interface OAuthTokenVerificationParams {
+  token: string
+  username: string
+}
+
 // ---- Hook dönüş tipleri ----
 export interface AuthHookReturn {
   // Session bilgileri

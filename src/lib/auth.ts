@@ -10,8 +10,8 @@ import { env } from './env'
 import { logInfo, logError, logWarn } from './logger'
 import { LOG_EVENTS } from './constants/logging'
 import { SESSION_MAX_AGE, JWT_MAX_AGE, OAUTH_PROVIDERS } from './constants/auth'
-import { DEFAULT_THEME, DEFAULT_LANGUAGE } from './constants/app'
 import { AUTH_ROUTES } from './constants/routes'
+import { createOAuthPendingUser } from '@/services/auth/oauth.service'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
@@ -21,16 +21,6 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID!,
       clientSecret: env.GOOGLE_CLIENT_SECRET!,
-      profile(profile) {
-        return {
-          id: profile.sub,
-          email: profile.email,
-          image: profile.picture,
-          // Username'i null bırak - sonradan seçtirilecek
-          username: null,
-          role: 'USER' as const,
-        }
-      },
     }),
 
     // Email/Password Provider
@@ -119,6 +109,11 @@ export const authOptions: NextAuthOptions = {
         token.username = user.username
         token.role = user.role
         token.image = user.image
+        
+        // OAuth token'ı varsa ekle
+        if (user.oauthToken) {
+          token.oauthToken = user.oauthToken
+        }
       }
 
       // OAuth provider bilgilerini ekle
@@ -135,30 +130,45 @@ export const authOptions: NextAuthOptions = {
         session.user.username = token.username as string | null
         session.user.role = token.role
         session.user.provider = token.provider as string
+        
+        // OAuth token'ı varsa ekle
+        if (token.oauthToken) {
+          session.user.oauthToken = token.oauthToken
+        }
       }
 
       return session
     },
 
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       try {
         // OAuth ile giriş yapılıyorsa
-        if (account?.provider === OAUTH_PROVIDERS.GOOGLE) {
-          // Mevcut kullanıcıyı kontrol et
-          const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! }
-          })
+        if (account?.provider === OAUTH_PROVIDERS.GOOGLE && profile) {
+          // Geçici kullanıcı oluştur veya mevcut kullanıcıyı kontrol et
+                     const result = await createOAuthPendingUser({
+             email: user.email!,
+             provider: account.provider,
+             providerId: account.providerAccountId,
+             name: profile.name,
+             image: profile.picture
+           })
 
-          // Eğer kullanıcı var ama username'i yoksa, username seçim sayfasına yönlendir
-          if (existingUser && !existingUser.username) {
-            // URL'de username seçim gerektiğini belirt
-            return `${AUTH_ROUTES.SETUP_USERNAME}?email=${encodeURIComponent(user.email!)}`
+          if (!result.success) {
+            logError(LOG_EVENTS.AUTH_OAUTH_FAILED, 'OAuth geçici kullanıcı oluşturulamadı', {
+              email: user.email,
+              provider: account.provider,
+              error: result.error
+            })
+            return false
           }
 
+          // Token'ı user objesine ekle (username seçimi için)
+          user.oauthToken = result.data!.token
+
           logInfo(LOG_EVENTS.AUTH_OAUTH_SUCCESS, 'Google OAuth başarılı', {
-            userId: user.id,
             email: user.email,
-            provider: account.provider
+            provider: account.provider,
+            hasToken: !!result.data?.token
           })
         }
 
@@ -174,6 +184,13 @@ export const authOptions: NextAuthOptions = {
     },
 
     async redirect({ url, baseUrl }) {
+      // OAuth sonrası username seçim kontrolü
+      if (url === baseUrl || url === `${baseUrl}/`) {
+        // Ana sayfaya yönlendiriliyorsa, session'ı kontrol et
+        // Bu kısım client-side'da yapılacak
+        return baseUrl
+      }
+
       // Relative URL'leri base URL ile birleştir
       if (url.startsWith('/')) return `${baseUrl}${url}`
       // Aynı origin'deyse izin ver
@@ -184,37 +201,6 @@ export const authOptions: NextAuthOptions = {
   },
 
   events: {
-    async signIn({ user, account, isNewUser }) {
-      const eventData = {
-        userId: user.id,
-        email: user.email,
-        provider: account?.provider,
-        isNewUser
-      }
-
-      if (isNewUser) {
-        logInfo(LOG_EVENTS.AUTH_USER_CREATED, 'Yeni kullanıcı oluşturuldu', eventData, user.id)
-        
-        // Yeni kullanıcı için varsayılan ayarları oluştur
-        try {
-          await prisma.userProfileSettings.create({
-            data: {
-              userId: user.id,
-              themePreference: DEFAULT_THEME,
-              languagePreference: DEFAULT_LANGUAGE
-            }
-          })
-        } catch (error) {
-          logError(LOG_EVENTS.AUTH_USER_SETTINGS_ERROR, 'Kullanıcı ayarları oluşturulamadı', {
-            ...eventData,
-            error: error instanceof Error ? error.message : 'Bilinmeyen hata'
-          }, user.id)
-        }
-      } else {
-        logInfo(LOG_EVENTS.AUTH_LOGIN_SUCCESS, 'Kullanıcı giriş yaptı', eventData, user.id)
-      }
-    },
-
     async signOut({ session }) {
       if (session?.user?.id) {
         logInfo(LOG_EVENTS.AUTH_LOGOUT_SUCCESS, 'Kullanıcı çıkış yaptı', {

@@ -64,8 +64,12 @@ export function useAuth(): AuthHookReturn {
 
     // Modern NextAuth session güncelleme
     await update({
-      username: result.data.username
+      username: result.data.username,
+      id: result.data.id
     })
+    
+    // Session güncellemesinin tamamlanmasını bekle
+    await new Promise(resolve => setTimeout(resolve, 100))
     
     // Ana sayfaya yönlendir
     router.push(PUBLIC_ROUTES.HOME)

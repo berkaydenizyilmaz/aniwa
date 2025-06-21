@@ -75,7 +75,7 @@ export default function SignupPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Kayıt işlemi başarısız')
+        throw new Error(data.error || data.message || 'Kayıt işlemi başarısız')
       }
 
       setSuccess('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...')

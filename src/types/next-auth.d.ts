@@ -14,6 +14,7 @@ declare module 'next-auth' {
       username?: string | null
       role: UserRole
       provider?: string
+      oauthToken?: string
     } & DefaultSession['user']
   }
 
@@ -23,6 +24,14 @@ declare module 'next-auth' {
   interface User extends DefaultUser {
     username?: string | null
     role: UserRole
+    oauthToken?: string
+  }
+
+  /**
+   * Profile interface'ini genişlet (Google OAuth için)
+   */
+  interface Profile {
+    picture?: string
   }
 }
 
@@ -35,5 +44,6 @@ declare module 'next-auth/jwt' {
     username?: string | null
     role: UserRole
     provider?: string
+    oauthToken?: string
   }
 } 

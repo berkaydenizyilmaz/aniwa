@@ -1,10 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { PUBLIC_ROUTES, API_ROUTES } from '@/lib/constants/routes'
+import { useAuth } from '@/hooks/use-auth'
 
 export default function SetupUsernamePage() {
   const [username, setUsername] = useState('')
@@ -12,25 +10,7 @@ export default function SetupUsernamePage() {
   const [error, setError] = useState('')
   const [isChecking, setIsChecking] = useState(false)
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null)
-  const { data: session, status } = useSession()
-  const router = useRouter()
-
-  // Session kontrolü
-  useEffect(() => {
-    if (status === 'loading') return
-
-    // Giriş yapmamışsa ana sayfaya yönlendir
-    if (!session) {
-      router.push(PUBLIC_ROUTES.HOME)
-      return
-    }
-
-    // Zaten username'i varsa ana sayfaya yönlendir
-    if (session.user?.username) {
-      router.push(PUBLIC_ROUTES.HOME)
-      return
-    }
-  }, [session, status, router])
+  const { user, isLoading: authLoading, setupUsername } = useAuth()
 
   // Username kullanılabilirlik kontrolü (debounced)
   useEffect(() => {
@@ -74,23 +54,8 @@ export default function SetupUsernamePage() {
     setError('')
 
     try {
-      const response = await fetch(API_ROUTES.AUTH.SETUP_USERNAME, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Username kaydedilemedi')
-      }
-
-      // Başarılı, ana sayfaya yönlendir
-      router.push(PUBLIC_ROUTES.HOME)
-      
+      await setupUsername(username)
+      // setupUsername hook'u zaten ana sayfaya yönlendirir
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Bir hata oluştu')
       console.error('Setup username error:', err)
@@ -107,7 +72,7 @@ export default function SetupUsernamePage() {
   }
 
   // Loading durumu
-  if (status === 'loading') {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -128,9 +93,9 @@ export default function SetupUsernamePage() {
           <p className="mt-2 text-center text-sm text-gray-600">
             Hesabını tamamlamak için bir kullanıcı adı seç
           </p>
-          {session?.user?.email && (
+          {user?.email && (
             <p className="mt-2 text-center text-sm text-gray-500">
-              Email: {session.user.email}
+              Email: {user.email}
             </p>
           )}
         </div>
