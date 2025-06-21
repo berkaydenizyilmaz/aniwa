@@ -24,7 +24,6 @@ export const authOptions: NextAuthOptions = {
       profile(profile) {
         return {
           id: profile.sub,
-          name: profile.name,
           email: profile.email,
           image: profile.picture,
           // Username'i null bırak - sonradan seçtirilecek
@@ -82,7 +81,6 @@ export const authOptions: NextAuthOptions = {
           return {
             id: user.id,
             email: user.email,
-            name: user.name,
             username: user.username,
             image: user.image || user.profilePicture,
             role: user.role,

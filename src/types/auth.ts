@@ -10,12 +10,11 @@ import { Prisma } from '@prisma/client'
 export interface CreateUserParams {
   email: string
   password: string
-  username?: string
-  name?: string
+  username: string
 }
 
 // Kullanıcı profil güncelleme parametreleri - sadece güncellenebilir alanlar
-export type UpdateProfileParams = Partial<Pick<User, 'username' | 'name' | 'bio' | 'profilePicture' | 'profileBanner'>>
+export type UpdateProfileParams = Partial<Pick<User, 'username' | 'bio' | 'profilePicture' | 'profileBanner'>>
 
 // Kullanıcı ayarları güncelleme parametreleri
 export type UpdateUserSettingsParams = Partial<{
@@ -41,7 +40,7 @@ export interface AuthApiResponse<T = unknown> {
 }
 
 // Login response tipi - User'dan sadece gerekli alanları al
-export type LoginResponse = Pick<User, 'id' | 'email' | 'username' | 'name' | 'role'>
+export type LoginResponse = Pick<User, 'id' | 'email' | 'username' | 'role'>
 
 // Session user tipi (NextAuth ile uyumlu) - User'dan türet
 export type SessionUser = Pick<User, 'id' | 'role'> & {

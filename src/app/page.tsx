@@ -12,13 +12,17 @@ import {
   ContentSkeleton
 } from '@/components/ui/loading'
 import { Button } from '@/components/ui/button'
+import AuthStatus from '@/components/auth/auth-status'
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <nav className="flex justify-between items-center p-4 border-b border-border">
         <h1 className="text-2xl font-bold">Aniwa</h1>
-        <ThemeToggle />
+        <div className="flex items-center space-x-4">
+          <AuthStatus />
+          <ThemeToggle />
+        </div>
       </nav>
       
       <main className="container mx-auto px-4 py-8">

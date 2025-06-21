@@ -20,7 +20,7 @@ import type {
  * Yeni kullanıcı oluşturur
  */
 export async function createUser(params: CreateUserParams): Promise<AuthApiResponse> {
-  const { email, password, username, name } = params
+  const { email, password, username } = params
 
   try {
     // Email kontrolü
@@ -35,18 +35,16 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
       return { success: false, error: 'Bu email adresi zaten kullanımda' }
     }
 
-    // Username kontrolü (eğer verilmişse)
-    if (username) {
-      const existingUsername = await prisma.user.findUnique({
-        where: { username }
-      })
+    // Username kontrolü
+    const existingUsername = await prisma.user.findUnique({
+      where: { username }
+    })
 
-      if (existingUsername) {
-        logWarn(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Username zaten kullanımda', {
-          username
-        })
-        return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
-      }
+    if (existingUsername) {
+      logWarn(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Username zaten kullanımda', {
+        username
+      })
+      return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
     }
 
     // Şifreyi hash'le
@@ -57,8 +55,7 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
       data: {
         email: email.toLowerCase(),
         passwordHash,
-        username: username || email.split('@')[0],
-        name,
+        username,
         role: USER_ROLES.USER,
       }
     })
@@ -84,7 +81,6 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
         id: user.id,
         email: user.email,
         username: user.username,
-        name: user.name,
         role: user.role
       }
     }

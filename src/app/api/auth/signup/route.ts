@@ -23,14 +23,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { email, password, username, name } = validationResult.data
+    const { email, password, username } = validationResult.data
 
     // Kullanıcı oluştur
     const result = await createUser({
       email,
       password,
       username,
-      name
     })
 
     if (!result.success) {

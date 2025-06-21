@@ -2,6 +2,8 @@
 // Bu endpoint OAuth sonrası username seçimi için kullanılır
 
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { usernameSchema } from '@/lib/schemas/auth.schemas'
 import { prisma } from '@/lib/prisma'
 import { logInfo, logError } from '@/lib/logger'
@@ -9,16 +11,18 @@ import { LOG_EVENTS } from '@/lib/constants/logging'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email, username } = body
-
-    // Email kontrolü
-    if (!email) {
+    // Session kontrolü
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: 'Email gerekli' },
-        { status: 400 }
+        { success: false, error: 'Giriş yapmanız gerekli' },
+        { status: 401 }
       )
     }
+
+    const body = await request.json()
+    const { username } = body
 
     // Username validasyonu
     const usernameValidation = usernameSchema.safeParse(username)
@@ -32,9 +36,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Kullanıcıyı email ile bul
+    // Kullanıcıyı session'dan al
     const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() }
+      where: { id: session.user.id }
     })
 
     if (!user) {

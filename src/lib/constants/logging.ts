@@ -52,6 +52,9 @@ export const LOG_EVENTS = {
   AUTH_USER_SETTINGS_ERROR: 'auth_user_settings_error',
   AUTH_SIGNIN_ERROR: 'auth_signin_error',
   AUTH_SESSION_ERROR: 'auth_session_error',
+  AUTH_USERNAME_CHECK: 'auth_username_check',
+  AUTH_USERNAME_SETUP: 'auth_username_setup',
+  AUTH_USERNAME_SETUP_ERROR: 'auth_username_setup_error',
 } as const
 
 // Log events tipini export et

@@ -66,8 +66,7 @@ export const urlSchema = z
 export const signupSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
-  username: usernameSchema.optional(),
-  name: nameSchema.optional(),
+  username: usernameSchema, // Zorunlu
 })
 
 // Login şeması
@@ -79,7 +78,6 @@ export const loginSchema = z.object({
 // Profil güncelleme şeması
 export const updateProfileSchema = z.object({
   username: usernameSchema.optional(),
-  name: nameSchema.optional(),
   bio: bioSchema,
   profilePicture: urlSchema,
   profileBanner: urlSchema,
