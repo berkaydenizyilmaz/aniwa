@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { logInfo, logError, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import bcrypt from 'bcryptjs'
-import type { Prisma } from '@/generated/prisma'
+import type { Prisma } from '@prisma/client'
 import type { 
   CreateUserParams, 
   UserWithSettings, 

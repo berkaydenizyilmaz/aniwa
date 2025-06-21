@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { Prisma, LogLevel } from '@/generated/prisma'; 
+import { Prisma, LogLevel } from '@prisma/client'; 
 
 export interface CreateLogParams {
   level: LogLevel

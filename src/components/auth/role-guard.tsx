@@ -5,7 +5,7 @@
 
 import { ReactNode } from 'react'
 import { useRole } from '@/hooks/use-auth'
-import type { UserRole } from '@/generated/prisma'
+import type { UserRole } from '@prisma/client'
 
 interface RoleGuardProps {
   /**

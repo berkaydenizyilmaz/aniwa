@@ -6,7 +6,7 @@
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
-import type { UserRole } from '@/generated/prisma'
+import type { UserRole } from '@prisma/client'
 
 /**
  * Auth durumunu yöneten ana hook

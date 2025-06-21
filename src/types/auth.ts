@@ -1,7 +1,7 @@
 // Aniwa Projesi - Auth Tipleri
 // Bu dosya kimlik doğrulama ile ilgili tüm tip tanımlarını içerir
 
-import type { UserRole } from '@/generated/prisma'
+import type { UserRole } from '@prisma/client'
 
 // Kullanıcı oluşturma parametreleri
 export interface CreateUserParams {

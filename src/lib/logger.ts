@@ -1,6 +1,6 @@
 import pino from 'pino'
 import { LogService } from '@/services/db/log.service'
-import type { LogLevel } from '@/generated/prisma'
+import type { LogLevel } from '@prisma/client'
 import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS } from '@/lib/constants/logging'
 import type { LogMetadata, PerformanceMetadata, AuthMetadata } from '@/types/logging'
 
@@ -192,9 +192,9 @@ export const logAuth = (
   }
   
   if (success) {
-    logInfo(LOG_EVENTS.AUTH, `Auth success: ${action}`, authData, userId)
+    logInfo(LOG_EVENTS.AUTH_LOGIN_SUCCESS, `Auth success: ${action}`, authData, userId)
   } else {
-    logWarn(LOG_EVENTS.AUTH, `Auth failed: ${action}`, authData, userId)
+    logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, `Auth failed: ${action}`, authData, userId)
   }
 }
 
