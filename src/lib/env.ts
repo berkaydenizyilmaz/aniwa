@@ -36,7 +36,7 @@ const envSchema = z.object({
 })
 
 // Environment değişkenlerini doğrula
-function validateEnv() {
+function validateEnv(): Env {
   try {
     const validatedEnv = envSchema.parse(process.env)
     

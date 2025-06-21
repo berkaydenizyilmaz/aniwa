@@ -1,5 +1,5 @@
 import pino from 'pino'
-import { LogService } from '@/services/db/log.service'
+import { createLog } from '@/services/db/log.service'
 import type { LogLevel } from '@prisma/client'
 import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS } from '@/lib/constants/logging'
 import type { LogMetadata, PerformanceMetadata, AuthMetadata } from '@/types/logging'
@@ -40,7 +40,7 @@ export const logger = pino({
 
 /**
  * MongoDB'ye kaydetme için wrapper fonksiyonu
- * Mevcut LogService'i kullanarak - hiçbir şeyi bozmadan
+ * Mevcut createLog fonksiyonu kullanarak - hiçbir şeyi bozmadan
  */
 export const logToDatabase = async (
   level: LogLevel,
@@ -50,7 +50,7 @@ export const logToDatabase = async (
   userId?: string
 ) => {
   try {
-    await LogService.createLog({
+    await createLog({
       level,
       event,
       message,

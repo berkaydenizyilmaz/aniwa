@@ -2,6 +2,8 @@
 // Bu dosya kimlik doğrulama ile ilgili tüm tip tanımlarını içerir
 
 import type { UserRole } from '@prisma/client'
+import type { Session } from 'next-auth'
+import type { SignInResponse } from 'next-auth/react'
 
 // Kullanıcı oluşturma parametreleri
 export interface CreateUserParams {
@@ -71,10 +73,45 @@ export interface LoginResponse {
 // Session user tipi (NextAuth ile uyumlu)
 export interface SessionUser {
   id: string
-  email: string
+  email?: string | null
   name?: string | null
   image?: string | null
   username?: string | null
   role: UserRole
   provider?: string
+}
+
+// Hook dönüş tipleri
+export interface AuthHookReturn {
+  // Session bilgileri
+  user: SessionUser | undefined
+  session: Session | null
+  isAuthenticated: boolean
+  isLoading: boolean
+  needsUsername: boolean
+  
+  // Auth fonksiyonları
+  login: (email: string, password: string) => Promise<SignInResponse | undefined>
+  loginWithGoogle: () => Promise<void>
+  logout: () => Promise<void>
+  setupUsername: (username: string) => Promise<AuthApiResponse>
+}
+
+export interface RoleHookReturn {
+  role: UserRole | undefined
+  hasRole: (role: UserRole) => boolean
+  hasAnyRole: (roles: UserRole[]) => boolean | undefined
+  isAdmin: () => boolean | undefined
+  isModerator: () => boolean | undefined
+  isEditor: () => boolean | undefined
+}
+
+export interface RequireAuthHookReturn {
+  isAuthenticated: boolean
+  isLoading: boolean
+}
+
+export interface RequireRoleHookReturn {
+  hasRequiredRole: boolean | undefined
+  isLoading: boolean
 } 

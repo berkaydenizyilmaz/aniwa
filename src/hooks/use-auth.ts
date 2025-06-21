@@ -7,11 +7,17 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
 import type { UserRole } from '@prisma/client'
+import type { 
+  AuthHookReturn, 
+  RoleHookReturn, 
+  RequireAuthHookReturn, 
+  RequireRoleHookReturn 
+} from '@/types/auth'
 
 /**
  * Auth durumunu yöneten ana hook
  */
-export function useAuth() {
+export function useAuth(): AuthHookReturn {
   const { data: session, status, update } = useSession()
   const router = useRouter()
 
@@ -84,7 +90,7 @@ export function useAuth() {
 /**
  * Kullanıcı rolü kontrolü için hook
  */
-export function useRole() {
+export function useRole(): RoleHookReturn {
   const { user } = useAuth()
 
   const hasRole = useCallback(
@@ -114,7 +120,7 @@ export function useRole() {
 /**
  * Korumalı sayfa erişimi için hook
  */
-export function useRequireAuth(redirectTo = '/auth/signin') {
+export function useRequireAuth(redirectTo = '/auth/signin'): RequireAuthHookReturn {
   const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
 
@@ -128,7 +134,10 @@ export function useRequireAuth(redirectTo = '/auth/signin') {
 /**
  * Rol tabanlı erişim kontrolü için hook
  */
-export function useRequireRole(requiredRole: UserRole | UserRole[], redirectTo = '/') {
+export function useRequireRole(
+  requiredRole: UserRole | UserRole[], 
+  redirectTo = '/'
+): RequireRoleHookReturn {
   const { isAuthenticated, isLoading } = useAuth()
   const { hasRole, hasAnyRole } = useRole()
   const router = useRouter()
