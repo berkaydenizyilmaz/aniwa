@@ -1,4 +1,6 @@
-import pino from 'pino'
+// Aniwa Projesi - Basit ve Etkili Logger
+// Bu dosya hem console hem MongoDB logging sağlar
+
 import { createLog } from '@/services/log/log.service'
 import type { LogLevel } from '@prisma/client'
 import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS, LOG_LEVELS } from '@/lib/constants/logging'
@@ -7,42 +9,23 @@ import type { LogMetadata, PerformanceMetadata, AuthMetadata } from '@/types/log
 import { Prisma } from '@prisma/client'
 
 /**
- * Environment'a göre log level'ı belirle
+ * Sensitive data'yı temizle
  */
-const getLogLevel = (): pino.Level => {
-  const level = process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug')
-  return level as pino.Level
+const sanitizeMetadata = (metadata?: LogMetadata): LogMetadata | undefined => {
+  if (!metadata) return undefined
+  
+  const sanitized = { ...metadata }
+  SENSITIVE_FIELDS.forEach(field => {
+    if (field in sanitized) {
+      sanitized[field] = '[REDACTED]'
+    }
+  })
+  
+  return sanitized
 }
-
-/**
- * Environment'a göre transport'ları belirle
- * Next.js API routes için basitleştirilmiş versiyon
- */
-const getTransports = () => {
-  // API routes'ta transport kullanmayalım - sadece basit JSON logging
-  return undefined
-}
-
-/**
- * Ana Pino logger'ı oluştur
- * Proje kurallarına uygun: performanslı, güvenli, yapılandırılabilir
- */
-export const logger = pino({
-  level: getLogLevel(),
-  timestamp: pino.stdTimeFunctions.isoTime,
-  formatters: {
-    level: (label) => ({ level: label.toUpperCase() }),
-  },
-  redact: {
-    paths: [...SENSITIVE_FIELDS],
-    remove: true,
-  },
-  transport: getTransports(),
-})
 
 /**
  * MongoDB'ye kaydetme için wrapper fonksiyonu
- * Mevcut createLog fonksiyonu kullanarak - hiçbir şeyi bozmadan
  */
 export const logToDatabase = async (
   level: LogLevel,
@@ -56,7 +39,7 @@ export const logToDatabase = async (
       level,
       event,
       message,
-      metadata: metadata as Prisma.JsonValue || null,
+      metadata: sanitizeMetadata(metadata) as Prisma.JsonValue || null,
       userId: userId || undefined,
     })
   } catch (error) {
@@ -66,8 +49,26 @@ export const logToDatabase = async (
 }
 
 /**
- * Hibrit logger fonksiyonları (hem console hem database)
- * Mevcut log.service.ts'deki helper fonksiyonları ile uyumlu
+ * Console logging için formatlanmış çıktı
+ */
+const formatConsoleLog = (level: string, event: string, message: string, metadata?: LogMetadata) => {
+  const timestamp = new Date().toISOString()
+  const emoji = {
+    ERROR: '🔴',
+    WARN: '🟡', 
+    INFO: '🔵',
+    DEBUG: '⚪'
+  }[level] || '⚪'
+  
+  console.log(`${emoji} [${timestamp}] [${event}] ${message}`)
+  
+  if (metadata && Object.keys(metadata).length > 0) {
+    console.log('   📋 Details:', sanitizeMetadata(metadata))
+  }
+}
+
+/**
+ * Ana logging fonksiyonları
  */
 export const logError = (
   event: string,
@@ -75,15 +76,7 @@ export const logError = (
   metadata?: LogMetadata,
   userId?: string
 ) => {
-  // Development'ta sadeleştirilmiş log
-  if (process.env.NODE_ENV === 'development') {
-    console.error(`🔴 [${event}] ${message}`)
-    if (metadata && Object.keys(metadata).length > 0) {
-      console.error('   📋 Details:', metadata)
-    }
-  } else {
-    logger.error({ event, metadata, userId }, message)
-  }
+  formatConsoleLog(LOG_LEVELS.ERROR, event, message, metadata)
   void logToDatabase(LOG_LEVELS.ERROR, event, message, metadata, userId)
 }
 
@@ -93,15 +86,7 @@ export const logWarn = (
   metadata?: LogMetadata,
   userId?: string
 ) => {
-  // Development'ta sadeleştirilmiş log
-  if (process.env.NODE_ENV === 'development') {
-      console.warn(`🟡 [${event}] ${message}`)
-      if (metadata && Object.keys(metadata).length > 0) {
-        console.warn('   📋 Details:', metadata)
-      }
-  } else {
-    logger.warn({ event, metadata, userId }, message)
-  }
+  formatConsoleLog(LOG_LEVELS.WARN, event, message, metadata)
   void logToDatabase(LOG_LEVELS.WARN, event, message, metadata, userId)
 }
 
@@ -111,16 +96,7 @@ export const logInfo = (
   metadata?: LogMetadata,
   userId?: string
 ) => {
-  // Development'ta sadeleştirilmiş log
-  if (process.env.NODE_ENV === 'development') {
-
-      console.info(`🔵 [${event}] ${message}`)
-      if (metadata && Object.keys(metadata).length > 0) {
-        console.info('   📋 Details:', metadata)
-      }
-  } else {
-    logger.info({ event, metadata, userId }, message)
-  }
+  formatConsoleLog(LOG_LEVELS.INFO, event, message, metadata)
   void logToDatabase(LOG_LEVELS.INFO, event, message, metadata, userId)
 }
 
@@ -130,18 +106,15 @@ export const logDebug = (
   metadata?: LogMetadata,
   userId?: string
 ) => {
-  // Development'ta debug logları gösterme (çok gürültü)
+  // Debug logları sadece development'ta göster
   if (process.env.NODE_ENV === 'development') {
-    // Debug logları sadece çok gerekli olduğunda göster
-    return
+    formatConsoleLog(LOG_LEVELS.DEBUG, event, message, metadata)
   }
-  logger.debug({ event, metadata, userId }, message)
   void logToDatabase(LOG_LEVELS.DEBUG, event, message, metadata, userId)
 }
 
 /**
  * HTTP Request logging için özel fonksiyon
- * Express middleware'lerde kullanım için
  */
 export const logRequest = (
   method: string,
@@ -175,7 +148,6 @@ export const logRequest = (
 
 /**
  * Error handling için özel fonksiyon
- * Uncaught exception ve unhandled rejection'lar için
  */
 export const logException = (error: Error, context?: string, userId?: string) => {
   const metadata = {
@@ -189,7 +161,6 @@ export const logException = (error: Error, context?: string, userId?: string) =>
 
 /**
  * Performance logging için özel fonksiyon
- * Yavaş operasyonları tespit etmek için
  */
 export const logPerformance = (
   operation: string,
@@ -229,6 +200,4 @@ export const logAuth = (
   } else {
     logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, `Auth failed: ${action}`, authData, userId)
   }
-}
-
-export default logger 
+} 

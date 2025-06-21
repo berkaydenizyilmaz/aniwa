@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db/prisma'
 import { Prisma, LogLevel, UserRole } from '@prisma/client'
-import { LOG_CLEANUP_DEFAULTS, LOG_LEVELS } from '@/lib/constants/logging'
+import { LOG_CLEANUP_DEFAULTS } from '@/lib/constants/logging'
 import { PAGINATION_DEFAULTS } from '@/lib/constants/app'
 import type { 
   CreateLogParams, 
@@ -277,16 +277,3 @@ export async function getLogStatsByRole(dateRange?: DateRange): Promise<LogServi
     }
   }
 }
-
-// Hızlı kullanım için yardımcı fonksiyonlar - tip güvenli
-export const logError = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
-  createLog({ level: LOG_LEVELS.ERROR, event, message, metadata, userId })
-
-export const logWarn = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
-  createLog({ level: LOG_LEVELS.WARN, event, message, metadata, userId })
-
-export const logInfo = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
-  createLog({ level: LOG_LEVELS.INFO, event, message, metadata, userId })
-
-export const logDebug = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
-  createLog({ level: LOG_LEVELS.DEBUG, event, message, metadata, userId })
