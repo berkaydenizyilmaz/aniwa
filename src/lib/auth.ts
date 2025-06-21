@@ -37,24 +37,24 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: 'credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
+        username: { label: 'Username', type: 'text' },
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        if (!credentials?.username || !credentials?.password) {
           logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Eksik kimlik bilgileri')
           return null
         }
 
         try {
-          // Kullanıcıyı email ile bul
+          // Kullanıcıyı username ile bul
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email.toLowerCase() }
+            where: { username: credentials.username }
           })
 
           if (!user || !user.passwordHash) {
             logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Kullanıcı bulunamadı', {
-              email: credentials.email
+              username: credentials.username
             })
             return null
           }
@@ -68,14 +68,14 @@ export const authOptions: NextAuthOptions = {
           if (!isPasswordValid) {
             logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Geçersiz şifre', {
               userId: user.id,
-              email: credentials.email
+              username: credentials.username
             })
             return null
           }
 
           logInfo(LOG_EVENTS.AUTH_LOGIN_SUCCESS, 'Başarılı giriş', {
             userId: user.id,
-            email: user.email
+            username: user.username
           }, user.id)
 
           return {
@@ -88,7 +88,7 @@ export const authOptions: NextAuthOptions = {
         } catch (error) {
           logError(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Giriş hatası', {
             error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-            email: credentials.email
+            username: credentials.username
           })
           return null
         }

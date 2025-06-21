@@ -64,7 +64,7 @@ export const signupSchema = z.object({
 
 // Login şeması
 export const loginSchema = z.object({
-  email: emailSchema,
+  username: usernameSchema,
   password: z.string().min(PASSWORD_MIN_LENGTH, 'Şifre gerekli'),
 })
 

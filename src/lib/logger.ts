@@ -75,7 +75,15 @@ export const logError = (
   metadata?: LogMetadata,
   userId?: string
 ) => {
-  logger.error({ event, metadata, userId }, message)
+  // Development'ta sadeleştirilmiş log
+  if (process.env.NODE_ENV === 'development') {
+    console.error(`🔴 [${event}] ${message}`)
+    if (metadata && Object.keys(metadata).length > 0) {
+      console.error('   📋 Details:', metadata)
+    }
+  } else {
+    logger.error({ event, metadata, userId }, message)
+  }
   void logToDatabase(LOG_LEVELS.ERROR, event, message, metadata, userId)
 }
 
@@ -85,7 +93,15 @@ export const logWarn = (
   metadata?: LogMetadata,
   userId?: string
 ) => {
-  logger.warn({ event, metadata, userId }, message)
+  // Development'ta sadeleştirilmiş log
+  if (process.env.NODE_ENV === 'development') {
+      console.warn(`🟡 [${event}] ${message}`)
+      if (metadata && Object.keys(metadata).length > 0) {
+        console.warn('   📋 Details:', metadata)
+      }
+  } else {
+    logger.warn({ event, metadata, userId }, message)
+  }
   void logToDatabase(LOG_LEVELS.WARN, event, message, metadata, userId)
 }
 
@@ -95,7 +111,16 @@ export const logInfo = (
   metadata?: LogMetadata,
   userId?: string
 ) => {
-  logger.info({ event, metadata, userId }, message)
+  // Development'ta sadeleştirilmiş log
+  if (process.env.NODE_ENV === 'development') {
+
+      console.info(`🔵 [${event}] ${message}`)
+      if (metadata && Object.keys(metadata).length > 0) {
+        console.info('   📋 Details:', metadata)
+      }
+  } else {
+    logger.info({ event, metadata, userId }, message)
+  }
   void logToDatabase(LOG_LEVELS.INFO, event, message, metadata, userId)
 }
 
@@ -105,6 +130,11 @@ export const logDebug = (
   metadata?: LogMetadata,
   userId?: string
 ) => {
+  // Development'ta debug logları gösterme (çok gürültü)
+  if (process.env.NODE_ENV === 'development') {
+    // Debug logları sadece çok gerekli olduğunda göster
+    return
+  }
   logger.debug({ event, metadata, userId }, message)
   void logToDatabase(LOG_LEVELS.DEBUG, event, message, metadata, userId)
 }

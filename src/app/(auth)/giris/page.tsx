@@ -9,7 +9,7 @@ import { PUBLIC_ROUTES, AUTH_ROUTES } from '@/lib/constants/routes'
 import Link from 'next/link'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -24,13 +24,13 @@ export default function LoginPage() {
 
     try {
       const result = await signIn('credentials', {
-        email,
+        username,
         password,
         redirect: false,
       })
 
       if (result?.error) {
-        setError('Geçersiz email veya şifre')
+        setError('Geçersiz kullanıcı adı veya şifre')
       } else {
         // Session'ı yenile ve yönlendir
         const session = await getSession()
@@ -86,18 +86,18 @@ export default function LoginPage() {
 
         <form className="mt-8 space-y-6" onSubmit={handleCredentialsLogin}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              Kullanıcı Adı
             </label>
             <input
-              id="email"
-              name="email"
-              type="email"
+              id="username"
+              name="username"
+              type="text"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="email@example.com"
+              placeholder="kullaniciadi"
             />
           </div>
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { logInfo, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
+import { USERNAME_REGEX } from '@/lib/constants/auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Sadece alfanumerik ve alt çizgi kontrolü
-    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    if (!USERNAME_REGEX.test(username)) {
       return NextResponse.json(
         { available: false, error: 'Username sadece harf, rakam ve alt çizgi içerebilir' },
         { status: 400 }

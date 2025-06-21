@@ -81,7 +81,7 @@ export interface AuthHookReturn {
   needsUsername: boolean
   
   // Auth fonksiyonları
-  login: (email: string, password: string) => Promise<SignInResponse | undefined>
+  login: (username: string, password: string) => Promise<SignInResponse | undefined>
   loginWithGoogle: () => Promise<void>
   logout: () => Promise<void>
   setupUsername: (username: string) => Promise<AuthApiResponse>

@@ -23,9 +23,9 @@ export function useAuth(): AuthHookReturn {
   const { data: session, status, update } = useSession()
   const router = useRouter()
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (username: string, password: string) => {
     const result = await signIn('credentials', {
-      email,
+      username,
       password,
       redirect: false,
     })

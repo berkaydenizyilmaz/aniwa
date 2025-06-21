@@ -121,12 +121,12 @@ export async function getUserById(userId: string): Promise<UserWithSettings | nu
 }
 
 /**
- * Kullanıcıyı email ile getirir
+ * Kullanıcıyı username ile getirir
  */
-export async function getUserByEmail(email: string): Promise<UserWithSettings | null> {
+export async function getUserByUsername(username: string): Promise<UserWithSettings | null> {
   try {
     const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
+      where: { username },
       include: {
         userSettings: true
       }
@@ -136,9 +136,9 @@ export async function getUserByEmail(email: string): Promise<UserWithSettings | 
 
     return user
   } catch (error) {
-    logError(LOG_EVENTS.AUTH_SESSION_ERROR, 'Email ile kullanıcı getirme hatası', {
+    logError(LOG_EVENTS.AUTH_SESSION_ERROR, 'Username ile kullanıcı getirme hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      email: email.toLowerCase()
+      username
     })
     return null
   }
