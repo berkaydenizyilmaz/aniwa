@@ -4,6 +4,7 @@
 import { prisma } from '@/lib/prisma'
 import { logInfo, logError, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
+import { DEFAULT_THEME, DEFAULT_LANGUAGE, USER_ROLES, BCRYPT_SALT_ROUNDS } from '@/lib/constants/auth'
 import bcrypt from 'bcryptjs'
 import type { Prisma } from '@prisma/client'
 import type { 
@@ -48,7 +49,7 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
     }
 
     // Şifreyi hash'le
-    const passwordHash = await bcrypt.hash(password, 12)
+    const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
 
     // Kullanıcıyı oluştur
     const user = await prisma.user.create({
@@ -57,7 +58,7 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
         passwordHash,
         username: username || email.split('@')[0],
         name,
-        role: 'USER',
+        role: USER_ROLES.USER,
       }
     })
 
@@ -65,8 +66,8 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
     await prisma.userProfileSettings.create({
       data: {
         userId: user.id,
-        themePreference: 'system',
-        languagePreference: 'tr'
+        themePreference: DEFAULT_THEME,
+        languagePreference: DEFAULT_LANGUAGE
       }
     })
 
@@ -151,7 +152,7 @@ export async function getUserByEmail(email: string): Promise<UserWithSettings | 
  */
 export async function updatePassword(userId: string, newPassword: string): Promise<AuthApiResponse> {
   try {
-    const passwordHash = await bcrypt.hash(newPassword, 12)
+    const passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS)
 
     await prisma.user.update({
       where: { id: userId },

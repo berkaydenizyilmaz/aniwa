@@ -2,11 +2,21 @@
 // Bu dosya kimlik doğrulama ile ilgili tüm validasyon şemalarını içerir
 
 import { z } from 'zod'
-
-// Temel validasyon kuralları
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/
-const PASSWORD_MIN_LENGTH = 8
+import {
+  EMAIL_REGEX,
+  USERNAME_REGEX,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  USERNAME_MAX_LENGTH,
+  NAME_MIN_LENGTH,
+  NAME_MAX_LENGTH,
+  BIO_MAX_LENGTH,
+  THEME_PREFERENCES,
+  DEFAULT_THEME,
+  LANGUAGE_PREFERENCES,
+  DEFAULT_LANGUAGE,
+} from '../constants/auth'
 
 // Email şeması
 export const emailSchema = z
@@ -18,27 +28,27 @@ export const emailSchema = z
 // Username şeması
 export const usernameSchema = z
   .string()
-  .min(3, 'Kullanıcı adı en az 3 karakter olmalıdır')
-  .max(20, 'Kullanıcı adı en fazla 20 karakter olmalıdır')
+  .min(USERNAME_MIN_LENGTH, `Kullanıcı adı en az ${USERNAME_MIN_LENGTH} karakter olmalıdır`)
+  .max(USERNAME_MAX_LENGTH, `Kullanıcı adı en fazla ${USERNAME_MAX_LENGTH} karakter olmalıdır`)
   .regex(USERNAME_REGEX, 'Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir')
 
 // Password şeması
 export const passwordSchema = z
   .string()
   .min(PASSWORD_MIN_LENGTH, `Şifre en az ${PASSWORD_MIN_LENGTH} karakter olmalıdır`)
-  .max(128, 'Şifre en fazla 128 karakter olmalıdır')
+  .max(PASSWORD_MAX_LENGTH, `Şifre en fazla ${PASSWORD_MAX_LENGTH} karakter olmalıdır`)
 
 // Name şeması
 export const nameSchema = z
   .string()
-  .min(2, 'İsim en az 2 karakter olmalıdır')
-  .max(50, 'İsim en fazla 50 karakter olmalıdır')
+  .min(NAME_MIN_LENGTH, `İsim en az ${NAME_MIN_LENGTH} karakter olmalıdır`)
+  .max(NAME_MAX_LENGTH, `İsim en fazla ${NAME_MAX_LENGTH} karakter olmalıdır`)
   .trim()
 
 // Bio şeması
 export const bioSchema = z
   .string()
-  .max(500, 'Biyografi en fazla 500 karakter olmalıdır')
+  .max(BIO_MAX_LENGTH, `Biyografi en fazla ${BIO_MAX_LENGTH} karakter olmalıdır`)
   .trim()
   .optional()
 
@@ -83,8 +93,8 @@ export const updatePasswordSchema = z.object({
 
 // Kullanıcı ayarları şeması
 export const userSettingsSchema = z.object({
-  themePreference: z.enum(['light', 'dark', 'system']).default('system'),
-  languagePreference: z.enum(['tr']).default('tr'),
+  themePreference: z.enum(THEME_PREFERENCES).default(DEFAULT_THEME),
+  languagePreference: z.enum(LANGUAGE_PREFERENCES).default(DEFAULT_LANGUAGE),
   notificationPreferences: z.record(z.boolean()).optional(),
   privacySettings: z.record(z.union([z.string(), z.boolean(), z.number()])).optional(),
 })

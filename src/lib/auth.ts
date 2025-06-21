@@ -9,6 +9,7 @@ import { prisma } from './prisma'
 import { env } from './env'
 import { logInfo, logError, logWarn } from './logger'
 import { LOG_EVENTS } from './constants/logging'
+import { SESSION_MAX_AGE, JWT_MAX_AGE, AUTH_PAGES, OAUTH_PROVIDERS } from './constants/auth'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
@@ -97,17 +98,17 @@ export const authOptions: NextAuthOptions = {
 
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 gün
+    maxAge: SESSION_MAX_AGE,
   },
 
   jwt: {
-    maxAge: 30 * 24 * 60 * 60, // 30 gün
+    maxAge: JWT_MAX_AGE,
   },
 
   pages: {
-    signIn: '/auth/signin',
-    error: '/auth/error',
-    verifyRequest: '/auth/verify-request',
+    signIn: AUTH_PAGES.SIGN_IN,
+    error: AUTH_PAGES.ERROR,
+    verifyRequest: AUTH_PAGES.VERIFY_REQUEST,
   },
 
   callbacks: {
@@ -142,7 +143,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       try {
         // OAuth ile giriş yapılıyorsa
-        if (account?.provider === 'google') {
+        if (account?.provider === OAUTH_PROVIDERS.GOOGLE) {
           // Mevcut kullanıcıyı kontrol et
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email! }
@@ -151,7 +152,7 @@ export const authOptions: NextAuthOptions = {
           // Eğer kullanıcı var ama username'i yoksa, username seçim sayfasına yönlendir
           if (existingUser && !existingUser.username) {
             // URL'de username seçim gerektiğini belirt
-            return `/auth/setup-username?email=${encodeURIComponent(user.email!)}`
+            return `${AUTH_PAGES.SETUP_USERNAME}?email=${encodeURIComponent(user.email!)}`
           }
 
           logInfo(LOG_EVENTS.AUTH_OAUTH_SUCCESS, 'Google OAuth başarılı', {
