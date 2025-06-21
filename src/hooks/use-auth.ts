@@ -12,7 +12,7 @@ import type { UserRole } from '@/generated/prisma'
  * Auth durumunu yöneten ana hook
  */
 export function useAuth() {
-  const { data: session, status } = useSession()
+  const { data: session, status, update } = useSession()
   const router = useRouter()
 
   const login = useCallback(async (email: string, password: string) => {
@@ -34,17 +34,50 @@ export function useAuth() {
     router.push('/')
   }, [router])
 
+  const setupUsername = useCallback(async (username: string) => {
+    if (!session?.user?.email) {
+      throw new Error('Kullanıcı email bilgisi bulunamadı')
+    }
+
+    const response = await fetch('/api/auth/setup-username', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: session.user.email,
+        username
+      })
+    })
+
+    const result = await response.json()
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Username ayarlama başarısız')
+    }
+
+    // Modern NextAuth session güncelleme
+    await update({
+      username: result.data.username
+    })
+    
+    // Ana sayfaya yönlendir
+    router.push('/')
+    
+    return result
+  }, [session?.user?.email, router, update])
+
   return {
     // Session bilgileri
     user: session?.user,
     session,
     isAuthenticated: !!session?.user,
     isLoading: status === 'loading',
+    needsUsername: !!session?.user && !session?.user.username,
     
     // Auth fonksiyonları
     login,
     loginWithGoogle,
     logout,
+    setupUsername,
   }
 }
 

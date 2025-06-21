@@ -24,7 +24,8 @@ export const authOptions: NextAuthOptions = {
           name: profile.name,
           email: profile.email,
           image: profile.picture,
-          username: profile.email.split('@')[0], // Email'den username türet
+          // Username'i null bırak - sonradan seçtirilecek
+          username: null,
           role: 'USER' as const,
         }
       },
@@ -142,6 +143,17 @@ export const authOptions: NextAuthOptions = {
       try {
         // OAuth ile giriş yapılıyorsa
         if (account?.provider === 'google') {
+          // Mevcut kullanıcıyı kontrol et
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email! }
+          })
+
+          // Eğer kullanıcı var ama username'i yoksa, username seçim sayfasına yönlendir
+          if (existingUser && !existingUser.username) {
+            // URL'de username seçim gerektiğini belirt
+            return `/auth/setup-username?email=${encodeURIComponent(user.email!)}`
+          }
+
           logInfo(LOG_EVENTS.AUTH_OAUTH_SUCCESS, 'Google OAuth başarılı', {
             userId: user.id,
             email: user.email,
