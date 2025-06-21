@@ -1,8 +1,7 @@
 // Aniwa Projesi - Auth Constants
 // Bu dosya kimlik doğrulama ile ilgili tüm sabitleri içerir
 
-// Validasyon kuralları
-export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+// Validasyon kuralları (auth spesifik)
 export const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/
 
 // Uzunluk limitleri
@@ -23,21 +22,9 @@ export const BCRYPT_SALT_ROUNDS = 12
 export const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye cinsinden)
 export const JWT_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye cinsinden)
 
-// Auth sayfaları
-export const AUTH_PAGES = {
-  SIGN_IN: '/auth/signin',
-  ERROR: '/auth/error',
-  VERIFY_REQUEST: '/auth/verify-request',
-  SETUP_USERNAME: '/auth/setup-username',
-} as const
 
-// Tema tercihleri
-export const THEME_PREFERENCES = ['light', 'dark', 'system'] as const
-export const DEFAULT_THEME = 'system' as const
 
-// Dil tercihleri
-export const LANGUAGE_PREFERENCES = ['tr'] as const
-export const DEFAULT_LANGUAGE = 'tr' as const
+
 
 // OAuth Provider'lar
 export const OAUTH_PROVIDERS = {
@@ -53,7 +40,5 @@ export const USER_ROLES = {
 } as const
 
 // Tip tanımlamaları
-export type ThemePreference = typeof THEME_PREFERENCES[number]
-export type LanguagePreference = typeof LANGUAGE_PREFERENCES[number]
 export type OAuthProvider = typeof OAUTH_PROVIDERS[keyof typeof OAUTH_PROVIDERS]
 export type UserRoleType = typeof USER_ROLES[keyof typeof USER_ROLES] 

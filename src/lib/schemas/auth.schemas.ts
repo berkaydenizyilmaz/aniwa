@@ -3,7 +3,6 @@
 
 import { z } from 'zod'
 import {
-  EMAIL_REGEX,
   USERNAME_REGEX,
   PASSWORD_MIN_LENGTH,
   PASSWORD_MAX_LENGTH,
@@ -12,13 +11,16 @@ import {
   NAME_MIN_LENGTH,
   NAME_MAX_LENGTH,
   BIO_MAX_LENGTH,
+  TOKEN_MIN_LENGTH,
+  EMAIL_MIN_LENGTH,
+} from '../constants/auth'
+import {
+  EMAIL_REGEX,
   THEME_PREFERENCES,
   DEFAULT_THEME,
   LANGUAGE_PREFERENCES,
   DEFAULT_LANGUAGE,
-  TOKEN_MIN_LENGTH,
-  EMAIL_MIN_LENGTH,
-} from '../constants/auth'
+} from '../constants/app'
 
 // Email şeması
 export const emailSchema = z

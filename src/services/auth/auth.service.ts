@@ -4,7 +4,8 @@
 import { prisma } from '@/lib/prisma'
 import { logInfo, logError, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
-import { DEFAULT_THEME, DEFAULT_LANGUAGE, USER_ROLES, BCRYPT_SALT_ROUNDS } from '@/lib/constants/auth'
+import { USER_ROLES, BCRYPT_SALT_ROUNDS } from '@/lib/constants/auth'
+import { DEFAULT_THEME, DEFAULT_LANGUAGE } from '@/lib/constants/app'
 import bcrypt from 'bcryptjs'
 import type { Prisma } from '@prisma/client'
 import type { 

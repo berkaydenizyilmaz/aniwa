@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Home, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { PUBLIC_ROUTES } from "@/lib/constants/routes";
 
 export default function NotFound() {
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function NotFound() {
         {/* Eylem Butonları */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button asChild>
-            <Link href="/" className="flex items-center gap-2">
+            <Link href={PUBLIC_ROUTES.HOME} className="flex items-center gap-2">
               <Home className="h-4 w-4" />
               Ana Sayfaya Dön
             </Link>
@@ -52,13 +53,13 @@ export default function NotFound() {
           </p>
           <div className="flex justify-center gap-4 text-sm">
             <Link 
-              href="/contact" 
+              href={PUBLIC_ROUTES.CONTACT} 
               className="text-primary hover:underline"
             >
               İletişim
             </Link>
             <Link 
-              href="/help" 
+              href={PUBLIC_ROUTES.HELP} 
               className="text-primary hover:underline"
             >
               Yardım

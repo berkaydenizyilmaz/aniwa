@@ -6,6 +6,7 @@
 import { ReactNode } from 'react'
 import { useRole } from '@/hooks/use-auth'
 import type { UserRole } from '@prisma/client'
+import { USER_ROLES } from '@/lib/constants/auth'
 
 interface RoleGuardProps {
   /**
@@ -66,7 +67,7 @@ export function RoleGuard({
  */
 export function AdminOnly({ children, fallback }: Omit<RoleGuardProps, 'allowedRoles'>) {
   return (
-    <RoleGuard allowedRoles={['ADMIN']} fallback={fallback}>
+    <RoleGuard allowedRoles={[USER_ROLES.ADMIN]} fallback={fallback}>
       {children}
     </RoleGuard>
   )
@@ -77,7 +78,7 @@ export function AdminOnly({ children, fallback }: Omit<RoleGuardProps, 'allowedR
  */
 export function ModeratorOnly({ children, fallback }: Omit<RoleGuardProps, 'allowedRoles'>) {
   return (
-    <RoleGuard allowedRoles={['ADMIN', 'MODERATOR']} fallback={fallback}>
+    <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.MODERATOR]} fallback={fallback}>
       {children}
     </RoleGuard>
   )
@@ -88,7 +89,7 @@ export function ModeratorOnly({ children, fallback }: Omit<RoleGuardProps, 'allo
  */
 export function EditorOnly({ children, fallback }: Omit<RoleGuardProps, 'allowedRoles'>) {
   return (
-    <RoleGuard allowedRoles={['ADMIN', 'MODERATOR', 'EDITOR']} fallback={fallback}>
+    <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.MODERATOR, USER_ROLES.EDITOR]} fallback={fallback}>
       {children}
     </RoleGuard>
   )

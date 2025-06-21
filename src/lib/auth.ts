@@ -9,7 +9,9 @@ import { prisma } from './prisma'
 import { env } from './env'
 import { logInfo, logError, logWarn } from './logger'
 import { LOG_EVENTS } from './constants/logging'
-import { SESSION_MAX_AGE, JWT_MAX_AGE, AUTH_PAGES, OAUTH_PROVIDERS, DEFAULT_THEME, DEFAULT_LANGUAGE } from './constants/auth'
+import { SESSION_MAX_AGE, JWT_MAX_AGE, OAUTH_PROVIDERS } from './constants/auth'
+import { DEFAULT_THEME, DEFAULT_LANGUAGE } from './constants/app'
+import { AUTH_ROUTES } from './constants/routes'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
@@ -106,9 +108,9 @@ export const authOptions: NextAuthOptions = {
   },
 
   pages: {
-    signIn: AUTH_PAGES.SIGN_IN,
-    error: AUTH_PAGES.ERROR,
-    verifyRequest: AUTH_PAGES.VERIFY_REQUEST,
+    signIn: AUTH_ROUTES.SIGN_IN,
+    error: AUTH_ROUTES.ERROR,
+    verifyRequest: AUTH_ROUTES.VERIFY_REQUEST,
   },
 
   callbacks: {
@@ -152,7 +154,7 @@ export const authOptions: NextAuthOptions = {
           // Eğer kullanıcı var ama username'i yoksa, username seçim sayfasına yönlendir
           if (existingUser && !existingUser.username) {
             // URL'de username seçim gerektiğini belirt
-            return `${AUTH_PAGES.SETUP_USERNAME}?email=${encodeURIComponent(user.email!)}`
+            return `${AUTH_ROUTES.SETUP_USERNAME}?email=${encodeURIComponent(user.email!)}`
           }
 
           logInfo(LOG_EVENTS.AUTH_OAUTH_SUCCESS, 'Google OAuth başarılı', {

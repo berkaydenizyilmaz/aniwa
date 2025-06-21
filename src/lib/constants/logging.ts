@@ -67,25 +67,7 @@ export const PERFORMANCE_THRESHOLDS = {
 // Performance threshold tipini export et
 export type PerformanceThreshold = typeof PERFORMANCE_THRESHOLDS[keyof typeof PERFORMANCE_THRESHOLDS]
 
-// HTTP status code kategorileri
-export const HTTP_STATUS_CATEGORIES = {
-  SUCCESS: [200, 201, 202, 204],
-  CLIENT_ERROR: [400, 401, 403, 404, 422],
-  SERVER_ERROR: [500, 502, 503, 504],
-} as const
 
-// HTTP status code eşikleri
-export const HTTP_STATUS_THRESHOLDS = {
-  CLIENT_ERROR: 400,
-  SERVER_ERROR: 500,
-} as const
-
-// Pagination varsayılan değerleri
-export const PAGINATION_DEFAULTS = {
-  LIMIT: 50,
-  OFFSET: 0,
-  MAX_LIMIT: 100,
-} as const
 
 // Log temizleme varsayılan değerleri
 export const LOG_CLEANUP_DEFAULTS = {
@@ -93,6 +75,4 @@ export const LOG_CLEANUP_DEFAULTS = {
   MAX_OLDER_THAN_DAYS: 365,
 } as const
 
-// Tip tanımlamaları
-export type HttpStatusCategory = typeof HTTP_STATUS_CATEGORIES[keyof typeof HTTP_STATUS_CATEGORIES]
-export type HttpStatusThreshold = typeof HTTP_STATUS_THRESHOLDS[keyof typeof HTTP_STATUS_THRESHOLDS] 
+ 

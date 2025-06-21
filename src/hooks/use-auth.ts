@@ -13,6 +13,8 @@ import type {
   RequireAuthHookReturn, 
   RequireRoleHookReturn 
 } from '@/types/auth'
+import { API_ROUTES, AUTH_ROUTES } from '@/lib/constants/routes'
+import { USER_ROLES } from '@/lib/constants/auth'
 
 /**
  * Auth durumunu yöneten ana hook
@@ -45,7 +47,7 @@ export function useAuth(): AuthHookReturn {
       throw new Error('Kullanıcı email bilgisi bulunamadı')
     }
 
-    const response = await fetch('/api/auth/setup-username', {
+    const response = await fetch(API_ROUTES.AUTH.SETUP_USERNAME, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -103,9 +105,9 @@ export function useRole(): RoleHookReturn {
     [user?.role]
   )
 
-  const isAdmin = useCallback(() => hasRole('ADMIN'), [hasRole])
-  const isModerator = useCallback(() => hasAnyRole(['ADMIN', 'MODERATOR']), [hasAnyRole])
-  const isEditor = useCallback(() => hasAnyRole(['ADMIN', 'MODERATOR', 'EDITOR']), [hasAnyRole])
+  const isAdmin = useCallback(() => hasRole(USER_ROLES.ADMIN), [hasRole])
+  const isModerator = useCallback(() => hasAnyRole([USER_ROLES.ADMIN, USER_ROLES.MODERATOR]), [hasAnyRole])
+  const isEditor = useCallback(() => hasAnyRole([USER_ROLES.ADMIN, USER_ROLES.MODERATOR, USER_ROLES.EDITOR]), [hasAnyRole])
 
   return {
     role: user?.role,
@@ -120,7 +122,7 @@ export function useRole(): RoleHookReturn {
 /**
  * Korumalı sayfa erişimi için hook
  */
-export function useRequireAuth(redirectTo = '/auth/signin'): RequireAuthHookReturn {
+export function useRequireAuth(redirectTo = AUTH_ROUTES.SIGN_IN): RequireAuthHookReturn {
   const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
 
