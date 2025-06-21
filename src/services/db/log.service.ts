@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { Prisma, LogLevel, UserRole } from '@prisma/client'
+import { PAGINATION_DEFAULTS, LOG_CLEANUP_DEFAULTS, LOG_LEVELS } from '@/lib/constants/logging'
 import type { 
   CreateLogParams, 
   LogFilters, 
@@ -63,8 +64,8 @@ export async function getLogs(filters: LogFilters = {}): Promise<LogServiceRespo
       userRoles,
       startDate,
       endDate,
-      limit = 50,
-      offset = 0,
+      limit = PAGINATION_DEFAULTS.LIMIT,
+      offset = PAGINATION_DEFAULTS.OFFSET,
     } = filters
 
     // Filtreleme koşullarını oluştur
@@ -150,7 +151,7 @@ export async function getLogById(id: string): Promise<LogServiceResponse<LogWith
 /**
  * Belirli tarihten eski logları siler (temizlik için)
  */
-export async function cleanOldLogs(olderThanDays: number = 30): Promise<LogServiceResponse<CleanupResult>> {
+export async function cleanOldLogs(olderThanDays: number = LOG_CLEANUP_DEFAULTS.OLDER_THAN_DAYS): Promise<LogServiceResponse<CleanupResult>> {
   try {
     const cutoffDate = new Date()
     cutoffDate.setDate(cutoffDate.getDate() - olderThanDays)
@@ -276,13 +277,13 @@ export async function getLogStatsByRole(dateRange?: DateRange): Promise<LogServi
 
 // Hızlı kullanım için yardımcı fonksiyonlar - tip güvenli
 export const logError = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
-  createLog({ level: 'ERROR', event, message, metadata, userId })
+  createLog({ level: LOG_LEVELS.ERROR, event, message, metadata, userId })
 
 export const logWarn = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
-  createLog({ level: 'WARN', event, message, metadata, userId })
+  createLog({ level: LOG_LEVELS.WARN, event, message, metadata, userId })
 
 export const logInfo = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
-  createLog({ level: 'INFO', event, message, metadata, userId })
+  createLog({ level: LOG_LEVELS.INFO, event, message, metadata, userId })
 
 export const logDebug = (event: string, message: string, metadata?: Prisma.JsonValue, userId?: string): Promise<LogServiceResponse<LogWithUser>> =>
-  createLog({ level: 'DEBUG', event, message, metadata, userId })
+  createLog({ level: LOG_LEVELS.DEBUG, event, message, metadata, userId })

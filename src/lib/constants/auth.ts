@@ -42,10 +42,11 @@ export const OAUTH_PROVIDERS = {
   GOOGLE: 'google',
 } as const
 
-// Kullanıcı rolleri (Prisma'dan gelen enum'a ek)
+// Kullanıcı rolleri (Prisma'dan gelen enum'a uygun)
 export const USER_ROLES = {
   USER: 'USER',
-  MODERATOR: 'MODERATOR', 
+  MODERATOR: 'MODERATOR',
+  EDITOR: 'EDITOR',
   ADMIN: 'ADMIN',
 } as const
 

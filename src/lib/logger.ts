@@ -1,7 +1,7 @@
 import pino from 'pino'
 import { createLog } from '@/services/db/log.service'
 import type { LogLevel } from '@prisma/client'
-import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS } from '@/lib/constants/logging'
+import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS, HTTP_STATUS_THRESHOLDS, LOG_LEVELS } from '@/lib/constants/logging'
 import type { LogMetadata, PerformanceMetadata, AuthMetadata } from '@/types/logging'
 import { Prisma } from '@prisma/client'
 
@@ -75,7 +75,7 @@ export const logError = (
   userId?: string
 ) => {
   logger.error({ event, metadata, userId }, message)
-  void logToDatabase('ERROR', event, message, metadata, userId)
+  void logToDatabase(LOG_LEVELS.ERROR, event, message, metadata, userId)
 }
 
 export const logWarn = (
@@ -85,7 +85,7 @@ export const logWarn = (
   userId?: string
 ) => {
   logger.warn({ event, metadata, userId }, message)
-  void logToDatabase('WARN', event, message, metadata, userId)
+  void logToDatabase(LOG_LEVELS.WARN, event, message, metadata, userId)
 }
 
 export const logInfo = (
@@ -95,7 +95,7 @@ export const logInfo = (
   userId?: string
 ) => {
   logger.info({ event, metadata, userId }, message)
-  void logToDatabase('INFO', event, message, metadata, userId)
+  void logToDatabase(LOG_LEVELS.INFO, event, message, metadata, userId)
 }
 
 export const logDebug = (
@@ -105,7 +105,7 @@ export const logDebug = (
   userId?: string
 ) => {
   logger.debug({ event, metadata, userId }, message)
-  void logToDatabase('DEBUG', event, message, metadata, userId)
+  void logToDatabase(LOG_LEVELS.DEBUG, event, message, metadata, userId)
 }
 
 /**
@@ -130,11 +130,12 @@ export const logRequest = (
     userAgent,
   }
   
-  const level = statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'info'
+  const level = statusCode >= HTTP_STATUS_THRESHOLDS.SERVER_ERROR ? LOG_LEVELS.ERROR : 
+                statusCode >= HTTP_STATUS_THRESHOLDS.CLIENT_ERROR ? LOG_LEVELS.WARN : LOG_LEVELS.INFO
   
-  if (level === 'error') {
+  if (level === LOG_LEVELS.ERROR) {
     logError(LOG_EVENTS.HTTP_REQUEST, `${method} ${url} - ${statusCode}`, metadata, userId)
-  } else if (level === 'warn') {
+  } else if (level === LOG_LEVELS.WARN) {
     logWarn(LOG_EVENTS.HTTP_REQUEST, `${method} ${url} - ${statusCode}`, metadata, userId)
   } else {
     logInfo(LOG_EVENTS.HTTP_REQUEST, `${method} ${url} - ${statusCode}`, metadata, userId)

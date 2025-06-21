@@ -89,16 +89,9 @@ export type PaginationInfo = {
   hasMore: boolean
 }
 
-// Rol bazlı log filtreleme için örnek kullanım tipleri - Union types kullan
-export type RoleBasedLogFilters = {
-  // Tek rol filtreleme
-  adminLogs: LogFilters & { userRoles: ['ADMIN'] }
-  moderatorLogs: LogFilters & { userRoles: ['MODERATOR'] }
-  
-  // Çoklu rol filtreleme
-  staffLogs: LogFilters & { userRoles: ['ADMIN', 'MODERATOR', 'EDITOR'] }
-  nonUserLogs: LogFilters & { userRoles: ['ADMIN', 'MODERATOR'] }
-}
+// Rol bazlı log filtreleme için genel tip tanımları
+export type SingleRoleFilter<T extends UserRole> = LogFilters & { userRoles: [T] }
+export type MultiRoleFilter<T extends readonly UserRole[]> = LogFilters & { userRoles: T }
 
 // Rol bazlı istatistikler için tip
 export interface RoleBasedLogStats {
