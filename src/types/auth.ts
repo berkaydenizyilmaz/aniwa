@@ -1,9 +1,10 @@
 // Aniwa Projesi - Auth Tipleri
 // Bu dosya kimlik doğrulama ile ilgili tüm tip tanımlarını içerir
 
-import type { UserRole } from '@prisma/client'
+import type { User, UserRole } from '@prisma/client'
 import type { Session } from 'next-auth'
 import type { SignInResponse } from 'next-auth/react'
+import { Prisma } from '@prisma/client'
 
 // Kullanıcı oluşturma parametreleri
 export interface CreateUserParams {
@@ -13,45 +14,23 @@ export interface CreateUserParams {
   name?: string
 }
 
-// Kullanıcı profil güncelleme parametreleri
-export interface UpdateProfileParams {
-  username?: string
-  name?: string
-  bio?: string
-  profilePicture?: string
-  profileBanner?: string
-}
+// Kullanıcı profil güncelleme parametreleri - sadece güncellenebilir alanlar
+export type UpdateProfileParams = Partial<Pick<User, 'username' | 'name' | 'bio' | 'profilePicture' | 'profileBanner'>>
 
 // Kullanıcı ayarları güncelleme parametreleri
-export interface UpdateUserSettingsParams {
-  themePreference?: string
-  languagePreference?: string
-  notificationPreferences?: Record<string, unknown>
-  privacySettings?: Record<string, unknown>
-}
+export type UpdateUserSettingsParams = Partial<{
+  themePreference: string
+  languagePreference: string
+  notificationPreferences: Prisma.JsonValue
+  privacySettings: Prisma.JsonValue
+}>
 
-// Ayarlarıyla birlikte kullanıcı tipi
-export interface UserWithSettings {
-  id: string
-  email: string
-  username: string | null
-  name: string | null
-  role: UserRole
-  profilePicture: string | null
-  profileBanner: string | null
-  bio: string | null
-  createdAt: Date
-  updatedAt: Date
-  userSettings?: {
-    id: string
-    themePreference: string
-    languagePreference: string
-    notificationPreferences: Record<string, unknown> | null
-    privacySettings: Record<string, unknown> | null
-    createdAt: Date
-    updatedAt: Date
-  } | null
-}
+// Ayarlarıyla birlikte kullanıcı tipi - Prisma include tipini kullan
+export type UserWithSettings = Prisma.UserGetPayload<{
+  include: {
+    userSettings: true
+  }
+}>
 
 // API yanıt tipleri
 export interface AuthApiResponse<T = unknown> {
@@ -61,27 +40,39 @@ export interface AuthApiResponse<T = unknown> {
   data?: T
 }
 
-// Login response tipi
-export interface LoginResponse {
-  id: string
-  email: string
-  username: string | null
-  name: string | null
-  role: UserRole
-}
+// Login response tipi - User'dan sadece gerekli alanları al
+export type LoginResponse = Pick<User, 'id' | 'email' | 'username' | 'name' | 'role'>
 
-// Session user tipi (NextAuth ile uyumlu)
-export interface SessionUser {
-  id: string
+// Session user tipi (NextAuth ile uyumlu) - User'dan türet
+export type SessionUser = Pick<User, 'id' | 'role'> & {
   email?: string | null
   name?: string | null
   image?: string | null
   username?: string | null
-  role: UserRole
   provider?: string
 }
 
-// Hook dönüş tipleri
+// Kullanıcı listesi için sadece gerekli alanlar
+export type UserListItem = Pick<User, 'id' | 'username' | 'email' | 'role' | 'createdAt'>
+
+// Kullanıcı profil sayfası için gerekli alanlar
+export type UserProfile = Omit<User, 'passwordHash' | 'emailVerified'> & {
+  userSettings?: {
+    themePreference: string
+    languagePreference: string
+  } | null
+}
+
+// Admin paneli için kullanıcı yönetimi
+export type AdminUserView = Pick<User, 'id' | 'username' | 'email' | 'role' | 'createdAt' | 'updatedAt'>
+
+// Kullanıcı arama sonuçları için minimal bilgi
+export type UserSearchResult = Pick<User, 'id' | 'username' | 'profilePicture'>
+
+// Güvenli kullanıcı tipi - hassas bilgiler hariç
+export type SafeUser = Omit<User, 'passwordHash' | 'emailVerified'>
+
+// ---- Hook dönüş tipleri ----
 export interface AuthHookReturn {
   // Session bilgileri
   user: SessionUser | undefined

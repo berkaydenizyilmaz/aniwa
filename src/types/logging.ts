@@ -31,12 +31,8 @@ export interface AuthMetadata extends LogMetadata {
   success: boolean
 }
 
-// Log servisi için parametreler
-export interface CreateLogParams {
-  level: LogLevel
-  event: string
-  message: string
-  metadata?: Prisma.JsonValue
+// Log servisi için parametreler - Prisma create input'undan türet
+export type CreateLogParams = Pick<Prisma.LogCreateInput, 'level' | 'event' | 'message' | 'metadata'> & {
   userId?: string
 }
 
@@ -59,22 +55,19 @@ export interface LogServiceResponse<T = unknown> {
   error?: string
 }
 
-// Log ile kullanıcı bilgilerini birlikte getirmek için tip
-export interface LogWithUser {
-  id: string
-  level: LogLevel
-  event: string
-  message: string
-  metadata: Prisma.JsonValue | null
-  timestamp: Date
-  userId: string | null
-  user?: {
-    id: string
-    username: string | null
-    email: string
-    role: UserRole
-  } | null
-}
+// Log ile kullanıcı bilgilerini birlikte getirmek için tip - Prisma include kullan
+export type LogWithUser = Prisma.LogGetPayload<{
+  include: {
+    user: {
+      select: {
+        id: true
+        username: true
+        email: true
+        role: true
+      }
+    }
+  }
+}>
 
 // Log listesi için tip
 export interface LogListResponse {

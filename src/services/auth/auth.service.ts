@@ -112,28 +112,7 @@ export async function getUserById(userId: string): Promise<UserWithSettings | nu
 
     if (!user) return null
 
-    // Prisma tiplerini UserWithSettings tipine dönüştür
-    return {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      name: user.name,
-      role: user.role,
-      profilePicture: user.profilePicture,
-      profileBanner: user.profileBanner,
-      bio: user.bio,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-      userSettings: user.userSettings ? {
-        id: user.userSettings.id,
-        themePreference: user.userSettings.themePreference,
-        languagePreference: user.userSettings.languagePreference,
-        notificationPreferences: user.userSettings.notificationPreferences as Record<string, unknown> | null,
-        privacySettings: user.userSettings.privacySettings as Record<string, unknown> | null,
-        createdAt: user.userSettings.createdAt,
-        updatedAt: user.userSettings.updatedAt,
-      } : null
-    }
+    return user
   } catch (error) {
     logError(LOG_EVENTS.AUTH_SESSION_ERROR, 'Kullanıcı bilgisi getirme hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -157,28 +136,7 @@ export async function getUserByEmail(email: string): Promise<UserWithSettings | 
 
     if (!user) return null
 
-    // Prisma tiplerini UserWithSettings tipine dönüştür
-    return {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      name: user.name,
-      role: user.role,
-      profilePicture: user.profilePicture,
-      profileBanner: user.profileBanner,
-      bio: user.bio,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-      userSettings: user.userSettings ? {
-        id: user.userSettings.id,
-        themePreference: user.userSettings.themePreference,
-        languagePreference: user.userSettings.languagePreference,
-        notificationPreferences: user.userSettings.notificationPreferences as Record<string, unknown> | null,
-        privacySettings: user.userSettings.privacySettings as Record<string, unknown> | null,
-        createdAt: user.userSettings.createdAt,
-        updatedAt: user.userSettings.updatedAt,
-      } : null
-    }
+    return user
   } catch (error) {
     logError(LOG_EVENTS.AUTH_SESSION_ERROR, 'Email ile kullanıcı getirme hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
