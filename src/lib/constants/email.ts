@@ -1,7 +1,7 @@
 // Aniwa Projesi - Email Sabitleri
 // Bu dosya email sistemi ile ilgili tüm sabitleri içerir
 
-import { EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS, PASSWORD_RESET_TOKEN_EXPIRY_HOURS } from "./auth";
+import { EMAIL_VERIFICATION_TOKEN_EXPIRY, PASSWORD_RESET_TOKEN_EXPIRY } from "./auth";
 
 // Email Gönderen Bilgileri
 export const EMAIL_SENDER = {
@@ -41,7 +41,7 @@ export const EMAIL_CONTENT = {
     GREETING: 'Merhaba!',
     MESSAGE: 'Aniwa\'ya hoş geldin! Email adresini doğrulamak için aşağıdaki butona tıkla:',
     BUTTON_TEXT: 'Email Adresimi Doğrula',
-    EXPIRY_NOTE: 'Bu link ' + EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS + ' saat boyunca geçerlidir.',
+    EXPIRY_NOTE: 'Bu link ' + EMAIL_VERIFICATION_TOKEN_EXPIRY + ' saat boyunca geçerlidir.',
     ALTERNATIVE: 'Eğer buton çalışmıyorsa, aşağıdaki linki tarayıcına kopyala:',
     SECURITY_NOTE: 'Eğer bu işlemi sen yapmadıysan, bu emaili görmezden gel.',
   },
@@ -50,7 +50,7 @@ export const EMAIL_CONTENT = {
     GREETING: 'Merhaba!',
     MESSAGE: 'Şifre sıfırlama talebinde bulundun. Yeni şifre oluşturmak için aşağıdaki butona tıkla:',
     BUTTON_TEXT: 'Şifremi Sıfırla',
-    EXPIRY_NOTE: 'Bu link ' + PASSWORD_RESET_TOKEN_EXPIRY_HOURS + ' saat boyunca geçerlidir.',
+    EXPIRY_NOTE: 'Bu link ' + PASSWORD_RESET_TOKEN_EXPIRY + ' saat boyunca geçerlidir.',
     ALTERNATIVE: 'Eğer buton çalışmıyorsa, aşağıdaki linki tarayıcına kopyala:',
     SECURITY_NOTE: 'Eğer bu talebi sen yapmadıysan, bu emaili görmezden gel.',  
   },

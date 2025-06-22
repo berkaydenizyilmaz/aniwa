@@ -15,7 +15,7 @@ import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { forgotPasswordSchema, type ForgotPasswordData } from '@/lib/schemas/auth.schemas'
 import { AUTH_ROUTES } from '@/lib/constants/routes'
-import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS } from '@/lib/constants/auth'
+import { PASSWORD_RESET_TOKEN_EXPIRY } from '@/lib/constants/auth'
 import type { ForgotPasswordResponse } from '@/types/auth'
 
 export default function ForgotPasswordPage() {
@@ -82,7 +82,7 @@ export default function ForgotPasswordPage() {
               <Mail className="h-4 w-4" />
               <AlertDescription>
                 Email gelmezse spam/junk klasörünüzü kontrol edin. 
-                Bağlantı sadece {PASSWORD_RESET_TOKEN_EXPIRY_HOURS} saat boyunca geçerlidir.
+                Bağlantı sadece {PASSWORD_RESET_TOKEN_EXPIRY} saat boyunca geçerlidir.
               </AlertDescription>
             </Alert>
             
