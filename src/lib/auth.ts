@@ -61,8 +61,6 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
-          // Email doğrulama kontrolü - Session'da kontrol edilecek
-
           logInfo(LOG_EVENTS.AUTH_LOGIN_SUCCESS, 'Başarılı giriş', {
             userId: user.id,
             username: user.username

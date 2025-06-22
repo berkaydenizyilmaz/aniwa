@@ -4,7 +4,7 @@
 import { prisma } from '@/lib/db/prisma'
 import { logInfo, logError, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
-import { USER_ROLES, OAUTH_TOKEN_EXPIRY } from '@/lib/constants/auth'
+import { USER_ROLES, OAUTH_TOKEN_EXPIRY_HOURS } from '@/lib/constants/auth'
 import { DEFAULT_THEME, DEFAULT_LANGUAGE } from '@/lib/constants/app'
 import type { 
   CreateOAuthPendingUserParams, 
@@ -43,7 +43,7 @@ export async function createOAuthPendingUser(
     const tokenBytes = new Uint8Array(32)
     crypto.getRandomValues(tokenBytes)
     const token = Array.from(tokenBytes, byte => byte.toString(16).padStart(2, '0')).join('')
-    const expiresAt = new Date(Date.now() + OAUTH_TOKEN_EXPIRY)
+    const expiresAt = new Date(Date.now() + OAUTH_TOKEN_EXPIRY_HOURS * (60 * 1000))
 
     // Mevcut pending user'ı temizle
     await prisma.oAuthPendingUser.deleteMany({
