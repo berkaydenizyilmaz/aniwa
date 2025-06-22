@@ -247,4 +247,24 @@ export async function updateUserSettings(userId: string, settings: UpdateUserSet
     }, userId)
     return { success: false, error: 'Ayarlar güncellenemedi' }
   }
+}
+
+/**
+ * Kullanıcının email doğrulama durumunu kontrol eder
+ */
+export async function checkEmailVerification(userId: string): Promise<boolean> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { emailVerified: true }
+    })
+
+    return !!user?.emailVerified
+  } catch (error) {
+    logError(LOG_EVENTS.AUTH_SESSION_ERROR, 'Email doğrulama kontrolü hatası', {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      userId
+    })
+    return false
+  }
 } 

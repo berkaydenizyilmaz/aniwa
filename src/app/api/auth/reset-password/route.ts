@@ -2,18 +2,10 @@
 // Bu dosya şifre sıfırlama token'ını kullanarak şifre değiştirir
 
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 import { verifyPasswordResetToken, resetPasswordWithToken } from '@/services/auth/email-verification.service'
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
-
-// Request body validation
-const resetPasswordSchema = z.object({
-  token: z.string().min(1, 'Token gerekli'),
-  password: z.string()
-    .min(8, 'Şifre en az 8 karakter olmalı')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Şifre en az bir küçük harf, bir büyük harf ve bir rakam içermeli')
-})
+import { resetPasswordApiSchema } from '@/lib/schemas/auth.schemas'
 
 // Token doğrulama endpoint'i (GET)
 export async function GET(request: NextRequest) {
@@ -61,7 +53,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     
     // Input validation
-    const validation = resetPasswordSchema.safeParse(body)
+    const validation = resetPasswordApiSchema.safeParse(body)
     if (!validation.success) {
       return NextResponse.json(
         { 

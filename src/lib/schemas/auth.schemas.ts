@@ -13,7 +13,6 @@ import {
   EMAIL_MIN_LENGTH,
 } from '../constants/auth'
 import {
-  EMAIL_REGEX,
   THEME_PREFERENCES,
   DEFAULT_THEME,
   LANGUAGE_PREFERENCES,
@@ -24,7 +23,7 @@ import {
 export const emailSchema = z
   .string()
   .min(EMAIL_MIN_LENGTH, 'Email adresi gerekli')
-  .regex(EMAIL_REGEX, 'Geçerli bir email adresi giriniz')
+  .email('Geçerli bir email adresi giriniz')
   .toLowerCase()
 
 // Username şeması
@@ -102,13 +101,19 @@ export const forgotPasswordSchema = z.object({
   email: emailSchema
 })
 
-// Şifre sıfırlama şeması
+// Şifre sıfırlama şeması (frontend form için - password + confirm)
 export const resetPasswordSchema = z.object({
   password: passwordSchema,
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Şifreler eşleşmiyor",
   path: ["confirmPassword"],
+})
+
+// Şifre sıfırlama API şeması (backend için - token + password)
+export const resetPasswordApiSchema = z.object({
+  token: z.string().min(TOKEN_MIN_LENGTH, 'Token gerekli'),
+  password: passwordSchema,
 })
 
 // Şifre sıfırlama onay şeması
@@ -130,4 +135,5 @@ export type UserSettingsData = z.infer<typeof userSettingsSchema>
 export type VerifyEmailData = z.infer<typeof verifyEmailSchema>
 export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>
+export type ResetPasswordApiData = z.infer<typeof resetPasswordApiSchema>
 export type ConfirmResetPasswordData = z.infer<typeof confirmResetPasswordSchema> 

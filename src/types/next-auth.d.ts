@@ -16,6 +16,7 @@ declare module 'next-auth' {
       provider?: string
       oauthToken?: string
       oauthExpired?: boolean
+      emailVerified?: Date | null
     } & DefaultSession['user']
   }
 
@@ -26,6 +27,7 @@ declare module 'next-auth' {
     username?: string | null
     roles: UserRole[]
     oauthToken?: string
+    emailVerified?: Date | null
   }
 
   /**
@@ -47,5 +49,6 @@ declare module 'next-auth/jwt' {
     provider?: string
     oauthToken?: string
     oauthExpired?: boolean
+    emailVerified?: Date | null
   }
 } 

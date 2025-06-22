@@ -61,6 +61,15 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
+          // Email doğrulama kontrolü
+          if (!user.emailVerified) {
+            logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Email doğrulanmamış', {
+              userId: user.id,
+              username: credentials.username
+            })
+            return null
+          }
+
           logInfo(LOG_EVENTS.AUTH_LOGIN_SUCCESS, 'Başarılı giriş', {
             userId: user.id,
             username: user.username
@@ -107,6 +116,7 @@ export const authOptions: NextAuthOptions = {
         token.username = user.username
         token.roles = user.roles
         token.image = user.image
+        token.emailVerified = user.emailVerified
         
         // OAuth token'ı varsa ekle
         if (user.oauthToken) {
@@ -133,6 +143,7 @@ export const authOptions: NextAuthOptions = {
               token.username = user.username
               token.roles = user.roles
               token.image = user.image || user.profilePicture
+              token.emailVerified = user.emailVerified
             }
           } catch (error) {
             logError(LOG_EVENTS.AUTH_SESSION_ERROR, 'Mevcut kullanıcı bilgisi güncelleme hatası', {
@@ -166,6 +177,7 @@ export const authOptions: NextAuthOptions = {
                 token.username = user.username
                 token.roles = user.roles
                 token.image = user.image || user.profilePicture
+                token.emailVerified = user.emailVerified
               }
             }
             
@@ -205,6 +217,7 @@ export const authOptions: NextAuthOptions = {
         session.user.username = token.username as string | null
         session.user.roles = token.roles
         session.user.provider = token.provider as string
+        session.user.emailVerified = token.emailVerified as Date | null
         
         // OAuth token'ı varsa ekle
         if (token.oauthToken) {

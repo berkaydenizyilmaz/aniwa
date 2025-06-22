@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 import { logInfo, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
-import { USERNAME_REGEX } from '@/lib/constants/auth'
+import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_REGEX } from '@/lib/constants/auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,9 +17,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Username formatını kontrol et
-    if (username.length < 3 || username.length > 20) {
+    if (username.length < USERNAME_MIN_LENGTH || username.length > USERNAME_MAX_LENGTH) {
       return NextResponse.json(
-        { available: false, error: 'Username 3-20 karakter arasında olmalı' },
+        { available: false, error: 'Username ' + USERNAME_MIN_LENGTH + '-' + USERNAME_MAX_LENGTH + ' karakter arasında olmalı' },
         { status: 400 }
       )
     }

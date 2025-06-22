@@ -30,7 +30,12 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
-        setError('Geçersiz kullanıcı adı veya şifre')
+        // Email doğrulanmamış kullanıcı için özel mesaj
+        if (result.error === 'CredentialsSignin') {
+          setError('Email adresinizi doğrulamanız gerekiyor. Lütfen email kutunuzu kontrol edin.')
+        } else {
+          setError('Geçersiz kullanıcı adı veya şifre')
+        }
       } else {
         // Session'ı yenile ve yönlendir
         const session = await getSession()

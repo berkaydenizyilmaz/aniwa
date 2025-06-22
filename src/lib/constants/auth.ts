@@ -26,8 +26,6 @@ export const OAUTH_TOKEN_EXPIRY_MINUTES = 1 // OAuth pending user token süresi
 export const EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS = 24 // Email doğrulama token süresi (24 saat)
 export const PASSWORD_RESET_TOKEN_EXPIRY_HOURS = 1 // Şifre sıfırlama token süresi (1 saat)
 
-
-
 // Verification Token Türleri
 export const VERIFICATION_TOKEN_TYPES = {
   EMAIL_VERIFICATION: 'email_verification',

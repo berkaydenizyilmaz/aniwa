@@ -12,7 +12,7 @@ import {
   ContentSkeleton
 } from '@/components/ui/loading'
 import { Button } from '@/components/ui/button'
-import AuthStatus from '@/components/auth/auth-status'
+import AuthStatus from '@/components/modules/auth/auth-status'
 
 export default function Home() {
   return (

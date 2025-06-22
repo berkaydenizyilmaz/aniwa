@@ -29,23 +29,8 @@ export const DEFAULT_THEME = 'system' as const
 export const LANGUAGE_PREFERENCES = ['tr'] as const
 export const DEFAULT_LANGUAGE = 'tr' as const
 
-// Genel Email Validasyonu
-export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
 // Tip tanımlamaları
 export type HttpStatusCategory = typeof HTTP_STATUS_CATEGORIES[keyof typeof HTTP_STATUS_CATEGORIES]
 export type HttpStatusThreshold = typeof HTTP_STATUS_THRESHOLDS[keyof typeof HTTP_STATUS_THRESHOLDS]
 export type ThemePreference = typeof THEME_PREFERENCES[number]
-export type LanguagePreference = typeof LANGUAGE_PREFERENCES[number]
-
-// Email Template Sabitleri
-export const EMAIL_TEMPLATES = {
-  FROM_ADDRESS: 'Aniwa <noreply@aniwa.tr>',
-  BRAND_NAME: 'aniwa',
-} as const
-
-export const EMAIL_SUBJECTS = {
-  EMAIL_VERIFICATION: 'Aniwa - Email Adresinizi Doğrulayın',
-  PASSWORD_RESET: 'Aniwa - Şifre Sıfırlama',
-  PASSWORD_CHANGED: 'Aniwa - Şifreniz Değiştirildi',
-} as const 
+export type LanguagePreference = typeof LANGUAGE_PREFERENCES[number] 

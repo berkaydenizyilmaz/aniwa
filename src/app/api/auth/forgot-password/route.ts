@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const { email } = validation.data
     
     // Base URL'i oluştur
-    const baseUrl = request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const baseUrl = request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3001'
     
     // Şifre sıfırlama token'ı oluştur ve email gönder
     const result = await createPasswordResetToken(email, baseUrl)
