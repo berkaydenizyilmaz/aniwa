@@ -40,8 +40,6 @@ export const passwordSchema = z
   .min(PASSWORD_MIN_LENGTH, `Şifre en az ${PASSWORD_MIN_LENGTH} karakter olmalıdır`)
   .max(PASSWORD_MAX_LENGTH, `Şifre en fazla ${PASSWORD_MAX_LENGTH} karakter olmalıdır`)
 
-
-
 // Bio şeması
 export const bioSchema = z
   .string()
@@ -106,7 +104,11 @@ export const forgotPasswordSchema = z.object({
 
 // Şifre sıfırlama şeması
 export const resetPasswordSchema = z.object({
-  email: emailSchema,
+  password: passwordSchema,
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Şifreler eşleşmiyor",
+  path: ["confirmPassword"],
 })
 
 // Şifre sıfırlama onay şeması
@@ -126,5 +128,6 @@ export type UpdateProfileData = z.infer<typeof updateProfileSchema>
 export type UpdatePasswordData = z.infer<typeof updatePasswordSchema>
 export type UserSettingsData = z.infer<typeof userSettingsSchema>
 export type VerifyEmailData = z.infer<typeof verifyEmailSchema>
+export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>
 export type ConfirmResetPasswordData = z.infer<typeof confirmResetPasswordSchema> 

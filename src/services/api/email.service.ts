@@ -91,14 +91,14 @@ function createEmailTemplate(content: string): string {
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           line-height: 1.6;
           color: #333;
-          max-width: ${EMAIL_TEMPLATES.STYLES.CONTAINER_MAX_WIDTH};
+          max-width: 600px;
           margin: 0 auto;
           padding: 20px;
           background-color: #f8f9fa;
         }
         .container {
           background: white;
-          border-radius: ${EMAIL_TEMPLATES.STYLES.BORDER_RADIUS};
+          border-radius: 12px;
           padding: 40px;
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -109,7 +109,7 @@ function createEmailTemplate(content: string): string {
         .logo {
           font-size: 32px;
           font-weight: bold;
-          background: ${EMAIL_TEMPLATES.BRAND_COLORS.PRIMARY_GRADIENT};
+          background: linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -125,9 +125,9 @@ function createEmailTemplate(content: string): string {
         }
         .button {
           display: inline-block;
-          background: ${EMAIL_TEMPLATES.BRAND_COLORS.BUTTON_GRADIENT};
+          background: linear-gradient(135deg, #8b5cf6, #06b6d4);
           color: white;
-          padding: ${EMAIL_TEMPLATES.STYLES.BUTTON_PADDING};
+          padding: 14px 28px;
           text-decoration: none;
           border-radius: 8px;
           font-weight: 600;

@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -15,19 +14,9 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Lock, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react'
 import Link from 'next/link'
+import { resetPasswordSchema, type ResetPasswordData } from '@/lib/schemas/auth.schemas'
+import { API_ROUTES, AUTH_ROUTES } from '@/lib/constants/routes'
 
-// Form validation schema
-const resetPasswordSchema = z.object({
-  password: z.string()
-    .min(8, 'Şifre en az 8 karakter olmalı')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Şifre en az bir küçük harf, bir büyük harf ve bir rakam içermeli'),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Şifreler eşleşmiyor",
-  path: ["confirmPassword"],
-})
-
-type ResetPasswordForm = z.infer<typeof resetPasswordSchema>
 type PageState = 'loading' | 'form' | 'success' | 'error'
 
 export default function ResetPasswordPage() {
@@ -46,7 +35,7 @@ export default function ResetPasswordPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ResetPasswordForm>({
+  } = useForm<ResetPasswordData>({
     resolver: zodResolver(resetPasswordSchema)
   })
 
@@ -60,7 +49,7 @@ export default function ResetPasswordPage() {
 
     const verifyToken = async () => {
       try {
-        const response = await fetch(`/api/auth/reset-password?token=${token}`)
+        const response = await fetch(API_ROUTES.AUTH.RESET_PASSWORD + '?token=' + token)
         const data = await response.json()
 
         if (data.success) {
@@ -80,12 +69,12 @@ export default function ResetPasswordPage() {
     verifyToken()
   }, [token])
 
-  const onSubmit = async (data: ResetPasswordForm) => {
+  const onSubmit = async (data: ResetPasswordData) => {
     setIsSubmitting(true)
     setError('')
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch(API_ROUTES.AUTH.RESET_PASSWORD, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +91,7 @@ export default function ResetPasswordPage() {
         setPageState('success')
         // 3 saniye sonra login sayfasına yönlendir
         setTimeout(() => {
-          router.push('/giris?password-reset=true')
+          router.push(AUTH_ROUTES.SIGN_IN + '?password-reset=true')
         }, 3000)
       } else {
         setError(result.error || 'Şifre sıfırlama başarısız')
@@ -158,7 +147,7 @@ export default function ResetPasswordPage() {
               3 saniye içinde giriş sayfasına yönlendirileceksiniz...
             </p>
             <Button asChild className="w-full">
-              <Link href="/giris">
+              <Link href={AUTH_ROUTES.SIGN_IN}>
                 Hemen Giriş Yap
               </Link>
             </Button>
@@ -187,12 +176,12 @@ export default function ResetPasswordPage() {
           
           <CardContent className="space-y-4">
             <Button asChild className="w-full">
-              <Link href="/sifremi-unuttum">
+              <Link href={AUTH_ROUTES.FORGOT_PASSWORD}>
                 Yeni Sıfırlama Bağlantısı İste
               </Link>
             </Button>
             <Button asChild variant="ghost" className="w-full">
-              <Link href="/giris">
+              <Link href={AUTH_ROUTES.SIGN_IN}>
                 Giriş Sayfasına Dön
               </Link>
             </Button>

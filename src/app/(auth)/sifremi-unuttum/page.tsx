@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
-import { resetPasswordSchema, type ResetPasswordData } from '@/lib/schemas/auth.schemas'
+import { forgotPasswordSchema, type ForgotPasswordData } from '@/lib/schemas/auth.schemas'
 import { AUTH_ROUTES } from '@/lib/constants/routes'
 import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS } from '@/lib/constants/auth'
 import type { ForgotPasswordResponse } from '@/types/auth'
@@ -28,11 +28,11 @@ export default function ForgotPasswordPage() {
     handleSubmit,
     formState: { errors },
     getValues
-  } = useForm<ResetPasswordData>({
-    resolver: zodResolver(resetPasswordSchema)
+  } = useForm<ForgotPasswordData>({
+    resolver: zodResolver(forgotPasswordSchema)
   })
 
-  const onSubmit = async (data: ResetPasswordData) => {
+  const onSubmit = async (data: ForgotPasswordData) => {
     setIsLoading(true)
     setError('')
 

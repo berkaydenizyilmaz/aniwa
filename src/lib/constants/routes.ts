@@ -8,6 +8,8 @@ export const API_ROUTES = {
     SETUP_USERNAME: '/api/auth/setup-username',
     SIGNUP: '/api/auth/signup',
     SIGN_OUT: '/api/auth/signout',
+    RESET_PASSWORD: '/api/auth/reset-password',
+    FORGOT_PASSWORD: '/api/auth/forgot-password',
   },
 } as const
 
@@ -18,6 +20,8 @@ export const AUTH_ROUTES = {
   ERROR: '/hata',
   VERIFY_REQUEST: '/dogrulama',
   SETUP_USERNAME: '/kullanici-adi-secimi',
+  FORGOT_PASSWORD: '/sifremi-unuttum',
+  RESET_PASSWORD: '/sifre-sifirlama',
 } as const
 
 // Public sayfalar (Türkçe URL'ler)

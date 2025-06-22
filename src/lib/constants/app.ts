@@ -42,15 +42,6 @@ export type LanguagePreference = typeof LANGUAGE_PREFERENCES[number]
 export const EMAIL_TEMPLATES = {
   FROM_ADDRESS: 'Aniwa <noreply@aniwa.tr>',
   BRAND_NAME: 'aniwa',
-  BRAND_COLORS: {
-    PRIMARY_GRADIENT: 'linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981)',
-    BUTTON_GRADIENT: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
-  },
-  STYLES: {
-    CONTAINER_MAX_WIDTH: '600px',
-    BORDER_RADIUS: '12px',
-    BUTTON_PADDING: '14px 28px',
-  }
 } as const
 
 export const EMAIL_SUBJECTS = {

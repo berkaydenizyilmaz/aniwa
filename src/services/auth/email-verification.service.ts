@@ -15,6 +15,7 @@ import {
   sendPasswordChangedNotification 
 } from '@/services/api/email.service'
 import type { AuthApiResponse } from '@/types/auth'
+import { AUTH_ROUTES } from '@/lib/constants/routes'
 
 /**
  * Email doğrulama token'ı oluşturur ve doğrulama emaili gönderir
@@ -51,7 +52,7 @@ export async function createEmailVerificationToken(
     })
 
     // Email gönder
-    const verificationUrl = `${baseUrl}/dogrulama?token=${token}`
+    const verificationUrl = `${baseUrl}${AUTH_ROUTES.VERIFY_REQUEST}?token=${token}`
     const emailResult = await sendVerificationEmail({
       to: email.toLowerCase(),
       username,
@@ -145,7 +146,7 @@ export async function createPasswordResetToken(
     })
 
     // Email gönder
-    const resetUrl = `${baseUrl}/sifre-sifirlama?token=${token}`
+    const resetUrl = `${baseUrl}${AUTH_ROUTES.RESET_PASSWORD}?token=${token}`
     const emailResult = await sendPasswordResetEmail({
       to: email.toLowerCase(),
       username: user.username || user.email.split('@')[0],
