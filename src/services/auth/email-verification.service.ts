@@ -377,10 +377,10 @@ export async function resetPasswordWithToken(
     })
 
     // Şifre değişikliği bildirim emaili gönder
-    await sendPasswordChangedNotification(
-      email,
-      user.username || user.email.split('@')[0]
-    )
+    await sendPasswordChangedNotification({
+      to: email,
+      username: user.username || user.email.split('@')[0]
+    })
 
     logInfo(LOG_EVENTS.AUTH_PASSWORD_RESET_SUCCESS, 'Şifre başarıyla sıfırlandı', {
       email,

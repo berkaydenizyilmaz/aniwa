@@ -99,6 +99,11 @@ export const verifyEmailSchema = z.object({
   token: z.string().min(TOKEN_MIN_LENGTH, 'Doğrulama kodu gerekli'),
 })
 
+// Şifre sıfırlama talebi şeması
+export const forgotPasswordSchema = z.object({
+  email: emailSchema
+})
+
 // Şifre sıfırlama şeması
 export const resetPasswordSchema = z.object({
   email: emailSchema,

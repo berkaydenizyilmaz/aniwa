@@ -6,7 +6,6 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -14,13 +13,10 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
-
-// Form validation schema
-const forgotPasswordSchema = z.object({
-  email: z.string().email('Geçerli bir email adresi girin')
-})
-
-type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>
+import { resetPasswordSchema, type ResetPasswordData } from '@/lib/schemas/auth.schemas'
+import { AUTH_ROUTES } from '@/lib/constants/routes'
+import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS } from '@/lib/constants/auth'
+import type { ForgotPasswordResponse } from '@/types/auth'
 
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -32,11 +28,11 @@ export default function ForgotPasswordPage() {
     handleSubmit,
     formState: { errors },
     getValues
-  } = useForm<ForgotPasswordForm>({
-    resolver: zodResolver(forgotPasswordSchema)
+  } = useForm<ResetPasswordData>({
+    resolver: zodResolver(resetPasswordSchema)
   })
 
-  const onSubmit = async (data: ForgotPasswordForm) => {
+  const onSubmit = async (data: ResetPasswordData) => {
     setIsLoading(true)
     setError('')
 
@@ -49,7 +45,7 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify(data),
       })
 
-      const result = await response.json()
+      const result: ForgotPasswordResponse = await response.json()
 
       if (result.success) {
         setIsSuccess(true)
@@ -86,13 +82,13 @@ export default function ForgotPasswordPage() {
               <Mail className="h-4 w-4" />
               <AlertDescription>
                 Email gelmezse spam/junk klasörünüzü kontrol edin. 
-                Bağlantı sadece 1 saat boyunca geçerlidir.
+                Bağlantı sadece {PASSWORD_RESET_TOKEN_EXPIRY_HOURS} saat boyunca geçerlidir.
               </AlertDescription>
             </Alert>
             
             <div className="space-y-2">
               <Button asChild className="w-full">
-                <Link href="/giris">
+                <Link href={AUTH_ROUTES.SIGN_IN}>
                   Giriş Sayfasına Dön
                 </Link>
               </Button>
@@ -165,7 +161,7 @@ export default function ForgotPasswordPage() {
           
           <div className="mt-6 text-center">
             <Button variant="ghost" asChild>
-              <Link href="/giris" className="flex items-center">
+              <Link href={AUTH_ROUTES.SIGN_IN} className="flex items-center">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Giriş Sayfasına Dön
               </Link>

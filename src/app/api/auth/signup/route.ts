@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Email doğrulama token'ı oluştur ve email gönder
-    const baseUrl = request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const baseUrl = request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3001'
     const verificationResult = await createEmailVerificationToken(email, username, baseUrl)
 
     if (!verificationResult.success) {

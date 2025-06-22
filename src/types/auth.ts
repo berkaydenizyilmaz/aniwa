@@ -120,4 +120,58 @@ export interface RequireAuthHookReturn {
 export interface RequireRoleHookReturn {
   hasRequiredRole: boolean | undefined
   isLoading: boolean
+}
+
+// ---- Email Service Tipleri ----
+export interface EmailSendResult {
+  id: string
+}
+
+export interface SendEmailParams {
+  to: string
+  subject: string
+  html: string
+  from?: string
+}
+
+export interface SendVerificationEmailParams {
+  to: string
+  username: string
+  verificationUrl: string
+}
+
+export interface SendPasswordResetEmailParams {
+  to: string
+  username: string
+  resetUrl: string
+}
+
+export interface SendPasswordChangedNotificationParams {
+  to: string
+  username: string
+}
+
+// ---- API Response Tipleri ----
+export interface ForgotPasswordResponse {
+  success: boolean
+  message?: string
+  error?: string
+}
+
+export interface ResetPasswordResponse {
+  success: boolean
+  message?: string
+  error?: string
+  data?: {
+    email: string
+  }
+}
+
+export interface VerifyEmailResponse {
+  success: boolean
+  message?: string
+  error?: string
+  data?: {
+    email: string
+  }
 } 

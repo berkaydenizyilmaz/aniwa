@@ -2,15 +2,10 @@
 // Bu dosya şifre sıfırlama token'ı oluşturur ve email gönderir
 
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 import { createPasswordResetToken } from '@/services/auth/email-verification.service'
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
-
-// Request body validation
-const forgotPasswordSchema = z.object({
-  email: z.string().email('Geçerli bir email adresi girin')
-})
+import { forgotPasswordSchema } from '@/lib/schemas/auth.schemas'
 
 export async function POST(request: NextRequest) {
   try {

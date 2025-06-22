@@ -36,4 +36,25 @@ export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export type HttpStatusCategory = typeof HTTP_STATUS_CATEGORIES[keyof typeof HTTP_STATUS_CATEGORIES]
 export type HttpStatusThreshold = typeof HTTP_STATUS_THRESHOLDS[keyof typeof HTTP_STATUS_THRESHOLDS]
 export type ThemePreference = typeof THEME_PREFERENCES[number]
-export type LanguagePreference = typeof LANGUAGE_PREFERENCES[number] 
+export type LanguagePreference = typeof LANGUAGE_PREFERENCES[number]
+
+// Email Template Sabitleri
+export const EMAIL_TEMPLATES = {
+  FROM_ADDRESS: 'Aniwa <noreply@aniwa.tr>',
+  BRAND_NAME: 'aniwa',
+  BRAND_COLORS: {
+    PRIMARY_GRADIENT: 'linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981)',
+    BUTTON_GRADIENT: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+  },
+  STYLES: {
+    CONTAINER_MAX_WIDTH: '600px',
+    BORDER_RADIUS: '12px',
+    BUTTON_PADDING: '14px 28px',
+  }
+} as const
+
+export const EMAIL_SUBJECTS = {
+  EMAIL_VERIFICATION: 'Aniwa - Email Adresinizi Doğrulayın',
+  PASSWORD_RESET: 'Aniwa - Şifre Sıfırlama',
+  PASSWORD_CHANGED: 'Aniwa - Şifreniz Değiştirildi',
+} as const 
