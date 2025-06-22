@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState } from 'react'  
 import { signIn, getSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -30,12 +30,8 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
-        // Email doğrulanmamış kullanıcı için özel mesaj
-        if (result.error === 'CredentialsSignin') {
-          setError('Email adresinizi doğrulamanız gerekiyor. Lütfen email kutunuzu kontrol edin.')
-        } else {
-          setError('Geçersiz kullanıcı adı veya şifre')
-        }
+        // Diğer tüm durumlar için generic message (güvenlik için)
+        setError('Geçersiz kullanıcı adı veya şifre. Lütfen tekrar deneyin.')
       } else {
         // Session'ı yenile ve yönlendir
         const session = await getSession()
@@ -108,9 +104,9 @@ export default function LoginPage() {
 
           <div>
             <div className="flex justify-between items-center">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Şifre
-              </label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Şifre
+            </label>
               <Link href="/sifremi-unuttum" className="text-sm text-blue-600 hover:text-blue-500">
                 Şifremi unuttum
               </Link>

@@ -61,14 +61,7 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
-          // Email doğrulama kontrolü
-          if (!user.emailVerified) {
-            logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Email doğrulanmamış', {
-              userId: user.id,
-              username: credentials.username
-            })
-            return null
-          }
+          // Email doğrulama kontrolü - Session'da kontrol edilecek
 
           logInfo(LOG_EVENTS.AUTH_LOGIN_SUCCESS, 'Başarılı giriş', {
             userId: user.id,
@@ -190,7 +183,7 @@ export const authOptions: NextAuthOptions = {
           
           // Token süresi dolmuşsa temizle
           if (pendingUser.expiresAt < new Date()) {
-            await prisma.oAuthPendingUser.delete({ where: { id: pendingUser.id } })
+              await prisma.oAuthPendingUser.delete({ where: { id: pendingUser.id } })
             
             logWarn(LOG_EVENTS.AUTH_OAUTH_FAILED, 'OAuth token süresi doldu - oauthToken temizlendi', {
               tokenPrefix: typeof token.oauthToken === 'string' ? token.oauthToken.substring(0, 8) + '...' : 'unknown'
@@ -238,7 +231,7 @@ export const authOptions: NextAuthOptions = {
         // OAuth ile giriş yapılıyorsa
         if (account?.provider === OAUTH_PROVIDERS.GOOGLE && profile) {
           // Geçici kullanıcı oluştur veya mevcut kullanıcıyı kontrol et
-                     const result = await createOAuthPendingUser({
+            const result = await createOAuthPendingUser({
              email: user.email!,
              provider: account.provider,
              providerId: account.providerAccountId,
