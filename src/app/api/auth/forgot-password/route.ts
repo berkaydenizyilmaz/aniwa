@@ -39,13 +39,13 @@ export async function POST(request: NextRequest) {
       // Güvenlik için her zaman başarılı yanıt döndür
       return NextResponse.json({
         success: true,
-        message: 'Eğer bu email adresi sistemde kayıtlıysa, şifre sıfırlama bağlantısı gönderildi'
+        message: 'Şifre sıfırlama bağlantısı gönderildi'
       })
     } else {
       // Hata durumunda bile güvenlik için genel mesaj döndür
       return NextResponse.json({
         success: true,
-        message: 'Eğer bu email adresi sistemde kayıtlıysa, şifre sıfırlama bağlantısı gönderildi'
+        message: 'Şifre sıfırlama bağlantısı gönderildi'
       })
     }
   } catch (error) {

@@ -6,8 +6,8 @@ import { logInfo, logError, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import { 
   VERIFICATION_TOKEN_TYPES, 
-  EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS,
-  PASSWORD_RESET_TOKEN_EXPIRY_HOURS 
+  EMAIL_VERIFICATION_TOKEN_EXPIRY,
+  PASSWORD_RESET_TOKEN_EXPIRY 
 } from '@/lib/constants/auth'
 import { 
   sendVerificationEmail, 
@@ -39,7 +39,7 @@ export async function createEmailVerificationToken(
     crypto.getRandomValues(tokenBytes)
     const token = Array.from(tokenBytes, byte => byte.toString(16).padStart(2, '0')).join('')
     
-    const expiresAt = new Date(Date.now() + EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000)
+    const expiresAt = new Date(Date.now() + EMAIL_VERIFICATION_TOKEN_EXPIRY)
 
     // Token'ı veritabanına kaydet
     await prisma.verificationToken.create({
@@ -133,7 +133,7 @@ export async function createPasswordResetToken(
     crypto.getRandomValues(tokenBytes)
     const token = Array.from(tokenBytes, byte => byte.toString(16).padStart(2, '0')).join('')
     
-    const expiresAt = new Date(Date.now() + PASSWORD_RESET_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000)
+    const expiresAt = new Date(Date.now() + PASSWORD_RESET_TOKEN_EXPIRY)
 
     // Token'ı veritabanına kaydet
     await prisma.verificationToken.create({

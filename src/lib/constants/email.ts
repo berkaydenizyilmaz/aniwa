@@ -37,13 +37,16 @@ export const EMAIL_STYLES = {
 // Email Template Metinleri
 export const EMAIL_CONTENT = {
   VERIFICATION: {
+    SUBJECT: 'Email Adresinizi Doğrulayın',
     GREETING: 'Merhaba!',
     MESSAGE: 'Aniwa\'ya hoş geldin! Email adresini doğrulamak için aşağıdaki butona tıkla:',
     BUTTON_TEXT: 'Email Adresimi Doğrula',
     EXPIRY_NOTE: 'Bu link ' + EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS + ' saat boyunca geçerlidir.',
     ALTERNATIVE: 'Eğer buton çalışmıyorsa, aşağıdaki linki tarayıcına kopyala:',
+    SECURITY_NOTE: 'Eğer bu işlemi sen yapmadıysan, bu emaili görmezden gel.',
   },
   PASSWORD_RESET: {
+    SUBJECT: 'Şifre Sıfırlama',
     GREETING: 'Merhaba!',
     MESSAGE: 'Şifre sıfırlama talebinde bulundun. Yeni şifre oluşturmak için aşağıdaki butona tıkla:',
     BUTTON_TEXT: 'Şifremi Sıfırla',
@@ -52,6 +55,7 @@ export const EMAIL_CONTENT = {
     SECURITY_NOTE: 'Eğer bu talebi sen yapmadıysan, bu emaili görmezden gel.',  
   },
   PASSWORD_CHANGED: {
+    SUBJECT: 'Şifreniz Değiştirildi',
     GREETING: 'Merhaba!',
     MESSAGE: 'Hesabının şifresi başarıyla değiştirildi.',
     SECURITY_MESSAGE: 'Eğer bu değişikliği sen yapmadıysan, hemen bizimle iletişime geç.',

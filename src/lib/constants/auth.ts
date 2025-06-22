@@ -18,13 +18,13 @@ export const TOKEN_MIN_LENGTH = 32
 export const BCRYPT_SALT_ROUNDS = 12
 
 // Session ve JWT ayarları
-export const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye cinsinden)
-export const JWT_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye cinsinden)
+export const SESSION_MAX_AGE = 30 * (24 * 60 * 60) // 30 gün (saniye cinsinden)
+export const JWT_MAX_AGE = 30 * (24 * 60 * 60) // 30 gün (saniye cinsinden)
 
 // Token süreleri
-export const OAUTH_TOKEN_EXPIRY_MINUTES = 1 // OAuth pending user token süresi
-export const EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS = 24 // Email doğrulama token süresi (24 saat)
-export const PASSWORD_RESET_TOKEN_EXPIRY_HOURS = 1 // Şifre sıfırlama token süresi (1 saat)
+export const OAUTH_TOKEN_EXPIRY = 1 * (60 * 1000) // OAuth pending user token süresi (1 dakika)
+export const EMAIL_VERIFICATION_TOKEN_EXPIRY = 24 * (60 * 60 * 1000) // Email doğrulama token süresi (24 saat)
+export const PASSWORD_RESET_TOKEN_EXPIRY = 1 * (60 * 60 * 1000) // Şifre sıfırlama token süresi (1 saat)
 
 // Verification Token Türleri
 export const VERIFICATION_TOKEN_TYPES = {

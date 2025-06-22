@@ -87,12 +87,12 @@ export default withAuth(
         }
 
         // 3. Ana sayfa - Her zaman erişilebilir
-        if (pathname === '/') {
+        if (pathname === PUBLIC_ROUTES.HOME) {
           return true
         }
 
         // 4. Public sayfalar - Her zaman erişilebilir
-        if (PUBLIC_ROUTE_LIST.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+        if (PUBLIC_ROUTE_LIST.some(route => pathname === route || pathname.startsWith(route + PUBLIC_ROUTES.HOME))) {
           return true
         }
 

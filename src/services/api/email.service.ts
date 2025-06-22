@@ -123,7 +123,7 @@ export async function sendVerificationEmail(
   const { to, username, verificationUrl } = params
 
   const content = `
-    <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">Email Adresinizi Doğrulayın</h1>
+    <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">${EMAIL_CONTENT.VERIFICATION.SUBJECT}</h1>
     
     <div class="content">
       <p>${EMAIL_CONTENT.VERIFICATION.GREETING} <strong>${username}</strong>,</p>
@@ -141,7 +141,7 @@ export async function sendVerificationEmail(
       <p>${EMAIL_CONTENT.VERIFICATION.ALTERNATIVE}</p>
       <p class="link">${verificationUrl}</p>
       
-      <p>Bu işlemi siz yapmadıysanız, bu emaili güvenle yok sayabilirsiniz.</p>
+      <p>${EMAIL_CONTENT.VERIFICATION.SECURITY_NOTE}</p>
     </div>
   `
 
@@ -163,7 +163,7 @@ export async function sendPasswordResetEmail(
   const { to, username, resetUrl } = params
 
   const content = `
-    <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">Şifre Sıfırlama</h1>
+    <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">${EMAIL_CONTENT.PASSWORD_RESET.SUBJECT}</h1>
     
     <div class="content">
       <p>${EMAIL_CONTENT.PASSWORD_RESET.GREETING} <strong>${username}</strong>,</p>
@@ -203,7 +203,7 @@ export async function sendPasswordChangedNotification(
   const { to, username } = params
 
   const content = `
-    <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">Şifreniz Değiştirildi</h1>
+    <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">${EMAIL_CONTENT.PASSWORD_CHANGED.SUBJECT}</h1>
     
     <div class="content">
       <p>${EMAIL_CONTENT.PASSWORD_CHANGED.GREETING} <strong>${username}</strong>,</p>
