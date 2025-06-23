@@ -3,7 +3,7 @@
 
 import Link from 'next/link'
 import { Search } from 'lucide-react'
-import AuthStatus from '@/components/modules/auth/auth-status'
+import AuthStatus from './Auth-status'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { Input } from '@/components/ui/input'
 import { PUBLIC_ROUTES } from '@/lib/constants/routes'
