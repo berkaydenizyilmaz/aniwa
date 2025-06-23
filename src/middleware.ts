@@ -1,16 +1,24 @@
-// Aniwa Projesi - NextAuth Middleware
-// Bu dosya route seviyesinde kimlik doğrulama ve yetkilendirme kontrolü yapar
+// Aniwa Projesi - NextAuth Middleware + Rate Limiting
+// Bu dosya route seviyesinde kimlik doğrulama, yetkilendirme ve rate limiting kontrolü yapar
 
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
 import { PROTECTED_ROUTE_PATTERNS, PUBLIC_ROUTE_LIST, AUTH_ROUTES, API_ROUTES, PUBLIC_ROUTES } from '@/lib/constants/routes'
 import { USER_ROLES } from "@/lib/constants/auth"
+import { HTTP_STATUS } from '@/lib/constants/app'
 import { UserRole } from "@prisma/client"
+import { withGlobalRateLimit } from '@/lib/rate-limit/middleware'
 
 export default withAuth(
-  function middleware(req) {
+  async function middleware(req) {
     const pathname = req.nextUrl.pathname
     const token = req.nextauth.token
+    
+    // 0. RATE LIMITING - Tüm istekler için genel rate limiting kontrolü
+    const rateLimitResponse = await withGlobalRateLimit(req, () => NextResponse.next())
+    if (rateLimitResponse.status === HTTP_STATUS.TOO_MANY_REQUESTS) {
+      return rateLimitResponse
+    }
     
     // 1. GİRİŞ YAPMIŞ KULLANICILAR - Auth sayfalarına ve API'lerine erişemez
     if (token && !token.oauthToken) {

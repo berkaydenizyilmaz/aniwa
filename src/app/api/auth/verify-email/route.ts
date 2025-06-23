@@ -5,8 +5,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyEmailToken } from '@/services/auth/email-verification.service'
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
+import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 
 export async function GET(request: NextRequest) {
+  // Rate limiting kontrolü
+  const rateLimitResponse = await withAuthRateLimit(request, 'EMAIL_VERIFICATION')
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
+  
   try {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get('token')

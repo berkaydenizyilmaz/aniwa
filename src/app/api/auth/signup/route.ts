@@ -7,8 +7,15 @@ import { createUser } from '@/services/auth/auth.service'
 import { createEmailVerificationToken } from '@/services/auth/email-verification.service'
 import { logError, logInfo } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
+import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 
 export async function POST(request: NextRequest) {
+  // Rate limiting kontrolü
+  const rateLimitResponse = await withAuthRateLimit(request, 'SIGNUP')
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
+  
   try {
     const body = await request.json()
     

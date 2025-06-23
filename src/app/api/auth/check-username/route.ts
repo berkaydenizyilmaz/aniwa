@@ -3,8 +3,15 @@ import { prisma } from '@/lib/db/prisma'
 import { logInfo, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_REGEX } from '@/lib/constants/auth'
+import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 
 export async function GET(request: NextRequest) {
+  // Rate limiting kontrolü
+  const rateLimitResponse = await withAuthRateLimit(request, 'USERNAME_CHECK')
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
+  
   try {
     const { searchParams } = new URL(request.url)
     const username = searchParams.get('username')

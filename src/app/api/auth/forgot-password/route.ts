@@ -6,8 +6,15 @@ import { createPasswordResetToken } from '@/services/auth/email-verification.ser
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import { forgotPasswordSchema } from '@/lib/schemas/auth.schemas'
+import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 
 export async function POST(request: NextRequest) {
+  // Rate limiting kontrolü
+  const rateLimitResponse = await withAuthRateLimit(request, 'PASSWORD_RESET')
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
+  
   try {
     const body = await request.json()
     

@@ -4,7 +4,7 @@
 import { createLog } from '@/services/log/log.service'
 import type { LogLevel } from '@prisma/client'
 import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS, LOG_LEVELS } from '@/lib/constants/logging'
-import { HTTP_STATUS_THRESHOLDS } from '@/lib/constants/app'
+import { HTTP_STATUS } from '@/lib/constants/app'
 import type { LogMetadata, PerformanceMetadata } from '@/types/logging'
 import { Prisma } from '@prisma/client'
 
@@ -134,8 +134,8 @@ export const logRequest = (
     userAgent,
   }
   
-  const level = statusCode >= HTTP_STATUS_THRESHOLDS.SERVER_ERROR ? LOG_LEVELS.ERROR : 
-                statusCode >= HTTP_STATUS_THRESHOLDS.CLIENT_ERROR ? LOG_LEVELS.WARN : LOG_LEVELS.INFO
+  const level = statusCode >= HTTP_STATUS.INTERNAL_SERVER_ERROR ? LOG_LEVELS.ERROR : 
+                statusCode >= HTTP_STATUS.BAD_REQUEST ? LOG_LEVELS.WARN : LOG_LEVELS.INFO
   
   if (level === LOG_LEVELS.ERROR) {
     logError(LOG_EVENTS.HTTP_REQUEST, `${method} ${url} - ${statusCode}`, metadata, userId)
