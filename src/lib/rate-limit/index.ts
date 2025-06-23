@@ -4,7 +4,7 @@
 import { Ratelimit } from '@upstash/ratelimit'
 import { kv } from '@vercel/kv'
 import { env, hasRateLimit } from '@/lib/env'
-import { logInfo, logWarn, logError } from '@/lib/logger'
+import { logWarn, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import { RATE_LIMIT_MULTIPLIERS } from '@/lib/constants/rate-limits'
 import type { 
@@ -124,14 +124,8 @@ export async function checkRateLimit(
     const key = createRateLimitKey(keyOptions)
     const result = await rateLimiter.limit(key)
     
-    // Başarılı rate limit kontrolünü logla
-    if (result.success) {
-      logInfo(LOG_EVENTS.AUTH_LOGIN_SUCCESS, 'Rate limit kontrolü geçti', {
-        key: key.substring(0, 20) + '...', // Güvenlik için kısalt
-        remaining: result.remaining,
-        limit: result.limit,
-      })
-    } else {
+    // Sadece rate limit aşımlarını logla (başarılı olanları değil)
+    if (!result.success) {
       logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Rate limit aşıldı', {
         key: key.substring(0, 20) + '...', // Güvenlik için kısalt
         limit: result.limit,
