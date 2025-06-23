@@ -15,6 +15,7 @@ import type {
 
 /**
  * Rate limit key oluşturur
+ * Öncelik sırası: customKey > userId > ip
  */
 export function createRateLimitKey(options: RateLimitKeyOptions): string {
   const { ip, userId, endpoint, customKey } = options
@@ -29,6 +30,7 @@ export function createRateLimitKey(options: RateLimitKeyOptions): string {
     parts.push(`endpoint:${endpoint}`)
   }
   
+  // Kullanıcı bazlı rate limiting öncelikli
   if (userId) {
     parts.push(`user:${userId}`)
   } else if (ip) {

@@ -6,6 +6,7 @@ import { checkRateLimit, getClientIP } from './index'
 import { AUTH_RATE_LIMIT_TYPES, RATE_LIMITS } from '@/lib/constants/rate-limits'
 import type { RateLimitConfig, RateLimitKeyOptions } from '@/types/rate-limit'
 import { HTTP_STATUS } from '@/lib/constants/app'
+import { getToken } from 'next-auth/jwt'
 
 /**
  * Global API rate limiting için middleware
@@ -64,8 +65,13 @@ export function withAuthRateLimit(
   return async (request: NextRequest): Promise<NextResponse> => {
     const ip = getClientIP(request)
     const config = RATE_LIMITS.AUTH[authType]
+    
+    // Kullanıcı token'ını al (varsa)
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+    
     const keyOptions: RateLimitKeyOptions = {
       ip,
+      userId: token?.sub, // Kullanıcı ID'si (varsa)
       endpoint: `auth-${authType.toLowerCase()}`,
     }
     
@@ -114,6 +120,82 @@ export function withAuthRateLimit(
     response.headers.set('X-RateLimit-Limit', status.result.limit.toString())
     response.headers.set('X-RateLimit-Remaining', status.result.remaining.toString())
     response.headers.set('X-RateLimit-Reset', status.result.reset.toString())
+    
+    return response
+  }
+}
+
+/**
+ * Kullanıcı seviyesine göre rate limiting wrapper
+ */
+export function withUserTierRateLimit(
+  handler: (request: NextRequest) => Promise<NextResponse>,
+  options?: {
+    message?: string
+    endpoint?: string
+  }
+) {
+  return async (request: NextRequest): Promise<NextResponse> => {
+    const ip = getClientIP(request)
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+    
+    // Kullanıcı seviyesini belirle
+    let config: RateLimitConfig
+    let tierName: string
+    
+    if (!token) {
+      // Giriş yapmamış kullanıcı (Guest)
+      config = RATE_LIMITS.USER_TIER.GUEST
+      tierName = 'guest'
+    } else if (token.emailVerified) {
+      // Email doğrulanmış kullanıcı (Verified)
+      config = RATE_LIMITS.USER_TIER.VERIFIED
+      tierName = 'verified'
+    } else {
+      // Kayıtlı ama email doğrulanmamış (Registered)
+      config = RATE_LIMITS.USER_TIER.REGISTERED
+      tierName = 'registered'
+    }
+    
+    const keyOptions: RateLimitKeyOptions = {
+      ip,
+      userId: token?.sub,
+      endpoint: options?.endpoint || request.nextUrl.pathname,
+    }
+    
+    const status = await checkRateLimit(config, keyOptions)
+    
+    if (status.isRateLimited && status.error) {
+      const message = options?.message || 
+        `${tierName === 'guest' ? 'Giriş yapmamış kullanıcılar için' : 'Kullanıcı seviyeniz için'} çok fazla istek gönderdiniz. Lütfen biraz bekleyip tekrar deneyin.`
+      
+      return NextResponse.json(
+        { 
+          error: message,
+          retryAfter: status.error.retryAfter,
+          userTier: tierName,
+        },
+        { 
+          status: HTTP_STATUS.TOO_MANY_REQUESTS,
+          headers: {
+            'X-RateLimit-Limit': status.result.limit.toString(),
+            'X-RateLimit-Remaining': status.result.remaining.toString(),
+            'X-RateLimit-Reset': status.result.reset.toString(),
+            'Retry-After': status.error.retryAfter?.toString() || '60',
+            'X-User-Tier': tierName,
+          },
+        }
+      )
+    }
+    
+    // Rate limit geçti, ana handler'ı çalıştır
+    const response = await handler(request)
+    
+    // Rate limit header'larını response'a ekle
+    response.headers.set('X-RateLimit-Limit', status.result.limit.toString())
+    response.headers.set('X-RateLimit-Remaining', status.result.remaining.toString())
+    response.headers.set('X-RateLimit-Reset', status.result.reset.toString())
+    response.headers.set('X-User-Tier', tierName)
     
     return response
   }
