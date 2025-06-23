@@ -6,6 +6,7 @@ import { verifyEmailToken } from '@/services/auth/email-verification.service'
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
+import { HTTP_STATUS } from '@/lib/constants/app'
 
 export async function GET(request: NextRequest) {
   // Rate limiting kontrolü
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
     if (!token) {
       return NextResponse.json(
         { success: false, error: 'Token parametresi gerekli' },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
     } else {
       return NextResponse.json(
         { success: false, error: result.error },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
   } catch (error) {
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
-      { status: 500 }
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
 } 

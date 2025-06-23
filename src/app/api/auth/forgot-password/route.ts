@@ -7,6 +7,7 @@ import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import { forgotPasswordSchema } from '@/lib/schemas/auth.schemas'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
+import { HTTP_STATUS } from '@/lib/constants/app'
 
 export async function POST(request: NextRequest) {
   // Rate limiting kontrolü
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
           success: false, 
           error: validation.error.errors[0]?.message || 'Geçersiz veri'
         },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
-      { status: 500 }
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
 } 

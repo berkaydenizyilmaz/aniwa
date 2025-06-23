@@ -6,6 +6,7 @@ import { verifyPasswordResetToken, resetPasswordWithToken } from '@/services/aut
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import { resetPasswordApiSchema } from '@/lib/schemas/auth.schemas'
+import { HTTP_STATUS } from '@/lib/constants/app'
 
 // Token doğrulama endpoint'i (GET)
 export async function GET(request: NextRequest) {
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
     if (!token) {
       return NextResponse.json(
         { success: false, error: 'Token parametresi gerekli' },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
     } else {
       return NextResponse.json(
         { success: false, error: result.error },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
   } catch (error) {
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
-      { status: 500 }
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
 }
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
           success: false, 
           error: validation.error.errors[0]?.message || 'Geçersiz veri'
         },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         { success: false, error: result.error },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
   } catch (error) {
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
-      { status: 500 }
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
 } 

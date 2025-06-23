@@ -28,7 +28,7 @@ export default withAuth(
       }
       // Auth API'lerine erişemez
       if (pathname === API_ROUTES.AUTH.SIGNUP) {
-        return NextResponse.json({ error: 'Zaten giriş yapmışsınız' }, { status: 403 })
+        return NextResponse.json({ error: 'Zaten giriş yapmışsınız' }, { status: HTTP_STATUS.FORBIDDEN })
       }
     }
 

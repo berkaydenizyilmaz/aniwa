@@ -4,6 +4,7 @@ import { logInfo, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_REGEX } from '@/lib/constants/auth'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
+import { HTTP_STATUS } from '@/lib/constants/app'
 
 export async function GET(request: NextRequest) {
   // Rate limiting kontrolü
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
     if (!username) {
       return NextResponse.json(
         { error: 'Username parametresi gerekli' },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
     if (username.length < USERNAME_MIN_LENGTH || username.length > USERNAME_MAX_LENGTH) {
       return NextResponse.json(
         { available: false, error: 'Username ' + USERNAME_MIN_LENGTH + '-' + USERNAME_MAX_LENGTH + ' karakter arasında olmalı' },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
     if (!USERNAME_REGEX.test(username)) {
       return NextResponse.json(
         { available: false, error: 'Username sadece harf, rakam ve alt çizgi içerebilir' },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { error: 'Sunucu hatası' },
-      { status: 500 }
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
 } 
