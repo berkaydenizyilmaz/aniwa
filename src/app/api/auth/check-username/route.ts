@@ -7,13 +7,7 @@ import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import { AUTH_RATE_LIMIT_TYPES } from '@/lib/constants/rate-limits'
 import { HTTP_STATUS } from '@/lib/constants/app'
 
-export async function GET(request: NextRequest) {
-  // Rate limiting kontrolü
-  const rateLimitResponse = await withAuthRateLimit(request, AUTH_RATE_LIMIT_TYPES.USERNAME_CHECK)
-  if (rateLimitResponse) {
-    return rateLimitResponse
-  }
-  
+async function checkUsernameHandler(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const username = searchParams.get('username')
@@ -69,4 +63,7 @@ export async function GET(request: NextRequest) {
       { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
-} 
+}
+
+// Rate limiting ile sarılmış export
+export const GET = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.USERNAME_CHECK, checkUsernameHandler) 

@@ -11,13 +11,7 @@ import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import { HTTP_STATUS } from '@/lib/constants/app'
 import { AUTH_RATE_LIMIT_TYPES } from '@/lib/constants/rate-limits'
 
-export async function POST(request: NextRequest) {
-  // Rate limiting kontrolü
-  const rateLimitResponse = await withAuthRateLimit(request, AUTH_RATE_LIMIT_TYPES.SIGNUP)
-  if (rateLimitResponse) {
-    return rateLimitResponse
-  }
-  
+async function signupHandler(request: NextRequest) {
   try {
     const body = await request.json()
     
@@ -90,4 +84,7 @@ export async function POST(request: NextRequest) {
       { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
-} 
+}
+
+// Rate limiting ile sarılmış export
+export const POST = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.SIGNUP, signupHandler) 
