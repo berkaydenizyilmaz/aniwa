@@ -1,33 +1,33 @@
-import { Suspense } from 'react'
 import { getLogs } from '@/services/log/log.service'
 import { LogsTable } from './_components/Logs-table'
 import { LogsFilters } from './_components/Logs-filters'
-import { LogsStats } from './_components/Logs-stats'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Spinner } from '@/components/ui/loading'
 import type { LogLevel } from '@prisma/client'
 
 interface AdminLogsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     level?: string
     event?: string
     userId?: string
     page?: string
     limit?: string
-  }
+  }>
 }
 
 export default async function AdminLogsPage({ searchParams }: AdminLogsPageProps) {
+  // searchParams'ı await ile çöz
+  const params = await searchParams
+  
   // Sayfa parametrelerini parse et
-  const page = parseInt(searchParams.page || '1')
-  const limit = parseInt(searchParams.limit || '50')
+  const page = parseInt(params.page || '1')
+  const limit = parseInt(params.limit || '50')
   const offset = (page - 1) * limit
 
   // Log verilerini getir
   const logsResult = await getLogs({
-    level: searchParams.level as LogLevel | undefined,
-    event: searchParams.event,
-    userId: searchParams.userId,
+    level: params.level as LogLevel | undefined,
+    event: params.event,
+    userId: params.userId,
     limit,
     offset,
   })
@@ -47,11 +47,6 @@ export default async function AdminLogsPage({ searchParams }: AdminLogsPageProps
           </p>
         </div>
       </div>
-
-      {/* İstatistikler */}
-      <Suspense fallback={<Spinner size="lg" />}>
-        <LogsStats />
-      </Suspense>
 
       {/* Filtreler */}
       <Card>
