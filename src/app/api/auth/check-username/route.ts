@@ -4,11 +4,12 @@ import { logInfo, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/lib/constants/logging'
 import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_REGEX } from '@/lib/constants/auth'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
+import { AUTH_RATE_LIMIT_TYPES } from '@/lib/constants/rate-limits'
 import { HTTP_STATUS } from '@/lib/constants/app'
 
 export async function GET(request: NextRequest) {
   // Rate limiting kontrolü
-  const rateLimitResponse = await withAuthRateLimit(request, 'USERNAME_CHECK')
+  const rateLimitResponse = await withAuthRateLimit(request, AUTH_RATE_LIMIT_TYPES.USERNAME_CHECK)
   if (rateLimitResponse) {
     return rateLimitResponse
   }

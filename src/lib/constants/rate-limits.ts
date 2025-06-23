@@ -4,6 +4,15 @@
 // Rate limit algoritması - Sadece sliding window kullanıyoruz
 export const RATE_LIMIT_ALGORITHM = 'slidingWindow' as const
 
+// Auth rate limit türleri
+export const AUTH_RATE_LIMIT_TYPES = {
+  LOGIN: 'LOGIN',
+  SIGNUP: 'SIGNUP', 
+  PASSWORD_RESET: 'PASSWORD_RESET',
+  EMAIL_VERIFICATION: 'EMAIL_VERIFICATION',
+  USERNAME_CHECK: 'USERNAME_CHECK',
+} as const
+
 // Temel rate limit konfigürasyonları
 export const RATE_LIMITS = {
   // Genel API limitleri - Tüm API endpoint'leri için

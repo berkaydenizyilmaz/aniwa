@@ -8,10 +8,11 @@ import { LOG_EVENTS } from '@/lib/constants/logging'
 import { forgotPasswordSchema } from '@/lib/schemas/auth.schemas'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import { HTTP_STATUS } from '@/lib/constants/app'
+import { AUTH_RATE_LIMIT_TYPES } from '@/lib/constants/rate-limits'
 
 export async function POST(request: NextRequest) {
   // Rate limiting kontrolü
-  const rateLimitResponse = await withAuthRateLimit(request, 'PASSWORD_RESET')
+  const rateLimitResponse = await withAuthRateLimit(request, AUTH_RATE_LIMIT_TYPES.PASSWORD_RESET)
   if (rateLimitResponse) {
     return rateLimitResponse
   }
