@@ -33,8 +33,8 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
-          <Header />
-          {children}
+            <Header />
+            {children}
         </Providers>
         <Analytics />
         <SpeedInsights />

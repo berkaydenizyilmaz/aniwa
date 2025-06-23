@@ -23,16 +23,16 @@ export default function Header() {
 
         {/* Navigation Links - Desktop */}
         <nav className="hidden md:flex items-center space-x-6 mr-6">
-          <Link href="/anime" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Anime
           </Link>
-          <Link href="/manga" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Manga
           </Link>
-          <Link href="/topluluk" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Topluluk
           </Link>
-          <Link href="/listeler" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Listeler
           </Link>
         </nav>
