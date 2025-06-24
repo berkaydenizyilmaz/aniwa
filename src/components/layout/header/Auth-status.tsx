@@ -2,7 +2,8 @@
 
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
-import { AUTH_ROUTES } from '@/lib/constants/routes'
+import { AUTH_ROUTES, PROTECTED_ROUTES } from '@/lib/constants/routes'
+import { Settings } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AuthStatus() {
@@ -26,6 +27,15 @@ export default function AuthStatus() {
             {user.username || user.email}
           </span>
         </div>
+        
+        {/* Admin Panel Linki */}
+        <Button asChild variant="ghost" size="sm">
+          <Link href={PROTECTED_ROUTES.ADMIN.BASE} className="flex items-center space-x-1">
+            <Settings className="h-4 w-4" />
+            <span className="hidden sm:inline">Yönetim</span>
+          </Link>
+        </Button>
+        
         <Button 
           onClick={logout}
           variant="outline"
