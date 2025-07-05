@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -42,6 +36,21 @@ model VerificationToken {
   @@index([expiresAt], map: "verification_ttl")
 }
 
+// OAuth Geçici Kullanıcı Modeli
+model OAuthPendingUser {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  email      String   @unique
+  provider   String   // "google", "github" vs
+  providerId String   // Provider'dan gelen ID
+  name       String?
+  image      String?
+  token      String   @unique // Random verification token
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([expiresAt], map: "oauth_pending_ttl")
+}
+
 // Kullanıcı Bilgileri Modeli
 model User {
   id             String                @id @default(auto()) @map("_id") @db.ObjectId
@@ -77,21 +86,6 @@ model UserProfileSettings {
   updatedAt             DateTime @updatedAt
 
   user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// OAuth Geçici Kullanıcı Modeli
-model OAuthPendingUser {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  email      String   @unique
-  provider   String   // "google", "github" vs
-  providerId String   // Provider'dan gelen ID
-  name       String?
-  image      String?
-  token      String   @unique // Random verification token
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-
-  @@index([expiresAt], map: "oauth_pending_ttl")
 }
 
 // Log Modeli

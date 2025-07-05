@@ -23,7 +23,7 @@ export default function Header() {
 
         {/* Navigation Links - Desktop */}
         <nav className="hidden md:flex items-center space-x-6 mr-6">
-          <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="/anime" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Anime
           </Link>
           <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
