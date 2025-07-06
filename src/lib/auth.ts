@@ -9,7 +9,7 @@ import { env } from './env'
 import { logInfo, logError, logWarn } from './logger'
 import { LOG_EVENTS } from '../constants/logging'
 import { SESSION_MAX_AGE, JWT_MAX_AGE, OAUTH_PROVIDERS } from '../constants/auth'
-import { AUTH_ROUTES } from '../constants/routes'
+import { ROUTES } from '../constants/routes'
 import { createOAuthPendingUser } from '@/services/auth/oauth.service'
 import bcrypt from 'bcryptjs'
 
@@ -94,9 +94,9 @@ export const authOptions: NextAuthOptions = {
   },
 
   pages: {
-    signIn: AUTH_ROUTES.SIGN_IN,
-    error: AUTH_ROUTES.ERROR,
-    verifyRequest: AUTH_ROUTES.VERIFY_REQUEST,
+    signIn: ROUTES.PAGES.AUTH.SIGN_IN,
+    error: ROUTES.PAGES.AUTH.ERROR,
+    verifyRequest: ROUTES.PAGES.AUTH.VERIFY_REQUEST,
   },
 
   callbacks: {

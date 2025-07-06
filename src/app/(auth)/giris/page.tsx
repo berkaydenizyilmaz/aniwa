@@ -5,7 +5,7 @@ import { signIn, getSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
-import { PUBLIC_ROUTES, AUTH_ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/constants/routes'
 import Link from 'next/link'
 
 export default function LoginPage() {
@@ -36,9 +36,9 @@ export default function LoginPage() {
         // Session'ı yenile ve yönlendir
         const session = await getSession()
         if (session?.user?.username) {
-          router.push(PUBLIC_ROUTES.HOME)
+          router.push(ROUTES.PAGES.HOME)
         } else {
-          router.push(AUTH_ROUTES.SETUP_USERNAME)
+          router.push(ROUTES.PAGES.AUTH.SETUP_USERNAME)
         }
       }
     } catch (err) {
@@ -73,7 +73,7 @@ export default function LoginPage() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Hesabın yok mu?{' '}
-            <Link href={AUTH_ROUTES.SIGN_UP} className="text-blue-600 hover:text-blue-500">
+            <Link href={ROUTES.PAGES.AUTH.SIGN_UP} className="text-blue-600 hover:text-blue-500">
               Kayıt ol
             </Link>
           </p>
@@ -107,7 +107,7 @@ export default function LoginPage() {
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Şifre
             </label>
-              <Link href={AUTH_ROUTES.FORGOT_PASSWORD} className="text-sm text-blue-600 hover:text-blue-500">
+              <Link href={ROUTES.PAGES.AUTH.FORGOT_PASSWORD} className="text-sm text-blue-600 hover:text-blue-500">
                 Şifremi unuttum
               </Link>
             </div>
@@ -155,7 +155,7 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center">
-          <Link href={PUBLIC_ROUTES.HOME} className="text-sm text-gray-600 hover:text-gray-500">
+          <Link href={ROUTES.PAGES.HOME} className="text-sm text-gray-600 hover:text-gray-500">
             Ana sayfaya dön
           </Link>
         </div>

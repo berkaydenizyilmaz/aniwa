@@ -6,7 +6,7 @@ import { Search } from 'lucide-react'
 import AuthStatus from './Auth-status'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { Input } from '@/components/ui/input'
-import { PUBLIC_ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/constants/routes'
 
 export default function Header() {
   return (
@@ -14,7 +14,7 @@ export default function Header() {
       <div className="w-full px-4 md:px-6 lg:px-8 flex h-14 items-center">
         {/* Logo/Ana Sayfa Linki */}
         <div className="mr-6 flex">
-          <Link href={PUBLIC_ROUTES.HOME} className="flex items-center space-x-2">
+          <Link href={ROUTES.PAGES.HOME} className="flex items-center space-x-2">
             <span className="font-bold text-lg">
               Aniwa
             </span>

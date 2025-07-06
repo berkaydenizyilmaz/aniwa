@@ -3,7 +3,7 @@
 import { useAuth } from '@/hooks/use-auth'
 import { useRole } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
-import { AUTH_ROUTES, PROTECTED_ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/constants/routes'
 import { Settings } from 'lucide-react'
 import Link from 'next/link'
 
@@ -33,7 +33,7 @@ export default function AuthStatus() {
         {/* Admin Panel Linki - Sadece admin rolüne sahip kullanıcılara göster */}
         {isAdmin() && (
           <Button asChild variant="ghost" size="sm">
-            <Link href={PROTECTED_ROUTES.ADMIN.BASE} className="flex items-center space-x-1">
+            <Link href={ROUTES.PAGES.ADMIN.BASE} className="flex items-center space-x-1">
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">Yönetim</span>
             </Link>
@@ -54,12 +54,12 @@ export default function AuthStatus() {
   return (
     <div className="flex items-center space-x-2">
       <Button asChild variant="outline" size="sm">
-        <Link href={AUTH_ROUTES.SIGN_IN}>
+        <Link href={ROUTES.PAGES.AUTH.SIGN_IN}>
           Giriş
         </Link>
       </Button>
       <Button asChild size="sm">
-        <Link href={AUTH_ROUTES.SIGN_UP}>
+        <Link href={ROUTES.PAGES.AUTH.SIGN_UP}>
           Kayıt
         </Link>
       </Button>

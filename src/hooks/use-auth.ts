@@ -13,7 +13,7 @@ import type {
   RequireAuthHookReturn, 
   RequireRoleHookReturn 
 } from '@/types/auth'
-import { API_ROUTES, AUTH_ROUTES, PUBLIC_ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/constants/routes'
 import { USER_ROLES } from '@/constants/auth'
 
 /**
@@ -34,12 +34,12 @@ export function useAuth(): AuthHookReturn {
   }, [])
 
   const loginWithGoogle = useCallback(async () => {
-    await signIn('google', { callbackUrl: PUBLIC_ROUTES.HOME })
+    await signIn('google', { callbackUrl: ROUTES.PAGES.HOME })
   }, [])
 
   const logout = useCallback(async () => {
     await signOut({ redirect: false })
-    router.push(PUBLIC_ROUTES.HOME)
+    router.push(ROUTES.PAGES.HOME)
   }, [router])
 
   const setupUsername = useCallback(async (username: string) => {
@@ -47,7 +47,7 @@ export function useAuth(): AuthHookReturn {
       throw new Error('Kullanıcı email bilgisi bulunamadı')
     }
 
-    const response = await fetch(API_ROUTES.AUTH.SETUP_USERNAME, {
+    const response = await fetch(ROUTES.API.AUTH.SETUP_USERNAME, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -66,7 +66,7 @@ export function useAuth(): AuthHookReturn {
     await update()
     
     // Ana sayfaya yönlendir
-    router.push(PUBLIC_ROUTES.HOME)
+    router.push(ROUTES.PAGES.HOME)
     
     return result
   }, [session?.user?.email, router, update])
@@ -126,7 +126,7 @@ export function useRole(): RoleHookReturn {
 /**
  * Korumalı sayfa erişimi için hook
  */
-export function useRequireAuth(redirectTo = AUTH_ROUTES.SIGN_IN): RequireAuthHookReturn {
+export function useRequireAuth(redirectTo = ROUTES.PAGES.AUTH.SIGN_IN): RequireAuthHookReturn {
   const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
 
@@ -142,7 +142,7 @@ export function useRequireAuth(redirectTo = AUTH_ROUTES.SIGN_IN): RequireAuthHoo
  */
 export function useRequireRole(
   requiredRole: UserRole | UserRole[], 
-  redirectTo = PUBLIC_ROUTES.HOME
+  redirectTo = ROUTES.PAGES.HOME
 ): RequireRoleHookReturn {
   const { isAuthenticated, isLoading } = useAuth()
   const { hasRole, hasAnyRole } = useRole()

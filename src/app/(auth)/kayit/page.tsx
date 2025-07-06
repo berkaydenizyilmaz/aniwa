@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
-import { PUBLIC_ROUTES, AUTH_ROUTES, API_ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/constants/routes'
 import Link from 'next/link'
 
 export default function SignupPage() {
@@ -60,7 +60,7 @@ export default function SignupPage() {
     }
 
     try {
-      const response = await fetch(API_ROUTES.AUTH.SIGNUP, {
+      const response = await fetch(ROUTES.API.AUTH.SIGNUP, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ export default function SignupPage() {
 
       setSuccess('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...')
       setTimeout(() => {
-        router.push(AUTH_ROUTES.SIGN_IN)
+        router.push(ROUTES.PAGES.AUTH.SIGN_IN)
       }, 2000)
 
     } catch (err) {
@@ -115,7 +115,7 @@ export default function SignupPage() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Zaten hesabın var mı?{' '}
-            <Link href={AUTH_ROUTES.SIGN_IN} className="text-blue-600 hover:text-blue-500">
+            <Link href={ROUTES.PAGES.AUTH.SIGN_IN} className="text-blue-600 hover:text-blue-500">
               Giriş yap
             </Link>
           </p>
@@ -239,7 +239,7 @@ export default function SignupPage() {
         </div>
 
         <div className="text-center">
-          <Link href={PUBLIC_ROUTES.HOME} className="text-sm text-gray-600 hover:text-gray-500">
+          <Link href={ROUTES.PAGES.HOME} className="text-sm text-gray-600 hover:text-gray-500">
             Ana sayfaya dön
           </Link>
         </div>

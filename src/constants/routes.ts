@@ -1,75 +1,73 @@
-// Aniwa Projesi - Routes Constants
-// Bu dosya tüm site URL'lerini merkezi olarak yönetir
+// Routes Constants
+// Bu dosya tüm site URL'lerini merkezi, kategorik ve ölçeklenebilir bir şekilde yönetir.
 
-// API rotaları (İngilizce endpoint'ler)
-export const API_ROUTES = {
-  AUTH: {
-    BASE: '/api/auth',
-    SETUP_USERNAME: '/api/auth/setup-username',
-    SIGNUP: '/api/auth/signup',
-    SIGN_OUT: '/api/auth/signout',
-    RESET_PASSWORD: '/api/auth/reset-password',
-    FORGOT_PASSWORD: '/api/auth/forgot-password',
-    VERIFY_EMAIL: '/api/auth/verify-email',
-    CHECK_USERNAME: '/api/auth/check-username',
+// Uygulamadaki tüm rotaları içeren ana nesne.
+export const ROUTES = {
+  PAGES: {
+    HOME: '/',
+    MAIN: {
+      ANIME: '/anime',
+      CONTACT: '/iletisim',
+    },
+    AUTH: {
+      SIGN_IN: '/giris',
+      SIGN_UP: '/kayit',
+      ERROR: '/hata',
+      VERIFY_REQUEST: '/dogrulama',
+      SETUP_USERNAME: '/kullanici-adi-secimi',
+      FORGOT_PASSWORD: '/sifremi-unuttum',
+      RESET_PASSWORD: '/sifre-sifirlama',
+    },
+    ADMIN: {
+      BASE: '/yonetim',
+      LOGS: '/yonetim/loglar',
+    },
+    MODERATOR: {
+      BASE: '/moderasyon',
+    },
+    EDITOR: {
+      BASE: '/editor',
+    },
+    PROFILE: {
+      BASE: '/profil',    },
+  },
+  API: {
+    AUTH: {
+      BASE: '/api/auth',
+      CALLBACK: '/api/auth/callback',
+      SETUP_USERNAME: '/api/auth/setup-username',
+      SIGNUP: '/api/auth/signup',
+      SIGN_OUT: '/api/auth/signout',
+      RESET_PASSWORD: '/api/auth/reset-password',
+      FORGOT_PASSWORD: '/api/auth/forgot-password',
+      VERIFY_EMAIL: '/api/auth/verify-email',
+      CHECK_USERNAME: '/api/auth/check-username',
+    },
   },
 } as const
 
-// Auth sayfaları (Türkçe URL'ler)
-export const AUTH_ROUTES = {
-  SIGN_IN: '/giris',
-  SIGN_UP: '/kayit',
-  ERROR: '/hata',
-  VERIFY_REQUEST: '/dogrulama',
-  SETUP_USERNAME: '/kullanici-adi-secimi',
-  FORGOT_PASSWORD: '/sifremi-unuttum',
-  RESET_PASSWORD: '/sifre-sifirlama',
-} as const
 
-// Public sayfalar (Türkçe URL'ler)
-export const PUBLIC_ROUTES = {
-  HOME: '/',
-  ABOUT: '/hakkimizda',
-  CONTACT: '/iletisim',
-  HELP: '/yardim',
-  ANIME: '/anime',
-} as const
+// Kimlik doğrulaması gerektirmeyen sayfalar.
+export const publicRoutes: string[] = [
+  ROUTES.PAGES.HOME,
+  ROUTES.PAGES.MAIN.ANIME,
+  ROUTES.PAGES.AUTH.ERROR,
+]
 
-// Protected sayfalar (rol bazlı - Türkçe URL'ler)
-export const PROTECTED_ROUTES = {
-  ADMIN: {
-    BASE: '/yonetim',
-    LOGS: '/yonetim/loglar',
-  },
-  MODERATOR: {
-    BASE: '/moderasyon',
-  },
-  EDITOR: {
-    BASE: '/editör',
-  },
-} as const
+// Giriş yapmış kullanıcıların erişemeyeceği sayfalar.
+export const protectedAuthRoutes: string[] = [
+  ROUTES.PAGES.AUTH.SIGN_IN,
+  ROUTES.PAGES.AUTH.SIGN_UP,
+  ROUTES.PAGES.AUTH.VERIFY_REQUEST,
+  ROUTES.PAGES.AUTH.SETUP_USERNAME,
+  ROUTES.PAGES.AUTH.FORGOT_PASSWORD,
+  ROUTES.PAGES.AUTH.RESET_PASSWORD,
+]
 
-// Public route listesi (middleware için)
-export const PUBLIC_ROUTE_LIST = [
-  API_ROUTES.AUTH.SIGN_OUT,
-  AUTH_ROUTES.SIGN_IN,
-  AUTH_ROUTES.SIGN_UP,
-  AUTH_ROUTES.ERROR,
-  PUBLIC_ROUTES.ABOUT,
-  PUBLIC_ROUTES.CONTACT,
-  PUBLIC_ROUTES.ANIME,
-] as const
-
-// Protected route patterns (middleware için)
-export const PROTECTED_ROUTE_PATTERNS = {
-  ADMIN: PROTECTED_ROUTES.ADMIN.BASE,
-  MODERATOR: PROTECTED_ROUTES.MODERATOR.BASE,
-  EDITOR: PROTECTED_ROUTES.EDITOR.BASE,
-  API_AUTH: API_ROUTES.AUTH.BASE,
-} as const
-
-// Tip tanımlamaları
-export type AuthRoute = typeof AUTH_ROUTES[keyof typeof AUTH_ROUTES]
-export type ApiRoute = typeof API_ROUTES[keyof typeof API_ROUTES]
-export type PublicRoute = typeof PUBLIC_ROUTES[keyof typeof PUBLIC_ROUTES]
-export type ProtectedRoute = typeof PROTECTED_ROUTES[keyof typeof PROTECTED_ROUTES]
+// Giriş yapmış kullanıcıların erişemeyeceği API rotaları.
+export const protectedApiRoutes: string[] = [
+  ROUTES.API.AUTH.SIGNUP,
+  ROUTES.API.AUTH.RESET_PASSWORD,
+  ROUTES.API.AUTH.FORGOT_PASSWORD,
+  ROUTES.API.AUTH.SETUP_USERNAME,
+]

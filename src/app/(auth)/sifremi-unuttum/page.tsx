@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { forgotPasswordSchema, type ForgotPasswordData } from '@/lib/schemas/auth.schemas'
-import { API_ROUTES, AUTH_ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/constants/routes'
 import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS } from '@/constants/auth'
 import type { ApiResponse } from '@/types/api'
 
@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
     setError('')
 
     try {
-      const response = await fetch(API_ROUTES.AUTH.FORGOT_PASSWORD, {
+      const response = await fetch(ROUTES.API.AUTH.FORGOT_PASSWORD, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
             
             <div className="space-y-2">
               <Button asChild className="w-full">
-                <Link href={AUTH_ROUTES.SIGN_IN}>
+                <Link href={ROUTES.PAGES.AUTH.SIGN_IN}>
                   Giriş Sayfasına Dön
                 </Link>
               </Button>
@@ -161,7 +161,7 @@ export default function ForgotPasswordPage() {
           
           <div className="mt-6 text-center">
             <Button variant="ghost" asChild>
-              <Link href={AUTH_ROUTES.SIGN_IN} className="flex items-center">
+              <Link href={ROUTES.PAGES.AUTH.SIGN_IN} className="flex items-center">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Giriş Sayfasına Dön
               </Link>

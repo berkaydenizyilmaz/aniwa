@@ -3,7 +3,7 @@
 
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
-import { PROTECTED_ROUTE_PATTERNS, PUBLIC_ROUTE_LIST, AUTH_ROUTES, API_ROUTES, PUBLIC_ROUTES } from '@/constants/routes'
+import { ROUTES, publicRoutes, protectedAuthRoutes, protectedApiRoutes } from '@/constants/routes'
 import { USER_ROLES } from "@/constants/auth"
 import { UserRole } from "@prisma/client"
 import { withGlobalRateLimit } from '@/lib/rate-limit/middleware'
@@ -22,11 +22,11 @@ export default withAuth(
     // 1. GİRİŞ YAPMIŞ KULLANICILAR - Auth sayfalarına ve API'lerine erişemez
     if (token && !token.oauthToken) {
       // Auth sayfalarına erişemez
-      if (pathname === AUTH_ROUTES.SIGN_IN || pathname === AUTH_ROUTES.SIGN_UP) {
-        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
+      if (protectedAuthRoutes.some(route => pathname === route)) {
+        return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, req.url))
       }
       // Auth API'lerine erişemez
-      if (pathname === API_ROUTES.AUTH.SIGNUP) {
+      if (protectedApiRoutes.some(route => pathname === route)) {
         return NextResponse.json({ error: 'Zaten giriş yapmışsınız' }, { status: 403 })
       }
     }
@@ -34,45 +34,45 @@ export default withAuth(
     // 2. OAUTH KULLANICILAR - Username setup kontrolü
     if (token && token.oauthToken && token.oauthToken !== 'existing_user') {
       // OAuth kullanıcısı username setup sayfasında değilse oraya yönlendir
-      if (!pathname.startsWith(AUTH_ROUTES.SETUP_USERNAME) && !pathname.startsWith('/api/')) {
-        return NextResponse.redirect(new URL(AUTH_ROUTES.SETUP_USERNAME, req.url))
+      if (!pathname.startsWith(ROUTES.PAGES.AUTH.SETUP_USERNAME) && !pathname.startsWith('/api/')) {
+        return NextResponse.redirect(new URL(ROUTES.PAGES.AUTH.SETUP_USERNAME, req.url))
       }
     }
 
     // 2.1. OAUTH EXPIRED - Token süresi dolmuş kullanıcıları sessiz çıkış yaptır
     if (token && token.oauthExpired) {
       // Sessiz çıkış yap ve ana sayfaya yönlendir (onay ekranı olmadan)
-      const signoutUrl = new URL(API_ROUTES.AUTH.SIGN_OUT, req.url)
-      signoutUrl.searchParams.set('callbackUrl', PUBLIC_ROUTES.HOME)
+      const signoutUrl = new URL(ROUTES.API.AUTH.SIGN_OUT, req.url)
+      signoutUrl.searchParams.set('callbackUrl', ROUTES.PAGES.HOME)
       signoutUrl.searchParams.set('redirect', 'false')
       return NextResponse.redirect(signoutUrl)
     }
 
     // 3. USERNAME SETUP SAYFASI - Sadece OAuth kullanıcıları erişebilir
-    if (pathname.startsWith(AUTH_ROUTES.SETUP_USERNAME)) {
+    if (pathname.startsWith(ROUTES.PAGES.AUTH.SETUP_USERNAME)) {
       if (!token || !token.oauthToken) {
-        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
+        return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, req.url))
       }
     }
 
     // 4. ADMIN SAYFALARI - ADMIN rolü gerekli
-    if (pathname.startsWith(PROTECTED_ROUTE_PATTERNS.ADMIN)) {
+    if (pathname.startsWith(ROUTES.PAGES.ADMIN.BASE)) {
       if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.ADMIN)) {
-        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
+        return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, req.url))
       }
     }
 
     // 5. MODERATOR SAYFALARI - MODERATOR rolü gerekli
-    if (pathname.startsWith(PROTECTED_ROUTE_PATTERNS.MODERATOR)) {
+    if (pathname.startsWith(ROUTES.PAGES.MODERATOR.BASE)) {
       if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.MODERATOR)) {
-        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
+        return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, req.url))
       }
     }
 
     // 6. EDITOR SAYFALARI - EDITOR rolü gerekli
-    if (pathname.startsWith(PROTECTED_ROUTE_PATTERNS.EDITOR)) {
+    if (pathname.startsWith(ROUTES.PAGES.EDITOR.BASE)) {
       if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.EDITOR)) {
-        return NextResponse.redirect(new URL(PUBLIC_ROUTES.HOME, req.url))
+        return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, req.url))
       }
     }
 
@@ -84,39 +84,39 @@ export default withAuth(
         const { pathname } = req.nextUrl
         
         // 1. NextAuth kendi API rotaları - Her zaman erişilebilir (session, providers, vs)
-        if (pathname.startsWith(API_ROUTES.AUTH.BASE) && !pathname.startsWith(API_ROUTES.AUTH.SIGNUP)) {
+        if (pathname.startsWith(ROUTES.API.AUTH.BASE) && !pathname.startsWith(ROUTES.API.AUTH.SIGNUP)) {
           return true
         }
 
         // 2. Auth API'leri - Token kontrolü middleware'de yapılacak
-        if (pathname === API_ROUTES.AUTH.SIGNUP) {
+        if (pathname === ROUTES.API.AUTH.SIGNUP) {
           return true
         }
 
         // 3. Ana sayfa - Her zaman erişilebilir
-        if (pathname === PUBLIC_ROUTES.HOME) {
+        if (pathname === ROUTES.PAGES.HOME) {
           return true
         }
 
         // 4. Public sayfalar - Her zaman erişilebilir
-        if (PUBLIC_ROUTE_LIST.some(route => pathname === route || pathname.startsWith(route + PUBLIC_ROUTES.HOME))) {
+        if (publicRoutes.some(route => pathname === route || pathname.startsWith(route + ROUTES.PAGES.HOME))) {
           return true
         }
 
         // 5. Auth sayfaları - Token kontrolü middleware fonksiyonunda yapılacak
-        if (pathname === AUTH_ROUTES.SIGN_IN || pathname === AUTH_ROUTES.SIGN_UP) {
+        if (protectedAuthRoutes.some(route => pathname === route)) {
           return true
         }
 
         // 6. Username setup - OAuth token kontrolü middleware fonksiyonunda yapılacak
-        if (pathname.startsWith(AUTH_ROUTES.SETUP_USERNAME)) {
+        if (pathname.startsWith(ROUTES.PAGES.AUTH.SETUP_USERNAME)) {
           return true
         }
 
         // 7. Protected sayfalar - Token gerekli
-        if (pathname.startsWith(PROTECTED_ROUTE_PATTERNS.ADMIN) || 
-            pathname.startsWith(PROTECTED_ROUTE_PATTERNS.MODERATOR) || 
-            pathname.startsWith(PROTECTED_ROUTE_PATTERNS.EDITOR)) {
+        if (pathname.startsWith(ROUTES.PAGES.ADMIN.BASE) || 
+            pathname.startsWith(ROUTES.PAGES.MODERATOR.BASE) || 
+            pathname.startsWith(ROUTES.PAGES.EDITOR.BASE)) {
           return !!token
         }
 

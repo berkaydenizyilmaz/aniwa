@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Home, AlertTriangle } from "lucide-react";
 import Link from "next/link";
-import { PUBLIC_ROUTES } from "@/constants/routes";
+import { ROUTES } from "@/constants/routes";
 
 export default function GlobalError({
   error,
@@ -57,7 +57,7 @@ export default function GlobalError({
               </Button>
               
               <Button variant="outline" asChild>
-                <Link href={PUBLIC_ROUTES.HOME} className="flex items-center gap-2">
+                <Link href={ROUTES.PAGES.HOME} className="flex items-center gap-2">
                   <Home className="h-4 w-4" />
                   Ana Sayfaya Git
                 </Link>
@@ -69,7 +69,7 @@ export default function GlobalError({
               <p>
                 Sorun devam ederse, lütfen{" "}
                 <Link 
-                  href={PUBLIC_ROUTES.CONTACT} 
+                  href={ROUTES.PAGES.MAIN.CONTACT} 
                   className="text-primary hover:underline"
                 >
                   bizimle iletişime geçin

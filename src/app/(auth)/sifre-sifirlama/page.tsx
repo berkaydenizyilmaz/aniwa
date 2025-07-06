@@ -15,7 +15,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Lock, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { resetPasswordSchema, type ResetPasswordData } from '@/lib/schemas/auth.schemas'
-import { API_ROUTES, AUTH_ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/constants/routes'
 
 type PageState = 'loading' | 'form' | 'success' | 'error'
 
@@ -49,7 +49,7 @@ export default function ResetPasswordPage() {
 
     const verifyToken = async () => {
       try {
-        const response = await fetch(API_ROUTES.AUTH.RESET_PASSWORD + '?token=' + token)
+        const response = await fetch(ROUTES.API.AUTH.RESET_PASSWORD + '?token=' + token)
         const data = await response.json()
 
         if (data.success) {
@@ -74,7 +74,7 @@ export default function ResetPasswordPage() {
     setError('')
 
     try {
-      const response = await fetch(API_ROUTES.AUTH.RESET_PASSWORD, {
+      const response = await fetch(ROUTES.API.AUTH.RESET_PASSWORD, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ export default function ResetPasswordPage() {
         setPageState('success')
         // 3 saniye sonra login sayfasına yönlendir
         setTimeout(() => {
-          router.push(AUTH_ROUTES.SIGN_IN + '?password-reset=true')
+          router.push(ROUTES.PAGES.AUTH.SIGN_IN + '?password-reset=true')
         }, 3000)
       } else {
         setError(result.error || 'Şifre sıfırlama başarısız')
@@ -147,7 +147,7 @@ export default function ResetPasswordPage() {
               3 saniye içinde giriş sayfasına yönlendirileceksiniz...
             </p>
             <Button asChild className="w-full">
-              <Link href={AUTH_ROUTES.SIGN_IN}>
+              <Link href={ROUTES.PAGES.AUTH.SIGN_IN}>
                 Hemen Giriş Yap
               </Link>
             </Button>
@@ -176,12 +176,12 @@ export default function ResetPasswordPage() {
           
           <CardContent className="space-y-4">
             <Button asChild className="w-full">
-              <Link href={AUTH_ROUTES.FORGOT_PASSWORD}>
+              <Link href={ROUTES.PAGES.AUTH.FORGOT_PASSWORD}>
                 Yeni Sıfırlama Bağlantısı İste
               </Link>
             </Button>
             <Button asChild variant="ghost" className="w-full">
-              <Link href={AUTH_ROUTES.SIGN_IN}>
+              <Link href={ROUTES.PAGES.AUTH.SIGN_IN}>
                 Giriş Sayfasına Dön
               </Link>
             </Button>
