@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db/prisma'
 import { logInfo, logError, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { USER_ROLES, OAUTH_TOKEN_EXPIRY_HOURS } from '@/constants/auth'
-import { DEFAULT_THEME, DEFAULT_LANGUAGE } from '@/constants/app'
+import { generateUserSlug } from '@/lib/utils'
 import type { 
   CreateOAuthPendingUserParams, 
   OAuthTokenVerificationParams,
@@ -87,7 +87,7 @@ export async function createOAuthPendingUser(
 }
 
 /**
- * Token ile kullanıcı oluşturur ve geçici kaydı siler
+ * Token ile kullanıcı oluşturur ve geçici kaydı siler (Transaction ile)
  */
 export async function verifyOAuthTokenAndCreateUser(
   params: OAuthTokenVerificationParams
@@ -133,43 +133,51 @@ export async function verifyOAuthTokenAndCreateUser(
       return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
     }
 
-    // Kullanıcıyı oluştur
-    const user = await prisma.user.create({
-      data: {
-        email: pendingUser.email,
-        username,
-        roles: [USER_ROLES.USER],
-        image: pendingUser.image,
-        emailVerified: new Date() // OAuth kullanıcıları doğrulanmış sayılır
-      }
-    })
+    // Slug oluştur
+    const uniqueSlug = generateUserSlug(username)
 
-    // Varsayılan ayarları oluştur
-    await prisma.userProfileSettings.create({
-      data: {
-        userId: user.id,
-        themePreference: DEFAULT_THEME,
-        languagePreference: DEFAULT_LANGUAGE
-      }
-    })
+    // Transaction ile kullanıcı + ayarları oluştur ve geçici kaydı sil
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Kullanıcıyı oluştur
+      const user = await tx.user.create({
+        data: {
+          email: pendingUser.email,
+          username,
+          slug: uniqueSlug,
+          roles: [USER_ROLES.USER],
+          image: pendingUser.image,
+          emailVerified: new Date() // OAuth kullanıcıları doğrulanmış sayılır
+        }
+      })
 
-    // Geçici kaydı sil
-    await prisma.oAuthPendingUser.delete({ where: { id: pendingUser.id } })
+      // 2. Varsayılan ayarları oluştur
+      const userSettings = await tx.userProfileSettings.create({
+        data: {
+          userId: user.id,
+        }
+      })
+
+      // 3. Geçici kaydı sil
+      await tx.oAuthPendingUser.delete({ where: { id: pendingUser.id } })
+
+      return { user, userSettings }
+    })
 
     logInfo(LOG_EVENTS.AUTH_USER_CREATED, 'OAuth kullanıcısı oluşturuldu', {
-      userId: user.id,
-      email: user.email,
-      username: user.username,
+      userId: result.user.id,
+      email: result.user.email,
+      username: result.user.username,
+      slug: result.user.slug,
       provider: pendingUser.provider
-    }, user.id)
+    }, result.user.id)
 
     return { 
       success: true, 
       data: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        roles: user.roles
+        id: result.user.id,
+        email: result.user.email,
+        username: result.user.username,
+        roles: result.user.roles
       }
     }
   } catch (error) {

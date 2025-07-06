@@ -5,9 +5,8 @@ import { prisma } from '@/lib/db/prisma'
 import { logInfo, logError, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { USER_ROLES, BCRYPT_SALT_ROUNDS } from '@/constants/auth'
-import { DEFAULT_THEME } from '@/constants/app'
+import { generateUserSlug } from '@/lib/utils'
 import bcrypt from 'bcryptjs'
-import type { Prisma } from '@prisma/client'
 import type { 
   CreateUserParams, 
   UserWithSettings, 
@@ -17,7 +16,7 @@ import type {
 } from '@/types/auth'
 
 /**
- * Yeni kullanıcı oluşturur
+ * Yeni kullanıcı oluşturur (Transaction ile)
  */
 export async function createUser(params: CreateUserParams): Promise<AuthApiResponse> {
   const { email, password, username } = params
@@ -47,40 +46,49 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
       return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
     }
 
+    // Slug oluştur
+    const uniqueSlug = generateUserSlug(username)
+
     // Şifreyi hash'le
     const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
 
-    // Kullanıcıyı oluştur
-    const user = await prisma.user.create({
-      data: {
-        email: email.toLowerCase(),
-        passwordHash,
-        username,
-        roles: [USER_ROLES.USER],
-      }
-    })
+    // Transaction ile kullanıcı + ayarları oluştur
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Kullanıcıyı oluştur
+      const user = await tx.user.create({
+        data: {
+          email: email.toLowerCase(),
+          passwordHash,
+          username,
+          slug: uniqueSlug,
+          roles: [USER_ROLES.USER],
+        }
+      })
 
-    // Varsayılan ayarları oluştur
-    await prisma.userProfileSettings.create({
-      data: {
-        userId: user.id,
-        themePreference: DEFAULT_THEME,
-      }
+      // 2. Varsayılan ayarları oluştur
+      const userSettings = await tx.userProfileSettings.create({
+        data: {
+          userId: user.id,
+        }
+      })
+
+      return { user, userSettings }
     })
 
     logInfo(LOG_EVENTS.AUTH_SIGNUP_SUCCESS, 'Yeni kullanıcı oluşturuldu', {
-      userId: user.id,
-      email: user.email,
-      username: user.username
-    }, user.id)
+      userId: result.user.id,
+      email: result.user.email,
+      username: result.user.username,
+      slug: result.user.slug
+    }, result.user.id)
 
     return { 
       success: true, 
       data: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        roles: user.roles
+        id: result.user.id,
+        email: result.user.email,
+        username: result.user.username,
+        roles: result.user.roles
       }
     }
   } catch (error) {
@@ -220,14 +228,10 @@ export async function updateUserSettings(userId: string, settings: UpdateUserSet
       where: { userId },
       update: {
         themePreference: settings.themePreference,
-        notificationPreferences: settings.notificationPreferences as Prisma.InputJsonValue,
-        privacySettings: settings.privacySettings as Prisma.InputJsonValue
       },
       create: {
         userId,
         themePreference: settings.themePreference || 'system',
-        notificationPreferences: settings.notificationPreferences as Prisma.InputJsonValue,
-        privacySettings: settings.privacySettings as Prisma.InputJsonValue
       }
     })
 
