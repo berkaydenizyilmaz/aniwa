@@ -1,4 +1,4 @@
-// Aniwa Projesi - Auth Tipleri
+// Auth Tipleri
 // Bu dosya kimlik doğrulama ile ilgili tüm tip tanımlarını içerir
 
 import type { User, UserRole } from '@prisma/client'
@@ -52,25 +52,8 @@ export type SessionUser = Pick<User, 'id' | 'roles'> & {
   oauthToken?: string
 }
 
-// Kullanıcı listesi için sadece gerekli alanlar
-export type UserListItem = Pick<User, 'id' | 'username' | 'email' | 'roles' | 'createdAt'>
-
 // Kullanıcı profil sayfası için gerekli alanlar
-export type UserProfile = Omit<User, 'passwordHash' | 'emailVerified'> & {
-  userSettings?: {
-    themePreference: string
-    languagePreference: string
-  } | null
-}
-
-// Admin paneli için kullanıcı yönetimi
-export type AdminUserView = Pick<User, 'id' | 'username' | 'email' | 'roles' | 'createdAt' | 'updatedAt'>
-
-// Kullanıcı arama sonuçları için minimal bilgi
-export type UserSearchResult = Pick<User, 'id' | 'username' | 'profilePicture'>
-
-// Güvenli kullanıcı tipi - hassas bilgiler hariç
-export type SafeUser = Omit<User, 'passwordHash' | 'emailVerified'>
+export type UserProfile = Omit<UserWithSettings, 'passwordHash' | 'emailVerified'>
 
 // OAuth geçici kullanıcı tipleri
 export interface CreateOAuthPendingUserParams {
@@ -120,35 +103,6 @@ export interface RequireAuthHookReturn {
 export interface RequireRoleHookReturn {
   hasRequiredRole: boolean | undefined
   isLoading: boolean
-}
-
-// ---- Email Service Tipleri ----
-export interface EmailSendResult {
-  id: string
-}
-
-export interface SendEmailParams {
-  to: string
-  subject: string
-  html: string
-  from?: string
-}
-
-export interface SendVerificationEmailParams {
-  to: string
-  username: string
-  verificationUrl: string
-}
-
-export interface SendPasswordResetEmailParams {
-  to: string
-  username: string
-  resetUrl: string
-}
-
-export interface SendPasswordChangedNotificationParams {
-  to: string
-  username: string
 }
 
 // ---- API Response Tipleri ----

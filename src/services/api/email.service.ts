@@ -6,14 +6,14 @@ import { env } from '@/lib/env'
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { EMAIL_SENDER, EMAIL_SUBJECTS, EMAIL_CONTENT, EMAIL_STYLES } from '@/constants/email'
+import type { AuthApiResponse } from '@/types/auth'
 import type { 
-  AuthApiResponse, 
   EmailSendResult,
   SendEmailParams,
   SendVerificationEmailParams,
   SendPasswordResetEmailParams,
   SendPasswordChangedNotificationParams
-} from '@/types/auth'
+} from '@/types/email'
 
 // Resend client'ı oluştur
 const resend = new Resend(env.RESEND_API_KEY)

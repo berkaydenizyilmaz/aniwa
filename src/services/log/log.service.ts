@@ -1,28 +1,13 @@
 import { prisma } from '@/lib/db/prisma'
-import { Prisma, LogLevel, UserRole } from '@prisma/client'
-import { LOG_CLEANUP_DEFAULTS } from '@/constants/logging'
-import type { 
-  CreateLogParams, 
-  LogFilters, 
-  LogServiceResponse, 
-  LogWithUser, 
-  LogListResponse,
-  RoleBasedLogStats,
-  LogUserSelect,
-  LogStats,
-  CleanupResult,
-  DateRange
+import { Prisma } from '@prisma/client'
+import { logUserSelect } from '@/types/logging'
+import type {
+  CreateLogParams,
+  LogFilters,
+  LogServiceResponse,
+  LogWithUser,
+  LogListResponse
 } from '@/types/logging'
-
-// User select sabitini kullan - DRY prensibi
-const USER_SELECT: { select: LogUserSelect } = {
-  select: {
-    id: true,
-    username: true,
-    email: true,
-    roles: true,
-  }
-}
 
 /**
  * Yeni log kaydı oluşturur
@@ -38,7 +23,7 @@ export async function createLog(params: CreateLogParams): Promise<LogServiceResp
         userId: params.userId,
       },
       include: {
-        user: USER_SELECT,
+        user: { select: logUserSelect },
       },
     })
 
@@ -92,7 +77,7 @@ export async function getLogs(filters: LogFilters = {}): Promise<LogServiceRespo
       prisma.log.findMany({
         where,
         include: {
-          user: USER_SELECT,
+          user: { select: logUserSelect },
         },
         orderBy: { timestamp: 'desc' },
         take: limit,
@@ -118,161 +103,6 @@ export async function getLogs(filters: LogFilters = {}): Promise<LogServiceRespo
     return { 
       success: false, 
       error: 'Loglar listelenemedi' 
-    }
-  }
-}
-
-/**
- * Belirli bir log kaydını ID ile getirir
- */
-export async function getLogById(id: string): Promise<LogServiceResponse<LogWithUser>> {
-  try {
-    const log = await prisma.log.findUnique({
-      where: { id },
-      include: {
-        user: USER_SELECT,
-      },
-    })
-
-    if (!log) {
-      return { success: false, error: 'Log kaydı bulunamadı' }
-    }
-
-    return { success: true, data: log }
-  } catch (error) {
-    console.error('Log getirme hatası:', error)
-    return { 
-      success: false, 
-      error: 'Log kaydı getirilemedi' 
-    }
-  }
-}
-
-/**
- * Belirli tarihten eski logları siler (temizlik için)
- */
-export async function cleanOldLogs(olderThanDays: number = LOG_CLEANUP_DEFAULTS.OLDER_THAN_DAYS): Promise<LogServiceResponse<CleanupResult>> {
-  try {
-    const cutoffDate = new Date()
-    cutoffDate.setDate(cutoffDate.getDate() - olderThanDays)
-
-    const result = await prisma.log.deleteMany({
-      where: {
-        timestamp: {
-          lt: cutoffDate,
-        },
-      },
-    })
-
-    return { 
-      success: true, 
-      data: { deletedCount: result.count } 
-    }
-  } catch (error) {
-    console.error('Eski log temizleme hatası:', error)
-    return { 
-      success: false, 
-      error: 'Eski loglar temizlenemedi' 
-    }
-  }
-}
-
-/**
- * Log seviyelerine göre istatistik getirir
- */
-export async function getLogStats(dateRange?: DateRange): Promise<LogServiceResponse<LogStats>> {
-  try {
-    const where: Prisma.LogWhereInput = {}
-    
-    if (dateRange?.startDate || dateRange?.endDate) {
-      where.timestamp = {}
-      if (dateRange.startDate) where.timestamp.gte = dateRange.startDate
-      if (dateRange.endDate) where.timestamp.lte = dateRange.endDate
-    }
-
-    const stats = await prisma.log.groupBy({
-      by: ['level'],
-      where,
-      _count: {
-        level: true,
-      },
-    })
-
-    const formattedStats = stats.reduce((acc, stat) => {
-      acc[stat.level] = stat._count.level
-      return acc
-    }, {} as LogStats)
-
-    return { success: true, data: formattedStats }
-  } catch (error) {
-    console.error('Log istatistik hatası:', error)
-    return { 
-      success: false, 
-      error: 'Log istatistikleri getirilemedi' 
-    }
-  }
-}
-
-/**
- * Rol bazlı log istatistikleri getirir
- */
-export async function getLogStatsByRole(dateRange?: DateRange): Promise<LogServiceResponse<RoleBasedLogStats[]>> {
-  try {
-    const where: Prisma.LogWhereInput = {
-      user: { isNot: null } // Sadece kullanıcı logları
-    }
-    
-    if (dateRange?.startDate || dateRange?.endDate) {
-      where.timestamp = {}
-      if (dateRange.startDate) where.timestamp.gte = dateRange.startDate
-      if (dateRange.endDate) where.timestamp.lte = dateRange.endDate
-    }
-
-    // Tüm logları user ile birlikte getir
-    const logs = await prisma.log.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            roles: true
-          }
-        }
-      }
-    })
-
-    // Manuel olarak gruplama yap - her kullanıcı birden fazla role sahip olabilir
-    const roleMap = new Map<UserRole, RoleBasedLogStats>()
-
-    logs.forEach(log => {
-      if (!log.user || !log.user.roles) return
-      
-      const level = log.level
-      
-      // Her rol için ayrı ayrı sayım yap
-      log.user.roles.forEach(role => {
-        if (!roleMap.has(role)) {
-          roleMap.set(role, {
-            role,
-            count: 0,
-            levels: {} as Record<LogLevel, number>
-          })
-        }
-        
-        const roleStat = roleMap.get(role)!
-        roleStat.count += 1
-        roleStat.levels[level] = (roleStat.levels[level] || 0) + 1
-      })
-    })
-
-    return { 
-      success: true, 
-      data: Array.from(roleMap.values()) 
-    }
-  } catch (error) {
-    console.error('Rol bazlı log istatistik hatası:', error)
-    return { 
-      success: false, 
-      error: 'Rol bazlı log istatistikleri getirilemedi' 
     }
   }
 }

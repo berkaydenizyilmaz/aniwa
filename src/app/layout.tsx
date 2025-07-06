@@ -33,9 +33,9 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <PageErrorBoundary>
-          <Providers>
+        <Providers>
             {children}
-          </Providers>
+        </Providers>
         </PageErrorBoundary>
         <Analytics />
         <SpeedInsights />

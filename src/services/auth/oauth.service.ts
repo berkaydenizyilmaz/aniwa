@@ -140,22 +140,22 @@ export async function verifyOAuthTokenAndCreateUser(
     const result = await prisma.$transaction(async (tx) => {
       // 1. Kullanıcıyı oluştur
       const user = await tx.user.create({
-        data: {
-          email: pendingUser.email,
-          username,
+      data: {
+        email: pendingUser.email,
+        username,
           slug: uniqueSlug,
-          roles: [USER_ROLES.USER],
-          image: pendingUser.image,
-          emailVerified: new Date() // OAuth kullanıcıları doğrulanmış sayılır
-        }
-      })
+        roles: [USER_ROLES.USER],
+        image: pendingUser.image,
+        emailVerified: new Date() // OAuth kullanıcıları doğrulanmış sayılır
+      }
+    })
 
       // 2. Varsayılan ayarları oluştur
       const userSettings = await tx.userProfileSettings.create({
-        data: {
-          userId: user.id,
-        }
-      })
+      data: {
+        userId: user.id,
+      }
+    })
 
       // 3. Geçici kaydı sil
       await tx.oAuthPendingUser.delete({ where: { id: pendingUser.id } })

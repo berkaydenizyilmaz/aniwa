@@ -56,20 +56,20 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
     const result = await prisma.$transaction(async (tx) => {
       // 1. Kullanıcıyı oluştur
       const user = await tx.user.create({
-        data: {
-          email: email.toLowerCase(),
-          passwordHash,
-          username,
+      data: {
+        email: email.toLowerCase(),
+        passwordHash,
+        username,
           slug: uniqueSlug,
-          roles: [USER_ROLES.USER],
-        }
-      })
+        roles: [USER_ROLES.USER],
+      }
+    })
 
       // 2. Varsayılan ayarları oluştur
       const userSettings = await tx.userProfileSettings.create({
-        data: {
-          userId: user.id,
-        }
+      data: {
+        userId: user.id,
+      }
       })
 
       return { user, userSettings }

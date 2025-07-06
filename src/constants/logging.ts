@@ -80,8 +80,6 @@ export const PERFORMANCE_THRESHOLDS = {
 // Performance threshold tipini export et
 export type PerformanceThreshold = typeof PERFORMANCE_THRESHOLDS[keyof typeof PERFORMANCE_THRESHOLDS]
 
-
-
 // Log temizleme varsayılan değerleri
 export const LOG_CLEANUP_DEFAULTS = {
   OLDER_THAN_DAYS: 30,
