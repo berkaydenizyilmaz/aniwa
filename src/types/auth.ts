@@ -6,6 +6,7 @@ import type { Session } from 'next-auth'
 import type { SignInResponse } from 'next-auth/react'
 import { Prisma } from '@prisma/client'
 import type { ApiResponse } from './api'
+import type { OAUTH_PROVIDERS, USER_ROLES, VERIFICATION_TOKEN_TYPES } from "@/constants/auth"
 
 // Kullanıcı oluşturma parametreleri
 export interface CreateUserParams {
@@ -96,4 +97,26 @@ export type SessionUser = Pick<User, 'id' | 'roles'> & {
   username?: string | null
   provider?: string
   oauthToken?: string
-} 
+}
+
+/**
+ * Desteklenen OAuth provider'larının tipini tanımlar.
+ * Örn: 'google'
+ */
+export type OAuthProvider = typeof OAUTH_PROVIDERS[keyof typeof OAUTH_PROVIDERS]
+
+/**
+ * Kullanıcı rollerinin tipini tanımlar.
+ * Prisma'dan gelen `UserRole` enum'una dayanır.
+ * Örn: 'USER', 'ADMIN'
+ */
+export type UserRoleType = typeof USER_ROLES[keyof typeof USER_ROLES]
+
+/**
+ * Doğrulama token'larının türlerini tanımlar.
+ * Örn: 'email_verification', 'password_reset'
+ */
+export type VerificationTokenType = typeof VERIFICATION_TOKEN_TYPES[keyof typeof VERIFICATION_TOKEN_TYPES]
+
+// Diğer auth ile ilgili tipler buraya eklenebilir.
+// Örnek olarak, API yanıt tipleri veya form veri tipleri. 

@@ -25,7 +25,7 @@ export const usernameSchema = z
   .string()
   .min(USERNAME_MIN_LENGTH, `Kullanıcı adı en az ${USERNAME_MIN_LENGTH} karakter olmalıdır`)
   .max(USERNAME_MAX_LENGTH, `Kullanıcı adı en fazla ${USERNAME_MAX_LENGTH} karakter olmalıdır`)
-  .regex(USERNAME_REGEX, 'Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir')
+  .regex(USERNAME_REGEX, 'Kullanıcı adı sadece küçük harf ve rakam içerebilir')
 
 // Password şeması
 export const passwordSchema = z

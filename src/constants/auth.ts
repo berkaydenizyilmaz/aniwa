@@ -1,8 +1,10 @@
+import { UserRole } from "@prisma/client";
+
 // Aniwa Projesi - Auth Constants
 // Bu dosya kimlik doğrulama ile ilgili tüm sabitleri içerir
 
 // Validasyon kuralları (auth spesifik)
-export const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/
+export const USERNAME_REGEX = /^[a-z0-9]{USERNAME_MIN_LENGTH,USERNAME_MAX_LENGTH}$/
 
 // Uzunluk limitleri
 export const PASSWORD_MIN_LENGTH = 8
@@ -37,15 +39,5 @@ export const OAUTH_PROVIDERS = {
   GOOGLE: 'google',
 } as const
 
-// Kullanıcı rolleri (Prisma'dan gelen enum'a uygun)
-export const USER_ROLES = {
-  USER: 'USER',
-  MODERATOR: 'MODERATOR',
-  EDITOR: 'EDITOR',
-  ADMIN: 'ADMIN',
-} as const
-
-// Tip tanımlamaları
-export type OAuthProvider = typeof OAUTH_PROVIDERS[keyof typeof OAUTH_PROVIDERS]
-export type UserRoleType = typeof USER_ROLES[keyof typeof USER_ROLES]
-export type VerificationTokenType = typeof VERIFICATION_TOKEN_TYPES[keyof typeof VERIFICATION_TOKEN_TYPES] 
+// Kullanıcı rolleri (Prisma'dan gelen enum'u yeniden dışa aktar)
+export { UserRole as USER_ROLES };
