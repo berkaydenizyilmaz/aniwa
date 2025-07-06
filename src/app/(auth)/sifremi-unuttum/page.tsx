@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { forgotPasswordSchema, type ForgotPasswordData } from '@/lib/schemas/auth.schemas'
-import { AUTH_ROUTES } from '@/constants/routes'
+import { API_ROUTES, AUTH_ROUTES } from '@/constants/routes'
 import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS } from '@/constants/auth'
 import type { ForgotPasswordResponse } from '@/types/auth'
 
@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
     setError('')
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch(API_ROUTES.AUTH.FORGOT_PASSWORD, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

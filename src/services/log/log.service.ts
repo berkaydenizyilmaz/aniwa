@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/db/prisma'
 import { Prisma, LogLevel, UserRole } from '@prisma/client'
 import { LOG_CLEANUP_DEFAULTS } from '@/constants/logging'
-import { PAGINATION_DEFAULTS } from '@/constants/app'
 import type { 
   CreateLogParams, 
   LogFilters, 
@@ -65,8 +64,8 @@ export async function getLogs(filters: LogFilters = {}): Promise<LogServiceRespo
       userRoles,
       startDate,
       endDate,
-      limit = PAGINATION_DEFAULTS.LIMIT,
-      offset = PAGINATION_DEFAULTS.OFFSET,
+      limit = 50,
+      offset = 0,
     } = filters
 
     // Filtreleme koşullarını oluştur

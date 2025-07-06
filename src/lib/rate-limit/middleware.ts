@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getClientIP } from './index'
 import { AUTH_RATE_LIMIT_TYPES, RATE_LIMITS } from '@/constants/rate-limits'
 import type { RateLimitConfig, RateLimitKeyOptions } from '@/types/rate-limit'
-import { HTTP_STATUS } from '@/constants/app'
 import { getToken } from 'next-auth/jwt'
 
 /**
@@ -35,7 +34,7 @@ export async function withGlobalRateLimit(
         retryAfter: status.error.retryAfter,
       },
       { 
-        status: HTTP_STATUS.TOO_MANY_REQUESTS,
+        status: 429,
         headers: {
           'X-RateLimit-Limit': status.result.limit.toString(),
           'X-RateLimit-Remaining': status.result.remaining.toString(),
@@ -102,7 +101,7 @@ export function withAuthRateLimit(
           retryAfter: status.error.retryAfter,
         },
         { 
-          status: HTTP_STATUS.TOO_MANY_REQUESTS,
+          status: 429,
           headers: {
             'X-RateLimit-Limit': status.result.limit.toString(),
             'X-RateLimit-Remaining': status.result.remaining.toString(),
@@ -176,7 +175,7 @@ export function withUserTierRateLimit(
           userTier: tierName,
         },
         { 
-          status: HTTP_STATUS.TOO_MANY_REQUESTS,
+          status: 429,
           headers: {
             'X-RateLimit-Limit': status.result.limit.toString(),
             'X-RateLimit-Remaining': status.result.remaining.toString(),
@@ -226,7 +225,7 @@ export function withRateLimit(
           retryAfter: status.error.retryAfter,
         },
         { 
-          status: HTTP_STATUS.TOO_MANY_REQUESTS,
+          status: 429,
           headers: {
             'X-RateLimit-Limit': status.result.limit.toString(),
             'X-RateLimit-Remaining': status.result.remaining.toString(),

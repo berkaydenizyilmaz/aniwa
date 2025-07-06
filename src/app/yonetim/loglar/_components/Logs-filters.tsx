@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LogLevel } from '@prisma/client'
+import { PROTECTED_ROUTES } from '@/constants/routes'
 
 export function LogsFilters() {
   const router = useRouter()
@@ -26,7 +27,7 @@ export function LogsFilters() {
     // Sayfa numarasını sıfırla
     params.delete('page')
     
-    router.push(`/admin/loglar?${params.toString()}`)
+    router.push(`${PROTECTED_ROUTES.ADMIN.LOGS}?${params.toString()}`)
   }
 
   // Filtreleri temizle
@@ -34,7 +35,7 @@ export function LogsFilters() {
     setLevel('')
     setEvent('')
     setUserId('')
-    router.push('/admin/loglar')
+    router.push(PROTECTED_ROUTES.ADMIN.LOGS)
   }
 
   return (

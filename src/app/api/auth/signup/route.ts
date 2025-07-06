@@ -8,7 +8,6 @@ import { createEmailVerificationToken } from '@/services/auth/email-verification
 import { logError, logInfo } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
-import { HTTP_STATUS } from '@/constants/app'
 import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
 
 async function signupHandler(request: NextRequest) {
@@ -23,7 +22,7 @@ async function signupHandler(request: NextRequest) {
           success: false, 
           error: validationResult.error.errors[0].message 
         },
-        { status: HTTP_STATUS.BAD_REQUEST }
+        { status: 400 }
       )
     }
 
@@ -39,7 +38,7 @@ async function signupHandler(request: NextRequest) {
     if (!result.success) {
       return NextResponse.json(
         { success: false, error: result.error },
-        { status: HTTP_STATUS.BAD_REQUEST }
+        { status: 400 }
       )
     }
 
@@ -81,7 +80,7 @@ async function signupHandler(request: NextRequest) {
 
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
-      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+      { status: 500 }
     )
   }
 }

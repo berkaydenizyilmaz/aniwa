@@ -227,11 +227,9 @@ export async function updateUserSettings(userId: string, settings: UpdateUserSet
     const userSettings = await prisma.userProfileSettings.upsert({
       where: { userId },
       update: {
-        themePreference: settings.themePreference,
       },
       create: {
         userId,
-        themePreference: settings.themePreference || 'system',
       }
     })
 

@@ -8,7 +8,6 @@ import { usernameSchema } from '@/lib/schemas/auth.schemas'
 import { verifyOAuthTokenAndCreateUser } from '@/services/auth/oauth.service'
 import { logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
-import { HTTP_STATUS } from '@/constants/app'
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,7 +17,7 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.email) {
       return NextResponse.json(
         { success: false, error: 'Giriş yapmanız gerekli' },
-        { status: HTTP_STATUS.UNAUTHORIZED }
+        { status: 401 }
       )
     }
 
@@ -33,7 +32,7 @@ export async function POST(request: NextRequest) {
           success: false, 
           error: usernameValidation.error.errors[0].message 
         },
-        { status: HTTP_STATUS.BAD_REQUEST }
+        { status: 400 }
       )
     }
 
@@ -47,7 +46,7 @@ export async function POST(request: NextRequest) {
           error: 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.',
           errorCode: 'SESSION_EXPIRED'
         },
-        { status: HTTP_STATUS.UNAUTHORIZED }
+        { status: 401 }
       )
     }
 
@@ -60,7 +59,7 @@ export async function POST(request: NextRequest) {
     if (!result.success) {
       return NextResponse.json(
         { success: false, error: result.error },
-        { status: HTTP_STATUS.BAD_REQUEST }
+        { status: 400 }
       )
     }
 
@@ -77,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
-      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+      { status: 500 }
     )
   }
 } 

@@ -11,6 +11,7 @@ export const API_ROUTES = {
     RESET_PASSWORD: '/api/auth/reset-password',
     FORGOT_PASSWORD: '/api/auth/forgot-password',
     VERIFY_EMAIL: '/api/auth/verify-email',
+    CHECK_USERNAME: '/api/auth/check-username',
   },
 } as const
 
@@ -38,6 +39,7 @@ export const PUBLIC_ROUTES = {
 export const PROTECTED_ROUTES = {
   ADMIN: {
     BASE: '/yonetim',
+    LOGS: '/yonetim/loglar',
   },
   MODERATOR: {
     BASE: '/moderasyon',

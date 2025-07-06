@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
+import { API_ROUTES } from '@/constants/routes'
 
 export default function SetupUsernamePage() {
   const [username, setUsername] = useState('')
@@ -22,7 +23,7 @@ export default function SetupUsernamePage() {
     const timeoutId = setTimeout(async () => {
       setIsChecking(true)
       try {
-        const response = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username)}`)
+        const response = await fetch(`${API_ROUTES.AUTH.CHECK_USERNAME}?username=${encodeURIComponent(username)}`)
         const data = await response.json()
         setIsAvailable(data.available)
       } catch (err) {

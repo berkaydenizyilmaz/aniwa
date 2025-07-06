@@ -5,7 +5,6 @@ import { LOG_EVENTS } from '@/constants/logging'
 import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_REGEX } from '@/constants/auth'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
-import { HTTP_STATUS } from '@/constants/app'
 
 async function checkUsernameHandler(request: NextRequest) {
   try {
@@ -15,7 +14,7 @@ async function checkUsernameHandler(request: NextRequest) {
     if (!username) {
       return NextResponse.json(
         { error: 'Username parametresi gerekli' },
-        { status: HTTP_STATUS.BAD_REQUEST }
+        { status: 400 }
       )
     }
 
@@ -23,7 +22,7 @@ async function checkUsernameHandler(request: NextRequest) {
     if (username.length < USERNAME_MIN_LENGTH || username.length > USERNAME_MAX_LENGTH) {
       return NextResponse.json(
         { available: false, error: 'Username ' + USERNAME_MIN_LENGTH + '-' + USERNAME_MAX_LENGTH + ' karakter arasında olmalı' },
-        { status: HTTP_STATUS.BAD_REQUEST }
+        { status: 400 }
       )
     }
 
@@ -31,7 +30,7 @@ async function checkUsernameHandler(request: NextRequest) {
     if (!USERNAME_REGEX.test(username)) {
       return NextResponse.json(
         { available: false, error: 'Username sadece harf, rakam ve alt çizgi içerebilir' },
-        { status: HTTP_STATUS.BAD_REQUEST }
+        { status: 400 }
       )
     }
 
@@ -60,7 +59,7 @@ async function checkUsernameHandler(request: NextRequest) {
 
     return NextResponse.json(
       { error: 'Sunucu hatası' },
-      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+      { status: 500 }
     )
   }
 }

@@ -12,12 +12,6 @@ import {
   TOKEN_MIN_LENGTH,
   EMAIL_MIN_LENGTH,
 } from '../../constants/auth'
-import {
-  THEME_PREFERENCES,
-  DEFAULT_THEME,
-  LANGUAGE_PREFERENCES,
-  DEFAULT_LANGUAGE,
-} from '../../constants/app'
 
 // Email şeması
 export const emailSchema = z
@@ -83,14 +77,6 @@ export const updatePasswordSchema = z.object({
   path: ['confirmPassword'],
 })
 
-// Kullanıcı ayarları şeması
-export const userSettingsSchema = z.object({
-  themePreference: z.enum(THEME_PREFERENCES).default(DEFAULT_THEME),
-  languagePreference: z.enum(LANGUAGE_PREFERENCES).default(DEFAULT_LANGUAGE),
-  notificationPreferences: z.record(z.boolean()).optional(),
-  privacySettings: z.record(z.union([z.string(), z.boolean(), z.number()])).optional(),
-})
-
 // Email doğrulama şeması
 export const verifyEmailSchema = z.object({
   token: z.string().min(TOKEN_MIN_LENGTH, 'Doğrulama kodu gerekli'),
@@ -131,7 +117,6 @@ export type SignupData = z.infer<typeof signupSchema>
 export type LoginData = z.infer<typeof loginSchema>
 export type UpdateProfileData = z.infer<typeof updateProfileSchema>
 export type UpdatePasswordData = z.infer<typeof updatePasswordSchema>
-export type UserSettingsData = z.infer<typeof userSettingsSchema>
 export type VerifyEmailData = z.infer<typeof verifyEmailSchema>
 export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>

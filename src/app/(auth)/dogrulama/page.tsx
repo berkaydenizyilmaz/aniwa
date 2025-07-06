@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { CheckCircle, XCircle, Loader2, Mail } from 'lucide-react'
 import Link from 'next/link'
+import { AUTH_ROUTES, API_ROUTES } from '@/constants/routes'
 
 type VerificationState = 'loading' | 'success' | 'error' | 'invalid'
 
@@ -30,7 +31,7 @@ export default function EmailVerificationPage() {
     // Token'ı doğrula
     const verifyEmail = async () => {
       try {
-        const response = await fetch(`/api/auth/verify-email?token=${token}`)
+        const response = await fetch(`${API_ROUTES.AUTH.VERIFY_EMAIL}?token=${token}`)
         const data = await response.json()
 
         if (data.success) {
@@ -40,7 +41,7 @@ export default function EmailVerificationPage() {
           
           // 3 saniye sonra login sayfasına yönlendir
           setTimeout(() => {
-            router.push('/giris?verified=true')
+            router.push(`${AUTH_ROUTES.SIGN_IN}?verified=true`)
           }, 3000)
         } else {
           setState('error')
@@ -122,7 +123,7 @@ export default function EmailVerificationPage() {
                 3 saniye içinde giriş sayfasına yönlendirileceksiniz...
               </p>
               <Button asChild className="w-full">
-                <Link href="/giris">
+                <Link href={AUTH_ROUTES.SIGN_IN}>
                   Hemen Giriş Yap
                 </Link>
               </Button>
@@ -132,12 +133,12 @@ export default function EmailVerificationPage() {
           {(state === 'error' || state === 'invalid') && (
             <div className="space-y-4">
               <Button asChild className="w-full" variant="outline">
-                <Link href="/kayit">
+                <Link href={AUTH_ROUTES.SIGN_UP}>
                   Yeni Hesap Oluştur
                 </Link>
               </Button>
               <Button asChild className="w-full" variant="ghost">
-                <Link href="/giris">
+                <Link href={AUTH_ROUTES.SIGN_IN}>
                   Giriş Sayfasına Dön
                 </Link>
               </Button>

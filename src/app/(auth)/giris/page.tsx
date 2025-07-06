@@ -107,7 +107,7 @@ export default function LoginPage() {
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Şifre
             </label>
-              <Link href="/sifremi-unuttum" className="text-sm text-blue-600 hover:text-blue-500">
+              <Link href={AUTH_ROUTES.FORGOT_PASSWORD} className="text-sm text-blue-600 hover:text-blue-500">
                 Şifremi unuttum
               </Link>
             </div>

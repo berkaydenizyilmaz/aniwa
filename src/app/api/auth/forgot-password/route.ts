@@ -7,7 +7,6 @@ import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { forgotPasswordSchema } from '@/lib/schemas/auth.schemas'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
-import { HTTP_STATUS } from '@/constants/app'
 import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
 
 async function forgotPasswordHandler(request: NextRequest) {
@@ -22,7 +21,7 @@ async function forgotPasswordHandler(request: NextRequest) {
           success: false, 
           error: validation.error.errors[0]?.message || 'Geçersiz veri'
         },
-        { status: HTTP_STATUS.BAD_REQUEST }
+        { status: 400 }
       )
     }
 
@@ -58,7 +57,7 @@ async function forgotPasswordHandler(request: NextRequest) {
 
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
-      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+      { status: 500 }
     )
   }
 }

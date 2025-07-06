@@ -5,7 +5,6 @@ import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
 import { PROTECTED_ROUTE_PATTERNS, PUBLIC_ROUTE_LIST, AUTH_ROUTES, API_ROUTES, PUBLIC_ROUTES } from '@/constants/routes'
 import { USER_ROLES } from "@/constants/auth"
-import { HTTP_STATUS } from '@/constants/app'
 import { UserRole } from "@prisma/client"
 import { withGlobalRateLimit } from '@/lib/rate-limit/middleware'
 
@@ -16,7 +15,7 @@ export default withAuth(
     
     // 0. RATE LIMITING - Tüm istekler için genel rate limiting kontrolü
     const rateLimitResponse = await withGlobalRateLimit(req, () => NextResponse.next())
-    if (rateLimitResponse.status === HTTP_STATUS.TOO_MANY_REQUESTS) {
+    if (rateLimitResponse.status === 429) {
       return rateLimitResponse
     }
     
@@ -28,7 +27,7 @@ export default withAuth(
       }
       // Auth API'lerine erişemez
       if (pathname === API_ROUTES.AUTH.SIGNUP) {
-        return NextResponse.json({ error: 'Zaten giriş yapmışsınız' }, { status: HTTP_STATUS.FORBIDDEN })
+        return NextResponse.json({ error: 'Zaten giriş yapmışsınız' }, { status: 403 })
       }
     }
 
