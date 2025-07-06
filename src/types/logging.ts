@@ -1,4 +1,20 @@
+// Aniwa Projesi - Logging Tipi Tanımlamaları
+// Bu dosya, loglama sistemiyle ilgili tüm TypeScript tiplerini içerir.
+
 import { Prisma, LogLevel, UserRole } from '@prisma/client'
+import type { LOG_EVENTS, SENSITIVE_FIELDS, PERFORMANCE_THRESHOLDS } from '@/constants/logging'
+
+// Log seviyesi tipi (Prisma'dan gelir)
+export type LogLevelType = LogLevel
+
+// Hassas alanların tipi
+export type SensitiveField = typeof SENSITIVE_FIELDS[number]
+
+// Log olay türlerinin tipi
+export type LogEventType = typeof LOG_EVENTS[keyof typeof LOG_EVENTS]
+
+// Performans eşiklerinin tipi
+export type PerformanceThreshold = typeof PERFORMANCE_THRESHOLDS[keyof typeof PERFORMANCE_THRESHOLDS]
 
 // Log metadata tipi
 export interface LogMetadata {

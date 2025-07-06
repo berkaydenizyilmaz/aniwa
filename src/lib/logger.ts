@@ -2,8 +2,7 @@
 // Bu dosya hem console hem MongoDB logging sağlar
 
 import { createLog } from '@/services/log/log.service'
-import type { LogLevel } from '@prisma/client'
-import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS, LOG_LEVELS } from '@/constants/logging'
+import { LogLevel, SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS } from '@/constants/logging'
 import type { LogMetadata, PerformanceMetadata } from '@/types/logging'
 import { Prisma } from '@prisma/client'
 
@@ -50,7 +49,7 @@ export const logToDatabase = async (
 /**
  * Console logging için formatlanmış çıktı
  */
-const formatConsoleLog = (level: string, event: string, message: string, metadata?: LogMetadata) => {
+const formatConsoleLog = (level: LogLevel, event: string, message: string, metadata?: LogMetadata) => {
   const timestamp = new Date().toISOString()
   const emoji = {
     ERROR: '🔴',
@@ -75,8 +74,8 @@ export const logError = (
   metadata?: LogMetadata,
   userId?: string
 ) => {
-  formatConsoleLog(LOG_LEVELS.ERROR, event, message, metadata)
-  void logToDatabase(LOG_LEVELS.ERROR, event, message, metadata, userId)
+  formatConsoleLog(LogLevel.ERROR, event, message, metadata)
+  void logToDatabase(LogLevel.ERROR, event, message, metadata, userId)
 }
 
 export const logWarn = (
@@ -85,8 +84,8 @@ export const logWarn = (
   metadata?: LogMetadata,
   userId?: string
 ) => {
-  formatConsoleLog(LOG_LEVELS.WARN, event, message, metadata)
-  void logToDatabase(LOG_LEVELS.WARN, event, message, metadata, userId)
+  formatConsoleLog(LogLevel.WARN, event, message, metadata)
+  void logToDatabase(LogLevel.WARN, event, message, metadata, userId)
 }
 
 export const logInfo = (
@@ -95,8 +94,8 @@ export const logInfo = (
   metadata?: LogMetadata,
   userId?: string
 ) => {
-  formatConsoleLog(LOG_LEVELS.INFO, event, message, metadata)
-  void logToDatabase(LOG_LEVELS.INFO, event, message, metadata, userId)
+  formatConsoleLog(LogLevel.INFO, event, message, metadata)
+  void logToDatabase(LogLevel.INFO, event, message, metadata, userId)
 }
 
 export const logDebug = (
@@ -107,9 +106,9 @@ export const logDebug = (
 ) => {
   // Debug logları sadece development'ta göster
   if (process.env.NODE_ENV === 'development') {
-    formatConsoleLog(LOG_LEVELS.DEBUG, event, message, metadata)
+    formatConsoleLog(LogLevel.DEBUG, event, message, metadata)
   }
-  void logToDatabase(LOG_LEVELS.DEBUG, event, message, metadata, userId)
+  void logToDatabase(LogLevel.DEBUG, event, message, metadata, userId)
 }
 
 /**
@@ -133,12 +132,12 @@ export const logRequest = (
     userAgent,
   }
   
-  const level = statusCode >= 500 ? LOG_LEVELS.ERROR : 
-                statusCode >= 400 ? LOG_LEVELS.WARN : LOG_LEVELS.INFO
+  const level: LogLevel = statusCode >= 500 ? LogLevel.ERROR : 
+                statusCode >= 400 ? LogLevel.WARN : LogLevel.INFO
   
-  if (level === LOG_LEVELS.ERROR) {
+  if (level === LogLevel.ERROR) {
     logError(LOG_EVENTS.HTTP_REQUEST, `${method} ${url} - ${statusCode}`, metadata, userId)
-  } else if (level === LOG_LEVELS.WARN) {
+  } else if (level === LogLevel.WARN) {
     logWarn(LOG_EVENTS.HTTP_REQUEST, `${method} ${url} - ${statusCode}`, metadata, userId)
   } else {
     logInfo(LOG_EVENTS.HTTP_REQUEST, `${method} ${url} - ${statusCode}`, metadata, userId)
