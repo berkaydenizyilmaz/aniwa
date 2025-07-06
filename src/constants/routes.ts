@@ -10,6 +10,7 @@ export const API_ROUTES = {
     SIGN_OUT: '/api/auth/signout',
     RESET_PASSWORD: '/api/auth/reset-password',
     FORGOT_PASSWORD: '/api/auth/forgot-password',
+    VERIFY_EMAIL: '/api/auth/verify-email',
   },
 } as const
 

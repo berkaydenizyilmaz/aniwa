@@ -7,7 +7,6 @@ import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
-import { HTTP_STATUS } from '@/constants/app'
 
 async function verifyEmailHandler(request: NextRequest) {
   try {
@@ -17,7 +16,7 @@ async function verifyEmailHandler(request: NextRequest) {
     if (!token) {
       return NextResponse.json(
         { success: false, error: 'Token parametresi gerekli' },
-        { status: HTTP_STATUS.BAD_REQUEST }
+        { status: 400 }
       )
     }
 
@@ -37,7 +36,7 @@ async function verifyEmailHandler(request: NextRequest) {
     } else {
       return NextResponse.json(
         { success: false, error: result.error },
-        { status: HTTP_STATUS.BAD_REQUEST }
+        { status: 400 }
       )
     }
   } catch (error) {
@@ -47,7 +46,7 @@ async function verifyEmailHandler(request: NextRequest) {
 
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
-      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+      { status: 500 }
     )
   }
 }
