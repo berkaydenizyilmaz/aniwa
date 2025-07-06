@@ -50,7 +50,7 @@ async function signupHandler(request: NextRequest) {
       logError(LOG_EVENTS.AUTH_EMAIL_VERIFICATION_FAILED, 'Email doğrulama gönderim hatası', {
         email,
         username,
-        error: verificationResult.error
+        errorMessage: verificationResult.error?.message
       })
       
       // Kullanıcı oluşturuldu ama email gönderilemedi

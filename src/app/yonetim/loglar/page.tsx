@@ -33,7 +33,7 @@ export default async function AdminLogsPage({ searchParams }: AdminLogsPageProps
   })
 
   if (!logsResult.success || !logsResult.data) {
-    throw new Error(logsResult.error || 'Loglar yüklenemedi')
+    throw new Error(logsResult.error?.message || 'Loglar yüklenemedi')
   }
 
   return (

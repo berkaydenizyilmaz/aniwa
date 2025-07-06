@@ -6,29 +6,32 @@ import { verifyPasswordResetToken, resetPasswordWithToken } from '@/services/aut
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { resetPasswordApiSchema } from '@/lib/schemas/auth.schemas'
+import { ApiResponse } from '@/types/api'
 
 // Token doğrulama endpoint'i (GET)
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<NextResponse<ApiResponse<{ message: string, email?: string }>>> {
   try {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get('token')
 
     if (!token) {
-      return NextResponse.json(
-        { success: false, error: 'Token parametresi gerekli' },
-        { status: 400 }
-      )
+      return NextResponse.json({ 
+        success: false, error: { message: 'Token parametresi gerekli' } 
+      }, { status: 400 })
     }
 
     // Token'ı doğrula (şifre değiştirmeden)
     const result = await verifyPasswordResetToken(token)
 
     if (result.success) {
-      return NextResponse.json({
+      const payload: ApiResponse<{ message: string, email?: string }> = {
         success: true,
-        message: 'Token geçerli',
-        data: { email: result.data?.email }
-      })
+        data: { 
+          message: 'Token geçerli',
+          email: result.data?.email 
+        }
+      }
+      return NextResponse.json(payload)
     } else {
       return NextResponse.json(
         { success: false, error: result.error },
@@ -41,14 +44,14 @@ export async function GET(request: NextRequest) {
     })
 
     return NextResponse.json(
-      { success: false, error: 'Sunucu hatası' },
+      { success: false, error: { message: 'Sunucu hatası' } },
       { status: 500 }
     )
   }
 }
 
 // Şifre sıfırlama endpoint'i (POST)
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<{ message: string }>>> {
   try {
     const body = await request.json()
     
@@ -58,7 +61,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false, 
-          error: validation.error.errors[0]?.message || 'Geçersiz veri'
+          error: { message: validation.error.errors[0]?.message || 'Geçersiz veri' }
         },
         { status: 400 }
       )
@@ -74,7 +77,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: result.message || 'Şifreniz başarıyla güncellendi'
+        data: { message: 'Şifreniz başarıyla güncellendi' }
       })
     } else {
       return NextResponse.json(
@@ -88,7 +91,7 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json(
-      { success: false, error: 'Sunucu hatası' },
+      { success: false, error: { message: 'Sunucu hatası' } },
       { status: 500 }
     )
   }

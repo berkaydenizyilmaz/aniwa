@@ -5,6 +5,7 @@ import type { User, UserRole } from '@prisma/client'
 import type { Session } from 'next-auth'
 import type { SignInResponse } from 'next-auth/react'
 import { Prisma } from '@prisma/client'
+import type { ApiResponse } from './api'
 
 // Kullanıcı oluşturma parametreleri
 export interface CreateUserParams {
@@ -31,26 +32,8 @@ export type UserWithSettings = Prisma.UserGetPayload<{
   }
 }>
 
-// API yanıt tipleri
-export interface AuthApiResponse<T = unknown> {
-  success: boolean
-  message?: string
-  error?: string
-  data?: T
-}
-
 // Login response tipi - User'dan sadece gerekli alanları al
 export type LoginResponse = Pick<User, 'id' | 'email' | 'username' | 'roles'>
-
-// Session user tipi (NextAuth ile uyumlu) - User'dan türet
-export type SessionUser = Pick<User, 'id' | 'roles'> & {
-  email?: string | null
-  name?: string | null
-  image?: string | null
-  username?: string | null
-  provider?: string
-  oauthToken?: string
-}
 
 // Kullanıcı profil sayfası için gerekli alanlar
 export type UserProfile = Omit<UserWithSettings, 'passwordHash' | 'emailVerified'>
@@ -82,7 +65,7 @@ export interface AuthHookReturn {
   login: (username: string, password: string) => Promise<SignInResponse | undefined>
   loginWithGoogle: () => Promise<void>
   logout: () => Promise<void>
-  setupUsername: (username: string) => Promise<AuthApiResponse>
+  setupUsername: (username: string) => Promise<ApiResponse<void>>
 }
 
 export interface RoleHookReturn {
@@ -105,27 +88,12 @@ export interface RequireRoleHookReturn {
   isLoading: boolean
 }
 
-// ---- API Response Tipleri ----
-export interface ForgotPasswordResponse {
-  success: boolean
-  message?: string
-  error?: string
-}
-
-export interface ResetPasswordResponse {
-  success: boolean
-  message?: string
-  error?: string
-  data?: {
-    email: string
-  }
-}
-
-export interface VerifyEmailResponse {
-  success: boolean
-  message?: string
-  error?: string
-  data?: {
-    email: string
-  }
+// Session user tipi (NextAuth ile uyumlu) - User'dan türet
+export type SessionUser = Pick<User, 'id' | 'roles'> & {
+  email?: string | null
+  name?: string | null
+  image?: string | null
+  username?: string | null
+  provider?: string
+  oauthToken?: string
 } 

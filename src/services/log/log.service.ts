@@ -1,18 +1,18 @@
 import { prisma } from '@/lib/db/prisma'
 import { Prisma } from '@prisma/client'
-import { logUserSelect } from '@/types/logging'
+import type  { ApiResponse } from '@/types/api'
 import type {
   CreateLogParams,
   LogFilters,
-  LogServiceResponse,
   LogWithUser,
   LogListResponse
 } from '@/types/logging'
+import { logUserSelect } from '@/types/logging'
 
 /**
  * Yeni log kaydı oluşturur
  */
-export async function createLog(params: CreateLogParams): Promise<LogServiceResponse<LogWithUser>> {
+export async function createLog(params: CreateLogParams): Promise<ApiResponse<LogWithUser>> {
   try {
     const log = await prisma.log.create({
       data: {
@@ -32,7 +32,7 @@ export async function createLog(params: CreateLogParams): Promise<LogServiceResp
     console.error('Log oluşturma hatası:', error)
     return { 
       success: false, 
-      error: 'Log kaydı oluşturulamadı' 
+      error: { message: 'Log kaydı oluşturulamadı' }
     }
   }
 }
@@ -40,7 +40,7 @@ export async function createLog(params: CreateLogParams): Promise<LogServiceResp
 /**
  * Logları filtreler ve listeler
  */
-export async function getLogs(filters: LogFilters = {}): Promise<LogServiceResponse<LogListResponse>> {
+export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<LogListResponse>> {
   try {
     const {
       level,
@@ -102,7 +102,7 @@ export async function getLogs(filters: LogFilters = {}): Promise<LogServiceRespo
     console.error('Log listeleme hatası:', error)
     return { 
       success: false, 
-      error: 'Loglar listelenemedi' 
+      error: { message: 'Loglar listelenemedi' } 
     }
   }
 }

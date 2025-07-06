@@ -14,7 +14,7 @@ import {
   sendPasswordResetEmail, 
   sendPasswordChangedNotification 
 } from '@/services/api/email.service'
-import type { AuthApiResponse } from '@/types/auth'
+import type { ApiResponse } from '@/types/api'
 import { AUTH_ROUTES } from '@/constants/routes'
 
 /**
@@ -24,7 +24,7 @@ export async function createEmailVerificationToken(
   email: string,
   username: string,
   baseUrl: string
-): Promise<AuthApiResponse<{ token: string }>> {
+): Promise<ApiResponse<{ token: string }>> {
   try {
     // Mevcut token'ları temizle
     await prisma.verificationToken.deleteMany({
@@ -67,7 +67,7 @@ export async function createEmailVerificationToken(
       
       return {
         success: false,
-        error: 'Doğrulama emaili gönderilemedi'
+        error: { message: 'Doğrulama emaili gönderilemedi' }
       }
     }
 
@@ -90,7 +90,7 @@ export async function createEmailVerificationToken(
     
     return {
       success: false,
-      error: 'Email doğrulama token\'ı oluşturulamadı'
+      error: { message: 'Email doğrulama token\'ı oluşturulamadı' }
     }
   }
 }
@@ -101,7 +101,7 @@ export async function createEmailVerificationToken(
 export async function createPasswordResetToken(
   email: string,
   baseUrl: string
-): Promise<AuthApiResponse<{ token: string }>> {
+): Promise<ApiResponse<{ token: string }>> {
   try {
     // Kullanıcının varlığını kontrol et
     const user = await prisma.user.findUnique({
@@ -161,7 +161,7 @@ export async function createPasswordResetToken(
       
       return {
         success: false,
-        error: 'Şifre sıfırlama emaili gönderilemedi'
+        error: { message: 'Şifre sıfırlama emaili gönderilemedi' }
       }
     }
 
@@ -185,7 +185,7 @@ export async function createPasswordResetToken(
     
     return {
       success: false,
-      error: 'Şifre sıfırlama token\'ı oluşturulamadı'
+      error: { message: 'Şifre sıfırlama token\'ı oluşturulamadı' }
     }
   }
 }
@@ -193,7 +193,7 @@ export async function createPasswordResetToken(
 /**
  * Email doğrulama token'ını kontrol eder ve kullanıcının email'ini doğrular
  */
-export async function verifyEmailToken(token: string): Promise<AuthApiResponse<{ email: string }>> {
+export async function verifyEmailToken(token: string): Promise<ApiResponse<{ email: string }>> {
   try {
     // Token'ı bul
     const verificationToken = await prisma.verificationToken.findUnique({
@@ -207,7 +207,7 @@ export async function verifyEmailToken(token: string): Promise<AuthApiResponse<{
       
       return {
         success: false,
-        error: 'Geçersiz veya süresi dolmuş doğrulama bağlantısı'
+        error: { message: 'Geçersiz veya süresi dolmuş doğrulama bağlantısı' }
       }
     }
 
@@ -221,7 +221,7 @@ export async function verifyEmailToken(token: string): Promise<AuthApiResponse<{
       
       return {
         success: false,
-        error: 'Geçersiz doğrulama bağlantısı'
+        error: { message: 'Geçersiz doğrulama bağlantısı' }
       }
     }
 
@@ -239,7 +239,7 @@ export async function verifyEmailToken(token: string): Promise<AuthApiResponse<{
       
       return {
         success: false,
-        error: 'Doğrulama bağlantısının süresi dolmuş. Lütfen yeni bir doğrulama e-postası isteyin.'
+        error: { message: 'Doğrulama bağlantısının süresi dolmuş. Lütfen yeni bir doğrulama e-postası isteyin.' }
       }
     }
 
@@ -270,7 +270,7 @@ export async function verifyEmailToken(token: string): Promise<AuthApiResponse<{
     
     return {
       success: false,
-      error: 'Email doğrulama işlemi başarısız'
+      error: { message: 'Email doğrulama işlemi başarısız' }
     }
   }
 }
@@ -278,7 +278,7 @@ export async function verifyEmailToken(token: string): Promise<AuthApiResponse<{
 /**
  * Şifre sıfırlama token'ını kontrol eder (şifre değiştirmeden önce)
  */
-export async function verifyPasswordResetToken(token: string): Promise<AuthApiResponse<{ email: string }>> {
+export async function verifyPasswordResetToken(token: string): Promise<ApiResponse<{ email: string }>> {
   try {
     // Token'ı bul
     const verificationToken = await prisma.verificationToken.findUnique({
@@ -292,7 +292,7 @@ export async function verifyPasswordResetToken(token: string): Promise<AuthApiRe
       
       return {
         success: false,
-        error: 'Geçersiz veya süresi dolmuş şifre sıfırlama bağlantısı'
+        error: { message: 'Geçersiz veya süresi dolmuş şifre sıfırlama bağlantısı' }
       }
     }
 
@@ -306,7 +306,7 @@ export async function verifyPasswordResetToken(token: string): Promise<AuthApiRe
       
       return {
         success: false,
-        error: 'Geçersiz şifre sıfırlama bağlantısı'
+        error: { message: 'Geçersiz şifre sıfırlama bağlantısı' }
       }
     }
 
@@ -324,7 +324,7 @@ export async function verifyPasswordResetToken(token: string): Promise<AuthApiRe
       
       return {
         success: false,
-        error: 'Şifre sıfırlama bağlantısının süresi dolmuş. Lütfen yeni bir şifre sıfırlama e-postası isteyin.'
+        error: { message: 'Şifre sıfırlama bağlantısının süresi dolmuş. Lütfen yeni bir şifre sıfırlama e-postası isteyin.' }
       }
     }
 
@@ -340,7 +340,7 @@ export async function verifyPasswordResetToken(token: string): Promise<AuthApiRe
     
     return {
       success: false,
-      error: 'Şifre sıfırlama kontrolü başarısız'
+      error: { message: 'Şifre sıfırlama kontrolü başarısız' }
     }
   }
 }
@@ -351,7 +351,7 @@ export async function verifyPasswordResetToken(token: string): Promise<AuthApiRe
 export async function resetPasswordWithToken(
   token: string, 
   newPassword: string
-): Promise<AuthApiResponse> {
+): Promise<ApiResponse> {
   try {
     // Token'ı doğrula
     const tokenResult = await verifyPasswordResetToken(token)
@@ -390,7 +390,7 @@ export async function resetPasswordWithToken(
 
     return {
       success: true,
-      message: 'Şifreniz başarıyla güncellendi'
+      data: { message: 'Şifreniz başarıyla güncellendi' }
     }
   } catch (error) {
     logError(LOG_EVENTS.AUTH_PASSWORD_RESET_FAILED, 'Şifre sıfırlama hatası', {
@@ -400,7 +400,7 @@ export async function resetPasswordWithToken(
     
     return {
       success: false,
-      error: 'Şifre sıfırlama işlemi başarısız'
+      error: { message: 'Şifre sıfırlama işlemi başarısız' }
     }
   }
 } 

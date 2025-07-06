@@ -8,21 +8,20 @@ import { LOG_EVENTS } from '@/constants/logging'
 import { forgotPasswordSchema } from '@/lib/schemas/auth.schemas'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
+import { ApiResponse } from '@/types/api'
 
-async function forgotPasswordHandler(request: NextRequest) {
+async function forgotPasswordHandler(request: NextRequest): Promise<NextResponse<ApiResponse>> {
   try {
     const body = await request.json()
     
     // Input validation
     const validation = forgotPasswordSchema.safeParse(body)
     if (!validation.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: validation.error.errors[0]?.message || 'Geçersiz veri'
-        },
-        { status: 400 }
-      )
+      const errorPayload: ApiResponse = {
+        success: false, 
+        error: { message: validation.error.errors[0]?.message || 'Geçersiz veri' }
+      }
+      return NextResponse.json(errorPayload, { status: 400 })
     }
 
     const { email } = validation.data
@@ -37,28 +36,27 @@ async function forgotPasswordHandler(request: NextRequest) {
       logInfo(LOG_EVENTS.AUTH_PASSWORD_RESET_REQUESTED, 'Şifre sıfırlama talebi', {
         email: email.toLowerCase()
       })
-
-      // Güvenlik için her zaman başarılı yanıt döndür
-      return NextResponse.json({
-        success: true,
-        message: 'Şifre sıfırlama bağlantısı gönderildi'
-      })
-    } else {
-      // Hata durumunda bile güvenlik için genel mesaj döndür
-      return NextResponse.json({
-        success: true,
-        message: 'Şifre sıfırlama bağlantısı gönderildi'
-      })
     }
+
+    // Güvenlik için her zaman başarılı yanıt döndür
+    // Hata olsa bile, kullanıcının bir hesabının olup olmadığını belli etmemek için
+    // bu şekilde davranıyoruz. Asıl hata loglara yazılıyor.
+    const successPayload: ApiResponse = {
+      success: true,
+      data: { message: 'Şifre sıfırlama bağlantısı gönderildi' }
+    }
+    return NextResponse.json(successPayload)
+    
   } catch (error) {
     logError(LOG_EVENTS.AUTH_PASSWORD_RESET_FAILED, 'Şifre sıfırlama API hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata'
     })
 
-    return NextResponse.json(
-      { success: false, error: 'Sunucu hatası' },
-      { status: 500 }
-    )
+    const errorPayload: ApiResponse = { 
+      success: false, 
+      error: { message: 'Sunucu hatası' }
+    }
+    return NextResponse.json(errorPayload, { status: 500 })
   }
 }
 

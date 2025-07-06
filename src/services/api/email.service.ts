@@ -6,7 +6,7 @@ import { env } from '@/lib/env'
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { EMAIL_SENDER, EMAIL_SUBJECTS, EMAIL_CONTENT, EMAIL_STYLES } from '@/constants/email'
-import type { AuthApiResponse } from '@/types/auth'
+import type { ApiResponse } from '@/types/api'
 import type { 
   EmailSendResult,
   SendEmailParams,
@@ -21,7 +21,7 @@ const resend = new Resend(env.RESEND_API_KEY)
 /**
  * Genel email gönderim fonksiyonu
  */
-async function sendEmail(params: SendEmailParams): Promise<AuthApiResponse<EmailSendResult>> {
+async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSendResult>> {
   try {
     const { to, subject, html, from = EMAIL_SENDER.FROM_ADDRESS } = params
 
@@ -42,7 +42,7 @@ async function sendEmail(params: SendEmailParams): Promise<AuthApiResponse<Email
       
       return {
         success: false,
-        error: `Email gönderim hatası: ${result.error.message}`
+        error: { message: `Email gönderim hatası: ${result.error.message}` }
       }
     }
 
@@ -67,7 +67,7 @@ async function sendEmail(params: SendEmailParams): Promise<AuthApiResponse<Email
 
     return {
       success: false,
-      error: 'Email gönderilemedi'
+      error: { message: 'Email gönderilemedi' }
     }
   }
 }
@@ -119,7 +119,7 @@ function createEmailTemplate(content: string): string {
  */
 export async function sendVerificationEmail(
   params: SendVerificationEmailParams
-): Promise<AuthApiResponse<EmailSendResult>> {
+): Promise<ApiResponse<EmailSendResult>> {
   const { to, username, verificationUrl } = params
 
   const content = `
@@ -159,7 +159,7 @@ export async function sendVerificationEmail(
  */
 export async function sendPasswordResetEmail(
   params: SendPasswordResetEmailParams
-): Promise<AuthApiResponse<EmailSendResult>> {
+): Promise<ApiResponse<EmailSendResult>> {
   const { to, username, resetUrl } = params
 
   const content = `
@@ -199,7 +199,7 @@ export async function sendPasswordResetEmail(
  */
 export async function sendPasswordChangedNotification(
   params: SendPasswordChangedNotificationParams
-): Promise<AuthApiResponse<EmailSendResult>> {
+): Promise<ApiResponse<EmailSendResult>> {
   const { to, username } = params
 
   const content = `

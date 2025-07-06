@@ -12,13 +12,13 @@ import type {
   UserWithSettings, 
   UpdateProfileParams, 
   UpdateUserSettingsParams,
-  AuthApiResponse
 } from '@/types/auth'
+import type { ApiResponse } from '@/types/api'
 
 /**
  * Yeni kullanıcı oluşturur (Transaction ile)
  */
-export async function createUser(params: CreateUserParams): Promise<AuthApiResponse> {
+export async function createUser(params: CreateUserParams): Promise<ApiResponse<UserWithSettings>> {
   const { email, password, username } = params
 
   try {
@@ -31,7 +31,7 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
       logWarn(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Email zaten kullanımda', {
         email: email.toLowerCase()
       })
-      return { success: false, error: 'Bu email adresi zaten kullanımda' }
+      return { success: false, error: { message: 'Bu email adresi zaten kullanımda' } }
     }
 
     // Username kontrolü
@@ -43,7 +43,7 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
       logWarn(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Username zaten kullanımda', {
         username
       })
-      return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
+      return { success: false, error: { message: 'Bu kullanıcı adı zaten kullanımda' } }
     }
 
     // Slug oluştur
@@ -82,14 +82,14 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
       slug: result.user.slug
     }, result.user.id)
 
+    const data: UserWithSettings = {
+      ...result.user,
+      userSettings: result.userSettings,
+    }
+
     return { 
       success: true, 
-      data: {
-        id: result.user.id,
-        email: result.user.email,
-        username: result.user.username,
-        roles: result.user.roles
-      }
+      data
     }
   } catch (error) {
     logError(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Kullanıcı oluşturma hatası', {
@@ -98,7 +98,7 @@ export async function createUser(params: CreateUserParams): Promise<AuthApiRespo
     })
     return { 
       success: false, 
-      error: 'Kullanıcı oluşturulamadı' 
+      error: { message: 'Kullanıcı oluşturulamadı' }
     }
   }
 }
@@ -154,7 +154,7 @@ export async function getUserByUsername(username: string): Promise<UserWithSetti
 /**
  * Kullanıcı şifresini günceller
  */
-export async function updatePassword(userId: string, newPassword: string): Promise<AuthApiResponse> {
+export async function updatePassword(userId: string, newPassword: string): Promise<ApiResponse> {
   try {
     const passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS)
 
@@ -173,14 +173,14 @@ export async function updatePassword(userId: string, newPassword: string): Promi
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       userId
     }, userId)
-    return { success: false, error: 'Şifre güncellenemedi' }
+    return { success: false, error: { message: 'Şifre güncellenemedi' } }
   }
 }
 
 /**
  * Kullanıcı profilini günceller
  */
-export async function updateProfile(userId: string, data: UpdateProfileParams): Promise<AuthApiResponse> {
+export async function updateProfile(userId: string, data: UpdateProfileParams): Promise<ApiResponse> {
   try {
     // Username kontrolü (eğer değiştiriliyorsa)
     if (data.username) {
@@ -192,7 +192,7 @@ export async function updateProfile(userId: string, data: UpdateProfileParams): 
       })
 
       if (existingUser) {
-        return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
+        return { success: false, error: { message: 'Bu kullanıcı adı zaten kullanımda' } }
       }
     }
 
@@ -215,14 +215,14 @@ export async function updateProfile(userId: string, data: UpdateProfileParams): 
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       userId
     }, userId)
-    return { success: false, error: 'Profil güncellenemedi' }
+    return { success: false, error: { message: 'Profil güncellenemedi' } }
   }
 }
 
 /**
  * Kullanıcı ayarlarını günceller
  */
-export async function updateUserSettings(userId: string, settings: UpdateUserSettingsParams): Promise<AuthApiResponse> {
+export async function updateUserSettings(userId: string, settings: UpdateUserSettingsParams): Promise<ApiResponse> {
   try {
     const userSettings = await prisma.userProfileSettings.upsert({
       where: { userId },
@@ -244,7 +244,7 @@ export async function updateUserSettings(userId: string, settings: UpdateUserSet
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       userId
     }, userId)
-    return { success: false, error: 'Ayarlar güncellenemedi' }
+    return { success: false, error: { message: 'Ayarlar güncellenemedi' } }
   }
 }
 

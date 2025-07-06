@@ -16,7 +16,7 @@ import Link from 'next/link'
 import { forgotPasswordSchema, type ForgotPasswordData } from '@/lib/schemas/auth.schemas'
 import { API_ROUTES, AUTH_ROUTES } from '@/constants/routes'
 import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS } from '@/constants/auth'
-import type { ForgotPasswordResponse } from '@/types/auth'
+import type { ApiResponse } from '@/types/api'
 
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -45,12 +45,12 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify(data),
       })
 
-      const result: ForgotPasswordResponse = await response.json()
+      const result: ApiResponse<{ message: string }> = await response.json()
 
       if (result.success) {
         setIsSuccess(true)
       } else {
-        setError(result.error || 'Bir hata oluştu')
+        setError(result.error?.message || 'Bir hata oluştu')
       }
     } catch (error) {
       setError('Bağlantı hatası. Lütfen tekrar deneyin.')

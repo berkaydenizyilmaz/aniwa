@@ -44,13 +44,6 @@ export type LogFilters = Partial<{
   offset: number
 }>
 
-// Log service response tipi
-export interface LogServiceResponse<T = unknown> {
-  success: boolean
-  data?: T
-  error?: string
-}
-
 // Log user select tipi
 export const logUserSelect = {
   id: true,
@@ -59,7 +52,6 @@ export const logUserSelect = {
   roles: true
 } as const
 
-// Log user select tipi
 export type LogUserSelect = typeof logUserSelect
 
 // Log with user tipi

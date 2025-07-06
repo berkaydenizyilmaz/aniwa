@@ -7,15 +7,16 @@ import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
+import { ApiResponse } from '@/types/api'
 
-async function verifyEmailHandler(request: NextRequest) {
+async function verifyEmailHandler(request: NextRequest): Promise<NextResponse<ApiResponse<{ message: string, email?: string }>>> {
   try {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get('token')
 
     if (!token) {
       return NextResponse.json(
-        { success: false, error: 'Token parametresi gerekli' },
+        { success: false, error: { message: 'Token parametresi gerekli' } },
         { status: 400 }
       )
     }
@@ -28,11 +29,15 @@ async function verifyEmailHandler(request: NextRequest) {
         email: result.data?.email
       })
 
-      return NextResponse.json({
+      const payload: ApiResponse<{ message: string, email?: string }> = {
         success: true,
-        message: 'Email adresiniz başarıyla doğrulandı',
-        data: result.data
-      })
+        data: {
+          message: 'Email adresiniz başarıyla doğrulandı',
+          email: result.data?.email
+        }
+      }
+      return NextResponse.json(payload)
+
     } else {
       return NextResponse.json(
         { success: false, error: result.error },
@@ -45,7 +50,7 @@ async function verifyEmailHandler(request: NextRequest) {
     })
 
     return NextResponse.json(
-      { success: false, error: 'Sunucu hatası' },
+      { success: false, error: { message: 'Sunucu hatası' } },
       { status: 500 }
     )
   }

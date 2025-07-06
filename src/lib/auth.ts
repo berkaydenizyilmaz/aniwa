@@ -241,7 +241,7 @@ export const authOptions: NextAuthOptions = {
             logError(LOG_EVENTS.AUTH_OAUTH_FAILED, 'OAuth geçici kullanıcı oluşturulamadı', {
               email: user.email,
               provider: account.provider,
-              error: result.error
+              error: result.error?.message
             })
             return false
           }

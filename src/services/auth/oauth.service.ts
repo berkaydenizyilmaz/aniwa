@@ -9,15 +9,15 @@ import { generateUserSlug } from '@/lib/utils'
 import type { 
   CreateOAuthPendingUserParams, 
   OAuthTokenVerificationParams,
-  AuthApiResponse
 } from '@/types/auth'
+import type { ApiResponse } from '@/types/api'
 
 /**
  * OAuth geçici kullanıcısı oluşturur
  */
 export async function createOAuthPendingUser(
   params: CreateOAuthPendingUserParams
-): Promise<AuthApiResponse<{ token: string }>> {
+): Promise<ApiResponse<{ token: string }>> {
   const { email, provider, providerId, name, image } = params
 
   try {
@@ -81,7 +81,7 @@ export async function createOAuthPendingUser(
     })
     return { 
       success: false, 
-      error: 'OAuth işlemi başarısız' 
+      error: { message: 'OAuth işlemi başarısız' }
     }
   }
 }
@@ -91,13 +91,13 @@ export async function createOAuthPendingUser(
  */
 export async function verifyOAuthTokenAndCreateUser(
   params: OAuthTokenVerificationParams
-): Promise<AuthApiResponse> {
+): Promise<ApiResponse> {
   const { token, username } = params
 
   try {
     // Mevcut kullanıcı özel durumu
     if (token === 'existing_user') {
-      return { success: false, error: 'Kullanıcı zaten mevcut' }
+      return { success: false, error: { message: 'Kullanıcı zaten mevcut' } }
     }
 
     // Geçici kullanıcıyı bul
@@ -107,7 +107,7 @@ export async function verifyOAuthTokenAndCreateUser(
 
     if (!pendingUser) {
       logWarn(LOG_EVENTS.AUTH_OAUTH_FAILED, 'Geçersiz OAuth token', { token: token.substring(0, 8) + '...' })
-      return { success: false, error: 'Geçersiz veya süresi dolmuş token' }
+      return { success: false, error: { message: 'Geçersiz veya süresi dolmuş token' } }
     }
 
     // Token süresi kontrolü
@@ -117,7 +117,7 @@ export async function verifyOAuthTokenAndCreateUser(
         email: pendingUser.email,
         provider: pendingUser.provider
       })
-      return { success: false, error: 'Token süresi dolmuş, lütfen tekrar giriş yapın' }
+      return { success: false, error: { message: 'Token süresi dolmuş, lütfen tekrar giriş yapın' } }
     }
 
     // Username kontrolü
@@ -130,7 +130,7 @@ export async function verifyOAuthTokenAndCreateUser(
         username,
         email: pendingUser.email
       })
-      return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
+      return { success: false, error: { message: 'Bu kullanıcı adı zaten kullanımda' } }
     }
 
     // Slug oluştur
@@ -187,7 +187,7 @@ export async function verifyOAuthTokenAndCreateUser(
     })
     return { 
       success: false, 
-      error: 'Kullanıcı oluşturulamadı' 
+      error: { message: 'Kullanıcı oluşturulamadı' } 
     }
   }
 }
