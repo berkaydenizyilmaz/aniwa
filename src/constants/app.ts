@@ -34,10 +34,5 @@ export const PAGINATION_DEFAULTS = {
 export const THEME_PREFERENCES = ['light', 'dark', 'system'] as const
 export const DEFAULT_THEME = 'system' as const
 
-// Dil Tercihleri
-export const LANGUAGE_PREFERENCES = ['tr'] as const
-export const DEFAULT_LANGUAGE = 'tr' as const
-
 // Tip tanımlamaları
 export type ThemePreference = typeof THEME_PREFERENCES[number]
-export type LanguagePreference = typeof LANGUAGE_PREFERENCES[number] 
