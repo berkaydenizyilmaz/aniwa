@@ -29,13 +29,13 @@ export function ThemeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme(THEME_PREFERENCES[0])}>
+        <DropdownMenuItem onClick={() => setTheme(THEME_PREFERENCES.LIGHT)}>
           Açık
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme(THEME_PREFERENCES[1])}>
+        <DropdownMenuItem onClick={() => setTheme(THEME_PREFERENCES.DARK)}>
           Koyu
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme(THEME_PREFERENCES[2])}>
+        <DropdownMenuItem onClick={() => setTheme(THEME_PREFERENCES.SYSTEM)}>
           Sistem
         </DropdownMenuItem>
       </DropdownMenuContent>

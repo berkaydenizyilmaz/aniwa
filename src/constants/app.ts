@@ -1,9 +1,13 @@
 // Aniwa Projesi - Genel Uygulama Sabitleri
 // Bu dosya tüm uygulama genelinde kullanılan sabitleri içerir
 
-// Tema Tercihleri
-export const THEME_PREFERENCES = ['light', 'dark', 'system'] as const
-export const DEFAULT_THEME = 'system' as const
+import { Theme } from "@prisma/client";
 
-// Tip tanımlamaları
-export type ThemePreference = typeof THEME_PREFERENCES[number]
+/**
+ * @description Tema tercihleri için sabitler. Prisma Enum'dan türetilmiştir.
+ * Değerler küçük harfe çevrilmiştir çünkü next-themes kütüphanesi
+ * `setTheme` fonksiyonunda küçük harf tema isimleri beklemektedir.
+ */
+export const THEME_PREFERENCES = Object.fromEntries(
+  Object.entries(Theme).map(([key, value]) => [key, value.toLowerCase()])
+) as Record<Theme, Lowercase<Theme>>
