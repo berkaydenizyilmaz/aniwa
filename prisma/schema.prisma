@@ -200,8 +200,8 @@ model UserProfileSettings {
   userId                    String             @unique @db.ObjectId
   
   // Genel Tercihler
-  themePreference           Theme              @default("SYSTEM")
-  titleLanguagePreference   TitleLanguage      @default("ROMAJI")
+  themePreference           Theme              @default(SYSTEM)
+  titleLanguagePreference   TitleLanguage      @default(ROMAJI)
   displayAdultContent       Boolean            @default(false)
   scoreFormat               ScoreFormat        @default(POINT_10)
   autoTrackOnAniwaListAdd   Boolean            @default(true)
