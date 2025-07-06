@@ -3,9 +3,9 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getClientIP } from './index'
-import { AUTH_RATE_LIMIT_TYPES, RATE_LIMITS } from '@/lib/constants/rate-limits'
+import { AUTH_RATE_LIMIT_TYPES, RATE_LIMITS } from '@/constants/rate-limits'
 import type { RateLimitConfig, RateLimitKeyOptions } from '@/types/rate-limit'
-import { HTTP_STATUS } from '@/lib/constants/app'
+import { HTTP_STATUS } from '@/constants/app'
 import { getToken } from 'next-auth/jwt'
 
 /**

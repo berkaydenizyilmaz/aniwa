@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Home, AlertTriangle } from "lucide-react";
 import Link from "next/link";
-import { PUBLIC_ROUTES } from "@/lib/constants/routes";
+import { PUBLIC_ROUTES } from "@/constants/routes";
 
 export default function GlobalError({
   error,

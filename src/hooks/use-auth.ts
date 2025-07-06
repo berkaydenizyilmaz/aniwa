@@ -13,8 +13,8 @@ import type {
   RequireAuthHookReturn, 
   RequireRoleHookReturn 
 } from '@/types/auth'
-import { API_ROUTES, AUTH_ROUTES, PUBLIC_ROUTES } from '@/lib/constants/routes'
-import { USER_ROLES } from '@/lib/constants/auth'
+import { API_ROUTES, AUTH_ROUTES, PUBLIC_ROUTES } from '@/constants/routes'
+import { USER_ROLES } from '@/constants/auth'
 
 /**
  * Auth durumunu yöneten ana hook

@@ -3,9 +3,9 @@
 
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
-import { PROTECTED_ROUTE_PATTERNS, PUBLIC_ROUTE_LIST, AUTH_ROUTES, API_ROUTES, PUBLIC_ROUTES } from '@/lib/constants/routes'
-import { USER_ROLES } from "@/lib/constants/auth"
-import { HTTP_STATUS } from '@/lib/constants/app'
+import { PROTECTED_ROUTE_PATTERNS, PUBLIC_ROUTE_LIST, AUTH_ROUTES, API_ROUTES, PUBLIC_ROUTES } from '@/constants/routes'
+import { USER_ROLES } from "@/constants/auth"
+import { HTTP_STATUS } from '@/constants/app'
 import { UserRole } from "@prisma/client"
 import { withGlobalRateLimit } from '@/lib/rate-limit/middleware'
 

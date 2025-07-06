@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 import { logInfo, logWarn } from '@/lib/logger'
-import { LOG_EVENTS } from '@/lib/constants/logging'
-import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_REGEX } from '@/lib/constants/auth'
+import { LOG_EVENTS } from '@/constants/logging'
+import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_REGEX } from '@/constants/auth'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
-import { AUTH_RATE_LIMIT_TYPES } from '@/lib/constants/rate-limits'
-import { HTTP_STATUS } from '@/lib/constants/app'
+import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
+import { HTTP_STATUS } from '@/constants/app'
 
 async function checkUsernameHandler(request: NextRequest) {
   try {

@@ -4,8 +4,8 @@
 import { Resend } from 'resend'
 import { env } from '@/lib/env'
 import { logInfo, logError } from '@/lib/logger'
-import { LOG_EVENTS } from '@/lib/constants/logging'
-import { EMAIL_SENDER, EMAIL_SUBJECTS, EMAIL_CONTENT, EMAIL_STYLES } from '@/lib/constants/email'
+import { LOG_EVENTS } from '@/constants/logging'
+import { EMAIL_SENDER, EMAIL_SUBJECTS, EMAIL_CONTENT, EMAIL_STYLES } from '@/constants/email'
 import type { 
   AuthApiResponse, 
   EmailSendResult,

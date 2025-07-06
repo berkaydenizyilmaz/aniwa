@@ -1,7 +1,7 @@
 // Aniwa Projesi - Rate Limiting Types
 // Bu dosya rate limiting için TypeScript tip tanımlamalarını içerir
 
-import { RATE_LIMIT_ALGORITHM } from '@/lib/constants/rate-limits'
+import { RATE_LIMIT_ALGORITHM } from '@/constants/rate-limits'
 
 // Rate limit algoritma tipi
 export type RateLimitAlgorithm = typeof RATE_LIMIT_ALGORITHM

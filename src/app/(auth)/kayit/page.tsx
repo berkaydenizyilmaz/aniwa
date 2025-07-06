@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
-import { PUBLIC_ROUTES, AUTH_ROUTES, API_ROUTES } from '@/lib/constants/routes'
+import { PUBLIC_ROUTES, AUTH_ROUTES, API_ROUTES } from '@/constants/routes'
 import Link from 'next/link'
 
 export default function SignupPage() {

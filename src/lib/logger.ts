@@ -3,8 +3,8 @@
 
 import { createLog } from '@/services/log/log.service'
 import type { LogLevel } from '@prisma/client'
-import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS, LOG_LEVELS } from '@/lib/constants/logging'
-import { HTTP_STATUS } from '@/lib/constants/app'
+import { SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS, LOG_LEVELS } from '@/constants/logging'
+import { HTTP_STATUS } from '@/constants/app'
 import type { LogMetadata, PerformanceMetadata } from '@/types/logging'
 import { Prisma } from '@prisma/client'
 

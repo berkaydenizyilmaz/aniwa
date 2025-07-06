@@ -15,7 +15,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Lock, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { resetPasswordSchema, type ResetPasswordData } from '@/lib/schemas/auth.schemas'
-import { API_ROUTES, AUTH_ROUTES } from '@/lib/constants/routes'
+import { API_ROUTES, AUTH_ROUTES } from '@/constants/routes'
 
 type PageState = 'loading' | 'form' | 'success' | 'error'
 

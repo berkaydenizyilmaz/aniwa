@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Toaster } from "sonner"
 import { ThemeProvider } from "./theme-provider"
 import { SessionProvider } from "./session-provider"
-import { DEFAULT_THEME } from "@/lib/constants/app"
+import { DEFAULT_THEME } from "@/constants/app"
 
 interface ProvidersProps {
   children: ReactNode

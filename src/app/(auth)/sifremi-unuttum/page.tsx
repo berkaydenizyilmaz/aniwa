@@ -14,8 +14,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { forgotPasswordSchema, type ForgotPasswordData } from '@/lib/schemas/auth.schemas'
-import { AUTH_ROUTES } from '@/lib/constants/routes'
-import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS } from '@/lib/constants/auth'
+import { AUTH_ROUTES } from '@/constants/routes'
+import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS } from '@/constants/auth'
 import type { ForgotPasswordResponse } from '@/types/auth'
 
 export default function ForgotPasswordPage() {

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db/prisma'
 import { Prisma, LogLevel, UserRole } from '@prisma/client'
-import { LOG_CLEANUP_DEFAULTS } from '@/lib/constants/logging'
-import { PAGINATION_DEFAULTS } from '@/lib/constants/app'
+import { LOG_CLEANUP_DEFAULTS } from '@/constants/logging'
+import { PAGINATION_DEFAULTS } from '@/constants/app'
 import type { 
   CreateLogParams, 
   LogFilters, 

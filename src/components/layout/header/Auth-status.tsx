@@ -3,7 +3,7 @@
 import { useAuth } from '@/hooks/use-auth'
 import { useRole } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
-import { AUTH_ROUTES, PROTECTED_ROUTES } from '@/lib/constants/routes'
+import { AUTH_ROUTES, PROTECTED_ROUTES } from '@/constants/routes'
 import { Settings } from 'lucide-react'
 import Link from 'next/link'
 

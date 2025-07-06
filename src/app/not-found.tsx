@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Home, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { PUBLIC_ROUTES } from "@/lib/constants/routes";
+import { PUBLIC_ROUTES } from "@/constants/routes";
 
 export default function NotFound() {
   const router = useRouter();

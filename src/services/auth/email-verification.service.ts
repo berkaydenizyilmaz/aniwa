@@ -3,19 +3,19 @@
 
 import { prisma } from '@/lib/db/prisma'
 import { logInfo, logError, logWarn } from '@/lib/logger'
-import { LOG_EVENTS } from '@/lib/constants/logging'
+import { LOG_EVENTS } from '@/constants/logging'
 import { 
   VERIFICATION_TOKEN_TYPES, 
   EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS,
   PASSWORD_RESET_TOKEN_EXPIRY_HOURS 
-} from '@/lib/constants/auth'
+} from '@/constants/auth'
 import { 
   sendVerificationEmail, 
   sendPasswordResetEmail, 
   sendPasswordChangedNotification 
 } from '@/services/api/email.service'
 import type { AuthApiResponse } from '@/types/auth'
-import { AUTH_ROUTES } from '@/lib/constants/routes'
+import { AUTH_ROUTES } from '@/constants/routes'
 
 /**
  * Email doğrulama token'ı oluşturur ve doğrulama emaili gönderir
@@ -363,7 +363,7 @@ export async function resetPasswordWithToken(
 
     // Şifreyi hash'le
     const bcrypt = (await import('bcryptjs')).default
-    const { BCRYPT_SALT_ROUNDS } = await import('@/lib/constants/auth')
+    const { BCRYPT_SALT_ROUNDS } = await import('@/constants/auth')
     const passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS)
 
     // Kullanıcının şifresini güncelle

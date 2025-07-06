@@ -4,9 +4,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyPasswordResetToken, resetPasswordWithToken } from '@/services/auth/email-verification.service'
 import { logInfo, logError } from '@/lib/logger'
-import { LOG_EVENTS } from '@/lib/constants/logging'
+import { LOG_EVENTS } from '@/constants/logging'
 import { resetPasswordApiSchema } from '@/lib/schemas/auth.schemas'
-import { HTTP_STATUS } from '@/lib/constants/app'
+import { HTTP_STATUS } from '@/constants/app'
 
 // Token doğrulama endpoint'i (GET)
 export async function GET(request: NextRequest) {

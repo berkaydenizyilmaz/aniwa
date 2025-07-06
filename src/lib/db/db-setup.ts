@@ -3,7 +3,7 @@
 
 import { prisma } from './prisma'
 import { logInfo, logError, logWarn } from '../logger'
-import { LOG_EVENTS } from '../constants/logging'
+import { LOG_EVENTS } from '../../constants/logging'
 
 /**
  * MongoDB TTL (Time To Live) index'lerini kurar

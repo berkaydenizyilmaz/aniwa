@@ -7,8 +7,8 @@ import { authOptions } from '@/lib/auth'
 import { usernameSchema } from '@/lib/schemas/auth.schemas'
 import { verifyOAuthTokenAndCreateUser } from '@/services/auth/oauth.service'
 import { logError } from '@/lib/logger'
-import { LOG_EVENTS } from '@/lib/constants/logging'
-import { HTTP_STATUS } from '@/lib/constants/app'
+import { LOG_EVENTS } from '@/constants/logging'
+import { HTTP_STATUS } from '@/constants/app'
 
 export async function POST(request: NextRequest) {
   try {

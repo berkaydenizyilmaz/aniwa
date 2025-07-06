@@ -4,6 +4,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Providers } from "@/components/providers/providers"
+import { PageErrorBoundary } from '@/components/ui/error-boundary'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,9 +32,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <Providers>
+        <PageErrorBoundary>
+          <Providers>
             {children}
-        </Providers>
+          </Providers>
+        </PageErrorBoundary>
         <Analytics />
         <SpeedInsights />
       </body>

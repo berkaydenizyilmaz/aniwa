@@ -6,10 +6,10 @@ import { signupSchema } from '@/lib/schemas/auth.schemas'
 import { createUser } from '@/services/auth/auth.service'
 import { createEmailVerificationToken } from '@/services/auth/email-verification.service'
 import { logError, logInfo } from '@/lib/logger'
-import { LOG_EVENTS } from '@/lib/constants/logging'
+import { LOG_EVENTS } from '@/constants/logging'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
-import { HTTP_STATUS } from '@/lib/constants/app'
-import { AUTH_RATE_LIMIT_TYPES } from '@/lib/constants/rate-limits'
+import { HTTP_STATUS } from '@/constants/app'
+import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
 
 async function signupHandler(request: NextRequest) {
   try {

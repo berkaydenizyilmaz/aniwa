@@ -4,10 +4,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyEmailToken } from '@/services/auth/email-verification.service'
 import { logInfo, logError } from '@/lib/logger'
-import { LOG_EVENTS } from '@/lib/constants/logging'
+import { LOG_EVENTS } from '@/constants/logging'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
-import { AUTH_RATE_LIMIT_TYPES } from '@/lib/constants/rate-limits'
-import { HTTP_STATUS } from '@/lib/constants/app'
+import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
+import { HTTP_STATUS } from '@/constants/app'
 
 async function verifyEmailHandler(request: NextRequest) {
   try {

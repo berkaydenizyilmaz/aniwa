@@ -11,13 +11,13 @@ import {
   BIO_MAX_LENGTH,
   TOKEN_MIN_LENGTH,
   EMAIL_MIN_LENGTH,
-} from '../constants/auth'
+} from '../../constants/auth'
 import {
   THEME_PREFERENCES,
   DEFAULT_THEME,
   LANGUAGE_PREFERENCES,
   DEFAULT_LANGUAGE,
-} from '../constants/app'
+} from '../../constants/app'
 
 // Email şeması
 export const emailSchema = z
