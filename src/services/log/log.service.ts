@@ -32,7 +32,7 @@ export async function createLog(params: CreateLogParams): Promise<ApiResponse<Lo
     console.error('Log oluşturma hatası:', error)
     return { 
       success: false, 
-      error: { message: 'Log kaydı oluşturulamadı' }
+      error: 'Log kaydı oluşturulamadı'
     }
   }
 }
@@ -102,7 +102,7 @@ export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<Log
     console.error('Log listeleme hatası:', error)
     return { 
       success: false, 
-      error: { message: 'Loglar listelenemedi' } 
+      error: 'Loglar listelenemedi' 
     }
   }
 }

@@ -31,7 +31,7 @@ export async function createUser(params: CreateUserParams): Promise<ApiResponse<
       logWarn(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Email zaten kullanımda', {
         email: email.toLowerCase()
       })
-      return { success: false, error: { message: 'Bu email adresi zaten kullanımda' } }
+      return { success: false, error: 'Bu email adresi zaten kullanımda' }
     }
 
     // Username kontrolü
@@ -43,7 +43,7 @@ export async function createUser(params: CreateUserParams): Promise<ApiResponse<
       logWarn(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Username zaten kullanımda', {
         username
       })
-      return { success: false, error: { message: 'Bu kullanıcı adı zaten kullanımda' } }
+      return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
     }
 
     // Slug oluştur
@@ -98,7 +98,7 @@ export async function createUser(params: CreateUserParams): Promise<ApiResponse<
     })
     return { 
       success: false, 
-      error: { message: 'Kullanıcı oluşturulamadı' }
+      error: 'Kullanıcı oluşturulamadı'
     }
   }
 }
@@ -173,7 +173,7 @@ export async function updatePassword(userId: string, newPassword: string): Promi
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       userId
     }, userId)
-    return { success: false, error: { message: 'Şifre güncellenemedi' } }
+    return { success: false, error: 'Şifre güncellenemedi' }
   }
 }
 
@@ -192,7 +192,7 @@ export async function updateProfile(userId: string, data: UpdateProfileParams): 
       })
 
       if (existingUser) {
-        return { success: false, error: { message: 'Bu kullanıcı adı zaten kullanımda' } }
+        return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
       }
     }
 
@@ -215,7 +215,7 @@ export async function updateProfile(userId: string, data: UpdateProfileParams): 
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       userId
     }, userId)
-    return { success: false, error: { message: 'Profil güncellenemedi' } }
+    return { success: false, error: 'Profil güncellenemedi' }
   }
 }
 
@@ -244,7 +244,7 @@ export async function updateUserSettings(userId: string, settings: UpdateUserSet
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       userId
     }, userId)
-    return { success: false, error: { message: 'Ayarlar güncellenemedi' } }
+    return { success: false, error: 'Ayarlar güncellenemedi' }
   }
 }
 

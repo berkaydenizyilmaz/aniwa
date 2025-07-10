@@ -32,4 +32,5 @@ export interface SendPasswordResetEmailParams {
 export interface SendPasswordChangedNotificationParams {
   to: string
   username: string
+  changeTime: string
 } 

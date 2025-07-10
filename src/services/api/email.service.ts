@@ -42,7 +42,7 @@ async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSend
       
       return {
         success: false,
-        error: { message: `Email gönderim hatası: ${result.error.message}` }
+        error: `Email gönderim hatası: ${result.error.message}`
       }
     }
 
@@ -67,7 +67,7 @@ async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSend
 
     return {
       success: false,
-      error: { message: 'Email gönderilemedi' }
+      error: 'Email gönderilemedi'
     }
   }
 }
