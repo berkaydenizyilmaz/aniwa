@@ -32,21 +32,6 @@ export type UserWithSettings = Prisma.UserGetPayload<{
   }
 }>
 
-// OAuth geçici kullanıcı tipleri
-export interface CreateOAuthPendingUserParams {
-  email: string
-  provider: string
-  providerId: string
-  name?: string
-  image?: string
-}
-
-// OAuth token doğrulama parametreleri
-export interface OAuthTokenVerificationParams {
-  token: string
-  username: string
-}
-
 // ---- Hook dönüş tipleri ----
 export interface AuthHookReturn {
   // Session bilgileri
@@ -92,6 +77,4 @@ export type SessionUser = Pick<User, 'id' | 'roles'> & {
   name?: string | null
   image?: string | null
   username?: string | null
-  provider?: string
-  oauthToken?: string
 }

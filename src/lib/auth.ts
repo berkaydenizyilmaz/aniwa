@@ -10,7 +10,8 @@ import { logInfo, logError, logWarn } from './logger'
 import { LOG_EVENTS } from '../constants/logging'
 import { SESSION_MAX_AGE, JWT_MAX_AGE, OAUTH_PROVIDERS } from '../constants/auth'
 import { ROUTES } from '../constants/routes'
-import { createOAuthPendingUser } from '@/services/auth/oauth.service'
+import { generateUsernameFromName, generateUserSlug } from '@/lib/utils'
+import { USER_ROLES } from '@/constants/auth'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
@@ -100,7 +101,7 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       // İlk giriş
       if (user) {
         token.id = user.id
@@ -108,96 +109,9 @@ export const authOptions: NextAuthOptions = {
         token.roles = user.roles
         token.image = user.image
         token.emailVerified = user.emailVerified
-        
-        // OAuth token'ı varsa ekle
-        if (user.oauthToken) {
-          token.oauthToken = user.oauthToken
-        }
       }
 
-      // OAuth provider bilgilerini ekle
-      if (account) {
-        token.provider = account.provider
-      }
 
-      // Mevcut kullanıcı için oauthToken'ı temizle
-      if (token.oauthToken === 'existing_user') {
-        // Kullanıcı bilgilerini veritabanından güncelle
-        if (token.email) {
-          try {
-            const user = await prisma.user.findUnique({
-              where: { email: token.email as string }
-            })
-            
-            if (user) {
-              token.id = user.id
-              token.username = user.username
-              token.roles = user.roles
-              token.image = user.image || user.profilePicture
-              token.emailVerified = user.emailVerified
-            }
-          } catch (error) {
-            logError(LOG_EVENTS.AUTH_SESSION_ERROR, 'Mevcut kullanıcı bilgisi güncelleme hatası', {
-              error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-              email: token.email
-            })
-          }
-        }
-        
-        delete token.oauthToken
-        return token
-      }
-
-      // OAuth token süresi kontrolü - pending user yoksa temizle
-      if (token.oauthToken && token.oauthToken !== 'existing_user') {
-        try {
-          const pendingUser = await prisma.oAuthPendingUser.findUnique({
-            where: { token: token.oauthToken as string }
-          })
-          
-          // Pending user yoksa oauthToken'ı temizle (username setup tamamlanmış)
-          if (!pendingUser) {
-            // Kullanıcı bilgilerini veritabanından güncelle
-            if (token.sub) {
-              const user = await prisma.user.findUnique({
-                where: { email: token.email as string }
-              })
-              
-              if (user) {
-                token.id = user.id
-                token.username = user.username
-                token.roles = user.roles
-                token.image = user.image || user.profilePicture
-                token.emailVerified = user.emailVerified
-              }
-            }
-            
-            logInfo(LOG_EVENTS.AUTH_OAUTH_SUCCESS, 'OAuth token temizlendi - kullanıcı oluşturulmuş', {
-              tokenPrefix: typeof token.oauthToken === 'string' ? token.oauthToken.substring(0, 8) + '...' : 'unknown'
-            })
-            delete token.oauthToken
-            return token
-          }
-          
-          // Token süresi dolmuşsa temizle
-          if (pendingUser.expiresAt < new Date()) {
-              await prisma.oAuthPendingUser.delete({ where: { id: pendingUser.id } })
-            
-            logWarn(LOG_EVENTS.AUTH_OAUTH_FAILED, 'OAuth token süresi doldu - oauthToken temizlendi', {
-              tokenPrefix: typeof token.oauthToken === 'string' ? token.oauthToken.substring(0, 8) + '...' : 'unknown'
-            })
-            
-            delete token.oauthToken
-            token.oauthExpired = true
-          }
-        } catch (error) {
-          // Hata durumunda oauthToken'ı temizle
-          delete token.oauthToken
-          logError(LOG_EVENTS.AUTH_OAUTH_FAILED, 'OAuth token kontrolü hatası', {
-            error: error instanceof Error ? error.message : 'Bilinmeyen hata'
-          })
-        }
-      }
 
       return token
     },
@@ -207,18 +121,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string
         session.user.username = token.username as string | null
         session.user.roles = token.roles
-        session.user.provider = token.provider as string
         session.user.emailVerified = token.emailVerified as Date | null
-        
-        // OAuth token'ı varsa ekle
-        if (token.oauthToken) {
-          session.user.oauthToken = token.oauthToken
-        }
-        
-        // OAuth expired flag'i ekle
-        if (token.oauthExpired) {
-          session.user.oauthExpired = true
-        }
       }
 
       return session
@@ -228,32 +131,67 @@ export const authOptions: NextAuthOptions = {
       try {
         // OAuth ile giriş yapılıyorsa
         if (account?.provider === OAUTH_PROVIDERS.GOOGLE && profile) {
-          // Geçici kullanıcı oluştur veya mevcut kullanıcıyı kontrol et
-            const result = await createOAuthPendingUser({
-             email: user.email!,
-             provider: account.provider,
-             providerId: account.providerAccountId,
-             name: profile.name,
-             image: profile.picture
-           })
+          // Mevcut kullanıcı kontrolü
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email!.toLowerCase() }
+          })
 
-          if (!result.success) {
-            logError(LOG_EVENTS.AUTH_OAUTH_FAILED, 'OAuth geçici kullanıcı oluşturulamadı', {
-              email: user.email,
-              provider: account.provider,
-              error: result.error?.message
-            })
-            return false
+          if (existingUser) {
+            // Mevcut kullanıcı - bilgileri güncelle
+            user.id = existingUser.id
+            user.username = existingUser.username
+            user.roles = existingUser.roles
+            user.emailVerified = existingUser.emailVerified
+            
+            logInfo(LOG_EVENTS.AUTH_OAUTH_SUCCESS, 'Mevcut kullanıcı OAuth girişi', {
+              userId: existingUser.id,
+              email: existingUser.email,
+              provider: account.provider
+            }, existingUser.id)
+            
+            return true
           }
 
-          // Token'ı user objesine ekle (username seçimi için)
-          user.oauthToken = result.data!.token
+          // Yeni kullanıcı oluştur
+          const username = await generateUsernameFromName(profile.name || user.email!.split('@')[0])
+          const slug = generateUserSlug(username)
 
-          logInfo(LOG_EVENTS.AUTH_OAUTH_SUCCESS, 'Google OAuth başarılı', {
-            email: user.email,
-            provider: account.provider,
-            hasToken: !!result.data?.token
+          // Transaction ile kullanıcı + ayarları oluştur
+          const newUser = await prisma.$transaction(async (tx) => {
+            const createdUser = await tx.user.create({
+              data: {
+                email: user.email!.toLowerCase(),
+                username,
+                slug,
+                roles: [USER_ROLES.USER],
+                image: profile.picture,
+                emailVerified: new Date() // OAuth kullanıcıları doğrulanmış sayılır
+              }
+            })
+
+            // Varsayılan ayarları oluştur
+            await tx.userProfileSettings.create({
+              data: {
+                userId: createdUser.id,
+              }
+            })
+
+            return createdUser
           })
+
+          // User objesini güncelle
+          user.id = newUser.id
+          user.username = newUser.username
+          user.roles = newUser.roles
+          user.emailVerified = newUser.emailVerified
+
+          logInfo(LOG_EVENTS.AUTH_USER_CREATED, 'OAuth kullanıcısı oluşturuldu', {
+            userId: newUser.id,
+            email: newUser.email,
+            username: newUser.username,
+            slug: newUser.slug,
+            provider: account.provider
+          }, newUser.id)
         }
 
         return true
@@ -268,13 +206,6 @@ export const authOptions: NextAuthOptions = {
     },
 
     async redirect({ url, baseUrl }) {
-      // OAuth sonrası username seçim kontrolü
-      if (url === baseUrl || url === `${baseUrl}/`) {
-        // Ana sayfaya yönlendiriliyorsa, session'ı kontrol et
-        // Bu kısım client-side'da yapılacak
-        return baseUrl
-      }
-
       // Relative URL'leri base URL ile birleştir
       if (url.startsWith('/')) return `${baseUrl}${url}`
       // Aynı origin'deyse izin ver

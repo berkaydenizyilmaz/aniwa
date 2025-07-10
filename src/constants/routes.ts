@@ -14,7 +14,6 @@ export const ROUTES = {
       SIGN_UP: '/kayit',
       ERROR: '/hata',
       VERIFY_REQUEST: '/dogrulama',
-      SETUP_USERNAME: '/kullanici-adi-secimi',
       FORGOT_PASSWORD: '/sifremi-unuttum',
       RESET_PASSWORD: '/sifre-sifirlama',
     },
@@ -35,7 +34,6 @@ export const ROUTES = {
     AUTH: {
       BASE: '/api/auth',
       CALLBACK: '/api/auth/callback',
-      SETUP_USERNAME: '/api/auth/setup-username',
       SIGNUP: '/api/auth/signup',
       SIGN_OUT: '/api/auth/signout',
       RESET_PASSWORD: '/api/auth/reset-password',
@@ -59,7 +57,6 @@ export const protectedAuthRoutes: string[] = [
   ROUTES.PAGES.AUTH.SIGN_IN,
   ROUTES.PAGES.AUTH.SIGN_UP,
   ROUTES.PAGES.AUTH.VERIFY_REQUEST,
-  ROUTES.PAGES.AUTH.SETUP_USERNAME,
   ROUTES.PAGES.AUTH.FORGOT_PASSWORD,
   ROUTES.PAGES.AUTH.RESET_PASSWORD,
 ]
@@ -69,5 +66,4 @@ export const protectedApiRoutes: string[] = [
   ROUTES.API.AUTH.SIGNUP,
   ROUTES.API.AUTH.RESET_PASSWORD,
   ROUTES.API.AUTH.FORGOT_PASSWORD,
-  ROUTES.API.AUTH.SETUP_USERNAME,
 ]

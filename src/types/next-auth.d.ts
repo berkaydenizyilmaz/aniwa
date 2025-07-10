@@ -5,50 +5,35 @@ import { DefaultSession, DefaultUser } from 'next-auth'
 import { UserRole } from '@prisma/client'
 
 declare module 'next-auth' {
-  /**
-   * Session interface'ini genişlet
-   */
+  // Session interface'ini genişlet
   interface Session {
     user: {
       id: string
       username?: string | null
       roles: UserRole[]
-      provider?: string
-      oauthToken?: string
-      oauthExpired?: boolean
       emailVerified?: Date | null
     } & DefaultSession['user']
   }
 
-  /**
-   * User interface'ini genişlet
-   */
+  // User interface'ini genişlet
   interface User extends DefaultUser {
     username?: string | null
     roles: UserRole[]
-    oauthToken?: string
     emailVerified?: Date | null
   }
 
-  /**
-   * Profile interface'ini genişlet (Google OAuth için)
-   */
+  // Profile interface'ini genişlet (Google OAuth için)
   interface Profile {
     picture?: string
   }
 }
 
 declare module 'next-auth/jwt' {
-  /**
-   * JWT token interface'ini genişlet
-   */
+  // JWT token interface'ini genişlet
   interface JWT {
     id: string
     username?: string | null
     roles: UserRole[]
-    provider?: string
-    oauthToken?: string
-    oauthExpired?: boolean
     emailVerified?: Date | null
   }
 } 

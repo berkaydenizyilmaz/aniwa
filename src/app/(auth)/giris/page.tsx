@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn, getSession } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
@@ -33,13 +33,7 @@ export default function LoginPage() {
         // Diğer tüm durumlar için generic message (güvenlik için)
         setError('Geçersiz kullanıcı adı veya şifre. Lütfen tekrar deneyin.')
       } else {
-        // Session'ı yenile ve yönlendir
-        const session = await getSession()
-        if (session?.user?.username) {
-          router.push(ROUTES.PAGES.HOME)
-        } else {
-          router.push(ROUTES.PAGES.AUTH.SETUP_USERNAME)
-        }
+        router.push(ROUTES.PAGES.HOME)
       }
     } catch (err) {
       setError('Giriş yapılırken bir hata oluştu')

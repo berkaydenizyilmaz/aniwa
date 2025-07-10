@@ -144,21 +144,6 @@ model VerificationToken {
   @@index([expiresAt], map: "verification_ttl")
 }
 
-// OAuth Geçici Kullanıcı Modeli
-model OAuthPendingUser {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  email      String   @unique
-  provider   String   // "google", "github" vs
-  providerId String   // Provider'dan gelen ID
-  name       String?
-  image      String?
-  token      String   @unique // Random verification token
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-
-  @@index([expiresAt], map: "oauth_pending_ttl")
-}
-
 // =============================================================================
 // KULLANICI MODELLERİ
 // =============================================================================

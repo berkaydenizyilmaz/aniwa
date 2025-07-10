@@ -20,7 +20,7 @@ export default withAuth(
     }
     
     // 1. GİRİŞ YAPMIŞ KULLANICILAR - Auth sayfalarına ve API'lerine erişemez
-    if (token && !token.oauthToken) {
+    if (token) {
       // Auth sayfalarına erişemez
       if (protectedAuthRoutes.some(route => pathname === route)) {
         return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, req.url))
@@ -31,45 +31,21 @@ export default withAuth(
       }
     }
 
-    // 2. OAUTH KULLANICILAR - Username setup kontrolü
-    if (token && token.oauthToken && token.oauthToken !== 'existing_user') {
-      // OAuth kullanıcısı username setup sayfasında değilse oraya yönlendir
-      if (!pathname.startsWith(ROUTES.PAGES.AUTH.SETUP_USERNAME) && !pathname.startsWith('/api/')) {
-        return NextResponse.redirect(new URL(ROUTES.PAGES.AUTH.SETUP_USERNAME, req.url))
-      }
-    }
-
-    // 2.1. OAUTH EXPIRED - Token süresi dolmuş kullanıcıları sessiz çıkış yaptır
-    if (token && token.oauthExpired) {
-      // Sessiz çıkış yap ve ana sayfaya yönlendir (onay ekranı olmadan)
-      const signoutUrl = new URL(ROUTES.API.AUTH.SIGN_OUT, req.url)
-      signoutUrl.searchParams.set('callbackUrl', ROUTES.PAGES.HOME)
-      signoutUrl.searchParams.set('redirect', 'false')
-      return NextResponse.redirect(signoutUrl)
-    }
-
-    // 3. USERNAME SETUP SAYFASI - Sadece OAuth kullanıcıları erişebilir
-    if (pathname.startsWith(ROUTES.PAGES.AUTH.SETUP_USERNAME)) {
-      if (!token || !token.oauthToken) {
-        return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, req.url))
-      }
-    }
-
-    // 4. ADMIN SAYFALARI - ADMIN rolü gerekli
+    // 2. ADMIN SAYFALARI - ADMIN rolü gerekli
     if (pathname.startsWith(ROUTES.PAGES.ADMIN.BASE)) {
       if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.ADMIN)) {
         return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, req.url))
       }
     }
 
-    // 5. MODERATOR SAYFALARI - MODERATOR rolü gerekli
+    // 3. MODERATOR SAYFALARI - MODERATOR rolü gerekli
     if (pathname.startsWith(ROUTES.PAGES.MODERATOR.BASE)) {
       if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.MODERATOR)) {
         return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, req.url))
       }
     }
 
-    // 6. EDITOR SAYFALARI - EDITOR rolü gerekli
+    // 4. EDITOR SAYFALARI - EDITOR rolü gerekli
     if (pathname.startsWith(ROUTES.PAGES.EDITOR.BASE)) {
       if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.EDITOR)) {
         return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, req.url))
@@ -108,19 +84,14 @@ export default withAuth(
           return true
         }
 
-        // 6. Username setup - OAuth token kontrolü middleware fonksiyonunda yapılacak
-        if (pathname.startsWith(ROUTES.PAGES.AUTH.SETUP_USERNAME)) {
-          return true
-        }
-
-        // 7. Protected sayfalar - Token gerekli
+        // 6. Protected sayfalar - Token gerekli
         if (pathname.startsWith(ROUTES.PAGES.ADMIN.BASE) || 
             pathname.startsWith(ROUTES.PAGES.MODERATOR.BASE) || 
             pathname.startsWith(ROUTES.PAGES.EDITOR.BASE)) {
           return !!token
         }
 
-        // 8. Diğer tüm sayfalar şu an için public
+        // 7. Diğer tüm sayfalar şu an için public
         return true
       },
     },

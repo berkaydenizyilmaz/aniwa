@@ -20,7 +20,7 @@ import { USER_ROLES } from '@/constants/auth'
  * Auth durumunu yöneten ana hook
  */
 export function useAuth(): AuthHookReturn {
-  const { data: session, status, update } = useSession()
+  const { data: session, status } = useSession()
   const router = useRouter()
 
   const login = useCallback(async (username: string, password: string) => {
@@ -42,48 +42,19 @@ export function useAuth(): AuthHookReturn {
     router.push(ROUTES.PAGES.HOME)
   }, [router])
 
-  const setupUsername = useCallback(async (username: string) => {
-    if (!session?.user?.email) {
-      throw new Error('Kullanıcı email bilgisi bulunamadı')
-    }
-
-    const response = await fetch(ROUTES.API.AUTH.SETUP_USERNAME, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: session.user.email,
-        username
-      })
-    })
-
-    const result = await response.json()
-    
-    if (!result.success) {
-      throw new Error(result.error || 'Username ayarlama başarısız')
-    }
-
-    // Session'ı yenile
-    await update()
-    
-    // Ana sayfaya yönlendir
-    router.push(ROUTES.PAGES.HOME)
-    
-    return result
-  }, [session?.user?.email, router, update])
-
   return {
     // Session bilgileri
     user: session?.user,
     session,
     isAuthenticated: !!session?.user,
     isLoading: status === 'loading',
-    needsUsername: !!session?.user && !session?.user.username,
+    needsUsername: false, // OAuth artık otomatik username oluşturuyor
     
     // Auth fonksiyonları
     login,
     loginWithGoogle,
     logout,
-    setupUsername,
+    setupUsername: async () => ({ success: true }), // Eski uyumluluk için boş fonksiyon
   }
 }
 
