@@ -1,63 +1,39 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/use-auth'
 import { ROUTES } from '@/constants/routes'
+import { signupSchema, type SignupData } from '@/lib/schemas/auth.schemas'
 import Link from 'next/link'
+import { useState } from 'react'
 
 export default function SignupPage() {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const router = useRouter()
   const { loginWithGoogle } = useAuth()
 
-  // Form değişikliklerini handle et
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    
-    // Username için özel sanitization
-    if (name === 'username') {
-      const sanitizedValue = value.replace(/[^a-zA-Z0-9_]/g, '')
-      setFormData(prev => ({
-        ...prev,
-        [name]: sanitizedValue
-      }))
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }))
+  // React Hook Form + Zod resolver
+  const form = useForm<SignupData>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      username: '',
+      email: '',
+      password: '',
     }
-  }
+  })
 
-  // Email/Password ile kayıt
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // Form submit handler
+  const handleSignup = async (data: SignupData) => {
     setIsLoading(true)
     setError('')
     setSuccess('')
-
-    // Basit validasyon
-    if (formData.password !== formData.confirmPassword) {
-      setError('Şifreler eşleşmiyor')
-      setIsLoading(false)
-      return
-    }
-
-    if (formData.password.length < 6) {
-      setError('Şifre en az 6 karakter olmalı')
-      setIsLoading(false)
-      return
-    }
 
     try {
       const response = await fetch(ROUTES.API.AUTH.SIGNUP, {
@@ -65,17 +41,13 @@ export default function SignupPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          username: formData.username,
-        }),
+        body: JSON.stringify(data),
       })
 
-      const data = await response.json()
+      const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || data.message || 'Kayıt işlemi başarısız')
+        throw new Error(result.error || result.message || 'Kayıt işlemi başarısız')
       }
 
       setSuccess('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...')
@@ -95,7 +67,7 @@ export default function SignupPage() {
   const handleGoogleSignup = async () => {
     setIsLoading(true)
     setError('')
-    
+
     try {
       await loginWithGoogle()
     } catch (err) {
@@ -133,80 +105,54 @@ export default function SignupPage() {
           </div>
         )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleSignup}>
+        <form className="mt-8 space-y-6" onSubmit={form.handleSubmit(handleSignup)}>
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              Kullanıcı Adı
-            </label>
-            <input
+            <Label htmlFor="username">Kullanıcı Adı</Label>
+            <Input
               id="username"
-              name="username"
               type="text"
-              required
-              value={formData.username}
-              onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="kullaniciadi"
-              minLength={3}
-              maxLength={20}
-              pattern="[a-zA-Z0-9_]+"
-              title="Sadece harf, rakam ve alt çizgi kullanabilirsiniz"
+              {...form.register('username')}
             />
+            {form.formState.errors.username && (
+              <p className="mt-1 text-sm text-red-600">
+                {form.formState.errors.username.message}
+              </p>
+            )}
             <p className="mt-1 text-xs text-gray-500">
-              Sadece harf, rakam ve alt çizgi (_) kullanabilirsiniz. 3-20 karakter.
+              Sadece küçük harf ve rakam kullanabilirsiniz. 3-20 karakter.
             </p>
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
+            <Label htmlFor="email">Email</Label>
+            <Input
               id="email"
-              name="email"
               type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="email@example.com"
+              {...form.register('email')}
             />
+            {form.formState.errors.email && (
+              <p className="mt-1 text-sm text-red-600">
+                {form.formState.errors.email.message}
+              </p>
+            )}
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Şifre
-            </label>
-            <input
+            <Label htmlFor="password">Şifre</Label>
+            <Input
               id="password"
-              name="password"
               type="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="••••••••"
-              minLength={6}
+              {...form.register('password')}
             />
+            {form.formState.errors.password && (
+              <p className="mt-1 text-sm text-red-600">
+                {form.formState.errors.password.message}
+              </p>
+            )}
           </div>
-
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-              Şifre Tekrar
-            </label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              required
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="••••••••"
-              minLength={6}
-            />
-          </div>
-
           <Button
             type="submit"
             disabled={isLoading}

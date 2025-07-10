@@ -3,14 +3,14 @@ import { UserRole } from "@prisma/client";
 // Aniwa Projesi - Auth Constants
 // Bu dosya kimlik doğrulama ile ilgili tüm sabitleri içerir
 
-// Validasyon kuralları (auth spesifik)
-export const USERNAME_REGEX = /^[a-z0-9]{USERNAME_MIN_LENGTH,USERNAME_MAX_LENGTH}$/
-
 // Uzunluk limitleri
 export const PASSWORD_MIN_LENGTH = 8
 export const PASSWORD_MAX_LENGTH = 128
 export const USERNAME_MIN_LENGTH = 3
 export const USERNAME_MAX_LENGTH = 20
+
+// Validasyon kuralları (auth spesifik)
+export const USERNAME_REGEX = /^[a-z0-9]{3,20}$/
 
 export const BIO_MAX_LENGTH = 500
 export const EMAIL_MIN_LENGTH = 3

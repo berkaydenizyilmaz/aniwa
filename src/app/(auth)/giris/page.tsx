@@ -3,29 +3,40 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/use-auth'
 import { ROUTES } from '@/constants/routes'
+import { loginSchema, type LoginData } from '@/lib/schemas/auth.schemas'
 import Link from 'next/link'
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
   const { loginWithGoogle } = useAuth()
 
-  // Email/Password ile giriş
-  const handleCredentialsLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // React Hook Form + Zod resolver
+  const form = useForm<LoginData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+    }
+  })
+
+  // Form submit handler
+  const handleCredentialsLogin = async (data: LoginData) => {
     setIsLoading(true)
     setError('')
 
     try {
       const result = await signIn('credentials', {
-        username,
-        password,
+        username: data.username,
+        password: data.password,
         redirect: false,
       })
 
@@ -33,7 +44,7 @@ export default function LoginPage() {
         // Diğer tüm durumlar için generic message (güvenlik için)
         setError('Geçersiz kullanıcı adı veya şifre. Lütfen tekrar deneyin.')
       } else {
-        router.push(ROUTES.PAGES.HOME)
+          router.push(ROUTES.PAGES.HOME)
       }
     } catch (err) {
       setError('Giriş yapılırken bir hata oluştu')
@@ -79,42 +90,40 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleCredentialsLogin}>
+        <form className="mt-8 space-y-6" onSubmit={form.handleSubmit(handleCredentialsLogin)}>
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              Kullanıcı Adı
-            </label>
-            <input
+            <Label htmlFor="username">Kullanıcı Adı</Label>
+            <Input
               id="username"
-              name="username"
               type="text"
-              required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="kullaniciadi"
+              {...form.register('username')}
             />
+            {form.formState.errors.username && (
+              <p className="mt-1 text-sm text-red-600">
+                {form.formState.errors.username.message}
+              </p>
+            )}
           </div>
 
           <div>
             <div className="flex justify-between items-center">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Şifre
-            </label>
+              <Label htmlFor="password">Şifre</Label>
               <Link href={ROUTES.PAGES.AUTH.FORGOT_PASSWORD} className="text-sm text-blue-600 hover:text-blue-500">
                 Şifremi unuttum
               </Link>
             </div>
-            <input
+            <Input
               id="password"
-              name="password"
               type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="••••••••"
+              {...form.register('password')}
             />
+            {form.formState.errors.password && (
+              <p className="mt-1 text-sm text-red-600">
+                {form.formState.errors.password.message}
+              </p>
+            )}
           </div>
 
           <Button

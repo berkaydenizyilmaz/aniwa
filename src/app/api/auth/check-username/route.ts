@@ -26,10 +26,10 @@ async function checkUsernameHandler(request: NextRequest) {
       )
     }
 
-    // Sadece alfanumerik ve alt çizgi kontrolü
+    // Sadece küçük harf ve rakam kontrolü
     if (!USERNAME_REGEX.test(username)) {
       return NextResponse.json(
-        { available: false, error: 'Username sadece harf, rakam ve alt çizgi içerebilir' },
+        { available: false, error: 'Username sadece küçük harf ve rakam içerebilir' },
         { status: 400 }
       )
     }
