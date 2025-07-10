@@ -2,54 +2,56 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 import { logInfo, logWarn } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
-import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_REGEX } from '@/constants/auth'
+import { checkUsernameSchema } from '@/lib/schemas/auth.schemas'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
+import { ApiResponse } from '@/types/api'
 
-async function checkUsernameHandler(request: NextRequest) {
+async function checkUsernameHandler(request: NextRequest): Promise<NextResponse<ApiResponse<{ available: boolean, username: string }>>> {
   try {
     const { searchParams } = new URL(request.url)
     const username = searchParams.get('username')
 
     if (!username) {
       return NextResponse.json(
-        { error: 'Username parametresi gerekli' },
+        { success: false, error: { message: 'Username parametresi gerekli' } },
         { status: 400 }
       )
     }
 
-    // Username formatını kontrol et
-    if (username.length < USERNAME_MIN_LENGTH || username.length > USERNAME_MAX_LENGTH) {
+    // Zod ile validasyon
+    const validation = checkUsernameSchema.safeParse({ username })
+    if (!validation.success) {
       return NextResponse.json(
-        { available: false, error: 'Username ' + USERNAME_MIN_LENGTH + '-' + USERNAME_MAX_LENGTH + ' karakter arasında olmalı' },
+        { 
+          success: false, 
+          error: { message: validation.error.errors[0]?.message || 'Geçersiz username' }
+        },
         { status: 400 }
       )
     }
 
-    // Sadece küçük harf ve rakam kontrolü
-    if (!USERNAME_REGEX.test(username)) {
-      return NextResponse.json(
-        { available: false, error: 'Username sadece küçük harf ve rakam içerebilir' },
-        { status: 400 }
-      )
-    }
+    const validatedUsername = validation.data.username
 
     // Veritabanında kontrol et
     const existingUser = await prisma.user.findUnique({
-      where: { username },
+      where: { username: validatedUsername },
       select: { id: true }
     })
 
     const isAvailable = !existingUser
 
     logInfo(LOG_EVENTS.AUTH_USERNAME_CHECK, 'Username kullanılabilirlik kontrolü', {
-      username,
+      username: validatedUsername,
       available: isAvailable
     })
 
     return NextResponse.json({
-      available: isAvailable,
-      username
+      success: true,
+      data: {
+        available: isAvailable,
+        username: validatedUsername
+      }
     })
 
   } catch (error) {
@@ -58,7 +60,7 @@ async function checkUsernameHandler(request: NextRequest) {
     })
 
     return NextResponse.json(
-      { error: 'Sunucu hatası' },
+      { success: false, error: { message: 'Sunucu hatası' } },
       { status: 500 }
     )
   }

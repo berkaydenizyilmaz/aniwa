@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyEmailToken } from '@/services/auth/email-verification.service'
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
+import { verifyEmailSchema } from '@/lib/schemas/auth.schemas'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
 import { ApiResponse } from '@/types/api'
@@ -21,8 +22,22 @@ async function verifyEmailHandler(request: NextRequest): Promise<NextResponse<Ap
       )
     }
 
+    // Zod ile validasyon
+    const validation = verifyEmailSchema.safeParse({ token })
+    if (!validation.success) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: { message: validation.error.errors[0]?.message || 'Geçersiz token' }
+        },
+        { status: 400 }
+      )
+    }
+
+    const validatedToken = validation.data.token
+
     // Token'ı doğrula
-    const result = await verifyEmailToken(token)
+    const result = await verifyEmailToken(validatedToken)
 
     if (result.success) {
       logInfo(LOG_EVENTS.AUTH_EMAIL_VERIFICATION_SUCCESS, 'Email başarıyla doğrulandı', {

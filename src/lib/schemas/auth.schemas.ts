@@ -45,6 +45,16 @@ export const loginSchema = z.object({
   password: z.string().min(PASSWORD_MIN_LENGTH, 'Şifre gerekli'),
 })
 
+// Username kontrol şeması
+export const checkUsernameSchema = z.object({
+  username: usernameSchema,
+})
+
+// Email doğrulama şeması
+export const verifyEmailSchema = z.object({
+  token: z.string().min(TOKEN_MIN_LENGTH, 'Doğrulama kodu gerekli'),
+})
+
 // Şifre sıfırlama talebi şeması
 export const forgotPasswordSchema = z.object({
   email: emailSchema
@@ -70,6 +80,8 @@ export const resetPasswordApiSchema = z.object({
 // Tip çıkarımları (TypeScript için)
 export type SignupData = z.infer<typeof signupSchema>
 export type LoginData = z.infer<typeof loginSchema>
+export type CheckUsernameData = z.infer<typeof checkUsernameSchema>
+export type VerifyEmailData = z.infer<typeof verifyEmailSchema>
 export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>
 export type ResetPasswordApiData = z.infer<typeof resetPasswordApiSchema> 
