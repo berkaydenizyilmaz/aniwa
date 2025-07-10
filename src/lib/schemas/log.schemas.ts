@@ -2,10 +2,15 @@
 // Bu dosya log işlemleri validasyon şemalarını içerir
 
 import { z } from 'zod'
+import { LogLevel, UserRole } from '@prisma/client'
+
+// Prisma enum'larını Zod enum'larına çevir
+const logLevelEnum = z.enum([LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR])
+const userRoleEnum = z.enum([UserRole.USER, UserRole.MODERATOR, UserRole.EDITOR, UserRole.ADMIN])
 
 // Log oluşturma şeması
 export const createLogSchema = z.object({
-  level: z.enum(['DEBUG', 'INFO', 'WARN', 'ERROR']),
+  level: logLevelEnum,
   event: z.string().min(1, 'Event gerekli'),
   message: z.string().min(1, 'Mesaj gerekli'),
   metadata: z.record(z.unknown()).optional(),
@@ -14,10 +19,10 @@ export const createLogSchema = z.object({
 
 // Log filtreleme şeması
 export const logFiltersSchema = z.object({
-  level: z.enum(['DEBUG', 'INFO', 'WARN', 'ERROR']).optional(),
+  level: logLevelEnum.optional(),
   event: z.string().optional(),
   userId: z.string().optional(),
-  userRoles: z.array(z.string()).optional(),
+  userRoles: z.array(userRoleEnum).optional(),
   startDate: z.date().optional(),
   endDate: z.date().optional(),
   limit: z.number().positive().max(100).default(50),

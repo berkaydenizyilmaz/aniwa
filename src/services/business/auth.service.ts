@@ -19,13 +19,18 @@ export async function registerUser(
     // 1. Girdi validasyonu
     const validatedParams = signupSchema.parse(params)
 
-    // 2. Kullanıcı oluştur (database service kullan)
+    // 2. Ön koşul kontrolleri (guard clauses)
+    if (!baseUrl) {
+      return { success: false, error: 'Base URL gerekli' }
+    }
+
+    // 3. Ana iş mantığı - Kullanıcı oluştur (database service)
     const userResult = await createUser(validatedParams)
     if (!userResult.success || !userResult.data) {
       return userResult
     }
 
-    // 3. Email doğrulama token'ı oluştur ve email gönder
+    // Email doğrulama token'ı oluştur ve email gönder
     const emailResult = await createEmailVerificationToken(
       validatedParams.email,
       validatedParams.username,
@@ -35,11 +40,6 @@ export async function registerUser(
     if (!emailResult.success) {
       // Email gönderilemezse kullanıcı oluşturulmuş olsa bile hata dön
       // (Kullanıcı daha sonra email doğrulama tekrar talep edebilir)
-      logError(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Email doğrulama gönderilemedi', {
-        userId: userResult.data.id,
-        email: validatedParams.email
-      })
-      
       return {
         success: false,
         error: 'Kullanıcı oluşturuldu ancak doğrulama emaili gönderilemedi'
@@ -54,24 +54,26 @@ export async function registerUser(
       emailVerificationSent: true
     }, userResult.data.id)
 
+    // 5. Başarılı yanıt
     return {
       success: true,
       data: userResult.data
     }
 
   } catch (error) {
-    // Hata yönetimi
+    // 6. Hata loglaması
+    logError(LOG_EVENTS.SERVICE_ERROR, 'Kullanıcı kaydı hatası', {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      email: params.email
+    })
+
+    // 7. Hata yanıtı
     if (error instanceof z.ZodError) {
       return {
         success: false,
         error: error.errors[0].message
       }
     }
-
-    logError(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Kullanıcı kaydı hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      email: params.email
-    })
 
     return {
       success: false,

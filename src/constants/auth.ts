@@ -38,4 +38,9 @@ export const OAUTH_PROVIDERS = {
 } as const
 
 // Kullanıcı rolleri (Prisma'dan gelen enum'u yeniden dışa aktar)
-export { UserRole as USER_ROLES };
+export const USER_ROLES = {
+  USER: UserRole.USER,
+  MODERATOR: UserRole.MODERATOR,
+  EDITOR: UserRole.EDITOR,
+  ADMIN: UserRole.ADMIN
+} as const

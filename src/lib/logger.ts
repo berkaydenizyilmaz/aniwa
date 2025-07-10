@@ -1,7 +1,7 @@
 // Aniwa Projesi - Basit ve Etkili Logger
 // Bu dosya hem console hem MongoDB logging sağlar
 
-import { createLog } from '@/services/log/log.service'
+import { createLog } from '@/services/db/log.service'
 import { LogLevel, SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS } from '@/constants/logging'
 import type { LogMetadata, PerformanceMetadata } from '@/types/logging'
 import { Prisma } from '@prisma/client'

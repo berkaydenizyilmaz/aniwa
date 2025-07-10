@@ -2,14 +2,14 @@
 // Bu dosya kullanıcı CRUD işlemlerini yönetir
 
 import { prisma } from '@/lib/db/prisma'
-import { logInfo, logError, logWarn } from '@/lib/logger'
+import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { USER_ROLES, BCRYPT_SALT_ROUNDS } from '@/constants/auth'
 import { z } from 'zod'
 import { generateUserSlug } from '@/lib/utils'
 import { Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import { signupSchema } from '@/lib/schemas/auth.schemas'
+import { signupSchema, emailSchema, usernameSchema, userIdSchema } from '@/lib/schemas/auth.schemas'
 import type { ApiResponse } from '@/types/api'
 import type { 
   CreateUserParams, 
@@ -23,35 +23,27 @@ export async function createUser(params: CreateUserParams): Promise<ApiResponse<
     const validatedParams = signupSchema.parse(params)
     const { email, password, username } = validatedParams
 
-    // 2. Email kontrolü (guard clause)
+    // 2. Ön koşul kontrolleri (guard clauses)
     const existingUser = await prisma.user.findUnique({
       where: { email: email.toLowerCase() }
     })
 
     if (existingUser) {
-      logWarn(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Email zaten kullanımda', {
-        email: email.toLowerCase()
-      })
       return { success: false, error: 'Bu email adresi zaten kullanımda' }
     }
 
-    // 3. Username kontrolü (guard clause)
     const existingUsername = await prisma.user.findUnique({
       where: { username }
     })
 
     if (existingUsername) {
-      logWarn(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Username zaten kullanımda', {
-        username
-      })
       return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
     }
 
-    // 4. Ana iş mantığı
+    // 3. Ana iş mantığı - Transaction ile kullanıcı + ayarları oluştur
     const uniqueSlug = generateUserSlug(username)
     const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
 
-    // Transaction ile kullanıcı + ayarları oluştur
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
@@ -72,7 +64,7 @@ export async function createUser(params: CreateUserParams): Promise<ApiResponse<
       return { user, userSettings }
     })
 
-    // 5. Başarı loglaması
+    // 4. Başarı loglaması
     logInfo(LOG_EVENTS.AUTH_SIGNUP_SUCCESS, 'Yeni kullanıcı oluşturuldu', {
       userId: result.user.id,
       email: result.user.email,
@@ -80,7 +72,7 @@ export async function createUser(params: CreateUserParams): Promise<ApiResponse<
       slug: result.user.slug
     }, result.user.id)
 
-    // 6. Başarılı yanıt
+    // 5. Başarılı yanıt
     const data: UserWithSettings = {
       ...result.user,
       userSettings: result.userSettings,
@@ -89,7 +81,13 @@ export async function createUser(params: CreateUserParams): Promise<ApiResponse<
     return { success: true, data }
 
   } catch (error) {
-    // 7. Hata yönetimi
+    // 6. Hata loglaması
+    logError(LOG_EVENTS.SERVICE_ERROR, 'Kullanıcı oluşturma hatası', {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      email: params.email?.toLowerCase()
+    })
+
+    // 7. Hata yanıtı
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message }
     }
@@ -99,12 +97,6 @@ export async function createUser(params: CreateUserParams): Promise<ApiResponse<
         return { success: false, error: 'Bu kayıt zaten mevcut' }
       }
     }
-
-    // 8. Hata loglaması
-    logError(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Kullanıcı oluşturma hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      email: params.email?.toLowerCase()
-    })
 
     return { 
       success: false, 
@@ -116,19 +108,44 @@ export async function createUser(params: CreateUserParams): Promise<ApiResponse<
 // Kullanıcıyı email ile bulur
 export async function findUserByEmail(email: string): Promise<ApiResponse<UserWithSettings | null>> {
   try {
+    // 1. Girdi validasyonu
+    const validatedEmail = emailSchema.parse(email)
+
+    // 2. Ön koşul kontrolleri (guard clauses)
+    if (!validatedEmail || validatedEmail.trim().length === 0) {
+      return { success: false, error: 'Email adresi gerekli' }
+    }
+
+    // 3. Ana iş mantığı - Kullanıcı sorgulama
     const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
+      where: { email: validatedEmail },
       include: {
         userSettings: true
       }
     })
 
+    // 4. Başarı loglaması (sadece bulunursa)
+    if (user) {
+      logInfo(LOG_EVENTS.DATABASE_READ, 'Kullanıcı email ile bulundu', {
+        userId: user.id,
+        email: validatedEmail
+      }, user.id)
+    }
+
+    // 5. Başarılı yanıt
     return { success: true, data: user }
+
   } catch (error) {
-    logError(LOG_EVENTS.DATABASE_ERROR, 'Kullanıcı email ile bulunamadı', {
+    // 6. Hata loglaması
+    logError(LOG_EVENTS.SERVICE_ERROR, 'Kullanıcı email ile bulunamadı', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       email: email.toLowerCase()
     })
+
+    // 7. Hata yanıtı
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.errors[0].message }
+    }
 
     return { 
       success: false, 
@@ -140,19 +157,44 @@ export async function findUserByEmail(email: string): Promise<ApiResponse<UserWi
 // Kullanıcıyı username ile bulur
 export async function findUserByUsername(username: string): Promise<ApiResponse<UserWithSettings | null>> {
   try {
+    // 1. Girdi validasyonu
+    const validatedUsername = usernameSchema.parse(username)
+
+    // 2. Ön koşul kontrolleri (guard clauses)
+    if (!validatedUsername || validatedUsername.trim().length === 0) {
+      return { success: false, error: 'Kullanıcı adı gerekli' }
+    }
+
+    // 3. Ana iş mantığı - Kullanıcı sorgulama
     const user = await prisma.user.findUnique({
-      where: { username },
+      where: { username: validatedUsername },
       include: {
         userSettings: true
       }
     })
 
+    // 4. Başarı loglaması (sadece bulunursa)
+    if (user) {
+      logInfo(LOG_EVENTS.DATABASE_READ, 'Kullanıcı username ile bulundu', {
+        userId: user.id,
+        username: validatedUsername
+      }, user.id)
+    }
+
+    // 5. Başarılı yanıt
     return { success: true, data: user }
+
   } catch (error) {
-    logError(LOG_EVENTS.DATABASE_ERROR, 'Kullanıcı username ile bulunamadı', {
+    // 6. Hata loglaması
+    logError(LOG_EVENTS.SERVICE_ERROR, 'Kullanıcı username ile bulunamadı', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       username
     })
+
+    // 7. Hata yanıtı
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.errors[0].message }
+    }
 
     return { 
       success: false, 
@@ -164,19 +206,43 @@ export async function findUserByUsername(username: string): Promise<ApiResponse<
 // Kullanıcıyı ID ile bulur
 export async function findUserById(id: string): Promise<ApiResponse<UserWithSettings | null>> {
   try {
+    // 1. Girdi validasyonu
+    const validatedId = userIdSchema.parse(id)
+
+    // 2. Ön koşul kontrolleri (guard clauses)
+    if (!validatedId || validatedId.trim().length === 0) {
+      return { success: false, error: 'Kullanıcı ID gerekli' }
+    }
+
+    // 3. Ana iş mantığı - Kullanıcı sorgulama
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id: validatedId },
       include: {
         userSettings: true
       }
     })
 
+    // 4. Başarı loglaması (sadece bulunursa)
+    if (user) {
+      logInfo(LOG_EVENTS.DATABASE_READ, 'Kullanıcı ID ile bulundu', {
+        userId: user.id
+      }, user.id)
+    }
+
+    // 5. Başarılı yanıt
     return { success: true, data: user }
+
   } catch (error) {
-    logError(LOG_EVENTS.DATABASE_ERROR, 'Kullanıcı ID ile bulunamadı', {
+    // 6. Hata loglaması
+    logError(LOG_EVENTS.SERVICE_ERROR, 'Kullanıcı ID ile bulunamadı', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       userId: id
     })
+
+    // 7. Hata yanıtı
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.errors[0].message }
+    }
 
     return { 
       success: false, 
@@ -191,25 +257,43 @@ export async function updateEmailVerificationStatus(
   isVerified: boolean
 ): Promise<ApiResponse<void>> {
   try {
+    // 1. Girdi validasyonu
+    const validatedUserId = userIdSchema.parse(userId)
+
+    // 2. Ön koşul kontrolleri (guard clauses)
+    if (typeof isVerified !== 'boolean') {
+      return { success: false, error: 'Doğrulama durumu boolean olmalıdır' }
+    }
+
+    // 3. Ana iş mantığı - Email doğrulama durumu güncelleme
     await prisma.user.update({
-      where: { id: userId },
+      where: { id: validatedUserId },
       data: { 
         emailVerified: isVerified ? new Date() : null 
       }
     })
 
+    // 4. Başarı loglaması
     logInfo(LOG_EVENTS.AUTH_EMAIL_VERIFIED, 'Email doğrulama durumu güncellendi', {
-      userId,
+      userId: validatedUserId,
       isVerified
-    }, userId)
+    }, validatedUserId)
 
+    // 5. Başarılı yanıt
     return { success: true, data: undefined }
+
   } catch (error) {
-    logError(LOG_EVENTS.DATABASE_ERROR, 'Email doğrulama durumu güncellenemedi', {
+    // 6. Hata loglaması
+    logError(LOG_EVENTS.SERVICE_ERROR, 'Email doğrulama durumu güncellenemedi', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       userId,
       isVerified
     })
+
+    // 7. Hata yanıtı
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.errors[0].message }
+    }
 
     return { 
       success: false, 
@@ -224,23 +308,45 @@ export async function updateUserPassword(
   newPassword: string
 ): Promise<ApiResponse<void>> {
   try {
+    // 1. Girdi validasyonu
+    const validatedUserId = userIdSchema.parse(userId)
+
+    // 2. Ön koşul kontrolleri (guard clauses)
+    if (!newPassword || newPassword.trim().length === 0) {
+      return { success: false, error: 'Yeni şifre gerekli' }
+    }
+
+    if (newPassword.length < 8) {
+      return { success: false, error: 'Şifre en az 8 karakter olmalıdır' }
+    }
+
+    // 3. Ana iş mantığı - Şifre hash'leme ve güncelleme
     const passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS)
 
     await prisma.user.update({
-      where: { id: userId },
+      where: { id: validatedUserId },
       data: { passwordHash }
     })
 
+    // 4. Başarı loglaması
     logInfo(LOG_EVENTS.AUTH_PASSWORD_CHANGED, 'Kullanıcı şifresi güncellendi', {
-      userId
-    }, userId)
+      userId: validatedUserId
+    }, validatedUserId)
 
+    // 5. Başarılı yanıt
     return { success: true, data: undefined }
+
   } catch (error) {
-    logError(LOG_EVENTS.DATABASE_ERROR, 'Kullanıcı şifresi güncellenemedi', {
+    // 6. Hata loglaması
+    logError(LOG_EVENTS.SERVICE_ERROR, 'Kullanıcı şifresi güncellenemedi', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       userId
     })
+
+    // 7. Hata yanıtı
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.errors[0].message }
+    }
 
     return { 
       success: false, 

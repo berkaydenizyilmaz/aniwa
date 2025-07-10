@@ -2,7 +2,7 @@
 // Bu dosya email doğrulama token'ını kontrol eder
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyEmailToken } from '@/services/auth/email-verification.service'
+import { verifyEmailToken } from '@/services/business/email-verification.service'
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { verifyEmailSchema } from '@/lib/schemas/auth.schemas'
@@ -28,8 +28,7 @@ async function verifyEmailHandler(request: NextRequest): Promise<NextResponse<Ap
       return NextResponse.json(
         { 
           success: false, 
-          error: 'Geçersiz token',
-          details: validation.error.errors
+          error: 'Geçersiz token'
         },
         { status: 400 }
       )

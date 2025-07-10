@@ -2,7 +2,7 @@
 // Bu dosya log kayıtlarının CRUD işlemlerini yönetir
 
 import { prisma } from '@/lib/db/prisma'
-import { Prisma } from '@prisma/client'
+import { Prisma, UserRole } from '@prisma/client'
 import { z } from 'zod'
 import { createLogSchema, logFiltersSchema } from '@/lib/schemas/log.schemas'
 import type { ApiResponse } from '@/types/api'
@@ -13,6 +13,7 @@ import type {
   LogListResponse
 } from '@/types/logging'
 import { logUserSelect } from '@/types/logging'
+import { LOG_EVENTS } from '@/constants/logging'
 
 // Yeni log kaydı oluşturur
 export async function createLog(params: CreateLogParams): Promise<ApiResponse<LogWithUser>> {
@@ -20,24 +21,42 @@ export async function createLog(params: CreateLogParams): Promise<ApiResponse<Lo
     // 1. Girdi validasyonu
     const validatedParams = createLogSchema.parse(params)
 
-    // 2. Log kaydı oluştur
+    // 2. Ön koşul kontrolleri (guard clauses)
+    if (!validatedParams.event || !validatedParams.message) {
+      return { success: false, error: 'Event ve mesaj gerekli' }
+    }
+
+    // 3. Ana iş mantığı - Log kaydı oluştur
     const log = await prisma.log.create({
       data: {
         level: validatedParams.level,
         event: validatedParams.event,
         message: validatedParams.message,
-        metadata: validatedParams.metadata,
-        userId: validatedParams.userId,
+        metadata: (validatedParams.metadata as Prisma.JsonValue) || null,
+        userId: validatedParams.userId || null,
       },
       include: {
         user: { select: logUserSelect },
       },
     })
 
+    // 4. Başarı loglaması (sadece önemli işlemler için)
+    if (validatedParams.level === 'ERROR') {
+      console.info(`[LOG_CREATED] Error log kaydı oluşturuldu: ${validatedParams.event}`)
+    }
+
+    // 5. Başarılı yanıt
     return { success: true, data: log }
 
   } catch (error) {
-    // Hata yönetimi
+    // 6. Hata loglaması
+    console.error(`[${LOG_EVENTS.DATABASE_ERROR}] Log oluşturma hatası:`, {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      event: params.event,
+      level: params.level
+    })
+
+    // 7. Hata yanıtı
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message }
     }
@@ -48,7 +67,6 @@ export async function createLog(params: CreateLogParams): Promise<ApiResponse<Lo
       }
     }
 
-    console.error('Log oluşturma hatası:', error)
     return { 
       success: false, 
       error: 'Log kaydı oluşturulamadı'
@@ -73,7 +91,12 @@ export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<Log
       offset,
     } = validatedFilters
 
-    // 2. Filtreleme koşullarını oluştur
+    // 2. Ön koşul kontrolleri (guard clauses)
+    if (limit > 100) {
+      return { success: false, error: 'Limit maksimum 100 olabilir' }
+    }
+
+    // 3. Ana iş mantığı - Filtreleme koşullarını oluştur
     const where: Prisma.LogWhereInput = {}
 
     if (level) where.level = level
@@ -83,7 +106,7 @@ export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<Log
     // Rol bazlı filtreleme
     if (userRoles && userRoles.length > 0) {
       where.user = {
-        roles: { hasSome: userRoles }
+        roles: { hasSome: userRoles as UserRole[] }
       }
     }
     
@@ -93,7 +116,7 @@ export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<Log
       if (endDate) where.timestamp.lte = endDate
     }
 
-    // 3. Logları getir
+    // Logları getir
     const [logs, total] = await Promise.all([
       prisma.log.findMany({
         where,
@@ -107,6 +130,15 @@ export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<Log
       prisma.log.count({ where }),
     ])
 
+    // 4. Başarı loglaması (sadece büyük sorgular için)
+    if (total > 1000) {
+      console.info(`[LOG_QUERY] Büyük log sorgusu: ${total} kayıt`, {
+        filters: validatedFilters,
+        resultCount: logs.length
+      })
+    }
+
+    // 5. Başarılı yanıt
     return {
       success: true,
       data: {
@@ -121,12 +153,17 @@ export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<Log
     }
 
   } catch (error) {
-    // Hata yönetimi
+    // 6. Hata loglaması
+    console.error(`[${LOG_EVENTS.DATABASE_ERROR}] Log listeleme hatası:`, {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      filters
+    })
+
+    // 7. Hata yanıtı
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message }
     }
 
-    console.error('Log listeleme hatası:', error)
     return { 
       success: false, 
       error: 'Loglar listelenemedi' 
@@ -137,6 +174,17 @@ export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<Log
 // Log kaydını ID ile getirir
 export async function getLogById(id: string): Promise<ApiResponse<LogWithUser | null>> {
   try {
+    // 1. Girdi validasyonu
+    if (!id || typeof id !== 'string') {
+      return { success: false, error: 'Geçersiz log ID' }
+    }
+
+    // 2. Ön koşul kontrolleri (guard clauses)
+    if (id.length !== 24) {
+      return { success: false, error: 'Log ID formatı hatalı' }
+    }
+
+    // 3. Ana iş mantığı - Log kaydını getir
     const log = await prisma.log.findUnique({
       where: { id },
       include: {
@@ -144,9 +192,19 @@ export async function getLogById(id: string): Promise<ApiResponse<LogWithUser | 
       },
     })
 
+    // 4. Başarı loglaması (gerekli değil, basit sorgu)
+    
+    // 5. Başarılı yanıt
     return { success: true, data: log }
+
   } catch (error) {
-    console.error('Log getirme hatası:', error)
+    // 6. Hata loglaması
+    console.error(`[${LOG_EVENTS.DATABASE_ERROR}] Log getirme hatası:`, {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      logId: id
+    })
+
+    // 7. Hata yanıtı
     return { 
       success: false, 
       error: 'Log kaydı getirilemedi' 
@@ -157,6 +215,17 @@ export async function getLogById(id: string): Promise<ApiResponse<LogWithUser | 
 // Belirli tarihten eski logları siler
 export async function deleteOldLogs(daysOld: number): Promise<ApiResponse<{ deletedCount: number }>> {
   try {
+    // 1. Girdi validasyonu
+    if (!daysOld || typeof daysOld !== 'number' || daysOld <= 0) {
+      return { success: false, error: 'Geçersiz gün sayısı' }
+    }
+
+    // 2. Ön koşul kontrolleri (guard clauses)
+    if (daysOld < 7) {
+      return { success: false, error: 'En az 7 günlük loglar tutulmalı' }
+    }
+
+    // 3. Ana iş mantığı - Eski logları sil
     const cutoffDate = new Date()
     cutoffDate.setDate(cutoffDate.getDate() - daysOld)
 
@@ -168,12 +237,27 @@ export async function deleteOldLogs(daysOld: number): Promise<ApiResponse<{ dele
       }
     })
 
+    // 4. Başarı loglaması
+    console.info(`[LOG_CLEANUP] Eski loglar silindi`, {
+      daysOld,
+      cutoffDate: cutoffDate.toISOString(),
+      deletedCount: result.count
+    })
+
+    // 5. Başarılı yanıt
     return {
       success: true,
       data: { deletedCount: result.count }
     }
+
   } catch (error) {
-    console.error('Eski log silme hatası:', error)
+    // 6. Hata loglaması
+    console.error(`[${LOG_EVENTS.DATABASE_ERROR}] Eski log silme hatası:`, {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      daysOld
+    })
+
+    // 7. Hata yanıtı
     return {
       success: false,
       error: 'Eski loglar silinemedi'

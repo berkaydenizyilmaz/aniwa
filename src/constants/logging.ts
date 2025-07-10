@@ -58,6 +58,13 @@ export const LOG_EVENTS = {
   
   // Database events
   DATABASE_ERROR: 'database_error',
+  DATABASE_READ: 'database_read',
+  
+  // Service events
+  SERVICE_ERROR: 'service_error',
+  
+  // API events
+  API_ERROR: 'api_error',
 } as const
 
 // Performance eşikleri (ms)

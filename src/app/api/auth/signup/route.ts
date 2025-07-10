@@ -3,8 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { signupSchema } from '@/lib/schemas/auth.schemas'
-import { createUser } from '@/services/auth/auth.service'
-import { createEmailVerificationToken } from '@/services/auth/email-verification.service'
+import { registerUser } from '@/services/business/auth.service'
 import { logError, logInfo } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
@@ -14,28 +13,23 @@ async function signupHandler(request: NextRequest) {
   try {
     const body = await request.json()
     
-    // Request validation
+    // API layer validation - HTTP format kontrolü
     const validationResult = signupSchema.safeParse(body)
     if (!validationResult.success) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'Geçersiz veri',
+          error: 'Geçersiz veri formatı',
           details: validationResult.error.errors
         },
         { status: 400 }
       )
     }
 
-    const { email, password, username } = validationResult.data
-
-    // Kullanıcı oluştur
-    const result = await createUser({
-      email,
-      password,
-      username,
-    })
-
+    // Business service call - User creation + Email verification
+    const baseUrl = request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3001'
+    const result = await registerUser(validationResult.data, baseUrl)
+    
     if (!result.success) {
       return NextResponse.json(
         { success: false, error: result.error },
@@ -43,39 +37,27 @@ async function signupHandler(request: NextRequest) {
       )
     }
 
-    // Email doğrulama token'ı oluştur ve email gönder
-    const baseUrl = request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3001'
-    const verificationResult = await createEmailVerificationToken(email, username, baseUrl)
-
-    if (!verificationResult.success) {
-      logError(LOG_EVENTS.AUTH_EMAIL_VERIFICATION_FAILED, 'Email doğrulama gönderim hatası', {
-        email,
-        username,
-        errorMessage: verificationResult.error?.message
-      })
-      
-      // Kullanıcı oluşturuldu ama email gönderilemedi
-      return NextResponse.json({
-        success: true,
-        message: 'Hesabınız oluşturuldu ancak doğrulama emaili gönderilemedi. Lütfen tekrar deneyin.',
-        data: result.data,
-        warning: 'Email doğrulama gönderim hatası'
-      })
-    }
-
-    logInfo(LOG_EVENTS.AUTH_SIGNUP_SUCCESS, 'Kullanıcı kaydı ve email doğrulama tamamlandı', {
-      email,
-      username
+    // Başarı loglaması
+    logInfo(LOG_EVENTS.AUTH_SIGNUP_SUCCESS, 'Kullanıcı kaydı API başarılı', {
+      userId: result.data?.id,
+      email: validationResult.data.email
     })
 
     return NextResponse.json({
       success: true,
-      message: 'Hesabınız başarıyla oluşturuldu. Email adresinize gönderilen doğrulama bağlantısını kontrol edin.',
-      data: result.data
+      message: 'Kullanıcı kaydı başarılı! Lütfen email adresinizi doğrulayın.',
+      data: {
+        user: {
+          id: result.data?.id,
+          email: result.data?.email,
+          username: result.data?.username
+        }
+      }
     })
 
   } catch (error) {
-    logError(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Signup API hatası', {
+    // Hata loglaması
+    logError(LOG_EVENTS.API_ERROR, 'Signup API hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata'
     })
 
@@ -86,5 +68,5 @@ async function signupHandler(request: NextRequest) {
   }
 }
 
-// Rate limiting ile sarılmış export
+// Rate limiting ile export
 export const POST = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.SIGNUP, signupHandler) 

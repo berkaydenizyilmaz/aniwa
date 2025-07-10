@@ -1,4 +1,4 @@
-import { getLogs } from '@/services/log/log.service'
+import { getLogs } from '@/services/db/log.service'
 import { LogsTable } from './_components/Logs-table'
 import { LogsFilters } from './_components/Logs-filters'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'

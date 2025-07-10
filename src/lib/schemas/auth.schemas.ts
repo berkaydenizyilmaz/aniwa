@@ -2,6 +2,7 @@
 // Bu dosya kimlik doğrulama ile ilgili tüm validasyon şemalarını içerir
 
 import { z } from 'zod'
+import { UserRole } from '@prisma/client'
 import {
   USERNAME_REGEX,
   PASSWORD_MIN_LENGTH,
@@ -11,6 +12,16 @@ import {
   TOKEN_MIN_LENGTH,
   EMAIL_MIN_LENGTH,
 } from '../../constants/auth'
+
+// Prisma enum'larını Zod enum'larına çevir
+const userRoleEnum = z.enum([UserRole.USER, UserRole.MODERATOR, UserRole.EDITOR, UserRole.ADMIN])
+
+// User ID şeması (MongoDB ObjectId)
+export const userIdSchema = z
+  .string()
+  .min(24, 'Geçersiz kullanıcı ID')
+  .max(24, 'Geçersiz kullanıcı ID')
+  .regex(/^[a-f\d]{24}$/i, 'Geçersiz kullanıcı ID formatı')
 
 // Email şeması
 export const emailSchema = z
