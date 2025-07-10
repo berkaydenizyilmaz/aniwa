@@ -3,65 +3,61 @@
 
 'use client'
 
-import { useSession, signIn, signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
 import type { UserRole } from '@prisma/client'
-import type { 
-  AuthHookReturn, 
-  RoleHookReturn, 
-  RequireAuthHookReturn, 
-  RequireRoleHookReturn 
-} from '@/types/auth'
+import type { UseAuthReturn } from '@/types/auth'
 import { ROUTES } from '@/constants/routes'
 import { USER_ROLES } from '@/constants/auth'
 
-/**
- * Auth durumunu yöneten ana hook
- */
-export function useAuth(): AuthHookReturn {
+// Auth durumunu yöneten ana hook
+export function useAuth(): UseAuthReturn {
   const { data: session, status } = useSession()
-  const router = useRouter()
 
-  const login = useCallback(async (username: string, password: string) => {
-    const result = await signIn('credentials', {
-      username,
-      password,
-      redirect: false,
-    })
-    
-    return result
-  }, [])
+  const hasRole = useCallback(
+    (role: UserRole) => session?.user?.roles?.includes(role) ?? false,
+    [session?.user?.roles]
+  )
 
-  const loginWithGoogle = useCallback(async () => {
-    await signIn('google', { callbackUrl: ROUTES.PAGES.HOME })
-  }, [])
+  const hasAnyRole = useCallback(
+    (roles: UserRole[]) => session?.user?.roles ? roles.some(role => session.user.roles.includes(role)) : false,
+    [session?.user?.roles]
+  )
 
-  const logout = useCallback(async () => {
-    await signOut({ redirect: false })
-    router.push(ROUTES.PAGES.HOME)
-  }, [router])
+  const requireRole = useCallback(
+    (role: UserRole) => {
+      if (!hasRole(role)) {
+        throw new Error(`Required role: ${role}`)
+      }
+      return true
+    },
+    [hasRole]
+  )
+
+  const requireAnyRole = useCallback(
+    (roles: UserRole[]) => {
+      if (!hasAnyRole(roles)) {
+        throw new Error(`Required roles: ${roles.join(', ')}`)
+      }
+      return true
+    },
+    [hasAnyRole]
+  )
 
   return {
-    // Session bilgileri
-    user: session?.user,
-    session,
-    isAuthenticated: !!session?.user,
+    user: session?.user || null,
     isLoading: status === 'loading',
-    needsUsername: false, // OAuth artık otomatik username oluşturuyor
-    
-    // Auth fonksiyonları
-    login,
-    loginWithGoogle,
-    logout,
-    setupUsername: async () => ({ success: true }), // Eski uyumluluk için boş fonksiyon
+    isAuthenticated: !!session?.user,
+    hasRole,
+    hasAnyRole,
+    requireRole,
+    requireAnyRole,
   }
 }
 
-/**
- * Kullanıcı rolü kontrolü için hook
- */
-export function useRole(): RoleHookReturn {
+// Kullanıcı rolü kontrolü için hook
+export function useRole() {
   const { user } = useAuth()
 
   const hasRole = useCallback(
@@ -94,10 +90,8 @@ export function useRole(): RoleHookReturn {
   }
 }
 
-/**
- * Korumalı sayfa erişimi için hook
- */
-export function useRequireAuth(redirectTo = ROUTES.PAGES.AUTH.SIGN_IN): RequireAuthHookReturn {
+// Korumalı sayfa erişimi için hook
+export function useRequireAuth(redirectTo = ROUTES.PAGES.AUTH.SIGN_IN) {
   const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
 
@@ -108,13 +102,11 @@ export function useRequireAuth(redirectTo = ROUTES.PAGES.AUTH.SIGN_IN): RequireA
   return { isAuthenticated, isLoading }
 }
 
-/**
- * Rol tabanlı erişim kontrolü için hook
- */
+// Rol tabanlı erişim kontrolü için hook
 export function useRequireRole(
   requiredRole: UserRole | UserRole[], 
   redirectTo = ROUTES.PAGES.HOME
-): RequireRoleHookReturn {
+) {
   const { isAuthenticated, isLoading } = useAuth()
   const { hasRole, hasAnyRole } = useRole()
   const router = useRouter()

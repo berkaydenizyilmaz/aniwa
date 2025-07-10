@@ -17,9 +17,7 @@ import {
 import type { ApiResponse } from '@/types/api'
 import { ROUTES } from '@/constants/routes'
 
-/**
- * Email doğrulama token'ı oluşturur ve doğrulama emaili gönderir
- */
+// Email doğrulama token'ı oluşturur ve doğrulama emaili gönderir
 export async function createEmailVerificationToken(
   email: string,
   username: string,
@@ -95,9 +93,7 @@ export async function createEmailVerificationToken(
   }
 }
 
-/**
- * Şifre sıfırlama token'ı oluşturur ve sıfırlama emaili gönderir
- */
+// Şifre sıfırlama token'ı oluşturur ve sıfırlama emaili gönderir
 export async function createPasswordResetToken(
   email: string,
   baseUrl: string
@@ -190,9 +186,7 @@ export async function createPasswordResetToken(
   }
 }
 
-/**
- * Email doğrulama token'ını kontrol eder ve kullanıcının email'ini doğrular
- */
+// Email doğrulama token'ını kontrol eder ve kullanıcının email'ini doğrular
 export async function verifyEmailToken(token: string): Promise<ApiResponse<{ email: string }>> {
   try {
     // Token'ı bul
@@ -275,9 +269,7 @@ export async function verifyEmailToken(token: string): Promise<ApiResponse<{ ema
   }
 }
 
-/**
- * Şifre sıfırlama token'ını kontrol eder (şifre değiştirmeden önce)
- */
+// Şifre sıfırlama token'ını kontrol eder (şifre değiştirmeden önce)
 export async function verifyPasswordResetToken(token: string): Promise<ApiResponse<{ email: string }>> {
   try {
     // Token'ı bul
@@ -345,9 +337,7 @@ export async function verifyPasswordResetToken(token: string): Promise<ApiRespon
   }
 }
 
-/**
- * Şifre sıfırlama token'ını kullanarak kullanıcının şifresini günceller
- */
+// Şifre sıfırlama token'ını kullanarak kullanıcının şifresini günceller
 export async function resetPasswordWithToken(
   token: string, 
   newPassword: string

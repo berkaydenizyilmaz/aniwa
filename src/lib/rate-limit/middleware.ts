@@ -7,9 +7,7 @@ import { AUTH_RATE_LIMIT_TYPES, RATE_LIMITS } from '@/constants/rate-limits'
 import type { RateLimitConfig, RateLimitKeyOptions } from '@/types/rate-limit'
 import { getToken } from 'next-auth/jwt'
 
-/**
- * Global API rate limiting için middleware
- */
+// Global API rate limiting için middleware
 export async function withGlobalRateLimit(
   request: NextRequest,
   next: () => Promise<NextResponse> | NextResponse
@@ -54,9 +52,7 @@ export async function withGlobalRateLimit(
   return response
 }
 
-/**
- * Auth endpoint'leri için otomatik rate limiting wrapper
- */
+// Auth endpoint'leri için otomatik rate limiting wrapper
 export function withAuthRateLimit(
   authType: keyof typeof RATE_LIMITS.AUTH,
   handler: (request: NextRequest) => Promise<NextResponse>
@@ -124,9 +120,7 @@ export function withAuthRateLimit(
   }
 }
 
-/**
- * Kullanıcı seviyesine göre rate limiting wrapper
- */
+// Kullanıcı seviyesine göre rate limiting wrapper
 export function withUserTierRateLimit(
   handler: (request: NextRequest) => Promise<NextResponse>,
   options?: {
@@ -200,9 +194,7 @@ export function withUserTierRateLimit(
   }
 }
 
-/**
- * API route handler'ları için rate limiting wrapper
- */
+// API route handler'ları için rate limiting wrapper
 export function withRateLimit(
   config: RateLimitConfig,
   handler: (request: NextRequest) => Promise<NextResponse>,

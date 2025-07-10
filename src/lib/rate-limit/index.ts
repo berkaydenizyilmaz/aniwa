@@ -13,10 +13,8 @@ import type {
   RateLimitStatus 
 } from '@/types/rate-limit'
 
-/**
- * Rate limit key oluşturur
- * Öncelik sırası: customKey > userId > ip
- */
+// Rate limit key oluşturur
+// Öncelik sırası: customKey > userId > ip
 export function createRateLimitKey(options: RateLimitKeyOptions): string {
   const { ip, userId, endpoint, customKey } = options
   
@@ -40,9 +38,7 @@ export function createRateLimitKey(options: RateLimitKeyOptions): string {
   return parts.join(':')
 }
 
-/**
- * Environment'a göre rate limit konfigürasyonunu ayarlar
- */
+// Environment'a göre rate limit konfigürasyonunu ayarlar
 function adjustConfigForEnvironment(config: RateLimitConfig): RateLimitConfig {
   const multiplier = RATE_LIMIT_MULTIPLIERS[env.NODE_ENV] || 1
   
@@ -52,9 +48,7 @@ function adjustConfigForEnvironment(config: RateLimitConfig): RateLimitConfig {
   }
 }
 
-/**
- * Rate limiter instance oluşturur
- */
+// Rate limiter instance oluşturur
 function createRateLimiter(config: RateLimitConfig): Ratelimit | null {
   if (!hasRateLimit) {
     logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Rate limiting devre dışı - KV konfigürasyonu eksik')
@@ -86,9 +80,7 @@ function createRateLimiter(config: RateLimitConfig): Ratelimit | null {
   }
 }
 
-/**
- * Rate limit kontrolü yapar
- */
+// Rate limit kontrolü yapar
 export async function checkRateLimit(
   config: RateLimitConfig,
   keyOptions: RateLimitKeyOptions
@@ -171,9 +163,7 @@ export async function checkRateLimit(
   }
 }
 
-/**
- * IP adresini request'ten çıkarır
- */
+// IP adresini request'ten çıkarır
 export function getClientIP(request: Request): string {
   // Vercel'de x-forwarded-for header'ı kullan
   const forwardedFor = request.headers.get('x-forwarded-for')

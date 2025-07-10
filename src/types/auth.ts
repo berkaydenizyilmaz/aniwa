@@ -1,80 +1,45 @@
 // Auth Tipleri
 // Bu dosya kimlik doğrulama ile ilgili tüm tip tanımlarını içerir
 
-import type { User, UserRole } from '@prisma/client'
+import type { User, UserProfileSettings, UserRole } from '@prisma/client'
 import type { Session } from 'next-auth'
 import type { SignInResponse } from 'next-auth/react'
-import { Prisma } from '@prisma/client'
 import type { ApiResponse } from './api'
 
-// Kullanıcı oluşturma parametreleri
-export interface CreateUserParams {
+// Kullanıcı + ayarları birlikte
+export type UserWithSettings = User & {
+  userSettings: UserProfileSettings | null
+}
+
+// Yeni kullanıcı oluşturma parametreleri
+export type CreateUserParams = {
   email: string
   password: string
   username: string
 }
 
-// Kullanıcı profil güncelleme parametreleri - sadece güncellenebilir alanlar
-export type UpdateProfileParams = Partial<Pick<User, 'username' | 'bio' | 'profilePicture' | 'profileBanner'>>
-
-// Kullanıcı ayarları güncelleme parametreleri
-export type UpdateUserSettingsParams = Partial<{
-  themePreference: string
-  languagePreference: string
-  notificationPreferences: Prisma.JsonValue
-  privacySettings: Prisma.JsonValue
-}>
-
-// Ayarlarıyla birlikte kullanıcı tipi - Prisma include tipini kullan
-export type UserWithSettings = Prisma.UserGetPayload<{
-  include: {
-    userSettings: true
-  }
-}>
-
 // ---- Hook dönüş tipleri ----
-export interface AuthHookReturn {
-  // Session bilgileri
-  user: SessionUser | undefined
-  session: Session | null
-  isAuthenticated: boolean
-  isLoading: boolean
-  needsUsername: boolean
-  
-  // Auth fonksiyonları
-  login: (username: string, password: string) => Promise<SignInResponse | undefined>
-  loginWithGoogle: () => Promise<void>
-  logout: () => Promise<void>
-  setupUsername: (username: string) => Promise<ApiResponse<void>>
-}
 
-// Roller ile ilgili hook dönüş tipleri
-export interface RoleHookReturn {
-  roles: UserRole[] | undefined
+// useAuth hook'u için dönüş tipi
+export interface UseAuthReturn {
+  user: Session['user'] | null
+  isLoading: boolean
+  isAuthenticated: boolean
   hasRole: (role: UserRole) => boolean
-  hasAnyRole: (roles: UserRole[]) => boolean | undefined
-  hasAllRoles: (roles: UserRole[]) => boolean | undefined
-  isAdmin: () => boolean | undefined
-  isModerator: () => boolean | undefined
-  isEditor: () => boolean | undefined
+  hasAnyRole: (roles: UserRole[]) => boolean
+  requireRole: (role: UserRole) => boolean
+  requireAnyRole: (roles: UserRole[]) => boolean
 }
 
-// Auth gereklilikleri için hook dönüş tipleri
-export interface RequireAuthHookReturn {
-  isAuthenticated: boolean
-  isLoading: boolean
+// ---- API Response tipleri ----
+
+// Giriş işlemi sonucu
+export interface LoginResult extends ApiResponse {
+  user?: Session['user']
+  signInResponse?: SignInResponse
 }
 
-// Roller gereklilikleri için hook dönüş tipleri
-export interface RequireRoleHookReturn {
-  hasRequiredRole: boolean | undefined
-  isLoading: boolean
-}
-
-// Session user tipi (NextAuth ile uyumlu) - User'dan türet
-export type SessionUser = Pick<User, 'id' | 'roles'> & {
-  email?: string | null
-  name?: string | null
-  image?: string | null
-  username?: string | null
+// Çıkış işlemi sonucu
+export interface LogoutResult extends ApiResponse {
+  redirectUrl?: string
 }

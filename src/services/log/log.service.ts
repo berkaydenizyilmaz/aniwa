@@ -9,9 +9,7 @@ import type {
 } from '@/types/logging'
 import { logUserSelect } from '@/types/logging'
 
-/**
- * Yeni log kaydı oluşturur
- */
+// Yeni log kaydı oluşturur
 export async function createLog(params: CreateLogParams): Promise<ApiResponse<LogWithUser>> {
   try {
     const log = await prisma.log.create({
@@ -37,9 +35,7 @@ export async function createLog(params: CreateLogParams): Promise<ApiResponse<Lo
   }
 }
 
-/**
- * Logları filtreler ve listeler
- */
+// Logları filtreler ve listeler
 export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<LogListResponse>> {
   try {
     const {

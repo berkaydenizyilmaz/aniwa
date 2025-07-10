@@ -18,9 +18,7 @@ import type {
 // Resend client'ı oluştur
 const resend = new Resend(env.RESEND_API_KEY)
 
-/**
- * Genel email gönderim fonksiyonu
- */
+// Genel email gönderim fonksiyonu
 async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSendResult>> {
   try {
     const { to, subject, html, from = EMAIL_SENDER.FROM_ADDRESS } = params
@@ -72,9 +70,7 @@ async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSend
   }
 }
 
-/**
- * Email template için temel HTML yapısı oluşturur
- */
+// Email template için temel HTML yapısı oluşturur
 function createEmailTemplate(content: string): string {
   return `
     <!DOCTYPE html>
@@ -114,9 +110,7 @@ function createEmailTemplate(content: string): string {
   `
 }
 
-/**
- * Email doğrulama emaili gönderir
- */
+// Email doğrulama emaili gönderir
 export async function sendVerificationEmail(
   params: SendVerificationEmailParams
 ): Promise<ApiResponse<EmailSendResult>> {
@@ -154,9 +148,7 @@ export async function sendVerificationEmail(
   })
 }
 
-/**
- * Şifre sıfırlama emaili gönderir
- */
+// Şifre sıfırlama emaili gönderir
 export async function sendPasswordResetEmail(
   params: SendPasswordResetEmailParams
 ): Promise<ApiResponse<EmailSendResult>> {
@@ -194,13 +186,11 @@ export async function sendPasswordResetEmail(
   })
 }
 
-/**
- * Şifre değişikliği bildirim emaili gönderir
- */
+// Şifre değişikliği bildirim emaili gönderir
 export async function sendPasswordChangedNotification(
   params: SendPasswordChangedNotificationParams
 ): Promise<ApiResponse<EmailSendResult>> {
-  const { to, username } = params
+  const { to, username, changeTime } = params
 
   const content = `
     <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">${EMAIL_CONTENT.PASSWORD_CHANGED.SUBJECT}</h1>
@@ -216,7 +206,7 @@ export async function sendPasswordChangedNotification(
       
       <p><strong>Güvenlik Bilgileri:</strong></p>
       <ul>
-        <li>Değişiklik Zamanı: ${new Date().toLocaleString('tr-TR')}</li>
+        <li>Değişiklik Zamanı: ${changeTime}</li>
         <li>Hesap: ${to}</li>
       </ul>
       

@@ -6,9 +6,7 @@ import { LogLevel, SENSITIVE_FIELDS, LOG_EVENTS, PERFORMANCE_THRESHOLDS } from '
 import type { LogMetadata, PerformanceMetadata } from '@/types/logging'
 import { Prisma } from '@prisma/client'
 
-/**
- * Sensitive data'yı temizle
- */
+// Sensitive data'yı temizle
 const sanitizeMetadata = (metadata?: LogMetadata): LogMetadata | undefined => {
   if (!metadata) return undefined
   
@@ -22,9 +20,7 @@ const sanitizeMetadata = (metadata?: LogMetadata): LogMetadata | undefined => {
   return sanitized
 }
 
-/**
- * MongoDB'ye kaydetme için wrapper fonksiyonu
- */
+// MongoDB'ye kaydetme için wrapper fonksiyonu
 export const logToDatabase = async (
   level: LogLevel,
   event: string,
@@ -46,9 +42,7 @@ export const logToDatabase = async (
   }
 }
 
-/**
- * Console logging için formatlanmış çıktı
- */
+// Console logging için formatlanmış çıktı
 const formatConsoleLog = (level: LogLevel, event: string, message: string, metadata?: LogMetadata) => {
   const timestamp = new Date().toISOString()
   const emoji = {
@@ -65,9 +59,7 @@ const formatConsoleLog = (level: LogLevel, event: string, message: string, metad
   }
 }
 
-/**
- * Ana logging fonksiyonları
- */
+// Ana logging fonksiyonları
 export const logError = (
   event: string,
   message: string,
@@ -111,9 +103,7 @@ export const logDebug = (
   void logToDatabase(LogLevel.DEBUG, event, message, metadata, userId)
 }
 
-/**
- * HTTP Request logging için özel fonksiyon
- */
+// HTTP Request logging için özel fonksiyon
 export const logRequest = (
   method: string,
   url: string,
@@ -144,9 +134,7 @@ export const logRequest = (
   }
 }
 
-/**
- * Error handling için özel fonksiyon
- */
+// Error handling için özel fonksiyon
 export const logException = (error: Error, context?: string, userId?: string) => {
   const metadata = {
     name: error.name,
@@ -157,9 +145,7 @@ export const logException = (error: Error, context?: string, userId?: string) =>
   logError(LOG_EVENTS.EXCEPTION, error.message, metadata, userId)
 }
 
-/**
- * Performance logging için özel fonksiyon
- */
+// Performance logging için özel fonksiyon
 export const logPerformance = (
   operation: string,
   duration: number,
