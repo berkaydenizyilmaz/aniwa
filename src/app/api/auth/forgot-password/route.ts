@@ -19,7 +19,8 @@ async function forgotPasswordHandler(request: NextRequest): Promise<NextResponse
     if (!validation.success) {
       const errorPayload: ApiResponse = {
         success: false, 
-        error: { message: validation.error.errors[0]?.message || 'Geçersiz veri' }
+        error: 'Geçersiz veri',
+        details: validation.error.errors
       }
       return NextResponse.json(errorPayload, { status: 400 })
     }
@@ -43,7 +44,7 @@ async function forgotPasswordHandler(request: NextRequest): Promise<NextResponse
     // bu şekilde davranıyoruz. Asıl hata loglara yazılıyor.
     const successPayload: ApiResponse = {
       success: true,
-      data: { message: 'Şifre sıfırlama bağlantısı gönderildi' }
+      message: 'Şifre sıfırlama bağlantısı gönderildi'
     }
     return NextResponse.json(successPayload)
     
@@ -54,7 +55,7 @@ async function forgotPasswordHandler(request: NextRequest): Promise<NextResponse
 
     const errorPayload: ApiResponse = { 
       success: false, 
-      error: { message: 'Sunucu hatası' }
+      error: 'Sunucu hatası'
     }
     return NextResponse.json(errorPayload, { status: 500 })
   }

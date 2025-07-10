@@ -17,7 +17,7 @@ async function verifyEmailHandler(request: NextRequest): Promise<NextResponse<Ap
 
     if (!token) {
       return NextResponse.json(
-        { success: false, error: { message: 'Token parametresi gerekli' } },
+        { success: false, error: 'Token parametresi gerekli' },
         { status: 400 }
       )
     }
@@ -28,7 +28,8 @@ async function verifyEmailHandler(request: NextRequest): Promise<NextResponse<Ap
       return NextResponse.json(
         { 
           success: false, 
-          error: { message: validation.error.errors[0]?.message || 'Geçersiz token' }
+          error: 'Geçersiz token',
+          details: validation.error.errors
         },
         { status: 400 }
       )
@@ -65,7 +66,7 @@ async function verifyEmailHandler(request: NextRequest): Promise<NextResponse<Ap
     })
 
     return NextResponse.json(
-      { success: false, error: { message: 'Sunucu hatası' } },
+      { success: false, error: 'Sunucu hatası' },
       { status: 500 }
     )
   }

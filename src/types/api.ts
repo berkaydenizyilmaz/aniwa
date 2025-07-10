@@ -7,9 +7,26 @@ export interface ApiError {
   code?: string | number; // Opsiyonel hata kodu (örn: 'INVALID_INPUT')
 }
 
-// Proje genelindeki tüm API yanıtları için standartlaştırılmış genel (generic) tip.
-export interface ApiResponse<T = unknown> {
+// API Response tipi tanımlamaları
+export type ApiResponse<T = unknown> = {
   success: boolean;
   data?: T;
-  error?: ApiError;
-} 
+  error?: string;
+  details?: Record<string, unknown>;
+  message?: string;
+  warning?: string;
+};
+
+// Hata response tipi
+export type ApiErrorResponse = {
+  success: false;
+  error: string;
+  details?: Record<string, unknown>;
+};
+
+// Başarılı response tipi
+export type ApiSuccessResponse<T = unknown> = {
+  success: true;
+  data?: T;
+  message?: string;
+}; 

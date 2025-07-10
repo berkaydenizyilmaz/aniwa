@@ -20,7 +20,8 @@ async function signupHandler(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false, 
-          error: validationResult.error.errors[0].message 
+          error: 'Geçersiz veri',
+          details: validationResult.error.errors
         },
         { status: 400 }
       )

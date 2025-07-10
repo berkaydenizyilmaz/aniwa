@@ -6,17 +6,19 @@ import { verifyPasswordResetToken, resetPasswordWithToken } from '@/services/aut
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { resetPasswordApiSchema } from '@/lib/schemas/auth.schemas'
+import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
+import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
 import { ApiResponse } from '@/types/api'
 
 // Token doğrulama endpoint'i (GET)
-export async function GET(request: NextRequest): Promise<NextResponse<ApiResponse<{ message: string, email?: string }>>> {
+async function getHandler(request: NextRequest): Promise<NextResponse<ApiResponse<{ message: string, email?: string }>>> {
   try {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get('token')
 
     if (!token) {
       return NextResponse.json({ 
-        success: false, error: { message: 'Token parametresi gerekli' } 
+        success: false, error: 'Token parametresi gerekli' 
       }, { status: 400 })
     }
 
@@ -44,14 +46,18 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     })
 
     return NextResponse.json(
-      { success: false, error: { message: 'Sunucu hatası' } },
+      { success: false, error: 'Sunucu hatası' },
       { status: 500 }
     )
   }
 }
 
+// Rate limiting ile sarılmış exports
+export const GET = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.PASSWORD_RESET, getHandler)
+export const POST = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.PASSWORD_RESET, postHandler)
+
 // Şifre sıfırlama endpoint'i (POST)
-export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<{ message: string }>>> {
+async function postHandler(request: NextRequest): Promise<NextResponse<ApiResponse<{ message: string }>>> {
   try {
     const body = await request.json()
     
@@ -61,7 +67,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       return NextResponse.json(
         { 
           success: false, 
-          error: { message: validation.error.errors[0]?.message || 'Geçersiz veri' }
+          error: 'Geçersiz veri',
+          details: validation.error.errors
         },
         { status: 400 }
       )
@@ -77,7 +84,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
 
       return NextResponse.json({
         success: true,
-        data: { message: 'Şifreniz başarıyla güncellendi' }
+        message: 'Şifreniz başarıyla güncellendi'
       })
     } else {
       return NextResponse.json(
@@ -91,7 +98,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     })
 
     return NextResponse.json(
-      { success: false, error: { message: 'Sunucu hatası' } },
+      { success: false, error: 'Sunucu hatası' },
       { status: 500 }
     )
   }

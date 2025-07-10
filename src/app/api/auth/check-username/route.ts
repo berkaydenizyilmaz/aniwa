@@ -14,7 +14,7 @@ async function checkUsernameHandler(request: NextRequest): Promise<NextResponse<
 
     if (!username) {
       return NextResponse.json(
-        { success: false, error: { message: 'Username parametresi gerekli' } },
+        { success: false, error: 'Username parametresi gerekli' },
         { status: 400 }
       )
     }
@@ -25,7 +25,8 @@ async function checkUsernameHandler(request: NextRequest): Promise<NextResponse<
       return NextResponse.json(
         { 
           success: false, 
-          error: { message: validation.error.errors[0]?.message || 'Geçersiz username' }
+          error: 'Geçersiz username',
+          details: validation.error.errors
         },
         { status: 400 }
       )
@@ -60,7 +61,7 @@ async function checkUsernameHandler(request: NextRequest): Promise<NextResponse<
     })
 
     return NextResponse.json(
-      { success: false, error: { message: 'Sunucu hatası' } },
+      { success: false, error: 'Sunucu hatası' },
       { status: 500 }
     )
   }
