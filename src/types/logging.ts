@@ -2,45 +2,16 @@
 // Bu dosya, loglama sistemiyle ilgili tüm TypeScript tiplerini içerir.
 
 import { Prisma, LogLevel, UserRole } from '@prisma/client'
-import type { LOG_EVENTS, SENSITIVE_FIELDS, PERFORMANCE_THRESHOLDS } from '@/constants/logging'
-
-// Log seviyesi tipi (Prisma'dan gelir)
-export type LogLevelType = LogLevel
-
-// Hassas alanların tipi
-export type SensitiveField = typeof SENSITIVE_FIELDS[number]
-
-// Log olay türlerinin tipi
-export type LogEventType = typeof LOG_EVENTS[keyof typeof LOG_EVENTS]
-
-// Performans eşiklerinin tipi
-export type PerformanceThreshold = typeof PERFORMANCE_THRESHOLDS[keyof typeof PERFORMANCE_THRESHOLDS]
 
 // Log metadata tipi
 export interface LogMetadata {
   [key: string]: string | number | boolean | null | undefined | LogMetadata | LogMetadata[]
 }
 
-// Request metadata tipi
-export interface RequestMetadata extends LogMetadata {
-  method: string
-  url: string
-  statusCode: number
-  duration: number
-  ip?: string
-  userAgent?: string
-}
-
 // Performance metadata tipi
 export interface PerformanceMetadata extends LogMetadata {
   operation: string
   duration: number
-}
-
-// Auth metadata tipi
-export interface AuthMetadata extends LogMetadata {
-  action: string
-  success: boolean
 }
 
 // Create log params tipi
@@ -91,24 +62,4 @@ export type PaginationInfo = {
   limit: number
   offset: number
   hasMore: boolean
-}
-
-// Date range tipi
-export type DateRange = {
-  startDate?: Date
-  endDate?: Date
-}
-
-// Admin log view tipi
-export type AdminLogView = Pick<LogWithUser, 'id' | 'level' | 'event' | 'message' | 'timestamp'> & {
-  user?: {
-    username: string | null
-    roles: UserRole[]
-  } | null
-}
-
-// Log export tipi
-export type LogExport = Omit<LogWithUser, 'user'> & {
-  username?: string | null
-  userRoles?: UserRole[] | null
 } 

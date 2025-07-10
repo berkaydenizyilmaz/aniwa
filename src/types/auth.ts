@@ -32,12 +32,6 @@ export type UserWithSettings = Prisma.UserGetPayload<{
   }
 }>
 
-// Login response tipi - User'dan sadece gerekli alanları al
-export type LoginResponse = Pick<User, 'id' | 'email' | 'username' | 'roles'>
-
-// Kullanıcı profil sayfası için gerekli alanlar
-export type UserProfile = Omit<UserWithSettings, 'passwordHash' | 'emailVerified'>
-
 // OAuth geçici kullanıcı tipleri
 export interface CreateOAuthPendingUserParams {
   email: string
@@ -47,6 +41,7 @@ export interface CreateOAuthPendingUserParams {
   image?: string
 }
 
+// OAuth token doğrulama parametreleri
 export interface OAuthTokenVerificationParams {
   token: string
   username: string
@@ -68,6 +63,7 @@ export interface AuthHookReturn {
   setupUsername: (username: string) => Promise<ApiResponse<void>>
 }
 
+// Roller ile ilgili hook dönüş tipleri
 export interface RoleHookReturn {
   roles: UserRole[] | undefined
   hasRole: (role: UserRole) => boolean
@@ -78,11 +74,13 @@ export interface RoleHookReturn {
   isEditor: () => boolean | undefined
 }
 
+// Auth gereklilikleri için hook dönüş tipleri
 export interface RequireAuthHookReturn {
   isAuthenticated: boolean
   isLoading: boolean
 }
 
+// Roller gereklilikleri için hook dönüş tipleri
 export interface RequireRoleHookReturn {
   hasRequiredRole: boolean | undefined
   isLoading: boolean

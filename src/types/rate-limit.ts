@@ -3,23 +3,19 @@
 
 import { RATE_LIMIT_ALGORITHM } from '@/constants/rate-limits'
 
-// Rate limit algoritma tipi
-export type RateLimitAlgorithm = typeof RATE_LIMIT_ALGORITHM
-
 // Rate limit konfigürasyon tipi
 export interface RateLimitConfig {
   requests: number
   window: `${number} ${'ms' | 's' | 'm' | 'h' | 'd'}`
-  algorithm: RateLimitAlgorithm
+  algorithm: typeof RATE_LIMIT_ALGORITHM
 }
 
-// Rate limit sonuç tipi
-export interface RateLimitResult {
-  success: boolean
-  limit: number
-  remaining: number
-  reset: number
-  pending?: Promise<unknown>
+// Rate limit key oluşturma için tip
+export interface RateLimitKeyOptions {
+  ip?: string
+  userId?: string
+  endpoint?: string
+  customKey?: string
 }
 
 // Rate limit hata tipi
@@ -31,26 +27,15 @@ export interface RateLimitError {
   reset: number
 }
 
-// Rate limit key oluşturma için tip
-export interface RateLimitKeyOptions {
-  ip?: string
-  userId?: string
-  endpoint?: string
-  customKey?: string
-}
-
-// Rate limit middleware seçenekleri
-export interface RateLimitMiddlewareOptions {
-  config: RateLimitConfig
-  keyGenerator?: (options: RateLimitKeyOptions) => string
-  skipIf?: (options: RateLimitKeyOptions) => boolean
-  onLimitReached?: (error: RateLimitError) => void
-  message?: string
-}
-
 // Rate limit durumu
 export interface RateLimitStatus {
   isRateLimited: boolean
-  result: RateLimitResult
+  result: {
+    success: boolean
+    limit: number
+    remaining: number
+    reset: number
+    pending?: Promise<unknown>
+  }
   error?: RateLimitError
 } 

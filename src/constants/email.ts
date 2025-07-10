@@ -17,13 +17,6 @@ export const EMAIL_SUBJECTS = {
   PASSWORD_CHANGED: 'Aniwa - Şifreniz Değiştirildi',
 } as const
 
-// Email Template Türleri
-export const EMAIL_TYPES = {
-  EMAIL_VERIFICATION: 'email_verification',
-  PASSWORD_RESET: 'password_reset',
-  PASSWORD_CHANGED: 'password_changed',
-} as const
-
 // Email Template Ortak Stilleri
 export const EMAIL_STYLES = {
   CONTAINER: 'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff;',
@@ -67,8 +60,4 @@ export const EMAIL_CONTENT = {
     UNSUBSCRIBE: 'Bu emaili almak istemiyorsan, hesap ayarlarından bildirim tercihlerini değiştirebilirsin.',
     COPYRIGHT: `© ${new Date().getFullYear()} Aniwa. Tüm hakları saklıdır.`,
   },
-} as const
-
-// Tip tanımlamaları
-export type EmailType = typeof EMAIL_TYPES[keyof typeof EMAIL_TYPES]
-export type EmailSubject = typeof EMAIL_SUBJECTS[keyof typeof EMAIL_SUBJECTS] 
+} as const 

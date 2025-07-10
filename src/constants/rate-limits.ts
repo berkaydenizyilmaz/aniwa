@@ -80,10 +80,4 @@ export const RATE_LIMITS = {
 export const RATE_LIMIT_MULTIPLIERS = {
   development: 10,  // Geliştirmede 10x daha gevşek
   production: 1,    // Production'da tam limit
-} as const
-
-// Rate limit bypass için özel IP'ler (ileride kullanılacak)
-export const RATE_LIMIT_BYPASS_IPS = [
-  '127.0.0.1',
-  '::1',
-] as const 
+} as const 
