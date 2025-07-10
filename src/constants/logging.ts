@@ -51,6 +51,13 @@ export const LOG_EVENTS = {
   AUTH_PASSWORD_RESET_REQUESTED: 'auth_password_reset_requested',
   AUTH_PASSWORD_RESET_SUCCESS: 'auth_password_reset_success',
   AUTH_PASSWORD_RESET_FAILED: 'auth_password_reset_failed',
+  
+  // Additional auth events
+  AUTH_EMAIL_VERIFIED: 'auth_email_verified',
+  AUTH_PASSWORD_CHANGED: 'auth_password_changed',
+  
+  // Database events
+  DATABASE_ERROR: 'database_error',
 } as const
 
 // Performance eşikleri (ms)

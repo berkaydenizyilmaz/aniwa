@@ -1,0 +1,29 @@
+// Aniwa Projesi - Log Zod Schemas
+// Bu dosya log işlemleri validasyon şemalarını içerir
+
+import { z } from 'zod'
+
+// Log oluşturma şeması
+export const createLogSchema = z.object({
+  level: z.enum(['DEBUG', 'INFO', 'WARN', 'ERROR']),
+  event: z.string().min(1, 'Event gerekli'),
+  message: z.string().min(1, 'Mesaj gerekli'),
+  metadata: z.record(z.unknown()).optional(),
+  userId: z.string().optional()
+})
+
+// Log filtreleme şeması
+export const logFiltersSchema = z.object({
+  level: z.enum(['DEBUG', 'INFO', 'WARN', 'ERROR']).optional(),
+  event: z.string().optional(),
+  userId: z.string().optional(),
+  userRoles: z.array(z.string()).optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+  limit: z.number().positive().max(100).default(50),
+  offset: z.number().min(0).default(0)
+})
+
+// Tip çıkarımları
+export type CreateLogData = z.infer<typeof createLogSchema>
+export type LogFiltersData = z.infer<typeof logFiltersSchema> 

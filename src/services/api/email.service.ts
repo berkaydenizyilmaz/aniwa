@@ -6,6 +6,11 @@ import { env } from '@/lib/env'
 import { logInfo, logError } from '@/lib/logger'
 import { LOG_EVENTS } from '@/constants/logging'
 import { EMAIL_SENDER, EMAIL_SUBJECTS, EMAIL_CONTENT, EMAIL_STYLES } from '@/constants/email'
+import { 
+  sendEmailSchema,
+  sendVerificationEmailSchema
+} from '@/lib/schemas/email.schemas'
+import { z } from 'zod'
 import type { ApiResponse } from '@/types/api'
 import type { 
   EmailSendResult,
@@ -21,7 +26,9 @@ const resend = new Resend(env.RESEND_API_KEY)
 // Genel email gönderim fonksiyonu
 async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSendResult>> {
   try {
-    const { to, subject, html, from = EMAIL_SENDER.FROM_ADDRESS } = params
+    // 1. Girdi validasyonu
+    const validatedParams = sendEmailSchema.parse(params)
+    const { to, subject, html, from = EMAIL_SENDER.FROM_ADDRESS } = validatedParams
 
     const result = await resend.emails.send({
       from,
@@ -114,7 +121,10 @@ function createEmailTemplate(content: string): string {
 export async function sendVerificationEmail(
   params: SendVerificationEmailParams
 ): Promise<ApiResponse<EmailSendResult>> {
-  const { to, username, verificationUrl } = params
+  try {
+    // 1. Girdi validasyonu
+    const validatedParams = sendVerificationEmailSchema.parse(params)
+    const { to, username, verificationUrl } = validatedParams
 
   const content = `
     <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">${EMAIL_CONTENT.VERIFICATION.SUBJECT}</h1>
@@ -139,13 +149,25 @@ export async function sendVerificationEmail(
     </div>
   `
 
-  const html = createEmailTemplate(content)
+    const html = createEmailTemplate(content)
 
-  return sendEmail({
-    to,
-    subject: EMAIL_SUBJECTS.EMAIL_VERIFICATION,
-    html,
-  })
+    return sendEmail({
+      to,
+      subject: EMAIL_SUBJECTS.EMAIL_VERIFICATION,
+      html,
+    })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.errors[0].message }
+    }
+    
+    logError(LOG_EVENTS.API_CALL, 'Email doğrulama gönderim hatası', {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      to: params.to
+    })
+    
+    return { success: false, error: 'Email gönderilemedi' }
+  }
 }
 
 // Şifre sıfırlama emaili gönderir

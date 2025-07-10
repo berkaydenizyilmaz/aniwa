@@ -75,7 +75,10 @@ export const resetPasswordApiSchema = z.object({
   password: passwordSchema,
 })
 
-
+// Email tekrar gönderme şeması
+export const resendEmailSchema = z.object({
+  email: emailSchema
+})
 
 // Tip çıkarımları (TypeScript için)
 export type SignupData = z.infer<typeof signupSchema>
@@ -84,4 +87,5 @@ export type CheckUsernameData = z.infer<typeof checkUsernameSchema>
 export type VerifyEmailData = z.infer<typeof verifyEmailSchema>
 export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>
-export type ResetPasswordApiData = z.infer<typeof resetPasswordApiSchema> 
+export type ResetPasswordApiData = z.infer<typeof resetPasswordApiSchema>
+export type ResendEmailData = z.infer<typeof resendEmailSchema> 
