@@ -1,46 +1,39 @@
-import { UserRole } from "@prisma/client";
+// Aniwa Projesi - Auth Sabitleri
+// Bu dosya kimlik doğrulama sistemi ile ilgili tüm sabitleri içerir
 
-// Aniwa Projesi - Auth Constants
-// Bu dosya kimlik doğrulama ile ilgili tüm sabitleri içerir
+// Session yönetimi
+export const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye)
+export const JWT_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye)
 
-// Uzunluk limitleri
-export const PASSWORD_MIN_LENGTH = 8
-export const PASSWORD_MAX_LENGTH = 128
-export const USERNAME_MIN_LENGTH = 3
-export const USERNAME_MAX_LENGTH = 20
-
-// Validasyon kuralları (auth spesifik)
-export const USERNAME_REGEX = /^[a-z0-9]{3,20}$/
-
-export const EMAIL_MIN_LENGTH = 3
-export const TOKEN_MIN_LENGTH = 32
-
-// Şifreleme ayarları
+// Şifre güvenliği
 export const BCRYPT_SALT_ROUNDS = 12
+export const MIN_PASSWORD_LENGTH = 8
+export const MAX_PASSWORD_LENGTH = 128
 
-// Session ve JWT ayarları
-export const SESSION_MAX_AGE = 30 * (24 * 60 * 60) // 30 gün (saniye cinsinden)
-export const JWT_MAX_AGE = 30 * (24 * 60 * 60) // 30 gün (saniye cinsinden)
+// Username kuralları
+export const MIN_USERNAME_LENGTH = 3
+export const MAX_USERNAME_LENGTH = 20
+export const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/
+
+// Email kuralları
+export const MAX_EMAIL_LENGTH = 254
 
 // Token süreleri
-export const EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS = 24 // Email doğrulama token süresi (24 saat)
 export const PASSWORD_RESET_TOKEN_EXPIRY_HOURS = 1 // Şifre sıfırlama token süresi (1 saat)
 
-// Verification Token Türleri
-export const VERIFICATION_TOKEN_TYPES = {
-  EMAIL_VERIFICATION: 'email_verification',
-  PASSWORD_RESET: 'password_reset',
-} as const
-
-// OAuth Provider'lar
+// OAuth sağlayıcıları
 export const OAUTH_PROVIDERS = {
   GOOGLE: 'google',
 } as const
 
-// Kullanıcı rolleri (Prisma'dan gelen enum'u yeniden dışa aktar)
+// Verification token türleri
+export const VERIFICATION_TOKEN_TYPES = {
+  PASSWORD_RESET: 'password_reset',
+} as const
+
+// Kullanıcı rolleri
 export const USER_ROLES = {
-  USER: UserRole.USER,
-  MODERATOR: UserRole.MODERATOR,
-  EDITOR: UserRole.EDITOR,
-  ADMIN: UserRole.ADMIN
+  USER: 'USER',
+  MODERATOR: 'MODERATOR', 
+  ADMIN: 'ADMIN',
 } as const

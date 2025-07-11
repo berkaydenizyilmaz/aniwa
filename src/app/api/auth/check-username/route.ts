@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
-import { logInfo, logWarn } from '@/lib/logger'
+import { logInfo, logWarn } from '@/services/business/logger.service'
 import { LOG_EVENTS } from '@/constants/logging'
 import { checkUsernameSchema } from '@/lib/schemas/auth.schemas'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'

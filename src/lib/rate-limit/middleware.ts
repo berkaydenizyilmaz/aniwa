@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getClientIP } from './index'
-import { AUTH_RATE_LIMIT_TYPES, RATE_LIMITS } from '@/constants/rate-limits'
+import { AUTH_RATE_LIMIT_TYPES, AUTH_RATE_LIMIT_CONFIG, GLOBAL_RATE_LIMIT_CONFIG } from '@/constants/rate-limits'
 import type { RateLimitConfig, RateLimitKeyOptions } from '@/types/rate-limit'
 import { getToken } from 'next-auth/jwt'
 
@@ -23,7 +23,7 @@ export async function withGlobalRateLimit(
     endpoint: 'global-api',
   }
   
-  const status = await checkRateLimit(RATE_LIMITS.GLOBAL, keyOptions)
+  const status = await checkRateLimit(GLOBAL_RATE_LIMIT_CONFIG.API_GENERAL, keyOptions)
   
   if (status.isRateLimited && status.error) {
     return NextResponse.json(
@@ -54,12 +54,12 @@ export async function withGlobalRateLimit(
 
 // Auth endpoint'leri için otomatik rate limiting wrapper
 export function withAuthRateLimit(
-  authType: keyof typeof RATE_LIMITS.AUTH,
+  authType: keyof typeof AUTH_RATE_LIMIT_CONFIG,
   handler: (request: NextRequest) => Promise<NextResponse>
 ) {
   return async (request: NextRequest): Promise<NextResponse> => {
     const ip = getClientIP(request)
-    const config = RATE_LIMITS.AUTH[authType]
+    const config = AUTH_RATE_LIMIT_CONFIG[authType]
     
     // Kullanıcı token'ını al (varsa)
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
@@ -85,9 +85,6 @@ export function withAuthRateLimit(
           break
         case AUTH_RATE_LIMIT_TYPES.PASSWORD_RESET:
           message = 'Şifre sıfırlama talebinizi çok sık gönderiyorsunuz. Lütfen biraz bekleyip tekrar deneyin.'
-          break
-        case AUTH_RATE_LIMIT_TYPES.EMAIL_VERIFICATION:
-          message = 'Email doğrulama talebinizi çok sık gönderiyorsunuz. Lütfen biraz bekleyip tekrar deneyin.'
           break
       }
       
@@ -120,7 +117,7 @@ export function withAuthRateLimit(
   }
 }
 
-// Kullanıcı seviyesine göre rate limiting wrapper
+// Kullanıcı seviyesine göre rate limiting wrapper - Basitleştirilmiş
 export function withUserTierRateLimit(
   handler: (request: NextRequest) => Promise<NextResponse>,
   options?: {
@@ -132,22 +129,11 @@ export function withUserTierRateLimit(
     const ip = getClientIP(request)
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
     
-    // Kullanıcı seviyesini belirle
-    let config: RateLimitConfig
-    let tierName: string
-    
-    if (!token) {
-      // Giriş yapmamış kullanıcı (Guest)
-      config = RATE_LIMITS.USER_TIER.GUEST
-      tierName = 'guest'
-    } else if (token.emailVerified) {
-      // Email doğrulanmış kullanıcı (Verified)
-      config = RATE_LIMITS.USER_TIER.VERIFIED
-      tierName = 'verified'
-    } else {
-      // Kayıtlı ama email doğrulanmamış (Registered)
-      config = RATE_LIMITS.USER_TIER.REGISTERED
-      tierName = 'registered'
+    // Basit rate limiting - herkese aynı limit
+    const config: RateLimitConfig = {
+      requests: 100,
+      window: '15m',
+      message: 'Çok fazla istek gönderdiniz. Lütfen biraz bekleyip tekrar deneyin.'
     }
     
     const keyOptions: RateLimitKeyOptions = {
@@ -159,14 +145,12 @@ export function withUserTierRateLimit(
     const status = await checkRateLimit(config, keyOptions)
     
     if (status.isRateLimited && status.error) {
-      const message = options?.message || 
-        `${tierName === 'guest' ? 'Giriş yapmamış kullanıcılar için' : 'Kullanıcı seviyeniz için'} çok fazla istek gönderdiniz. Lütfen biraz bekleyip tekrar deneyin.`
+      const message = options?.message || config.message
       
       return NextResponse.json(
         { 
           error: message,
           retryAfter: status.error.retryAfter,
-          userTier: tierName,
         },
         { 
           status: 429,
@@ -175,7 +159,6 @@ export function withUserTierRateLimit(
             'X-RateLimit-Remaining': status.result.remaining.toString(),
             'X-RateLimit-Reset': status.result.reset.toString(),
             'Retry-After': status.error.retryAfter?.toString() || '60',
-            'X-User-Tier': tierName,
           },
         }
       )
@@ -188,7 +171,6 @@ export function withUserTierRateLimit(
     response.headers.set('X-RateLimit-Limit', status.result.limit.toString())
     response.headers.set('X-RateLimit-Remaining', status.result.remaining.toString())
     response.headers.set('X-RateLimit-Reset', status.result.reset.toString())
-    response.headers.set('X-User-Tier', tierName)
     
     return response
   }

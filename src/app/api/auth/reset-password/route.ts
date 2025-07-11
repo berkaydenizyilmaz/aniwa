@@ -2,13 +2,19 @@
 // Bu dosya şifre sıfırlama token'ını kullanarak şifre değiştirir
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyPasswordResetToken, resetPasswordWithToken } from '@/services/auth/email-verification.service'
-import { logInfo, logError } from '@/lib/logger'
+import { verifyPasswordResetToken, resetPasswordWithToken } from '@/services/business/auth.service'
+import { logInfo, logError } from '@/services/business/logger.service'
 import { LOG_EVENTS } from '@/constants/logging'
-import { resetPasswordApiSchema } from '@/lib/schemas/auth.schemas'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
 import { ApiResponse } from '@/types/api'
+import { z } from 'zod'
+
+// Reset password schema
+const resetPasswordSchema = z.object({
+  token: z.string().min(1, 'Token gerekli'),
+  password: z.string().min(6, 'Şifre en az 6 karakter olmalı')
+})
 
 // Token doğrulama endpoint'i (GET)
 async function getHandler(request: NextRequest): Promise<NextResponse<ApiResponse<{ message: string, email?: string }>>> {
@@ -62,13 +68,12 @@ async function postHandler(request: NextRequest): Promise<NextResponse<ApiRespon
     const body = await request.json()
     
     // Input validation
-    const validation = resetPasswordApiSchema.safeParse(body)
+    const validation = resetPasswordSchema.safeParse(body)
     if (!validation.success) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'Geçersiz veri',
-          details: validation.error.errors
+          error: 'Geçersiz veri'
         },
         { status: 400 }
       )
@@ -84,7 +89,7 @@ async function postHandler(request: NextRequest): Promise<NextResponse<ApiRespon
 
       return NextResponse.json({
         success: true,
-        message: 'Şifreniz başarıyla güncellendi'
+        data: { message: 'Şifreniz başarıyla güncellendi' }
       })
     } else {
       return NextResponse.json(

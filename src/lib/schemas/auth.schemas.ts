@@ -1,102 +1,91 @@
-// Aniwa Projesi - Auth Zod Schemas
-// Bu dosya kimlik doğrulama ile ilgili tüm validasyon şemalarını içerir
+// Aniwa Projesi - Auth Validation Schemas
+// Bu dosya kimlik doğrulama ile ilgili tüm Zod şemalarını içerir
 
 import { z } from 'zod'
-import { UserRole } from '@prisma/client'
-import {
+import { 
+  MIN_PASSWORD_LENGTH, 
+  MAX_PASSWORD_LENGTH, 
+  MIN_USERNAME_LENGTH, 
+  MAX_USERNAME_LENGTH,
   USERNAME_REGEX,
-  PASSWORD_MIN_LENGTH,
-  PASSWORD_MAX_LENGTH,
-  USERNAME_MIN_LENGTH,
-  USERNAME_MAX_LENGTH,
-  TOKEN_MIN_LENGTH,
-  EMAIL_MIN_LENGTH,
-} from '../../constants/auth'
+  MAX_EMAIL_LENGTH
+} from '@/constants/auth'
 
-// Prisma enum'larını Zod enum'larına çevir
-const userRoleEnum = z.enum([UserRole.USER, UserRole.MODERATOR, UserRole.EDITOR, UserRole.ADMIN])
-
-// User ID şeması (MongoDB ObjectId)
-export const userIdSchema = z
-  .string()
-  .min(24, 'Geçersiz kullanıcı ID')
-  .max(24, 'Geçersiz kullanıcı ID')
-  .regex(/^[a-f\d]{24}$/i, 'Geçersiz kullanıcı ID formatı')
-
-// Email şeması
+// Temel field şemaları
 export const emailSchema = z
   .string()
-  .min(EMAIL_MIN_LENGTH, 'Email adresi gerekli')
   .email('Geçerli bir email adresi giriniz')
+  .max(MAX_EMAIL_LENGTH, `Email adresi en fazla ${MAX_EMAIL_LENGTH} karakter olabilir`)
   .toLowerCase()
+  .transform((email) => email.trim())
 
-// Username şeması
-export const usernameSchema = z
-  .string()
-  .min(USERNAME_MIN_LENGTH, `Kullanıcı adı en az ${USERNAME_MIN_LENGTH} karakter olmalıdır`)
-  .max(USERNAME_MAX_LENGTH, `Kullanıcı adı en fazla ${USERNAME_MAX_LENGTH} karakter olmalıdır`)
-  .regex(USERNAME_REGEX, 'Kullanıcı adı sadece küçük harf ve rakam içerebilir')
-
-// Password şeması
 export const passwordSchema = z
   .string()
-  .min(PASSWORD_MIN_LENGTH, `Şifre en az ${PASSWORD_MIN_LENGTH} karakter olmalıdır`)
-  .max(PASSWORD_MAX_LENGTH, `Şifre en fazla ${PASSWORD_MAX_LENGTH} karakter olmalıdır`)
+  .min(MIN_PASSWORD_LENGTH, `Şifre en az ${MIN_PASSWORD_LENGTH} karakter olmalı`)
+  .max(MAX_PASSWORD_LENGTH, `Şifre en fazla ${MAX_PASSWORD_LENGTH} karakter olabilir`)
 
-// Signup şeması
+export const usernameSchema = z
+  .string()
+  .min(MIN_USERNAME_LENGTH, `Kullanıcı adı en az ${MIN_USERNAME_LENGTH} karakter olmalı`)
+  .max(MAX_USERNAME_LENGTH, `Kullanıcı adı en fazla ${MAX_USERNAME_LENGTH} karakter olabilir`)
+  .regex(USERNAME_REGEX, 'Kullanıcı adı sadece harf, rakam, alt çizgi ve tire içerebilir')
+  .toLowerCase()
+  .transform((username) => username.trim())
+
+export const userIdSchema = z.string().min(1, 'Kullanıcı ID gerekli')
+
+// Ana auth şemaları
 export const signupSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   username: usernameSchema,
 })
 
-// Login şeması
 export const loginSchema = z.object({
-  username: usernameSchema,
-  password: z.string().min(PASSWORD_MIN_LENGTH, 'Şifre gerekli'),
+  email: emailSchema,
+  password: passwordSchema,
 })
 
-// Username kontrol şeması
+export const forgotPasswordSchema = z.object({
+  email: emailSchema,
+})
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, 'Token gerekli'),
+  password: passwordSchema,
+})
+
 export const checkUsernameSchema = z.object({
   username: usernameSchema,
 })
 
-// Email doğrulama şeması
-export const verifyEmailSchema = z.object({
-  token: z.string().min(TOKEN_MIN_LENGTH, 'Doğrulama kodu gerekli'),
+// User update şeması
+export const userUpdateSchema = z.object({
+  email: emailSchema.optional(),
+  username: usernameSchema.optional(),
+  bio: z.string().max(500, 'Bio en fazla 500 karakter olabilir').optional(),
+  profilePicture: z.string().url('Geçerli bir URL giriniz').optional(),
+  profileBanner: z.string().url('Geçerli bir URL giriniz').optional(),
+  image: z.string().url('Geçerli bir URL giriniz').optional(),
 })
 
-// Şifre sıfırlama talebi şeması
-export const forgotPasswordSchema = z.object({
-  email: emailSchema
+// Verification token şemaları
+export const createVerificationTokenSchema = z.object({
+  email: emailSchema,
+  type: z.enum(['PASSWORD_RESET'] as const),
+  expiryHours: z.number().positive('Geçerli süre belirtilmeli')
 })
 
-// Şifre sıfırlama şeması (frontend form için - password + confirm)
-export const resetPasswordSchema = z.object({
-  password: passwordSchema,
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Şifreler eşleşmiyor",
-  path: ["confirmPassword"],
+export const verifyTokenSchema = z.object({
+  token: z.string().min(1, 'Token gerekli'),
+  type: z.enum(['PASSWORD_RESET'] as const)
 })
 
-// Şifre sıfırlama API şeması (backend için - token + password)
-export const resetPasswordApiSchema = z.object({
-  token: z.string().min(TOKEN_MIN_LENGTH, 'Token gerekli'),
-  password: passwordSchema,
-})
-
-// Email tekrar gönderme şeması
-export const resendEmailSchema = z.object({
-  email: emailSchema
-})
-
-// Tip çıkarımları (TypeScript için)
-export type SignupData = z.infer<typeof signupSchema>
-export type LoginData = z.infer<typeof loginSchema>
-export type CheckUsernameData = z.infer<typeof checkUsernameSchema>
-export type VerifyEmailData = z.infer<typeof verifyEmailSchema>
-export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>
-export type ResetPasswordData = z.infer<typeof resetPasswordSchema>
-export type ResetPasswordApiData = z.infer<typeof resetPasswordApiSchema>
-export type ResendEmailData = z.infer<typeof resendEmailSchema> 
+// NextAuth session şeması
+export const sessionUserSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+  username: z.string(),
+  image: z.string().url().optional(),
+  roles: z.array(z.enum(['USER', 'MODERATOR', 'ADMIN'])),
+}) 

@@ -1,13 +1,11 @@
 // Aniwa Projesi - Rate Limiting Types
 // Bu dosya rate limiting için TypeScript tip tanımlamalarını içerir
 
-import { RATE_LIMIT_ALGORITHM } from '@/constants/rate-limits'
-
 // Rate limit konfigürasyon tipi
 export interface RateLimitConfig {
   requests: number
-  window: `${number} ${'ms' | 's' | 'm' | 'h' | 'd'}`
-  algorithm: typeof RATE_LIMIT_ALGORITHM
+  window: string
+  message: string
 }
 
 // Rate limit key oluşturma için tip

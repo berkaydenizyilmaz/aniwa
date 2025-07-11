@@ -4,7 +4,7 @@
 import { Ratelimit } from '@upstash/ratelimit'
 import { kv } from '@vercel/kv'
 import { env, hasRateLimit } from '@/lib/env'
-import { logWarn, logError } from '@/lib/logger'
+import { logWarn, logError } from '@/services/business/logger.service'
 import { LOG_EVENTS } from '@/constants/logging'
 import { RATE_LIMIT_MULTIPLIERS } from '@/constants/rate-limits'
 import type { 

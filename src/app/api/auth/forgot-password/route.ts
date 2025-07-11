@@ -2,8 +2,8 @@
 // Bu dosya şifre sıfırlama token'ı oluşturur ve email gönderir
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createPasswordResetToken } from '@/services/auth/email-verification.service'
-import { logInfo, logError } from '@/lib/logger'
+import { createPasswordResetToken } from '@/services/business/auth.service'
+import { logInfo, logError } from '@/services/business/logger.service'
 import { LOG_EVENTS } from '@/constants/logging'
 import { forgotPasswordSchema } from '@/lib/schemas/auth.schemas'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'

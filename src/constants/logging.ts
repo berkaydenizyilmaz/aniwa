@@ -21,50 +21,65 @@ export const SENSITIVE_FIELDS = [
   'req.headers.cookie',
 ] as const
 
-// Log event türleri
+// Log event türleri - Sadece business-critical olaylar
 export const LOG_EVENTS = {
-  HTTP_REQUEST: 'http_request',
-  EXCEPTION: 'exception',
-  PERFORMANCE: 'performance',
+  // System events
+  SYSTEM_ERROR: 'system_error',
+  SYSTEM_WARNING: 'system_warning',
+  
+  // User lifecycle events (Admin panelinde görünecek)
+  USER_REGISTERED: 'user_registered',
+  USER_LOGIN: 'user_login',
+  USER_LOGOUT: 'user_logout',
+  USER_PASSWORD_CHANGED: 'user_password_changed',
+  USER_ACCOUNT_LOCKED: 'user_account_locked',
+  USER_ACCOUNT_DELETED: 'user_account_deleted',
+  
+  // Authentication failures (Security)
+  LOGIN_FAILED: 'login_failed',
+  REGISTRATION_FAILED: 'registration_failed',
+  PASSWORD_RESET_FAILED: 'password_reset_failed',
+  
+  // Rate limiting (Security)
+  RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
+  SUSPICIOUS_ACTIVITY: 'suspicious_activity',
+  
+  // Email operations (Business critical)
+  EMAIL_SENT: 'email_sent',
+  EMAIL_FAILED: 'email_failed',
+  
+  // Verification token operations (Business critical)
+  VERIFICATION_TOKEN_CREATED: 'verification_token_created',
+  VERIFICATION_TOKEN_VERIFIED: 'verification_token_verified',
+  VERIFICATION_TOKEN_FAILED: 'verification_token_failed',
+  VERIFICATION_TOKEN_CLEANUP: 'verification_token_cleanup',
+  
+  // Database critical errors (Only major issues)
+  DATABASE_CONNECTION_ERROR: 'database_connection_error',
+  DATABASE_MIGRATION_ERROR: 'database_migration_error',
+  
+  // External API critical errors
+  EXTERNAL_API_ERROR: 'external_api_error',
   API_CALL: 'api_call',
-  USER_ACTION: 'user_action',
   
-  // Auth events
-  AUTH_LOGIN_SUCCESS: 'auth_login_success',
-  AUTH_LOGIN_FAILED: 'auth_login_failed',
-  AUTH_LOGOUT_SUCCESS: 'auth_logout_success',
+  // Admin actions (Audit trail)
+  ADMIN_ACTION: 'admin_action',
+  MODERATOR_ACTION: 'moderator_action',
+  
+  // Business service events
   AUTH_SIGNUP_SUCCESS: 'auth_signup_success',
-  AUTH_SIGNUP_FAILED: 'auth_signup_failed',
-  AUTH_OAUTH_SUCCESS: 'auth_oauth_success',
-  AUTH_OAUTH_FAILED: 'auth_oauth_failed',
-  AUTH_USER_CREATED: 'auth_user_created',
-  AUTH_SIGNIN_ERROR: 'auth_signin_error',
-  AUTH_SESSION_ERROR: 'auth_session_error',
-  AUTH_USERNAME_CHECK: 'auth_username_check',
-  
-  // Email verification events
-  AUTH_EMAIL_VERIFICATION_SENT: 'auth_email_verification_sent',
-  AUTH_EMAIL_VERIFICATION_SUCCESS: 'auth_email_verification_success',
-  AUTH_EMAIL_VERIFICATION_FAILED: 'auth_email_verification_failed',
-  
-  // Password reset events
   AUTH_PASSWORD_RESET_REQUESTED: 'auth_password_reset_requested',
   AUTH_PASSWORD_RESET_SUCCESS: 'auth_password_reset_success',
   AUTH_PASSWORD_RESET_FAILED: 'auth_password_reset_failed',
-  
-  // Additional auth events
-  AUTH_EMAIL_VERIFIED: 'auth_email_verified',
-  AUTH_PASSWORD_CHANGED: 'auth_password_changed',
-  
-  // Database events
-  DATABASE_ERROR: 'database_error',
-  DATABASE_READ: 'database_read',
-  
-  // Service events
-  SERVICE_ERROR: 'service_error',
-  
-  // API events
+  AUTH_USERNAME_CHECK: 'auth_username_check',
+  AUTH_LOGIN_SUCCESS: 'auth_login_success',
+  AUTH_LOGIN_FAILED: 'auth_login_failed',
+  AUTH_LOGOUT_SUCCESS: 'auth_logout_success',
+  AUTH_SIGNIN_ERROR: 'auth_signin_error',
+  AUTH_OAUTH_SUCCESS: 'auth_oauth_success',
+  AUTH_USER_CREATED: 'auth_user_created',
   API_ERROR: 'api_error',
+  SERVICE_ERROR: 'service_error',
 } as const
 
 // Performance eşikleri (ms)

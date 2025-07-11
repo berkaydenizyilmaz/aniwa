@@ -1,198 +1,126 @@
 // Aniwa Projesi - Email Service
-// Bu dosya Resend ile email gönderim işlemlerini yönetir
+// Bu dosya email gönderim işlemlerini yönetir (Resend API)
 
 import { Resend } from 'resend'
 import { env } from '@/lib/env'
-import { logInfo, logError } from '@/lib/logger'
+import { logInfo, logError } from '@/services/business/logger.service'
 import { LOG_EVENTS } from '@/constants/logging'
 import { EMAIL_SENDER, EMAIL_SUBJECTS, EMAIL_CONTENT, EMAIL_STYLES } from '@/constants/email'
-import { 
-  sendEmailSchema,
-  sendVerificationEmailSchema,
-  sendPasswordResetEmailSchema,
-  sendPasswordChangedNotificationSchema
-} from '@/lib/schemas/email.schemas'
 import { z } from 'zod'
 import type { ApiResponse } from '@/types/api'
-import type { 
-  EmailSendResult,
-  SendEmailParams,
-  SendVerificationEmailParams,
-  SendPasswordResetEmailParams,
-  SendPasswordChangedNotificationParams
-} from '@/types/email'
 
-// Resend client'ı oluştur
+// Resend client
 const resend = new Resend(env.RESEND_API_KEY)
 
-// Genel email gönderim fonksiyonu
-async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSendResult>> {
-  try {
-    // 1. Girdi validasyonu
-    const validatedParams = sendEmailSchema.parse(params)
-    const { to, subject, html, from = EMAIL_SENDER.FROM_ADDRESS } = validatedParams
-
-    // 2. Ön koşul kontrolleri (guard clauses)
-    if (!env.RESEND_API_KEY) {
-      return { success: false, error: 'Email servisi yapılandırılmamış' }
-    }
-
-    // 3. Ana iş mantığı - Email gönderim
-    const result = await resend.emails.send({
-      from,
-      to: [to],
-      subject,
-      html,
-    })
-
-    if (result.error) {
-      logError(LOG_EVENTS.API_CALL, 'Resend API hatası', {
-        error: result.error.message,
-        to,
-        subject,
-        provider: 'resend'
-      })
-      
-      return {
-        success: false,
-        error: `Email gönderim hatası: ${result.error.message}`
-      }
-    }
-
-    // 4. Başarı loglaması
-    logInfo(LOG_EVENTS.API_CALL, 'Email başarıyla gönderildi', {
-      to,
-      subject,
-      emailId: result.data?.id,
-      provider: 'resend'
-    })
-
-    // 5. Başarılı yanıt
-    return {
-      success: true,
-      data: { id: result.data?.id || '' }
-    }
-
-  } catch (error) {
-    // 6. Hata loglaması
-    logError(LOG_EVENTS.SERVICE_ERROR, 'Email gönderim hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      to: params.to,
-      subject: params.subject,
-      provider: 'resend'
-    })
-
-    // 7. Hata yanıtı
-    return {
-      success: false,
-      error: 'Email gönderilemedi'
-    }
-  }
+// Email gönderme sonuç tipi
+export interface EmailSendResult {
+  id?: string
+  from: string
+  to: string
+  subject: string
 }
 
-// Email template için temel HTML yapısı oluşturur
-function createEmailTemplate(content: string): string {
+// Base email gönderme parametreleri
+interface SendEmailParams {
+  to: string
+  subject: string
+  html: string
+  from?: string
+}
+
+// Şifre sıfırlama email parametreleri
+interface SendPasswordResetEmailParams {
+  to: string
+  username: string
+  resetUrl: string
+}
+
+// Şifre sıfırlama email şeması
+const sendPasswordResetEmailSchema = z.object({
+  to: z.string().email('Geçerli email adresi gerekli'),
+  username: z.string().min(1, 'Kullanıcı adı gerekli'),
+  resetUrl: z.string().url('Geçerli URL gerekli')
+})
+
+// Email şablonu oluştur
+const createEmailTemplate = (content: string): string => {
   return `
     <!DOCTYPE html>
-    <html lang="tr">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${EMAIL_SENDER.BRAND_NAME}</title>
-      <style>
-        body { margin: 0; padding: 0; background-color: #f8f9fa; }
-        .container { ${EMAIL_STYLES.CONTAINER} }
-        .header { ${EMAIL_STYLES.HEADER} }
-        .logo { ${EMAIL_STYLES.LOGO} }
-        .content { ${EMAIL_STYLES.CONTENT} }
-        .button { ${EMAIL_STYLES.BUTTON} }
-        .footer { ${EMAIL_STYLES.FOOTER} }
-        .warning { background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 12px; margin: 20px 0; font-size: 14px; }
-        .success { background-color: #d1fae5; border: 1px solid #10b981; border-radius: 6px; padding: 12px; margin: 20px 0; font-size: 14px; }
-        .link { word-break: break-all; color: #6b7280; font-size: 14px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <div class="logo">${EMAIL_SENDER.BRAND_NAME}</div>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Aniwa</title>
+        <style>
+          ${EMAIL_STYLES}
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          ${content}
+          
+          <div class="footer">
+            <p>Bu email Aniwa tarafından gönderilmiştir.</p>
+            <p>Eğer bu işlemi siz yapmadıysanız, lütfen bu emaili dikkate almayın.</p>
+          </div>
         </div>
-        
-        ${content}
-        
-        <div class="footer">
-          <p>${EMAIL_CONTENT.FOOTER.BRAND}</p>
-          <p>${EMAIL_CONTENT.FOOTER.COPYRIGHT}</p>
-        </div>
-      </div>
-    </body>
+      </body>
     </html>
   `
 }
 
-// Email doğrulama emaili gönderir
-export async function sendVerificationEmail(
-  params: SendVerificationEmailParams
-): Promise<ApiResponse<EmailSendResult>> {
+// Base email gönderim fonksiyonu
+async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSendResult>> {
   try {
-    // 1. Girdi validasyonu
-    const validatedParams = sendVerificationEmailSchema.parse(params)
-    const { to, username, verificationUrl } = validatedParams
+    const { to, subject, html, from = EMAIL_SENDER.FROM_ADDRESS } = params
 
-    // 2. Ön koşul kontrolleri (guard clauses)
-    if (!verificationUrl.startsWith('http')) {
-      return { success: false, error: 'Geçersiz doğrulama URL\'si' }
-    }
-
-    // 3. Ana iş mantığı - Email içeriği oluştur
-    const content = `
-      <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">${EMAIL_CONTENT.VERIFICATION.SUBJECT}</h1>
-      
-      <div class="content">
-        <p>${EMAIL_CONTENT.VERIFICATION.GREETING} <strong>${username}</strong>,</p>
-        
-        <p>${EMAIL_CONTENT.VERIFICATION.MESSAGE}</p>
-        
-        <div style="text-align: center;">
-          <a href="${verificationUrl}" class="button">${EMAIL_CONTENT.VERIFICATION.BUTTON_TEXT}</a>
-        </div>
-        
-        <div class="warning">
-          <strong>⚠️ Önemli:</strong> ${EMAIL_CONTENT.VERIFICATION.EXPIRY_NOTE}
-        </div>
-        
-        <p>${EMAIL_CONTENT.VERIFICATION.ALTERNATIVE}</p>
-        <p class="link">${verificationUrl}</p>
-        
-        <p>${EMAIL_CONTENT.VERIFICATION.SECURITY_NOTE}</p>
-      </div>
-    `
-
-    const html = createEmailTemplate(content)
-
-    // 4. Email gönder
-    const result = await sendEmail({
+    const { data, error } = await resend.emails.send({
+      from,
       to,
-      subject: EMAIL_SUBJECTS.EMAIL_VERIFICATION,
+      subject,
       html,
     })
 
-    // 5. Başarılı yanıt (sendEmail'den dönen sonuç)
-    return result
+    if (error) {
+      logError(LOG_EVENTS.API_CALL, 'Resend API hatası', {
+        error: error.message,
+        to,
+        subject
+      })
+
+      return {
+        success: false,
+        error: 'Email gönderilemedi'
+      }
+    }
+
+    logInfo(LOG_EVENTS.API_CALL, 'Email başarıyla gönderildi', {
+      emailId: data?.id,
+      to,
+      subject
+    })
+
+    return {
+      success: true,
+      data: {
+        id: data?.id,
+        from,
+        to,
+        subject
+      }
+    }
 
   } catch (error) {
-    // 6. Hata loglaması
-    logError(LOG_EVENTS.SERVICE_ERROR, 'Email doğrulama gönderim hatası', {
+    logError(LOG_EVENTS.SERVICE_ERROR, 'Email gönderim hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      to: params.to
+      to: params.to,
+      subject: params.subject
     })
-    
-    // 7. Hata yanıtı
-    if (error instanceof z.ZodError) {
-      return { success: false, error: error.errors[0].message }
+
+    return {
+      success: false,
+      error: 'Email gönderilemedi'
     }
-    
-    return { success: false, error: 'Email gönderilemedi' }
   }
 }
 
@@ -230,7 +158,7 @@ export async function sendPasswordResetEmail(
         <p>${EMAIL_CONTENT.PASSWORD_RESET.ALTERNATIVE}</p>
         <p class="link">${resetUrl}</p>
         
-        <p><strong>${EMAIL_CONTENT.PASSWORD_RESET.SECURITY_NOTE}</strong></p>
+        <p>${EMAIL_CONTENT.PASSWORD_RESET.SECURITY_NOTE}</p>
       </div>
     `
 
@@ -263,70 +191,44 @@ export async function sendPasswordResetEmail(
 }
 
 // Şifre değişikliği bildirim emaili gönderir
-export async function sendPasswordChangedNotification(
-  params: SendPasswordChangedNotificationParams
+export async function sendPasswordChangeNotificationEmail(
+  params: { to: string; username: string }
 ): Promise<ApiResponse<EmailSendResult>> {
   try {
-    // 1. Girdi validasyonu
-    const validatedParams = sendPasswordChangedNotificationSchema.parse(params)
-    const { to, username, changeTime } = validatedParams
+    const { to, username } = params
 
-    // 2. Ön koşul kontrolleri (guard clauses)
-    if (!changeTime || changeTime.trim().length === 0) {
-      return { success: false, error: 'Değişiklik zamanı gerekli' }
-    }
-
-    // 3. Ana iş mantığı - Email içeriği oluştur
     const content = `
-      <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">${EMAIL_CONTENT.PASSWORD_CHANGED.SUBJECT}</h1>
+      <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">Şifre Değişikliği Bildirimi</h1>
       
       <div class="content">
-        <p>${EMAIL_CONTENT.PASSWORD_CHANGED.GREETING} <strong>${username}</strong>,</p>
+        <p>Merhaba <strong>${username}</strong>,</p>
         
-        <div class="success">
-          <strong>✅ ${EMAIL_CONTENT.PASSWORD_CHANGED.MESSAGE}</strong>
-        </div>
-        
-        <p>${EMAIL_CONTENT.PASSWORD_CHANGED.MESSAGE}</p>
-        
-        <p><strong>Güvenlik Bilgileri:</strong></p>
-        <ul>
-          <li>Değişiklik Zamanı: ${changeTime}</li>
-          <li>Hesap: ${to}</li>
-        </ul>
+        <p>Hesabınızın şifresi başarıyla değiştirildi.</p>
         
         <div class="warning">
-          <strong>⚠️ ${EMAIL_CONTENT.PASSWORD_CHANGED.SECURITY_MESSAGE}</strong>
+          <strong>⚠️ Önemli:</strong> Eğer bu değişikliği siz yapmadıysanız, lütfen derhal bizimle iletişime geçin.
         </div>
         
-        <p>${EMAIL_CONTENT.PASSWORD_CHANGED.SECURITY_NOTE}</p>
+        <p>Güvenliğiniz için hesabınızı düzenli olarak kontrol etmenizi öneririz.</p>
       </div>
     `
 
     const html = createEmailTemplate(content)
 
-    // 4. Email gönder
     const result = await sendEmail({
       to,
-      subject: EMAIL_SUBJECTS.PASSWORD_CHANGED,
+      subject: 'Aniwa - Şifre Değişikliği Bildirimi',
       html,
     })
 
-    // 5. Başarılı yanıt (sendEmail'den dönen sonuç)
     return result
 
   } catch (error) {
-    // 6. Hata loglaması
     logError(LOG_EVENTS.SERVICE_ERROR, 'Şifre değişikliği bildirim email gönderim hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       to: params.to
     })
-    
-    // 7. Hata yanıtı
-    if (error instanceof z.ZodError) {
-      return { success: false, error: error.errors[0].message }
-    }
-    
+
     return { success: false, error: 'Email gönderilemedi' }
   }
 } 

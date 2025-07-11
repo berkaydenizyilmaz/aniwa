@@ -2,12 +2,12 @@
 // Bu endpoint yeni kullanıcı kaydı işlemlerini yönetir
 
 import { NextRequest, NextResponse } from 'next/server'
-import { signupSchema } from '@/lib/schemas/auth.schemas'
 import { registerUser } from '@/services/business/auth.service'
-import { logError, logInfo } from '@/lib/logger'
-import { LOG_EVENTS } from '@/constants/logging'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
+import { signupSchema } from '@/lib/schemas/auth.schemas'
+import { logError, logInfo } from '@/services/business/logger.service'
+import { LOG_EVENTS } from '@/constants/logging'
 
 async function signupHandler(request: NextRequest) {
   try {
@@ -26,9 +26,8 @@ async function signupHandler(request: NextRequest) {
       )
     }
 
-    // Business service call - User creation + Email verification
-    const baseUrl = request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3001'
-    const result = await registerUser(validationResult.data, baseUrl)
+    // Business service call - User creation (email verification kaldırıldı)
+    const result = await registerUser(validationResult.data)
     
     if (!result.success) {
       return NextResponse.json(
@@ -45,7 +44,7 @@ async function signupHandler(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Kullanıcı kaydı başarılı! Lütfen email adresinizi doğrulayın.',
+      message: 'Kullanıcı kaydı başarılı!',
       data: {
         user: {
           id: result.data?.id,
@@ -56,7 +55,6 @@ async function signupHandler(request: NextRequest) {
     })
 
   } catch (error) {
-    // Hata loglaması
     logError(LOG_EVENTS.API_ERROR, 'Signup API hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata'
     })
@@ -68,5 +66,5 @@ async function signupHandler(request: NextRequest) {
   }
 }
 
-// Rate limiting ile export
+// Rate limiting ile sarılmış export
 export const POST = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.SIGNUP, signupHandler) 

@@ -6,7 +6,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/db/prisma'
 import { env } from './env'
-import { logInfo, logError, logWarn } from './logger'
+import { logInfo, logError, logWarn } from '@/services/business/logger.service'
 import { LOG_EVENTS } from '../constants/logging'
 import { SESSION_MAX_AGE, JWT_MAX_AGE, OAUTH_PROVIDERS } from '../constants/auth'
 import { ROUTES } from '../constants/routes'
@@ -108,10 +108,7 @@ export const authOptions: NextAuthOptions = {
         token.username = user.username
         token.roles = user.roles
         token.image = user.image
-        token.emailVerified = user.emailVerified
       }
-
-
 
       return token
     },
@@ -121,7 +118,6 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string
         session.user.username = token.username as string | null
         session.user.roles = token.roles
-        session.user.emailVerified = token.emailVerified as Date | null
       }
 
       return session
@@ -141,7 +137,6 @@ export const authOptions: NextAuthOptions = {
             user.id = existingUser.id
             user.username = existingUser.username
             user.roles = existingUser.roles
-            user.emailVerified = existingUser.emailVerified
             
             logInfo(LOG_EVENTS.AUTH_OAUTH_SUCCESS, 'Mevcut kullanıcı OAuth girişi', {
               userId: existingUser.id,
@@ -165,7 +160,6 @@ export const authOptions: NextAuthOptions = {
                 slug,
                 roles: [USER_ROLES.USER],
                 image: profile.picture,
-                emailVerified: new Date() // OAuth kullanıcıları doğrulanmış sayılır
               }
             })
 
@@ -183,7 +177,6 @@ export const authOptions: NextAuthOptions = {
           user.id = newUser.id
           user.username = newUser.username
           user.roles = newUser.roles
-          user.emailVerified = newUser.emailVerified
 
           logInfo(LOG_EVENTS.AUTH_USER_CREATED, 'OAuth kullanıcısı oluşturuldu', {
             userId: newUser.id,

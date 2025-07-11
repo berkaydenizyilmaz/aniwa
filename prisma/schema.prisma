@@ -136,7 +136,7 @@ model VerificationToken {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String
   token     String   @unique
-  type      String   // "email_verification", "password_reset", "email_change"
+  type      String   // "password_reset" - sadece şifre sıfırlama
   expiresAt DateTime
   createdAt DateTime @default(now())
   
@@ -153,7 +153,6 @@ model User {
   id                   String                 @id @default(auto()) @map("_id") @db.ObjectId
   username             String                 @unique
   email                String                 @unique
-  emailVerified        DateTime?
   image                String?
   passwordHash         String?
   profilePicture       String?
