@@ -62,11 +62,11 @@ export const checkUsernameSchema = z.object({
 
 export const createVerificationTokenSchema = z.object({
   email: emailSchema,
-  type: z.enum(['PASSWORD_RESET'] as const),
+  type: z.enum(Object.values(AUTH.VERIFICATION_TOKEN_TYPES) as [string, ...string[]]),
   expiryHours: z.number().positive('Geçerli süre belirtilmeli')
 })
 
 export const verifyTokenSchema = z.object({
   token: z.string().min(1, 'Token gerekli'),
-  type: z.enum(['PASSWORD_RESET'] as const)
+  type: z.enum(Object.values(AUTH.VERIFICATION_TOKEN_TYPES) as [string, ...string[]])
 }) 

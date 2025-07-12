@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Toaster } from "sonner"
 import { ThemeProvider } from "./theme-provider"
 import { SessionProvider } from "./session-provider"
-import { DEFAULT_THEME } from "@/constants/app"
+import { THEME } from "@/constants"
 
 interface ProvidersProps {
   children: ReactNode
@@ -22,7 +22,7 @@ export function Providers({ children }: ProvidersProps) {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider
           attribute="class"
-          defaultTheme={DEFAULT_THEME}
+          defaultTheme={THEME.SYSTEM}
           enableSystem
           disableTransitionOnChange
         >

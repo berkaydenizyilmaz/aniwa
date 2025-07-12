@@ -2,10 +2,9 @@
 
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
-import { USER_ROLES } from "@/constants/auth"
 import { UserRole } from "@prisma/client"
 import { withGlobalRateLimit } from '@/lib/rate-limit/middleware'
-import { ROUTES, ROUTE_ACCESS } from '@/constants'
+import { ROUTES, ROUTE_ACCESS, USER_ROLES } from '@/constants'
 
 export default withAuth(
   async function middleware(req) {

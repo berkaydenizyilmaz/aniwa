@@ -6,19 +6,19 @@
 // =============================================================================
 
 export {
-  UserRole,
-  LogLevel,
-  Theme,
-  TitleLanguage,
-  ProfileVisibility,
-  ScoreFormat,
-  NotificationType,
-  AnimeType,
-  AnimeStatus,
-  Season,
-  Source,
-  MediaListStatus,
-  TagCategory
+  UserRole as USER_ROLES,
+  LogLevel as LOG_LEVELS,
+  Theme as THEME,
+  TitleLanguage as TITLE_LANGUAGE,
+  ProfileVisibility as PROFILE_VISIBILITY,
+  ScoreFormat as SCORE_FORMAT,
+  NotificationType as NOTIFICATION_TYPE,
+  AnimeType as ANIME_TYPE,
+  AnimeStatus as ANIME_STATUS,
+  Season as SEASON,
+  Source as SOURCE,
+  MediaListStatus as MEDIA_LIST_STATUS,
+  TagCategory as TAG_CATEGORY
 } from "@prisma/client"
 
 // =============================================================================

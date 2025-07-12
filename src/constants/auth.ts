@@ -35,12 +35,4 @@ export const AUTH = {
   VERIFICATION_TOKEN_TYPES: {
     PASSWORD_RESET: 'PASSWORD_RESET',
   } as const,
-
-  // Kullanıcı rolleri
-  USER_ROLES: {
-    USER: 'USER',
-    MODERATOR: 'MODERATOR',
-    EDITOR: 'EDITOR',
-    ADMIN: 'ADMIN',
-  } as const,
 } as const

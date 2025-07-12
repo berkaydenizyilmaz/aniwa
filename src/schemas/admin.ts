@@ -4,13 +4,14 @@
 import { z } from 'zod'
 import { idSchema } from './user'
 import { dateSchema } from './anime'
+import { LOG_LEVELS, USER_ROLES } from '@/constants'
 
 // =============================================================================
 // ADMIN ŞEMALARI
 // =============================================================================
 
 export const logFiltersSchema = z.object({
-  level: z.array(z.enum(['ERROR', 'WARN', 'INFO', 'DEBUG'])).optional(),
+  level: z.array(z.enum(Object.values(LOG_LEVELS) as [string, ...string[]])).optional(),
   userId: idSchema.optional(),
   event: z.array(z.string()).optional(),
   startDate: dateSchema.optional(),
@@ -21,5 +22,5 @@ export const logFiltersSchema = z.object({
 
 export const updateUserRoleSchema = z.object({
   userId: idSchema,
-  roles: z.array(z.enum(['USER', 'MODERATOR', 'EDITOR', 'ADMIN'])),
+  roles: z.array(z.enum(Object.values(USER_ROLES) as [string, ...string[]])),
 }) 
