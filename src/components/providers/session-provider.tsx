@@ -1,4 +1,3 @@
-// Aniwa Projesi - Session Provider
 // Bu bileşen NextAuth session yönetimini sağlar
 
 'use client'

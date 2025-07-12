@@ -1,4 +1,3 @@
-// Aniwa Projesi - Log Database Service
 // Bu dosya log kayıtlarının CRUD işlemlerini yönetir
 
 import { prisma } from '@/lib/db/prisma'

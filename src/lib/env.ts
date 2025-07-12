@@ -1,4 +1,3 @@
-// Aniwa Projesi - Environment Variables Validation
 // Bu dosya environment değişkenlerini Zod ile doğrular
 
 import { z } from 'zod'

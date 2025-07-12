@@ -1,4 +1,3 @@
-// Business Layer Logger Service
 // Sadece kullanılan logging fonksiyonlarını içerir
 
 import { createLog } from '@/services/db/log.service'

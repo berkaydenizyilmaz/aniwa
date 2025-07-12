@@ -1,4 +1,3 @@
-// Aniwa Projesi - Auth Sabitleri
 // Bu dosya kimlik doğrulama sistemi ile ilgili tüm sabitleri içerir
 
 // Session yönetimi
@@ -28,12 +27,13 @@ export const OAUTH_PROVIDERS = {
 
 // Verification token türleri
 export const VERIFICATION_TOKEN_TYPES = {
-  PASSWORD_RESET: 'password_reset',
+  PASSWORD_RESET: 'PASSWORD_RESET',
 } as const
 
 // Kullanıcı rolleri
 export const USER_ROLES = {
   USER: 'USER',
   MODERATOR: 'MODERATOR', 
+  EDITOR: 'EDITOR',
   ADMIN: 'ADMIN',
 } as const

@@ -1,4 +1,3 @@
-// Aniwa Projesi - Auth Hooks
 // Bu dosya kimlik doğrulama ile ilgili custom hook'ları içerir
 
 'use client'

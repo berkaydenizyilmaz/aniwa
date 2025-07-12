@@ -1,4 +1,3 @@
-// Aniwa Projesi - Log Zod Schemas
 // Bu dosya log işlemleri validasyon şemalarını içerir
 
 import { z } from 'zod'

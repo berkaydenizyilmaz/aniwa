@@ -1,4 +1,5 @@
-// src/components/theme-provider.tsx
+// Bu bileşen NextThemesProvider'ı kullanarak tema değişikliklerini sağlar
+
 "use client"
 
 import { type ComponentProps } from "react"

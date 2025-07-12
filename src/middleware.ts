@@ -1,4 +1,3 @@
-// Aniwa Projesi - NextAuth Middleware + Rate Limiting
 // Bu dosya route seviyesinde kimlik doğrulama, yetkilendirme ve rate limiting kontrolü yapar
 
 import { withAuth } from "next-auth/middleware"

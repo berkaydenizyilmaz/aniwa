@@ -1,4 +1,3 @@
-// Aniwa Projesi - Auth Validation Schemas
 // Bu dosya kimlik doğrulama ile ilgili tüm Zod şemalarını içerir
 
 import { z } from 'zod'

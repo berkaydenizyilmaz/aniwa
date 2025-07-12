@@ -1,4 +1,3 @@
-// Services Main Index
 // Bu dosya tüm servis katmanlarını export eder
 
 // Database services

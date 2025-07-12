@@ -1,4 +1,3 @@
-// Aniwa Projesi - User Zod Schemas
 // Bu dosya kullanıcı işlemleri ile ilgili validasyon şemalarını içerir
 
 import { z } from 'zod'

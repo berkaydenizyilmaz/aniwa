@@ -1,4 +1,3 @@
-// Aniwa Projesi - Verification Token Database Service
 // Bu dosya doğrulama token'larının veritabanı işlemlerini yönetir
 
 import { prisma } from '@/lib/db/prisma'

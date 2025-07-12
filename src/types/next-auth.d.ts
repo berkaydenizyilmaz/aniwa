@@ -1,4 +1,3 @@
-// Aniwa Projesi - NextAuth Tip Genişletmeleri
 // Bu dosya NextAuth'un varsayılan tiplerini proje ihtiyaçlarına göre genişletir
 
 import { DefaultSession, DefaultUser } from 'next-auth'

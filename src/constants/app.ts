@@ -1,4 +1,3 @@
-// Aniwa Projesi - Genel Uygulama Sabitleri
 // Bu dosya tüm uygulama genelinde kullanılan sabitleri içerir
 
 import { Theme } from "@prisma/client";

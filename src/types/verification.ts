@@ -1,4 +1,3 @@
-// Aniwa Projesi - Verification Types
 // Bu dosya doğrulama token sistemi ile ilgili tüm tip tanımlarını içerir
 
 // Verification token türleri - Sadece şifre sıfırlama

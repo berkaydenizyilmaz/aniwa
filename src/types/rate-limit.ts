@@ -1,4 +1,3 @@
-// Aniwa Projesi - Rate Limiting Types
 // Bu dosya rate limiting için TypeScript tip tanımlamalarını içerir
 
 // Rate limit konfigürasyon tipi

@@ -1,4 +1,3 @@
-// Aniwa Projesi - Email Service
 // Bu dosya email gönderim işlemlerini yönetir (Resend API)
 
 import { Resend } from 'resend'

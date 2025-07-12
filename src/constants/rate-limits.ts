@@ -1,4 +1,3 @@
-// Aniwa Projesi - Rate Limiting Sabitleri
 // Bu dosya rate limiting sistemi ile ilgili tüm sabitleri içerir
 
 // Rate limit türleri

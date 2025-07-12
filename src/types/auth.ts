@@ -1,4 +1,3 @@
-// Auth Tipleri
 // Bu dosya kimlik doğrulama ile ilgili tüm tip tanımlarını içerir
 
 import { User, UserProfileSettings, UserRole } from "@prisma/client";
@@ -82,7 +81,7 @@ export interface UseAuthReturn {
 // Giriş işlemi sonucu
 export interface LoginResult {
   user?: SessionUser
-  signInResponse?: unknown // SignInResponse type is not imported, so using 'unknown' instead of 'any'
+  signInResponse?: unknown
 }
 
 // Çıkış işlemi sonucu

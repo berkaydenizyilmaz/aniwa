@@ -1,4 +1,3 @@
-// Aniwa Projesi - Rate Limiting Service
 // Bu dosya ana rate limiting fonksiyonalitesini sağlar
 
 import { Ratelimit } from '@upstash/ratelimit'

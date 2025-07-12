@@ -1,4 +1,3 @@
-// Database Services Index
 // Bu dosya tüm database servislerini export eder
 
 // User operations

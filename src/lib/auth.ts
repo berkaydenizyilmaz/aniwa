@@ -1,4 +1,3 @@
-// Aniwa Projesi - NextAuth Konfigürasyonu
 // Bu dosya kimlik doğrulama sistemini yönetir
 
 import { NextAuthOptions } from 'next-auth'

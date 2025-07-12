@@ -1,4 +1,3 @@
-// Aniwa Projesi - User Database Service
 // Bu dosya kullanıcı CRUD işlemlerini yönetir
 
 import { prisma } from '@/lib/db/prisma'
@@ -226,6 +225,7 @@ export async function findUsers(
   }
 }
 
+// Kullanıcı sayısını hesapla
 export async function countUsers(where?: Prisma.UserWhereInput): Promise<ApiResponse<number>> {
   try {
     const count = await prisma.user.count({ where })
@@ -235,6 +235,7 @@ export async function countUsers(where?: Prisma.UserWhereInput): Promise<ApiResp
   }
 }
 
+// Kullanıcı varlığını kontrol et
 export async function userExists(userId: string): Promise<ApiResponse<boolean>> {
   try {
     const validatedUserId = userIdSchema.parse(userId)

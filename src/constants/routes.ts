@@ -1,4 +1,3 @@
-// Routes Constants
 // Bu dosya tüm site URL'lerini merkezi, kategorik ve ölçeklenebilir bir şekilde yönetir.
 
 // Uygulamadaki tüm rotaları içeren ana nesne.

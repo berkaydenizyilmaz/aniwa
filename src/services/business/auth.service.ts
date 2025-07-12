@@ -1,4 +1,3 @@
-// Aniwa Projesi - Auth Business Logic Service
 // Bu dosya kimlik doğrulama iş mantığını yönetir (user creation + email verification)
 
 import { createUser, verifyCredentials, updatePassword, findUserByEmail } from '@/services/db/user.service'
@@ -10,6 +9,7 @@ import { LOG_EVENTS } from '@/constants/logging'
 import { z } from 'zod'
 import type { ApiResponse } from '@/types/api'
 import type { CreateUserParams, UserWithSettings } from '@/types/auth'
+import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS, VERIFICATION_TOKEN_TYPES } from '@/constants/auth'
 
 // Kullanıcı girişi - Credential verification
 export async function loginUser(
@@ -38,6 +38,11 @@ export async function loginUser(
     return { success: true, data: credentialsResult.data }
 
   } catch (error) {
+    logError(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Giriş işlemi hatası', {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      email: email
+    })
+
     if (error instanceof z.ZodError) {
       return {
         success: false,
@@ -52,7 +57,7 @@ export async function loginUser(
   }
 }
 
-// Kullanıcı kaydı - Basit user creation (email verification kaldırıldı)
+// Kullanıcı kaydı - Basit user creation
 export async function registerUser(
   params: CreateUserParams
 ): Promise<ApiResponse<UserWithSettings>> {
@@ -68,13 +73,6 @@ export async function registerUser(
 
     // Business log - Kullanıcı başarıyla kaydedildi
     logInfo(LOG_EVENTS.USER_REGISTERED, 'Yeni kullanıcı kaydı tamamlandı', {
-      userId: userResult.data.id,
-      email: userResult.data.email,
-      username: userResult.data.username
-    }, userResult.data.id)
-
-    // Başarı loglaması
-    logInfo(LOG_EVENTS.AUTH_SIGNUP_SUCCESS, 'Kullanıcı kaydı tamamlandı', {
       userId: userResult.data.id,
       email: userResult.data.email,
       username: userResult.data.username
@@ -159,8 +157,8 @@ export async function createPasswordResetToken(
     // 3. Password reset token'ı oluştur
     const tokenResult = await createToken({
       email: validatedEmail,
-      type: 'PASSWORD_RESET',
-      expiryHours: 1 // 1 saat
+      type: VERIFICATION_TOKEN_TYPES.PASSWORD_RESET,
+      expiryHours: PASSWORD_RESET_TOKEN_EXPIRY_HOURS
     })
 
     if (!tokenResult.success || !tokenResult.data) {
@@ -188,11 +186,6 @@ export async function createPasswordResetToken(
       }
     }
 
-    logInfo(LOG_EVENTS.AUTH_PASSWORD_RESET_REQUESTED, 'Şifre sıfırlama talebi', {
-      email: validatedEmail,
-      userId: userResult.data.id
-    }, userResult.data.id)
-
     return {
       success: true,
       data: { token: tokenResult.data }
@@ -219,7 +212,7 @@ export async function verifyPasswordResetToken(
     // Token'ı doğrula
     const tokenResult = await verifyToken({
       token,
-      type: 'PASSWORD_RESET'
+      type: VERIFICATION_TOKEN_TYPES.PASSWORD_RESET
     })
 
     if (!tokenResult.success || !tokenResult.data) {
@@ -255,7 +248,7 @@ export async function resetPasswordWithToken(
     // 1. Token'ı doğrula ve sil
     const tokenResult = await verifyToken({
       token,
-      type: 'PASSWORD_RESET'
+      type: VERIFICATION_TOKEN_TYPES.PASSWORD_RESET
     })
 
     if (!tokenResult.success || !tokenResult.data) {
@@ -281,11 +274,6 @@ export async function resetPasswordWithToken(
     if (!updateResult.success) {
       return updateResult
     }
-
-    logInfo(LOG_EVENTS.AUTH_PASSWORD_RESET_SUCCESS, 'Şifre başarıyla sıfırlandı', {
-      userId: userResult.data.id,
-      email: tokenResult.data.email
-    }, userResult.data.id)
 
     return { success: true, data: undefined }
 

@@ -1,4 +1,3 @@
-// Aniwa Projesi - Ana Providers Component
 // Bu component tüm provider'ları toplar ve layout'a temiz bir interface sunar
 
 "use client"

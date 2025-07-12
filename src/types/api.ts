@@ -1,4 +1,3 @@
-// API Yanıt Tipleri
 // Bu dosya, proje genelindeki tüm API yanıtları için standart tip tanımlarını içerir.
 
 // API'den dönen hatalar için standart yapı.

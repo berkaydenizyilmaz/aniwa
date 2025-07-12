@@ -1,4 +1,3 @@
-// Aniwa Projesi - Rate Limiting Middleware Helpers
 // Bu dosya rate limiting için middleware yardımcı fonksiyonlarını içerir
 
 import { NextRequest, NextResponse } from 'next/server'

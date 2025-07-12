@@ -1,4 +1,3 @@
-// Aniwa Projesi - Email Sabitleri
 // Bu dosya email sistemi ile ilgili tüm sabitleri içerir
 
 import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS } from "./auth";

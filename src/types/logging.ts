@@ -1,4 +1,3 @@
-// Aniwa Projesi - Logging Tipi Tanımlamaları
 // Bu dosya, loglama sistemiyle ilgili tüm TypeScript tiplerini içerir.
 
 import { Prisma, LogLevel, UserRole } from '@prisma/client'

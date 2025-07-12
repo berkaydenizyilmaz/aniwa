@@ -1,4 +1,3 @@
-// Email Tipleri
 // Bu dosya e-posta servisleri ile ilgili tüm tip tanımlarını içerir
 
 // Email send result tipi
@@ -12,13 +11,6 @@ export interface SendEmailParams {
   subject: string
   html: string
   from?: string
-}
-
-// Send verification email params tipi
-export interface SendVerificationEmailParams {
-  to: string
-  username:string
-  verificationUrl: string
 }
 
 // Send password reset email params tipi

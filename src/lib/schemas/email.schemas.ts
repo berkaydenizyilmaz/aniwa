@@ -1,4 +1,3 @@
-// Aniwa Projesi - Email Zod Schemas
 // Bu dosya email gönderim validasyon şemalarını içerir
 
 import { z } from 'zod'

@@ -1,6 +1,5 @@
-/**
- * Logging ile ilgili sabitler
- */
+// Bu dosya logging ile ilgili sabitleri içerir
+
 import { LogLevel } from "@prisma/client";
 
 // Log seviyeleri için Prisma enum'unu yeniden export et
