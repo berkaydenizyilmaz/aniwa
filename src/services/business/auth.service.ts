@@ -7,7 +7,7 @@ import { signupSchema, loginSchema } from '@/schemas/auth'
 import { logInfo, logError } from '@/services/business/logger.service'
 import { LOG_EVENTS, AUTH } from '@/constants'
 import { z } from 'zod'
-import type { ApiResponse, CreateUserParams, UserWithSettings } from '@/types'
+import type { ApiResponse, CreateUserParams, UserWithSettings, VerificationTokenType } from '@/types'
 
 // Kullanıcı girişi - Credential verification
 export async function loginUser(
@@ -155,7 +155,7 @@ export async function createPasswordResetToken(
     // 3. Password reset token'ı oluştur
     const tokenResult = await createToken({
       email: validatedEmail,
-      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET,
+      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET as VerificationTokenType,
       expiryHours: AUTH.PASSWORD_RESET_TOKEN_EXPIRY_HOURS
     })
 
@@ -210,7 +210,7 @@ export async function verifyPasswordResetToken(
     // Token'ı doğrula
     const tokenResult = await verifyToken({
       token,
-      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET
+      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET as VerificationTokenType
     })
 
     if (!tokenResult.success || !tokenResult.data) {
@@ -246,7 +246,7 @@ export async function resetPasswordWithToken(
     // 1. Token'ı doğrula ve sil
     const tokenResult = await verifyToken({
       token,
-      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET
+      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET as VerificationTokenType
     })
 
     if (!tokenResult.success || !tokenResult.data) {
