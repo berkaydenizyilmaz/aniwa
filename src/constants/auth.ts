@@ -1,39 +1,46 @@
-// Bu dosya kimlik doğrulama sistemi ile ilgili tüm sabitleri içerir
+// Aniwa Projesi - Auth Constants
+// Bu dosya kimlik doğrulama sistemi ile ilgili sabitleri içerir
 
-// Session yönetimi
-export const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye)
-export const JWT_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün (saniye)
+// =============================================================================
+// AUTH SABITLERI
+// =============================================================================
 
-// Şifre güvenliği
-export const BCRYPT_SALT_ROUNDS = 12
-export const MIN_PASSWORD_LENGTH = 8
-export const MAX_PASSWORD_LENGTH = 128
+export const AUTH = {
+  // Session yönetimi
+  SESSION_MAX_AGE: 30 * 24 * 60 * 60, // 30 gün (saniye)
+  JWT_MAX_AGE: 30 * 24 * 60 * 60, // 30 gün (saniye)
 
-// Username kuralları
-export const MIN_USERNAME_LENGTH = 3
-export const MAX_USERNAME_LENGTH = 20
-export const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/
+  // Şifre güvenliği
+  BCRYPT_SALT_ROUNDS: 12,
+  MIN_PASSWORD_LENGTH: 8,
+  MAX_PASSWORD_LENGTH: 128,
 
-// Email kuralları
-export const MAX_EMAIL_LENGTH = 254
+  // Username kuralları
+  MIN_USERNAME_LENGTH: 3,
+  MAX_USERNAME_LENGTH: 20,
+  USERNAME_REGEX: /^[a-zA-Z0-9_-]+$/,
 
-// Token süreleri
-export const PASSWORD_RESET_TOKEN_EXPIRY_HOURS = 1 // Şifre sıfırlama token süresi (1 saat)
+  // Email kuralları
+  MAX_EMAIL_LENGTH: 254,
 
-// OAuth sağlayıcıları
-export const OAUTH_PROVIDERS = {
-  GOOGLE: 'google',
-} as const
+  // Token süreleri
+  PASSWORD_RESET_TOKEN_EXPIRY_HOURS: 1,
 
-// Verification token türleri
-export const VERIFICATION_TOKEN_TYPES = {
-  PASSWORD_RESET: 'PASSWORD_RESET',
-} as const
+  // OAuth sağlayıcıları
+  OAUTH_PROVIDERS: {
+    GOOGLE: 'google',
+  } as const,
 
-// Kullanıcı rolleri
-export const USER_ROLES = {
-  USER: 'USER',
-  MODERATOR: 'MODERATOR', 
-  EDITOR: 'EDITOR',
-  ADMIN: 'ADMIN',
+  // Verification token türleri
+  VERIFICATION_TOKEN_TYPES: {
+    PASSWORD_RESET: 'PASSWORD_RESET',
+  } as const,
+
+  // Kullanıcı rolleri
+  USER_ROLES: {
+    USER: 'USER',
+    MODERATOR: 'MODERATOR',
+    EDITOR: 'EDITOR',
+    ADMIN: 'ADMIN',
+  } as const,
 } as const

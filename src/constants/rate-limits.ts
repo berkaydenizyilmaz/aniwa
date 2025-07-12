@@ -1,49 +1,46 @@
-// Bu dosya rate limiting sistemi ile ilgili tüm sabitleri içerir
+// Aniwa Projesi - Rate Limiting Constants
+// Bu dosya rate limiting sistemi ile ilgili sabitleri içerir
 
-// Rate limit türleri
-export const AUTH_RATE_LIMIT_TYPES = {
-  SIGNUP: 'SIGNUP',
-  LOGIN: 'LOGIN',
-  PASSWORD_RESET: 'PASSWORD_RESET',
-  USERNAME_CHECK: 'USERNAME_CHECK',
+// =============================================================================
+// RATE LIMITING SABITLERI
+// =============================================================================
+
+export const RATE_LIMITS = {
+  // Genel API rate limits
+  API: {
+    REQUESTS_PER_MINUTE: 60,
+    REQUESTS_PER_HOUR: 1000,
+  },
+  
+  // Auth işlemleri
+  AUTH: {
+    LOGIN_ATTEMPTS_PER_MINUTE: 5,
+    SIGNUP_ATTEMPTS_PER_HOUR: 3,
+    PASSWORD_RESET_ATTEMPTS_PER_HOUR: 3,
+    USERNAME_CHECK_ATTEMPTS_PER_MINUTE: 10,
+  },
+  
+  // Kullanıcı bazlı
+  USER: {
+    COMMENTS_PER_MINUTE: 5,
+    LIKES_PER_MINUTE: 30,
+    FOLLOWS_PER_MINUTE: 10,
+    LIST_UPDATES_PER_MINUTE: 20,
+  },
+  
+  // Tier bazlı limitler
+  TIERS: {
+    USER: {
+      REQUESTS_PER_MINUTE: 30,
+      REQUESTS_PER_HOUR: 500,
+    },
+    MODERATOR: {
+      REQUESTS_PER_MINUTE: 100,
+      REQUESTS_PER_HOUR: 2000,
+    },
+    ADMIN: {
+      REQUESTS_PER_MINUTE: 200,
+      REQUESTS_PER_HOUR: 5000,
+    },
+  },
 } as const
-
-// Rate limit çarpanları (farklı endpoint'ler için)
-export const RATE_LIMIT_MULTIPLIERS = {
-  STRICT: 0.5,    // Daha sıkı limitler için
-  NORMAL: 1,      // Standart limitler
-  RELAXED: 2,     // Daha gevşek limitler için
-} as const
-
-// Auth işlemleri için rate limit konfigürasyonları
-export const AUTH_RATE_LIMIT_CONFIG = {
-  SIGNUP: {
-    requests: 3,
-    window: '15m',
-    message: 'Çok fazla kayıt denemesi. 15 dakika sonra tekrar deneyin.',
-  },
-  LOGIN: {
-    requests: 5,
-    window: '15m',
-    message: 'Çok fazla giriş denemesi. 15 dakika sonra tekrar deneyin.',
-  },
-  PASSWORD_RESET: {
-    requests: 3,
-    window: '15m',
-    message: 'Çok fazla şifre sıfırlama talebi. 15 dakika sonra tekrar deneyin.',
-  },
-  USERNAME_CHECK: {
-    requests: 10,
-    window: '1m',
-    message: 'Çok fazla kullanıcı adı kontrolü. 1 dakika sonra tekrar deneyin.',
-  },
-} as const
-
-// Genel rate limit ayarları
-export const GLOBAL_RATE_LIMIT_CONFIG = {
-  API_GENERAL: {
-    requests: 100,
-    window: '15m',
-    message: 'Çok fazla API isteği. 15 dakika sonra tekrar deneyin.',
-  },
-} as const 

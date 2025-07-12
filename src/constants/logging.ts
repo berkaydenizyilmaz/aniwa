@@ -1,89 +1,57 @@
+// Aniwa Projesi - Logging Constants
 // Bu dosya logging ile ilgili sabitleri içerir
 
-import { LogLevel } from "@prisma/client";
+import { LogLevel } from "@prisma/client"
 
-// Log seviyeleri için Prisma enum'unu yeniden export et
-export { LogLevel };
+// =============================================================================
+// LOGGING SABITLERI
+// =============================================================================
 
-// Hassas veriler - redaction için
-export const SENSITIVE_FIELDS = [
-  'password',
-  'token',
-  'apiKey',
-  'authorization',
-  'cookie',
-  'email',
-  'phone',
-  'creditCard',
-  'ssn',
-  'req.headers.authorization',
-  'req.headers.cookie',
-] as const
-
-// Log event türleri - Sadece business-critical olaylar
 export const LOG_EVENTS = {
+  // Auth events
+  AUTH_LOGIN_SUCCESS: 'auth:login:success',
+  AUTH_LOGIN_FAILED: 'auth:login:failed',
+  AUTH_LOGOUT: 'auth:logout',
+  AUTH_SIGNUP_SUCCESS: 'auth:signup:success',
+  AUTH_SIGNUP_FAILED: 'auth:signup:failed',
+  AUTH_PASSWORD_RESET_REQUESTED: 'auth:password_reset:requested',
+  AUTH_PASSWORD_RESET_SUCCESS: 'auth:password_reset:success',
+  AUTH_PASSWORD_RESET_FAILED: 'auth:password_reset:failed',
+  
+  // User events
+  USER_CREATED: 'user:created',
+  USER_UPDATED: 'user:updated',
+  USER_DELETED: 'user:deleted',
+  USER_ROLE_CHANGED: 'user:role:changed',
+  
+  // Anime events
+  ANIME_CREATED: 'anime:created',
+  ANIME_UPDATED: 'anime:updated',
+  ANIME_DELETED: 'anime:deleted',
+  ANIME_LIST_UPDATED: 'anime:list:updated',
+  
   // System events
-  SYSTEM_ERROR: 'system_error',
-  SYSTEM_WARNING: 'system_warning',
+  SYSTEM_ERROR: 'system:error',
+  SYSTEM_WARNING: 'system:warning',
+  SYSTEM_INFO: 'system:info',
   
-  // User lifecycle events (Admin panelinde görünecek)
-  USER_REGISTERED: 'user_registered',
-  USER_LOGIN: 'user_login',
-  USER_LOGOUT: 'user_logout',
-  USER_PASSWORD_CHANGED: 'user_password_changed',
-  USER_ACCOUNT_LOCKED: 'user_account_locked',
-  USER_ACCOUNT_DELETED: 'user_account_deleted',
-  
-  // Authentication failures (Security)
-  LOGIN_FAILED: 'login_failed',
-  REGISTRATION_FAILED: 'registration_failed',
-  PASSWORD_RESET_FAILED: 'password_reset_failed',
-  
-  // Rate limiting (Security)
-  RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
-  SUSPICIOUS_ACTIVITY: 'suspicious_activity',
-  
-  // Email operations (Business critical)
-  EMAIL_SENT: 'email_sent',
-  EMAIL_FAILED: 'email_failed',
-  
-  // Verification token operations (Business critical)
-  VERIFICATION_TOKEN_CREATED: 'verification_token_created',
-  VERIFICATION_TOKEN_VERIFIED: 'verification_token_verified',
-  VERIFICATION_TOKEN_FAILED: 'verification_token_failed',
-  VERIFICATION_TOKEN_CLEANUP: 'verification_token_cleanup',
-  
-  // Database critical errors (Only major issues)
-  DATABASE_CONNECTION_ERROR: 'database_connection_error',
-  DATABASE_MIGRATION_ERROR: 'database_migration_error',
-  
-  // External API critical errors
-  EXTERNAL_API_ERROR: 'external_api_error',
-  API_CALL: 'api_call',
-  
-  // Admin actions (Audit trail)
-  ADMIN_ACTION: 'admin_action',
-  MODERATOR_ACTION: 'moderator_action',
-  
-  // Business service events
-  AUTH_SIGNUP_SUCCESS: 'auth_signup_success',
-  AUTH_PASSWORD_RESET_REQUESTED: 'auth_password_reset_requested',
-  AUTH_PASSWORD_RESET_SUCCESS: 'auth_password_reset_success',
-  AUTH_PASSWORD_RESET_FAILED: 'auth_password_reset_failed',
-  AUTH_USERNAME_CHECK: 'auth_username_check',
-  AUTH_LOGIN_SUCCESS: 'auth_login_success',
-  AUTH_LOGIN_FAILED: 'auth_login_failed',
-  AUTH_LOGOUT_SUCCESS: 'auth_logout_success',
-  AUTH_SIGNIN_ERROR: 'auth_signin_error',
-  AUTH_OAUTH_SUCCESS: 'auth_oauth_success',
-  AUTH_USER_CREATED: 'auth_user_created',
-  API_ERROR: 'api_error',
-  SERVICE_ERROR: 'service_error',
+  // Rate limiting
+  RATE_LIMIT_EXCEEDED: 'rate_limit:exceeded',
+  RATE_LIMIT_WARNING: 'rate_limit:warning',
 } as const
 
-// Performance eşikleri (ms)
-export const PERFORMANCE_THRESHOLDS = {
-  SLOW_OPERATION: 1000,
-  VERY_SLOW_OPERATION: 5000,
-  CRITICAL_OPERATION: 10000,
+// Log level priority mapping
+export const LOG_LEVEL_PRIORITY = {
+  [LogLevel.DEBUG]: 0,
+  [LogLevel.INFO]: 1,
+  [LogLevel.WARN]: 2,
+  [LogLevel.ERROR]: 3,
+} as const
+
+// Log retention periods (in days)
+export const LOG_RETENTION = {
+  ERROR: 90,   // 3 ay
+  WARN: 30,    // 1 ay
+  INFO: 7,     // 1 hafta
+  DEBUG: 1,    // 1 gün
 } as const

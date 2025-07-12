@@ -1,69 +1,58 @@
+// Aniwa Projesi - Auth Domain Types
 // Bu dosya kimlik doğrulama ile ilgili tüm tip tanımlarını içerir
 
-import { User, UserProfileSettings, UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/client"
+import type { ID } from './index'
 
-// Kullanıcı ile ilişkili ayarları içeren tip
-export type UserWithSettings = User & {
-  userSettings: UserProfileSettings | null;
-};
-
-// Kullanıcı oluşturma parametreleri
-export interface CreateUserParams {
-  email: string;
-  password: string;
-  username: string;
-  role?: UserRole;
-}
-
-// Kullanıcı güncelleme parametreleri
-export interface UpdateUserParams {
-  email?: string;
-  username?: string;
-  bio?: string;
-  profilePicture?: string;
-  profileBanner?: string;
-  image?: string;
-}
+// =============================================================================
+// AUTH PARAMETRELERI
+// =============================================================================
 
 // Giriş parametreleri
 export interface LoginParams {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
 // Kayıt parametreleri
 export interface SignupParams {
-  email: string;
-  password: string;
-  username: string;
+  email: string
+  password: string
+  username: string
 }
 
 // Şifre sıfırlama parametreleri
 export interface PasswordResetParams {
-  email: string;
+  email: string
 }
 
 // Şifre güncelleme parametreleri
 export interface PasswordUpdateParams {
-  token: string;
-  newPassword: string;
+  token: string
+  newPassword: string
 }
 
 // Username kontrol parametreleri
 export interface UsernameCheckParams {
-  username: string;
+  username: string
 }
+
+// =============================================================================
+// SESSION VE USER TIPLERI
+// =============================================================================
 
 // NextAuth session user tipi
 export interface SessionUser {
-  id: string;
-  email: string;
-  username: string;
-  image?: string;
-  roles: UserRole[];
+  id: ID
+  email: string
+  username: string
+  image?: string
+  roles: UserRole[]
 }
 
-// ---- Hook dönüş tipleri ----
+// =============================================================================
+// HOOK DÖNÜŞ TİPLERİ
+// =============================================================================
 
 // useAuth hook'u için dönüş tipi
 export interface UseAuthReturn {
@@ -76,7 +65,9 @@ export interface UseAuthReturn {
   requireAnyRole: (roles: UserRole[]) => boolean
 }
 
-// ---- API Response tipleri ----
+// =============================================================================
+// API RESPONSE TİPLERİ
+// =============================================================================
 
 // Giriş işlemi sonucu
 export interface LoginResult {
@@ -88,3 +79,10 @@ export interface LoginResult {
 export interface LogoutResult {
   redirectUrl?: string
 }
+
+// =============================================================================
+// EXPORTS
+// =============================================================================
+
+// Prisma enum'larını re-export et
+export { UserRole } from "@prisma/client"
