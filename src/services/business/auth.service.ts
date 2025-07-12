@@ -3,26 +3,24 @@
 import { createUser, verifyCredentials, updatePassword, findUserByEmail } from '@/services/db/user.service'
 import { createToken, verifyToken, deleteToken } from '@/services/db/verification-token.service'
 import { sendPasswordResetEmail } from '@/services/api/email.service'
-import { signupSchema, loginSchema } from '@/lib/schemas/auth.schemas'
+import { signupSchema, loginSchema } from '@/schemas/auth'
 import { logInfo, logError } from '@/services/business/logger.service'
-import { LOG_EVENTS } from '@/constants/logging'
+import { LOG_EVENTS, AUTH } from '@/constants'
 import { z } from 'zod'
-import type { ApiResponse } from '@/types/api'
-import type { CreateUserParams, UserWithSettings } from '@/types/auth'
-import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS, VERIFICATION_TOKEN_TYPES } from '@/constants/auth'
+import type { ApiResponse, CreateUserParams, UserWithSettings } from '@/types'
 
 // Kullanıcı girişi - Credential verification
 export async function loginUser(
-  email: string,
+  username: string,
   password: string
 ): Promise<ApiResponse<UserWithSettings | null>> {
   try {
     // 1. Girdi validasyonu
-    const validatedData = loginSchema.parse({ email, password })
+    const validatedData = loginSchema.parse({ username, password })
 
     // 2. Ana iş mantığı - Kimlik bilgilerini doğrula (database service)
     const credentialsResult = await verifyCredentials(
-      validatedData.email,
+      validatedData.username,
       validatedData.password
     )
 
@@ -40,7 +38,7 @@ export async function loginUser(
   } catch (error) {
     logError(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Giriş işlemi hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      email: email
+      username: username
     })
 
     if (error instanceof z.ZodError) {
@@ -72,7 +70,7 @@ export async function registerUser(
     }
 
     // Business log - Kullanıcı başarıyla kaydedildi
-    logInfo(LOG_EVENTS.USER_REGISTERED, 'Yeni kullanıcı kaydı tamamlandı', {
+    logInfo(LOG_EVENTS.AUTH_SIGNUP_SUCCESS, 'Yeni kullanıcı kaydı tamamlandı', {
       userId: userResult.data.id,
       email: userResult.data.email,
       username: userResult.data.username
@@ -86,7 +84,7 @@ export async function registerUser(
 
   } catch (error) {
     // Hata loglaması
-    logError(LOG_EVENTS.SERVICE_ERROR, 'Kullanıcı kaydı hatası', {
+    logError(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Kullanıcı kaydı hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       email: params.email
     })
@@ -123,7 +121,7 @@ export async function updateUserPassword(
 
   } catch (error) {
     // Hata loglaması
-    logError(LOG_EVENTS.SERVICE_ERROR, 'Şifre güncelleme hatası', {
+    logError(LOG_EVENTS.AUTH_PASSWORD_RESET_FAILED, 'Şifre güncelleme hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       userId
     })
@@ -157,8 +155,8 @@ export async function createPasswordResetToken(
     // 3. Password reset token'ı oluştur
     const tokenResult = await createToken({
       email: validatedEmail,
-      type: VERIFICATION_TOKEN_TYPES.PASSWORD_RESET,
-      expiryHours: PASSWORD_RESET_TOKEN_EXPIRY_HOURS
+      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET,
+      expiryHours: AUTH.PASSWORD_RESET_TOKEN_EXPIRY_HOURS
     })
 
     if (!tokenResult.success || !tokenResult.data) {
@@ -212,7 +210,7 @@ export async function verifyPasswordResetToken(
     // Token'ı doğrula
     const tokenResult = await verifyToken({
       token,
-      type: VERIFICATION_TOKEN_TYPES.PASSWORD_RESET
+      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET
     })
 
     if (!tokenResult.success || !tokenResult.data) {
@@ -248,7 +246,7 @@ export async function resetPasswordWithToken(
     // 1. Token'ı doğrula ve sil
     const tokenResult = await verifyToken({
       token,
-      type: VERIFICATION_TOKEN_TYPES.PASSWORD_RESET
+      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET
     })
 
     if (!tokenResult.success || !tokenResult.data) {

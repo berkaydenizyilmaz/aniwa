@@ -2,15 +2,14 @@
 
 import { createLog } from '@/services/db/log.service'
 import { LogLevel, SENSITIVE_FIELDS } from '@/constants/logging'
-import type { LogMetadata } from '@/types/logging'
-import { Prisma } from '@prisma/client'
+import type { LogMetadata } from '@/types/admin'
 
 // Sensitive data'yı temizle
 const sanitizeMetadata = (metadata?: LogMetadata): LogMetadata | undefined => {
   if (!metadata) return undefined
 
   const sanitized = { ...metadata }
-  SENSITIVE_FIELDS.forEach(field => {
+  SENSITIVE_FIELDS.forEach((field: string) => {
     if (field in sanitized) {
       sanitized[field] = '[REDACTED]'
     }
@@ -32,7 +31,7 @@ const logToDatabase = async (
       level,
       event,
       message,
-      metadata: sanitizeMetadata(metadata) as Prisma.JsonValue || null,
+      metadata: sanitizeMetadata(metadata),
       userId: userId || undefined,
     })
   } catch (error) {
@@ -44,14 +43,14 @@ const logToDatabase = async (
 // Console logging için formatlanmış çıktı
 const formatConsoleLog = (level: LogLevel, event: string, message: string, metadata?: LogMetadata) => {
   const timestamp = new Date().toISOString()
-  const emoji = {
-    ERROR: '🔴',
-    WARN: '🟡',
-    INFO: '🔵',
-    DEBUG: '⚪'
-  }[level] || '⚪'
+  const emoji: Record<LogLevel, string> = {
+    [LogLevel.ERROR]: '🔴',
+    [LogLevel.WARN]: '🟡',
+    [LogLevel.INFO]: '🔵',
+    [LogLevel.DEBUG]: '⚪'
+  }
 
-  console.log(`${emoji} [${timestamp}] [${event}] ${message}`)
+  console.log(`${emoji[level] || '⚪'} [${timestamp}] [${event}] ${message}`)
 
   if (metadata && Object.keys(metadata).length > 0) {
     console.log('   📋 Details:', sanitizeMetadata(metadata))

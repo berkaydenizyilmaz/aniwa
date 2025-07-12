@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { THEME_PREFERENCES } from "@/constants/app"
+import { THEME } from "@/constants"
 
 export function ThemeToggle() {
   const { setTheme } = useTheme()
@@ -29,13 +29,13 @@ export function ThemeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme(THEME_PREFERENCES.LIGHT)}>
+        <DropdownMenuItem onClick={() => setTheme(THEME.LIGHT)}>
           Açık
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme(THEME_PREFERENCES.DARK)}>
+        <DropdownMenuItem onClick={() => setTheme(THEME.DARK)}>
           Koyu
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme(THEME_PREFERENCES.SYSTEM)}>
+        <DropdownMenuItem onClick={() => setTheme(THEME.SYSTEM)}>
           Sistem
         </DropdownMenuItem>
       </DropdownMenuContent>

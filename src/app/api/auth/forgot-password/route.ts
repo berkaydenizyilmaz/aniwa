@@ -3,12 +3,10 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createPasswordResetToken } from '@/services/business/auth.service'
-import { logInfo, logError } from '@/services/business/logger.service'
-import { LOG_EVENTS } from '@/constants/logging'
-import { forgotPasswordSchema } from '@/lib/schemas/auth.schemas'
+import { AUTH_RATE_LIMIT_TYPES } from '@/constants'
+import { forgotPasswordSchema } from '@/schemas/auth'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
-import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
-import { ApiResponse } from '@/types/api'
+import type { ApiResponse } from '@/types'
 
 async function forgotPasswordHandler(request: NextRequest): Promise<NextResponse<ApiResponse>> {
   try {
@@ -31,13 +29,7 @@ async function forgotPasswordHandler(request: NextRequest): Promise<NextResponse
     const baseUrl = request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3001'
     
     // Şifre sıfırlama token'ı oluştur ve email gönder
-    const result = await createPasswordResetToken(email, baseUrl)
-
-    if (result.success) {
-      logInfo(LOG_EVENTS.AUTH_PASSWORD_RESET_REQUESTED, 'Şifre sıfırlama talebi', {
-        email: email.toLowerCase()
-      })
-    }
+    await createPasswordResetToken(email, baseUrl)
 
     // Güvenlik için her zaman başarılı yanıt döndür
     // Hata olsa bile, kullanıcının bir hesabının olup olmadığını belli etmemek için
@@ -48,11 +40,7 @@ async function forgotPasswordHandler(request: NextRequest): Promise<NextResponse
     }
     return NextResponse.json(successPayload)
     
-  } catch (error) {
-    logError(LOG_EVENTS.AUTH_PASSWORD_RESET_FAILED, 'Şifre sıfırlama API hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata'
-    })
-
+  } catch {
     const errorPayload: ApiResponse = { 
       success: false, 
       error: 'Sunucu hatası'

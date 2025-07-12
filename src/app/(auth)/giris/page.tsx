@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/use-auth'
-import { ROUTES } from '@/constants/routes'
-import { loginSchema, type LoginData } from '@/lib/schemas/auth.schemas'
+import { ROUTES } from '@/constants'
+import { loginSchema, type LoginData } from '@/schemas/auth'
 import Link from 'next/link'
 
 export default function LoginPage() {

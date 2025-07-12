@@ -13,10 +13,9 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
-import { forgotPasswordSchema, type ForgotPasswordData } from '@/lib/schemas/auth.schemas'
-import { ROUTES } from '@/constants/routes'
-import { PASSWORD_RESET_TOKEN_EXPIRY_HOURS } from '@/constants/auth'
-import type { ApiResponse } from '@/types/api'
+import { forgotPasswordSchema, type ForgotPasswordData } from '@/schemas/auth'
+import { ROUTES, AUTH } from '@/constants'
+import type { ApiResponse } from '@/types'
 
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -50,7 +49,7 @@ export default function ForgotPasswordPage() {
       if (result.success) {
         setIsSuccess(true)
       } else {
-        setError(result.error?.message || 'Bir hata oluştu')
+        setError(result.error || 'Bir hata oluştu')
       }
     } catch (error) {
       setError('Bağlantı hatası. Lütfen tekrar deneyin.')
@@ -82,7 +81,7 @@ export default function ForgotPasswordPage() {
               <Mail className="h-4 w-4" />
               <AlertDescription>
                 Email gelmezse spam/junk klasörünüzü kontrol edin. 
-                Bağlantı sadece {PASSWORD_RESET_TOKEN_EXPIRY_HOURS} saat boyunca geçerlidir.
+                Bağlantı sadece {AUTH.PASSWORD_RESET_TOKEN_EXPIRY_HOURS} saat boyunca geçerlidir.
               </AlertDescription>
             </Alert>
             

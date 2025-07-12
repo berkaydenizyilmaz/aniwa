@@ -10,6 +10,8 @@ export interface ApiResponse<T = unknown> {
   data?: T
   error?: string
   errors?: string[]
+  message?: string
+  details?: unknown
 }
 
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
@@ -100,3 +102,4 @@ export * from './anime'
 export * from './community'
 export * from './admin'
 export * from './user'
+export * from './rate-limit'

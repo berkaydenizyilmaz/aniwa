@@ -1,16 +1,18 @@
 // Bu dosya log kayıtlarının CRUD işlemlerini yönetir
 
 import { prisma } from '@/lib/db/prisma'
-import { Prisma, UserRole } from '@prisma/client'
-import { createLogSchema, logFiltersSchema } from '@/lib/schemas/log.schemas'
-import type { ApiResponse } from '@/types/api'
-import type {
-  CreateLogParams,
-  LogFilters,
-  LogWithUser,
-  LogListResponse
-} from '@/types/logging'
-import { logUserSelect } from '@/types/logging'
+import { Prisma, UserRole, LogLevel } from '@prisma/client'
+import { createLogSchema, logFiltersSchema } from '@/schemas/admin'
+import type { ApiResponse } from '@/types'
+import type { LogFilters, LogWithUser, LogListResponse, CreateLogParams } from '@/types/admin'
+
+// Log kullanıcı seçimi
+const logUserSelect = {
+  id: true,
+  username: true,
+  email: true,
+  roles: true,
+}
 
 // Yeni log kaydı oluşturur
 export async function createLog(params: CreateLogParams): Promise<ApiResponse<LogWithUser>> {
@@ -37,7 +39,7 @@ export async function createLog(params: CreateLogParams): Promise<ApiResponse<Lo
       },
     })
 
-    return { success: true, data: log }
+    return { success: true, data: log as LogWithUser }
 
   } catch {
     return { 
@@ -72,8 +74,10 @@ export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<Log
     // 3. Ana işlem - Filtreleme koşullarını oluştur
     const where: Prisma.LogWhereInput = {}
 
-    if (level) where.level = level
-    if (event) where.event = { contains: event, mode: 'insensitive' }
+    if (level) where.level = { in: level as LogLevel[] }
+    if (event && event.length > 0) {
+      where.event = { in: event }
+    }
     if (userId) where.userId = userId
     
     // Rol bazlı filtreleme
@@ -106,7 +110,7 @@ export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<Log
     return {
       success: true,
       data: {
-        logs,
+        logs: logs as LogWithUser[],
         pagination: {
           total,
           limit,
@@ -145,7 +149,7 @@ export async function getLogById(id: string): Promise<ApiResponse<LogWithUser | 
       },
     })
 
-    return { success: true, data: log }
+    return { success: true, data: log as LogWithUser | null }
 
   } catch {
     return { 

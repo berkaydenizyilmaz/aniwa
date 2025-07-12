@@ -1,21 +1,34 @@
-// Aniwa Projesi - Admin Schemas
-// Bu dosya admin ile ilgili Zod şemalarını içerir
+// Aniwa Projesi - Admin Domain Schemas
+// Bu dosya yönetim paneli ile ilgili doğrulama şemalarını içerir
 
 import { z } from 'zod'
+import { LogLevel, UserRole } from '@prisma/client'
 import { idSchema } from './user'
-import { dateSchema } from './anime'
-import { LOG_LEVELS, USER_ROLES } from '@/constants'
+import { USER_ROLES } from '@/constants'
 
 // =============================================================================
 // ADMIN ŞEMALARI
 // =============================================================================
 
+// Log oluşturma şeması
+export const createLogSchema = z.object({
+  level: z.nativeEnum(LogLevel),
+  event: z.string().min(1),
+  message: z.string().min(1),
+  metadata: z.record(z.unknown()).optional(),
+  userId: z.string().optional(),
+})
+
+// Log filtreleme şeması
 export const logFiltersSchema = z.object({
-  level: z.array(z.enum(Object.values(LOG_LEVELS) as [string, ...string[]])).optional(),
-  userId: idSchema.optional(),
+  level: z.array(z.string()).optional(),
   event: z.array(z.string()).optional(),
-  startDate: dateSchema.optional(),
-  endDate: dateSchema.optional(),
+  userId: z.string().optional(),
+  userRoles: z.array(z.nativeEnum(UserRole)).optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+  limit: z.number().min(1).max(100).default(20),
+  offset: z.number().min(0).default(0),
   sortBy: z.enum(['createdAt', 'level', 'event']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
 })

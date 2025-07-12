@@ -10,7 +10,7 @@ import type { ID } from './index'
 
 // Giriş parametreleri
 export interface LoginParams {
-  email: string
+  username: string
   password: string
 }
 
@@ -46,7 +46,7 @@ export interface SessionUser {
   id: ID
   email: string
   username: string
-  image?: string
+  image?: string | null
   roles: UserRole[]
 }
 
@@ -59,6 +59,7 @@ export interface UseAuthReturn {
   user: SessionUser | null
   isLoading: boolean
   isAuthenticated: boolean
+  loginWithGoogle: () => Promise<void>
   hasRole: (role: UserRole) => boolean
   hasAnyRole: (roles: UserRole[]) => boolean
   requireRole: (role: UserRole) => boolean
@@ -78,6 +79,29 @@ export interface LoginResult {
 // Çıkış işlemi sonucu
 export interface LogoutResult {
   redirectUrl?: string
+}
+
+// =============================================================================
+// VERIFICATION TOKEN TİPLERİ
+// =============================================================================
+
+// Verification token türleri
+export enum VerificationTokenType {
+  PASSWORD_RESET = 'PASSWORD_RESET',
+  EMAIL_VERIFICATION = 'EMAIL_VERIFICATION'
+}
+
+// Verification token oluşturma parametreleri
+export interface CreateVerificationTokenParams {
+  email: string
+  type: VerificationTokenType
+  expiryHours: number
+}
+
+// Token doğrulama parametreleri
+export interface VerifyTokenParams {
+  token: string
+  type: VerificationTokenType
 }
 
 // =============================================================================

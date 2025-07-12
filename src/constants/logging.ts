@@ -38,6 +38,17 @@ export const LOG_EVENTS = {
   // Rate limiting
   RATE_LIMIT_EXCEEDED: 'rate_limit:exceeded',
   RATE_LIMIT_WARNING: 'rate_limit:warning',
+  
+  // API events
+  API_CALL: 'api:call',
+  
+  // Service events
+  SERVICE_ERROR: 'service:error',
+  
+  // OAuth events
+  AUTH_OAUTH_SUCCESS: 'auth:oauth:success',
+  AUTH_SIGNIN_ERROR: 'auth:signin:error',
+  AUTH_LOGOUT_SUCCESS: 'auth:logout:success',
 } as const
 
 // Log level priority mapping
@@ -55,3 +66,19 @@ export const LOG_RETENTION = {
   INFO: 7,     // 1 hafta
   DEBUG: 1,    // 1 gün
 } as const
+
+// Hassas veri alanları - loglardan çıkarılacak
+export const SENSITIVE_FIELDS = [
+  'password',
+  'token',
+  'secret',
+  'apiKey',
+  'privateKey',
+  'sessionId',
+  'refreshToken',
+  'accessToken',
+  'email',
+] as const
+
+// LogLevel'ı re-export et
+export { LogLevel } from '@prisma/client'

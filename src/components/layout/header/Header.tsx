@@ -6,7 +6,7 @@ import { Search } from 'lucide-react'
 import AuthStatus from './Auth-status'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { Input } from '@/components/ui/input'
-import { ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/constants'
 
 export default function Header() {
   return (

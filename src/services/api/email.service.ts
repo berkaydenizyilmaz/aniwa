@@ -3,10 +3,9 @@
 import { Resend } from 'resend'
 import { env } from '@/lib/env'
 import { logInfo, logError } from '@/services/business/logger.service'
-import { LOG_EVENTS } from '@/constants/logging'
-import { EMAIL_SENDER, EMAIL_SUBJECTS, EMAIL_CONTENT, EMAIL_STYLES } from '@/constants/email'
+import { LOG_EVENTS } from '@/constants'
 import { z } from 'zod'
-import type { ApiResponse } from '@/types/api'
+import type { ApiResponse } from '@/types'
 
 // Resend client
 const resend = new Resend(env.RESEND_API_KEY)
@@ -51,7 +50,13 @@ const createEmailTemplate = (content: string): string => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Aniwa</title>
         <style>
-          ${EMAIL_STYLES}
+          .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+          }
         </style>
       </head>
       <body>
@@ -71,7 +76,7 @@ const createEmailTemplate = (content: string): string => {
 // Base email gönderim fonksiyonu
 async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSendResult>> {
   try {
-    const { to, subject, html, from = EMAIL_SENDER.FROM_ADDRESS } = params
+    const { to, subject, html, from = 'Aniwa <noreply@aniwa.com>' } = params
 
     const { data, error } = await resend.emails.send({
       from,
@@ -139,25 +144,25 @@ export async function sendPasswordResetEmail(
 
     // 3. Ana iş mantığı - Email içeriği oluştur
     const content = `
-      <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">${EMAIL_CONTENT.PASSWORD_RESET.SUBJECT}</h1>
+      <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px;">Şifre Sıfırlama</h1>
       
       <div class="content">
-        <p>${EMAIL_CONTENT.PASSWORD_RESET.GREETING} <strong>${username}</strong>,</p>
+        <p>Merhaba <strong>${username}</strong>,</p>
         
-        <p>${EMAIL_CONTENT.PASSWORD_RESET.MESSAGE}</p>
+        <p>Şifrenizi sıfırlamak için lütfen aşağıdaki linke tıklayınız.</p>
         
         <div style="text-align: center;">
-          <a href="${resetUrl}" class="button">${EMAIL_CONTENT.PASSWORD_RESET.BUTTON_TEXT}</a>
+          <a href="${resetUrl}" class="button">Şifre Sıfırlama</a>
         </div>
         
         <div class="warning">
-          <strong>⚠️ Önemli:</strong> ${EMAIL_CONTENT.PASSWORD_RESET.EXPIRY_NOTE}
+          <strong>⚠️ Önemli:</strong> Şifre sıfırlama linkiniz 1 saat sonra süresi dolacaktır.
         </div>
         
-        <p>${EMAIL_CONTENT.PASSWORD_RESET.ALTERNATIVE}</p>
+        <p>Eğer bu işlemi siz yapmadıysanız, lütfen bu emaili dikkate almayın.</p>
         <p class="link">${resetUrl}</p>
         
-        <p>${EMAIL_CONTENT.PASSWORD_RESET.SECURITY_NOTE}</p>
+        <p>Güvenliğiniz için hesabınızı düzenli olarak kontrol etmenizi öneririz.</p>
       </div>
     `
 
@@ -166,7 +171,7 @@ export async function sendPasswordResetEmail(
     // 4. Email gönder
     const result = await sendEmail({
       to,
-      subject: EMAIL_SUBJECTS.PASSWORD_RESET,
+      subject: 'Şifre Sıfırlama',
       html,
     })
 

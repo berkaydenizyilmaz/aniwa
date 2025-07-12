@@ -19,6 +19,29 @@ export type LogWithUser = Log & {
     username: string
     email: string
     roles: UserRole[]
+  } | null
+}
+
+// Log metadata tipi
+export type LogMetadata = Record<string, unknown>
+
+// Log oluşturma parametreleri
+export interface CreateLogParams {
+  level: LogLevel
+  event: string
+  message: string
+  metadata?: LogMetadata
+  userId?: string
+}
+
+// Log listesi response tipi
+export interface LogListResponse {
+  logs: LogWithUser[]
+  pagination: {
+    total: number
+    limit: number
+    offset: number
+    hasMore: boolean
   }
 }
 

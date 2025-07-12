@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getClientIP } from './index'
 import { AUTH_RATE_LIMIT_TYPES, AUTH_RATE_LIMIT_CONFIG, GLOBAL_RATE_LIMIT_CONFIG } from '@/constants/rate-limits'
-import type { RateLimitConfig, RateLimitKeyOptions } from '@/types/rate-limit'
+import type { RateLimitConfig, RateLimitKeyOptions } from '@/types'
 import { getToken } from 'next-auth/jwt'
 
 // Global API rate limiting için middleware
@@ -66,7 +66,7 @@ export function withAuthRateLimit(
     const keyOptions: RateLimitKeyOptions = {
       ip,
       userId: token?.sub, // Kullanıcı ID'si (varsa)
-      endpoint: `auth-${authType.toLowerCase()}`,
+      endpoint: `auth-${String(authType).toLowerCase()}`,
     }
     
     const status = await checkRateLimit(config, keyOptions)

@@ -2,17 +2,32 @@
 
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { useSession, signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
 import type { UserRole } from '@prisma/client'
-import type { UseAuthReturn } from '@/types/auth'
-import { ROUTES } from '@/constants/routes'
-import { USER_ROLES } from '@/constants/auth'
+import type { UseAuthReturn, SessionUser } from '@/types/auth'
+import { ROUTES, USER_ROLES } from '@/constants'
 
 // Auth durumunu yöneten ana hook
 export function useAuth(): UseAuthReturn {
   const { data: session, status } = useSession()
+  const router = useRouter()
+
+  const loginWithGoogle = useCallback(async () => {
+    try {
+      const result = await signIn('google', {
+        redirect: false,
+      })
+      
+      if (result?.ok) {
+        router.push(ROUTES.PAGES.HOME)
+      }
+    } catch (error) {
+      console.error('Google login error:', error)
+      throw error
+    }
+  }, [router])
 
   const hasRole = useCallback(
     (role: UserRole) => session?.user?.roles?.includes(role) ?? false,
@@ -45,9 +60,10 @@ export function useAuth(): UseAuthReturn {
   )
 
   return {
-    user: session?.user || null,
+    user: session?.user as SessionUser || null,
     isLoading: status === 'loading',
     isAuthenticated: !!session?.user,
+    loginWithGoogle,
     hasRole,
     hasAnyRole,
     requireRole,

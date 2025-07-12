@@ -39,7 +39,7 @@ export const signupSchema = z.object({
 })
 
 export const loginSchema = z.object({
-  email: emailSchema,
+  username: usernameSchema,
   password: passwordSchema,
 })
 
@@ -50,6 +50,10 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Token gerekli'),
   password: passwordSchema,
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Şifreler eşleşmiyor',
+  path: ['confirmPassword'],
 })
 
 export const checkUsernameSchema = z.object({
@@ -69,4 +73,16 @@ export const createVerificationTokenSchema = z.object({
 export const verifyTokenSchema = z.object({
   token: z.string().min(1, 'Token gerekli'),
   type: z.enum(Object.values(AUTH.VERIFICATION_TOKEN_TYPES) as [string, ...string[]])
-}) 
+})
+
+// =============================================================================
+// TYPE EXPORTS
+// =============================================================================
+
+export type SignupData = z.infer<typeof signupSchema>
+export type LoginData = z.infer<typeof loginSchema>
+export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>
+export type ResetPasswordData = z.infer<typeof resetPasswordSchema>
+export type CheckUsernameData = z.infer<typeof checkUsernameSchema>
+export type CreateVerificationTokenData = z.infer<typeof createVerificationTokenSchema>
+export type VerifyTokenData = z.infer<typeof verifyTokenSchema> 

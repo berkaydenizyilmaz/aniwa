@@ -3,18 +3,10 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyPasswordResetToken, resetPasswordWithToken } from '@/services/business/auth.service'
-import { logInfo, logError } from '@/services/business/logger.service'
-import { LOG_EVENTS } from '@/constants/logging'
+import { AUTH_RATE_LIMIT_TYPES } from '@/constants'
+import { resetPasswordSchema } from '@/schemas/auth'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
-import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
-import { ApiResponse } from '@/types/api'
-import { z } from 'zod'
-
-// Reset password schema
-const resetPasswordSchema = z.object({
-  token: z.string().min(1, 'Token gerekli'),
-  password: z.string().min(6, 'Şifre en az 6 karakter olmalı')
-})
+import type { ApiResponse } from '@/types'
 
 // Token doğrulama endpoint'i (GET)
 async function getHandler(request: NextRequest): Promise<NextResponse<ApiResponse<{ message: string, email?: string }>>> {
@@ -46,21 +38,13 @@ async function getHandler(request: NextRequest): Promise<NextResponse<ApiRespons
         { status: 400 }
       )
     }
-  } catch (error) {
-    logError(LOG_EVENTS.AUTH_PASSWORD_RESET_FAILED, 'Şifre sıfırlama token doğrulama hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata'
-    })
-
+  } catch {
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
     )
   }
 }
-
-// Rate limiting ile sarılmış exports
-export const GET = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.PASSWORD_RESET, getHandler)
-export const POST = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.PASSWORD_RESET, postHandler)
 
 // Şifre sıfırlama endpoint'i (POST)
 async function postHandler(request: NextRequest): Promise<NextResponse<ApiResponse<{ message: string }>>> {
@@ -85,8 +69,6 @@ async function postHandler(request: NextRequest): Promise<NextResponse<ApiRespon
     const result = await resetPasswordWithToken(token, password)
 
     if (result.success) {
-      logInfo(LOG_EVENTS.AUTH_PASSWORD_RESET_SUCCESS, 'Şifre başarıyla sıfırlandı')
-
       return NextResponse.json({
         success: true,
         data: { message: 'Şifreniz başarıyla güncellendi' }
@@ -97,14 +79,14 @@ async function postHandler(request: NextRequest): Promise<NextResponse<ApiRespon
         { status: 400 }
       )
     }
-  } catch (error) {
-    logError(LOG_EVENTS.AUTH_PASSWORD_RESET_FAILED, 'Şifre sıfırlama API hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata'
-    })
-
+  } catch {
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
     )
   }
-} 
+}
+
+// Rate limiting ile sarılmış exports
+export const GET = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.PASSWORD_RESET, getHandler)
+export const POST = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.PASSWORD_RESET, postHandler)

@@ -10,7 +10,7 @@ import type {
   RateLimitConfig, 
   RateLimitKeyOptions,
   RateLimitStatus 
-} from '@/types/rate-limit'
+} from '@/types'
 
 // Rate limit key oluşturur
 // Öncelik sırası: customKey > userId > ip

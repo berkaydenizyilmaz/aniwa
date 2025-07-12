@@ -1,14 +1,10 @@
 // Bu dosya doğrulama token'larının veritabanı işlemlerini yönetir
 
 import { prisma } from '@/lib/db/prisma'
-import { createVerificationTokenSchema, verifyTokenSchema } from '@/lib/schemas/auth.schemas'
-import type { ApiResponse } from '@/types/api'
+import { createVerificationTokenSchema, verifyTokenSchema } from '@/schemas/auth'
+import type { ApiResponse } from '@/types'
+import type { VerificationTokenType, CreateVerificationTokenParams, VerifyTokenParams } from '@/types/auth'
 import { randomBytes } from 'crypto'
-import type { 
-  VerificationTokenType, 
-  CreateVerificationTokenParams, 
-  VerifyTokenParams 
-} from '@/types/verification'
 
 // Token oluştur
 export async function createToken(params: CreateVerificationTokenParams): Promise<ApiResponse<string>> {

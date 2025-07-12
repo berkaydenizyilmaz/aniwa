@@ -4,10 +4,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { registerUser } from '@/services/business/auth.service'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
-import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
-import { signupSchema } from '@/lib/schemas/auth.schemas'
-import { logError, logInfo } from '@/services/business/logger.service'
-import { LOG_EVENTS } from '@/constants/logging'
+import { AUTH_RATE_LIMIT_TYPES } from '@/constants'
+import { signupSchema } from '@/schemas/auth'
 
 async function signupHandler(request: NextRequest) {
   try {
@@ -26,7 +24,7 @@ async function signupHandler(request: NextRequest) {
       )
     }
 
-    // Business service call - User creation (email verification kaldırıldı)
+    // Business service call - User creation
     const result = await registerUser(validationResult.data)
     
     if (!result.success) {
@@ -35,12 +33,6 @@ async function signupHandler(request: NextRequest) {
         { status: 400 }
       )
     }
-
-    // Başarı loglaması
-    logInfo(LOG_EVENTS.AUTH_SIGNUP_SUCCESS, 'Kullanıcı kaydı API başarılı', {
-      userId: result.data?.id,
-      email: validationResult.data.email
-    })
 
     return NextResponse.json({
       success: true,
@@ -54,11 +46,7 @@ async function signupHandler(request: NextRequest) {
       }
     })
 
-  } catch (error) {
-    logError(LOG_EVENTS.API_ERROR, 'Signup API hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata'
-    })
-
+  } catch {
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }

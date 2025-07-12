@@ -1,7 +1,8 @@
 // Bu dosya kullanıcı CRUD işlemlerini yönetir
 
 import { prisma } from '@/lib/db/prisma'
-import { USER_ROLES, BCRYPT_SALT_ROUNDS } from '@/constants/auth'
+import { USER_ROLES } from '@/constants'
+import { AUTH } from '@/constants/auth'
 import { generateUserSlug } from '@/lib/utils'
 import { Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
@@ -9,16 +10,10 @@ import {
   signupSchema, 
   emailSchema, 
   usernameSchema, 
-  userIdSchema,
-  userUpdateSchema,
   passwordSchema
-} from '@/lib/schemas/auth.schemas'
-import type { ApiResponse } from '@/types/api'
-import type { 
-  CreateUserParams, 
-  UserWithSettings,
-  UpdateUserParams
-} from '@/types/auth'
+} from '@/schemas/auth'
+import { idSchema, updateUserSchema } from '@/schemas/user'
+import type { ApiResponse, CreateUserParams, UserWithSettings, UpdateUserParams } from '@/types'
 
 // Kullanıcı oluştur (Transaction ile settings de oluştur)
 export async function createUser(params: CreateUserParams): Promise<ApiResponse<UserWithSettings>> {
@@ -46,7 +41,7 @@ export async function createUser(params: CreateUserParams): Promise<ApiResponse<
 
     // 3. Ana işlem - Transaction ile kullanıcı + ayarları oluştur
     const uniqueSlug = generateUserSlug(username)
-    const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
+    const passwordHash = await bcrypt.hash(password, AUTH.BCRYPT_SALT_ROUNDS)
 
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -87,7 +82,7 @@ export async function createUser(params: CreateUserParams): Promise<ApiResponse<
 // ID ile kullanıcı bul
 export async function findUserById(userId: string): Promise<ApiResponse<UserWithSettings | null>> {
   try {
-    const validatedUserId = userIdSchema.parse(userId)
+    const validatedUserId = idSchema.parse(userId)
 
     const user = await prisma.user.findUnique({
       where: { id: validatedUserId },
@@ -135,8 +130,8 @@ export async function findUserByUsername(username: string): Promise<ApiResponse<
 // Kullanıcı güncelle
 export async function updateUser(userId: string, params: UpdateUserParams): Promise<ApiResponse<UserWithSettings>> {
   try {
-    const validatedUserId = userIdSchema.parse(userId)
-    const validatedParams = userUpdateSchema.parse(params)
+    const validatedUserId = idSchema.parse(userId)
+    const validatedParams = updateUserSchema.parse(params)
 
     const user = await prisma.user.update({
       where: { id: validatedUserId },
@@ -153,7 +148,7 @@ export async function updateUser(userId: string, params: UpdateUserParams): Prom
 // Kullanıcı sil
 export async function deleteUser(userId: string): Promise<ApiResponse<void>> {
   try {
-    const validatedUserId = userIdSchema.parse(userId)
+    const validatedUserId = idSchema.parse(userId)
 
     await prisma.user.delete({
       where: { id: validatedUserId }
@@ -168,10 +163,10 @@ export async function deleteUser(userId: string): Promise<ApiResponse<void>> {
 // Kullanıcı şifresini güncelle
 export async function updatePassword(userId: string, newPassword: string): Promise<ApiResponse<void>> {
   try {
-    const validatedUserId = userIdSchema.parse(userId)
+    const validatedUserId = idSchema.parse(userId)
     const validatedPassword = passwordSchema.parse(newPassword)
 
-    const hashedPassword = await bcrypt.hash(validatedPassword, BCRYPT_SALT_ROUNDS)
+    const hashedPassword = await bcrypt.hash(validatedPassword, AUTH.BCRYPT_SALT_ROUNDS)
 
     await prisma.user.update({
       where: { id: validatedUserId },
@@ -185,9 +180,9 @@ export async function updatePassword(userId: string, newPassword: string): Promi
 }
 
 // Login credentials doğrula
-export async function verifyCredentials(email: string, password: string): Promise<ApiResponse<UserWithSettings | null>> {
+export async function verifyCredentials(username: string, password: string): Promise<ApiResponse<UserWithSettings | null>> {
   try {
-    const user = await findUserByEmail(email)
+    const user = await findUserByUsername(username)
     
     if (!user.success || !user.data || !user.data.passwordHash) {
       return { success: true, data: null } // Güvenlik için false bilgi verme
@@ -238,7 +233,7 @@ export async function countUsers(where?: Prisma.UserWhereInput): Promise<ApiResp
 // Kullanıcı varlığını kontrol et
 export async function userExists(userId: string): Promise<ApiResponse<boolean>> {
   try {
-    const validatedUserId = userIdSchema.parse(userId)
+    const validatedUserId = idSchema.parse(userId)
     const count = await prisma.user.count({
       where: { id: validatedUserId }
     })

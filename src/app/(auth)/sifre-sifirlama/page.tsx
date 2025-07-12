@@ -14,8 +14,8 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Lock, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react'
 import Link from 'next/link'
-import { resetPasswordSchema, type ResetPasswordData } from '@/lib/schemas/auth.schemas'
-import { ROUTES } from '@/constants/routes'
+import { resetPasswordSchema, type ResetPasswordData } from '@/schemas/auth'
+import { ROUTES } from '@/constants'
 
 type PageState = 'loading' | 'form' | 'success' | 'error'
 

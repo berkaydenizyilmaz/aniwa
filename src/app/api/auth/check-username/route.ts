@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
-import { logInfo, logWarn } from '@/services/business/logger.service'
-import { LOG_EVENTS } from '@/constants/logging'
-import { checkUsernameSchema } from '@/lib/schemas/auth.schemas'
+import { AUTH_RATE_LIMIT_TYPES } from '@/constants'
+import { checkUsernameSchema } from '@/schemas/auth'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
-import { AUTH_RATE_LIMIT_TYPES } from '@/constants/rate-limits'
-import { ApiResponse } from '@/types/api'
+import type { ApiResponse } from '@/types'
 
 async function checkUsernameHandler(request: NextRequest): Promise<NextResponse<ApiResponse<{ available: boolean, username: string }>>> {
   try {
@@ -42,11 +40,6 @@ async function checkUsernameHandler(request: NextRequest): Promise<NextResponse<
 
     const isAvailable = !existingUser
 
-    logInfo(LOG_EVENTS.AUTH_USERNAME_CHECK, 'Username kullanılabilirlik kontrolü', {
-      username: validatedUsername,
-      available: isAvailable
-    })
-
     return NextResponse.json({
       success: true,
       data: {
@@ -55,11 +48,7 @@ async function checkUsernameHandler(request: NextRequest): Promise<NextResponse<
       }
     })
 
-  } catch (error) {
-    logWarn(LOG_EVENTS.AUTH_USERNAME_CHECK, 'Username kontrol hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata'
-    })
-
+  } catch {
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }

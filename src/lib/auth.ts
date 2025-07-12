@@ -6,11 +6,11 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/db/prisma'
 import { env } from './env'
 import { logInfo, logError, logWarn } from '@/services/business/logger.service'
-import { LOG_EVENTS } from '../constants/logging'
-import { SESSION_MAX_AGE, JWT_MAX_AGE, OAUTH_PROVIDERS } from '../constants/auth'
-import { ROUTES } from '../constants/routes'
+import { LOG_EVENTS } from '@/constants'
+import { AUTH } from '@/constants/auth'
+import { ROUTES } from '@/constants'
 import { generateUsernameFromName, generateUserSlug } from '@/lib/utils'
-import { USER_ROLES } from '@/constants/auth'
+import { USER_ROLES } from '@/constants'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
@@ -86,11 +86,11 @@ export const authOptions: NextAuthOptions = {
 
   session: {
     strategy: 'jwt',
-    maxAge: SESSION_MAX_AGE,
+    maxAge: AUTH.SESSION_MAX_AGE,
   },
 
   jwt: {
-    maxAge: JWT_MAX_AGE,
+    maxAge: AUTH.JWT_MAX_AGE,
   },
 
   pages: {
@@ -125,7 +125,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile }) {
       try {
         // OAuth ile giriş yapılıyorsa
-        if (account?.provider === OAUTH_PROVIDERS.GOOGLE && profile) {
+        if (account?.provider === AUTH.OAUTH_PROVIDERS.GOOGLE && profile) {
           // Mevcut kullanıcı kontrolü
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email!.toLowerCase() }
