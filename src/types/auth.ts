@@ -60,6 +60,7 @@ export interface UseAuthReturn {
   isLoading: boolean
   isAuthenticated: boolean
   loginWithGoogle: () => Promise<void>
+  logout: () => Promise<void>
   hasRole: (role: UserRole) => boolean
   hasAnyRole: (roles: UserRole[]) => boolean
   requireRole: (role: UserRole) => boolean

@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useSession, signIn } from 'next-auth/react'
+import { useSession, signIn, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
 import type { UserRole } from '@prisma/client'
@@ -25,6 +25,16 @@ export function useAuth(): UseAuthReturn {
       }
     } catch (error) {
       console.error('Google login error:', error)
+      throw error
+    }
+  }, [router])
+
+  const logout = useCallback(async () => {
+    try {
+      await signOut({ redirect: false })
+      router.push(ROUTES.PAGES.HOME)
+    } catch (error) {
+      console.error('Logout error:', error)
       throw error
     }
   }, [router])
@@ -64,6 +74,7 @@ export function useAuth(): UseAuthReturn {
     isLoading: status === 'loading',
     isAuthenticated: !!session?.user,
     loginWithGoogle,
+    logout,
     hasRole,
     hasAnyRole,
     requireRole,
