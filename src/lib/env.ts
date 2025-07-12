@@ -36,6 +36,16 @@ const envSchema = z.object({
 
 // Environment değişkenlerini doğrula
 function validateEnv(): Env {
+  // Client-side'da çalışıyorsa validation'ı atla
+  if (typeof window !== 'undefined') {
+    console.log('🌐 Client-side detected, skipping env validation')
+    return {
+      NODE_ENV: 'development',
+      DATABASE_URL: '',
+      NEXTAUTH_SECRET: '',
+    } as Env
+  } 
+
   try {
     const validatedEnv = envSchema.parse(process.env)
     
