@@ -115,7 +115,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string
-        session.user.username = token.username as string | null
+        session.user.username = token.username as string
         session.user.roles = token.roles
       }
 
@@ -158,7 +158,7 @@ export const authOptions: NextAuthOptions = {
                 username,
                 slug,
                 roles: [USER_ROLES.USER],
-                image: profile.picture,
+                image: profile.image,
               }
             })
 
@@ -177,7 +177,7 @@ export const authOptions: NextAuthOptions = {
           user.username = newUser.username
           user.roles = newUser.roles
 
-          logInfo(LOG_EVENTS.AUTH_USER_CREATED, 'OAuth kullanıcısı oluşturuldu', {
+          logInfo(LOG_EVENTS.USER_CREATED, 'OAuth kullanıcısı oluşturuldu', {
             userId: newUser.id,
             email: newUser.email,
             username: newUser.username,
