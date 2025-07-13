@@ -22,7 +22,7 @@ async function getHandler(
     }
 
     // 2. Token'ı doğrula
-    const result = await verifyPasswordResetToken(token)
+    const result = await verifyPasswordResetToken({ token })
 
     if (result.success) {
       return NextResponse.json({
@@ -75,7 +75,7 @@ async function postHandler(
     const { token, password } = validation.data
     
     // 2. Şifre sıfırlama işlemini gerçekleştir
-    const result = await resetPasswordWithToken(token, password)
+    const result = await resetPasswordWithToken({ token, newPassword: password })
 
     if (result.success) {
       return NextResponse.json({
