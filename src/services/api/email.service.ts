@@ -1,35 +1,17 @@
 import { Resend } from 'resend'
 import { env } from '@/lib/env'
-import { logInfo, logError } from '@/services/business/logger.service'
-import { LOG_EVENTS } from '@/constants'
+import { logError } from '@/services/business/logger.service'
 import { z } from 'zod'
-import type { ApiResponse } from '@/types'
+import type { 
+  ApiResponse, 
+  EmailSendResult, 
+  SendEmailParams, 
+  SendPasswordResetEmailParams,
+  SendPasswordChangeNotificationEmailParams 
+} from '@/types'
 
 // Resend client
 const resend = new Resend(env.RESEND_API_KEY)
-
-// Email gönderme sonuç tipi
-export interface EmailSendResult {
-  id?: string
-  from: string
-  to: string
-  subject: string
-}
-
-// Base email gönderme parametreleri
-interface SendEmailParams {
-  to: string
-  subject: string
-  html: string
-  from?: string
-}
-
-// Şifre sıfırlama email parametreleri
-interface SendPasswordResetEmailParams {
-  to: string
-  username: string
-  resetUrl: string
-}
 
 // Şifre sıfırlama email şeması
 const sendPasswordResetEmailSchema = z.object({
@@ -76,38 +58,11 @@ async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSend
   try {
     const { to, subject, html, from = 'Aniwa <noreply@aniwa.com>' } = params
 
-    const { data, error } = await resend.emails.send({
+    const { data } = await resend.emails.send({
       from,
       to,
       subject,
       html,
-    })
-
-    if (error) {
-      logError({
-        event: LOG_EVENTS.API_CALL,
-        message: 'Resend API hatası',
-        metadata: {
-          error: error.message,
-          to,
-          subject
-        }
-      })
-
-      return {
-        success: false,
-        error: 'Email gönderilemedi'
-      }
-    }
-
-    logInfo({
-      event: LOG_EVENTS.API_CALL,
-      message: 'Email başarıyla gönderildi',
-      metadata: {
-        emailId: data?.id,
-        to,
-        subject
-      }
     })
 
     return {
@@ -122,7 +77,7 @@ async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSend
 
   } catch (error) {
     logError({
-      event: LOG_EVENTS.SERVICE_ERROR,
+      event: 'EMAIL_SEND_ERROR',
       message: 'Email gönderim hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -191,7 +146,7 @@ export async function sendPasswordResetEmail(
   } catch (error) {
     // 6. Hata loglaması
     logError({
-      event: LOG_EVENTS.SERVICE_ERROR,
+      event: 'PASSWORD_RESET_EMAIL_SEND_ERROR',
       message: 'Şifre sıfırlama email gönderim hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -210,7 +165,7 @@ export async function sendPasswordResetEmail(
 
 // Şifre değişikliği bildirim emaili gönderir
 export async function sendPasswordChangeNotificationEmail(
-  params: { to: string; username: string }
+  params: SendPasswordChangeNotificationEmailParams
 ): Promise<ApiResponse<EmailSendResult>> {
   try {
     const { to, username } = params
@@ -243,7 +198,7 @@ export async function sendPasswordChangeNotificationEmail(
 
   } catch (error) {
     logError({
-      event: LOG_EVENTS.SERVICE_ERROR,
+      event: 'PASSWORD_CHANGE_NOTIFICATION_EMAIL_SEND_ERROR',
       message: 'Şifre değişikliği bildirim email gönderim hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
