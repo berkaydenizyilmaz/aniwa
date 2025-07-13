@@ -48,7 +48,10 @@ function adjustConfigForEnvironment(config: RateLimitConfig): RateLimitConfig {
 // Rate limiter instance oluşturur
 function createRateLimiter(config: RateLimitConfig): Ratelimit | null {
   if (!hasRateLimit) {
-    logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Rate limiting devre dışı - KV konfigürasyonu eksik')
+    logWarn({
+      event: LOG_EVENTS.AUTH_LOGIN_FAILED,
+      message: 'Rate limiting devre dışı - KV konfigürasyonu eksik'
+    })
     return null
   }
   
@@ -67,11 +70,15 @@ function createRateLimiter(config: RateLimitConfig): Ratelimit | null {
       analytics: true, // Vercel Analytics entegrasyonu
     })
   } catch (error) {
-    logError(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Rate limiter oluşturma hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      requests: config.requests,
-      window: config.window,
-      algorithm: config.algorithm,
+    logError({
+      event: LOG_EVENTS.AUTH_LOGIN_FAILED,
+      message: 'Rate limiter oluşturma hatası',
+      metadata: {
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+        requests: config.requests,
+        window: config.window,
+        algorithm: config.algorithm,
+      }
     })
     return null
   }
@@ -115,10 +122,14 @@ export async function checkRateLimit(
     
     // Sadece rate limit aşımlarını logla (başarılı olanları değil)
     if (!result.success) {
-      logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Rate limit aşıldı', {
-        key: key.substring(0, 20) + '...', // Güvenlik için kısalt
-        limit: result.limit,
-        reset: new Date(result.reset).toISOString(),
+      logWarn({
+        event: LOG_EVENTS.AUTH_LOGIN_FAILED,
+        message: 'Rate limit aşıldı',
+        metadata: {
+          key: key.substring(0, 20) + '...', // Güvenlik için kısalt
+          limit: result.limit,
+          reset: new Date(result.reset).toISOString(),
+        }
       })
     }
     
@@ -140,11 +151,15 @@ export async function checkRateLimit(
       } : undefined,
     }
   } catch (error) {
-    logError(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Rate limit kontrolü hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      ip: keyOptions.ip,
-      userId: keyOptions.userId,
-      endpoint: keyOptions.endpoint,
+    logError({
+      event: LOG_EVENTS.AUTH_LOGIN_FAILED,
+      message: 'Rate limit kontrolü hatası',
+      metadata: {
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+        ip: keyOptions.ip,
+        userId: keyOptions.userId,
+        endpoint: keyOptions.endpoint,
+      }
     })
     
     // Hata durumunda graceful degradation - geç
