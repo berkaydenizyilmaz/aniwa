@@ -19,14 +19,24 @@ import { generateUserSlug } from '@/lib/utils'
 import { prisma } from '@/lib/db/prisma'
 import { randomBytes } from 'crypto'
 import bcrypt from 'bcryptjs'
-import type { CreateUserParams, UserWithSettings, ServiceResult } from '@/types'
+import type { 
+  LoginParams,
+  CreateUserParams,
+  CreatePasswordResetTokenParams,
+  PasswordResetParams,
+  PasswordUpdateParams,
+  TokenVerificationParams,
+  UserWithSettings, 
+  ServiceResult 
+} from '@/types'
 
 // Kullanıcı girişi
 export async function loginUser(
-  username: string,
-  password: string
+  params: LoginParams
 ): Promise<ServiceResult<UserWithSettings | null>> {
   try {
+    const { username, password } = params
+    
     const user = await findUserByUsernameWithSettings(username)
     if (!user || !user.passwordHash) {
       return { success: true, data: null }
@@ -37,14 +47,21 @@ export async function loginUser(
       return { success: true, data: null }
     }
 
+    logInfo({
+      event: 'USER_LOGIN',
+      message: `Kullanıcı giriş yaptı: ${user.email}`,
+      metadata: { email: user.email, username: user.username },
+      userId: user.id
+    })
+
     return { success: true, data: user }
 
   } catch (error) {
-    logError(
-      'LOGIN_SYSTEM_ERROR',
-      `Giriş sırasında sistem hatası: ${username}`,
-      { username, error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
-    )
+    logError({
+      event: 'LOGIN_SYSTEM_ERROR',
+      message: `Giriş sırasında sistem hatası: ${params.username}`,
+      metadata: { username: params.username, error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
+    })
     return { success: false, error: 'Giriş işlemi gerçekleştirilemedi.' }
   }
 }
@@ -86,12 +103,12 @@ export async function registerUser(
       return { user, userSettings }
     })
 
-    logInfo(
-      'USER_REGISTERED',
-      `Yeni kullanıcı kaydoldu: ${result.user.email}`,
-      { email: result.user.email, username: result.user.username },
-      result.user.id
-    )
+    logInfo({
+      event: 'USER_REGISTERED',
+      message: `Yeni kullanıcı kaydoldu: ${result.user.email}`,
+      metadata: { email: result.user.email, username: result.user.username },
+      userId: result.user.id
+    })
 
     const data: UserWithSettings = {
       ...result.user,
@@ -101,45 +118,47 @@ export async function registerUser(
     return { success: true, data }
 
   } catch (error) {
-    logError(
-      'USER_REGISTRATION_FAILED',
-      `Kullanıcı kaydı başarısız: ${params.email}`,
-      { 
+    logError({
+      event: 'USER_REGISTRATION_FAILED',
+      message: `Kullanıcı kaydı başarısız: ${params.email}`,
+      metadata: { 
         email: params.email,
         username: params.username,
         error: error instanceof Error ? error.message : 'Bilinmeyen hata'
       }
-    )
+    })
     return { success: false, error: 'Kullanıcı kaydı gerçekleştirilemedi.' }
   }
 }
 
 // Şifre güncelleme
 export async function updateUserPassword(
-  userId: string,
-  newPassword: string
+  params: PasswordUpdateParams
 ): Promise<ServiceResult<void>> {
   try {
+    const { userId, newPassword } = params
+    
     const hashedPassword = await bcrypt.hash(newPassword, AUTH.BCRYPT_SALT_ROUNDS)
     await updateUser(userId, { passwordHash: hashedPassword })
     return { success: true, data: undefined }
   } catch (error) {
-    logError(
-      'PASSWORD_UPDATE_FAILED',
-      'Şifre güncelleme hatası',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata' },
-      userId
-    )
+    logError({
+      event: 'PASSWORD_UPDATE_FAILED',
+      message: 'Şifre güncelleme hatası',
+      metadata: { error: error instanceof Error ? error.message : 'Bilinmeyen hata' },
+      userId: params.userId
+    })
     return { success: false, error: 'Şifre güncellenemedi.' }
   }
 }
 
 // Şifre sıfırlama token oluştur
 export async function createPasswordResetToken(
-  email: string,
-  baseUrl: string
+  params: CreatePasswordResetTokenParams
 ): Promise<ServiceResult<{ token: string }>> {
   try {
+    const { email, baseUrl } = params
+    
     // İş kuralı: Kullanıcı kontrolü
     const user = await findUserByEmail(email)
     if (!user) {
@@ -176,20 +195,22 @@ export async function createPasswordResetToken(
     return { success: true, data: { token } }
 
   } catch (error) {
-    logError(
-      'PASSWORD_RESET_REQUEST_FAILED',
-      `Şifre sıfırlama token oluşturma hatası: ${email}`,
-      { email, error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
-    )
+    logError({
+      event: 'PASSWORD_RESET_REQUEST_FAILED',
+      message: `Şifre sıfırlama token oluşturma hatası: ${params.email}`,
+      metadata: { email: params.email, error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
+    })
     return { success: false, error: 'Şifre sıfırlama işlemi başlatılamadı.' }
   }
 }
 
 // Token doğrula
 export async function verifyPasswordResetToken(
-  token: string
+  params: TokenVerificationParams
 ): Promise<ServiceResult<{ email: string }>> {
   try {
+    const { token } = params
+    
     // İş kuralı: Token kontrolü
     const verificationToken = await findVerificationTokenByToken(token)
 
@@ -202,21 +223,22 @@ export async function verifyPasswordResetToken(
     return { success: true, data: { email: verificationToken.email } }
 
   } catch (error) {
-    logError(
-      'PASSWORD_RESET_TOKEN_VERIFICATION_FAILED',
-      'Şifre sıfırlama token doğrulama hatası',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
-    )
+    logError({
+      event: 'PASSWORD_RESET_TOKEN_VERIFICATION_FAILED',
+      message: 'Şifre sıfırlama token doğrulama hatası',
+      metadata: { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
+    })
     return { success: false, error: 'Token doğrulaması başarısız.' }
   }
 }
 
 // Şifre sıfırla
 export async function resetPasswordWithToken(
-  token: string,
-  newPassword: string
+  params: PasswordResetParams
 ): Promise<ServiceResult<void>> {
   try {
+    const { token, newPassword } = params
+    
     // İş kuralı: Token kontrolü
     const verificationToken = await findVerificationTokenByToken(token)
 
@@ -241,11 +263,11 @@ export async function resetPasswordWithToken(
     return { success: true, data: undefined }
 
   } catch (error) {
-    logError(
-      'PASSWORD_RESET_FAILED',
-      'Şifre sıfırlama hatası',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
-    )
+    logError({
+      event: 'PASSWORD_RESET_FAILED',
+      message: 'Şifre sıfırlama hatası',
+      metadata: { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
+    })
     return { success: false, error: 'Şifre sıfırlanamadı.' }
   }
 } 

@@ -18,20 +18,32 @@ export interface SignupParams {
   username: string
 }
 
+// Şifre sıfırlama token oluşturma parametreleri
+export interface CreatePasswordResetTokenParams {
+  email: string
+  baseUrl: string
+}
+
 // Şifre sıfırlama parametreleri
 export interface PasswordResetParams {
-  email: string
+  token: string
+  newPassword: string
 }
 
 // Şifre güncelleme parametreleri
 export interface PasswordUpdateParams {
-  token: string
+  userId: string
   newPassword: string
 }
 
 // Username kontrol parametreleri
 export interface UsernameCheckParams {
   username: string
+}
+
+// Token doğrulama parametreleri
+export interface TokenVerificationParams {
+  token: string
 }
 
 // =============================================================================
@@ -48,10 +60,10 @@ export interface SessionUser {
 }
 
 // =============================================================================
-// HOOK DÖNÜŞ TİPLERİ
+// HOOK RETURN TIPLERI
 // =============================================================================
 
-// useAuth hook'u için dönüş tipi
+// useAuth hook return tipi
 export interface UseAuthReturn {
   user: SessionUser | null
   isLoading: boolean
@@ -65,25 +77,25 @@ export interface UseAuthReturn {
 }
 
 // =============================================================================
-// API RESPONSE TİPLERİ
+// AUTH RESULT TIPLERI
 // =============================================================================
 
-// Giriş işlemi sonucu
+// Login sonucu
 export interface LoginResult {
   user?: SessionUser
   signInResponse?: unknown
 }
 
-// Çıkış işlemi sonucu
+// Logout sonucu
 export interface LogoutResult {
   redirectUrl?: string
 }
 
 // =============================================================================
-// VERIFICATION TOKEN TİPLERİ
+// VERIFICATION TOKEN TIPLERI
 // =============================================================================
 
-// Verification token türleri
+// Verification token tipi
 export enum VerificationTokenType {
   PASSWORD_RESET = 'PASSWORD_RESET',
   EMAIL_VERIFICATION = 'EMAIL_VERIFICATION'
@@ -100,6 +112,17 @@ export interface CreateVerificationTokenParams {
 export interface VerifyTokenParams {
   token: string
   type: VerificationTokenType
+}
+
+// =============================================================================
+// BUSINESS SERVICE TIPLERI
+// =============================================================================
+
+// Kullanıcı oluşturma parametreleri (business service için)
+export interface CreateUserParams {
+  email: string
+  password: string
+  username: string
 }
 
 // =============================================================================
