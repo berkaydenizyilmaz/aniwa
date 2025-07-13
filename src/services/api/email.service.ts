@@ -84,10 +84,14 @@ async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSend
     })
 
     if (error) {
-      logError(LOG_EVENTS.API_CALL, 'Resend API hatası', {
-        error: error.message,
-        to,
-        subject
+      logError({
+        event: LOG_EVENTS.API_CALL,
+        message: 'Resend API hatası',
+        metadata: {
+          error: error.message,
+          to,
+          subject
+        }
       })
 
       return {
@@ -96,10 +100,14 @@ async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSend
       }
     }
 
-    logInfo(LOG_EVENTS.API_CALL, 'Email başarıyla gönderildi', {
-      emailId: data?.id,
-      to,
-      subject
+    logInfo({
+      event: LOG_EVENTS.API_CALL,
+      message: 'Email başarıyla gönderildi',
+      metadata: {
+        emailId: data?.id,
+        to,
+        subject
+      }
     })
 
     return {
@@ -113,10 +121,14 @@ async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSend
     }
 
   } catch (error) {
-    logError(LOG_EVENTS.SERVICE_ERROR, 'Email gönderim hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      to: params.to,
-      subject: params.subject
+    logError({
+      event: LOG_EVENTS.SERVICE_ERROR,
+      message: 'Email gönderim hatası',
+      metadata: {
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+        to: params.to,
+        subject: params.subject
+      }
     })
 
     return {
@@ -178,9 +190,13 @@ export async function sendPasswordResetEmail(
 
   } catch (error) {
     // 6. Hata loglaması
-    logError(LOG_EVENTS.SERVICE_ERROR, 'Şifre sıfırlama email gönderim hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      to: params.to
+    logError({
+      event: LOG_EVENTS.SERVICE_ERROR,
+      message: 'Şifre sıfırlama email gönderim hatası',
+      metadata: {
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+        to: params.to
+      }
     })
     
     // 7. Hata yanıtı
@@ -226,9 +242,13 @@ export async function sendPasswordChangeNotificationEmail(
     return result
 
   } catch (error) {
-    logError(LOG_EVENTS.SERVICE_ERROR, 'Şifre değişikliği bildirim email gönderim hatası', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      to: params.to
+    logError({
+      event: LOG_EVENTS.SERVICE_ERROR,
+      message: 'Şifre değişikliği bildirim email gönderim hatası',
+      metadata: {
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+        to: params.to
+      }
     })
 
     return { success: false, error: 'Email gönderilemedi' }

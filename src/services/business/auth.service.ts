@@ -47,13 +47,6 @@ export async function loginUser(
       return { success: true, data: null }
     }
 
-    logInfo({
-      event: 'USER_LOGIN',
-      message: `Kullanıcı giriş yaptı: ${user.email}`,
-      metadata: { email: user.email, username: user.username },
-      userId: user.id
-    })
-
     return { success: true, data: user }
 
   } catch (error) {
