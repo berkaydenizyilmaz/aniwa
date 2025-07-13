@@ -3,7 +3,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/db/prisma'
 import { env } from './env'
-import { logInfo, logError, logWarn } from '@/services/business/logger.service'
+import { logInfo, logError } from '@/services/business/logger.service'
 import { LOG_EVENTS } from '@/constants'
 import { AUTH } from '@/constants/auth'
 import { ROUTES } from '@/constants'
@@ -30,7 +30,6 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) {
-          logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Eksik kimlik bilgileri')
           return null
         }
 
@@ -39,9 +38,6 @@ export const authOptions: NextAuthOptions = {
           const user = await findUserByUsername(credentials.username)
 
           if (!user || !user.passwordHash) {
-            logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Kullanıcı bulunamadı', {
-              username: credentials.username
-            })
             return null
           }
 
@@ -52,10 +48,6 @@ export const authOptions: NextAuthOptions = {
           )
 
           if (!isPasswordValid) {
-            logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Geçersiz şifre', {
-              userId: user.id,
-              username: credentials.username
-            })
             return null
           }
 
@@ -67,9 +59,13 @@ export const authOptions: NextAuthOptions = {
             roles: user.roles,
           }
         } catch (error) {
-          logError(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Giriş hatası', {
-            error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-            username: credentials.username
+          logError({
+            event: LOG_EVENTS.AUTH_LOGIN_FAILED,
+            message: 'Giriş hatası',
+            metadata: {
+              error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+              username: credentials.username
+            }
           })
           return null
         }
@@ -129,13 +125,7 @@ export const authOptions: NextAuthOptions = {
             user.id = existingUser.id
             user.username = existingUser.username
             user.roles = existingUser.roles
-            
-            logInfo(LOG_EVENTS.AUTH_OAUTH_SUCCESS, 'Mevcut kullanıcı OAuth girişi', {
-              userId: existingUser.id,
-              email: existingUser.email,
-              provider: account.provider
-            }, existingUser.id)
-            
+        
             return true
           }
 
@@ -166,21 +156,29 @@ export const authOptions: NextAuthOptions = {
           user.username = newUser.username
           user.roles = newUser.roles
 
-          logInfo(LOG_EVENTS.USER_CREATED, 'OAuth kullanıcısı oluşturuldu', {
-            userId: newUser.id,
-            email: newUser.email,
-            username: newUser.username,
-            slug: newUser.slug,
-            provider: account.provider
-          }, newUser.id)
+          logInfo({
+            event: LOG_EVENTS.USER_CREATED,
+            message: 'OAuth kullanıcısı oluşturuldu',
+            metadata: {
+              userId: newUser.id,
+              email: newUser.email,
+              username: newUser.username,
+              slug: newUser.slug,
+              provider: account.provider
+            },
+          })
         }
 
         return true
       } catch (error) {
-        logError(LOG_EVENTS.AUTH_SIGNIN_ERROR, 'SignIn callback hatası', {
-          error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-          userId: user.id,
-          provider: account?.provider
+        logError({
+          event: LOG_EVENTS.AUTH_SIGNIN_ERROR,
+          message: 'SignIn callback hatası',
+          metadata: {
+            error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+            userId: user.id,
+            provider: account?.provider
+          }
         })
         return false
       }
@@ -197,13 +195,7 @@ export const authOptions: NextAuthOptions = {
   },
 
   events: {
-    async signOut({ session }) {
-      if (session?.user?.id) {
-        logInfo(LOG_EVENTS.AUTH_LOGOUT_SUCCESS, 'Kullanıcı çıkış yaptı', {
-          userId: session.user.id,
-          email: session.user.email
-        }, session.user.id)
-      }
+    async signOut() {
     },
   },
 
