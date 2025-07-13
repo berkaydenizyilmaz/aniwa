@@ -1,4 +1,3 @@
-// Aniwa Projesi - Auth Constants
 // Bu dosya kimlik doğrulama sistemi ile ilgili sabitleri içerir
 
 // =============================================================================

@@ -1,4 +1,3 @@
-// Aniwa Projesi - Auth Domain Types
 // Bu dosya kimlik doğrulama ile ilgili tüm tip tanımlarını içerir
 
 import { UserRole } from "@prisma/client"

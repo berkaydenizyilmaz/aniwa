@@ -1,4 +1,3 @@
-// Aniwa Projesi - User Domain Types
 // Bu dosya kullanıcı ve profil ile ilgili tüm tip tanımlarını içerir
 
 import { 

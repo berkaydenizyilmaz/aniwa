@@ -1,4 +1,3 @@
-// Aniwa Projesi - Rate Limiting Constants
 // Bu dosya rate limiting sistemi ile ilgili sabitleri içerir
 
 // =============================================================================

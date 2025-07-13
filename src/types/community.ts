@@ -1,4 +1,3 @@
-// Aniwa Projesi - Community Domain Types
 // Bu dosya topluluk, yorum ve sosyal özellikler ile ilgili tüm tip tanımlarını içerir
 
 import { 

@@ -1,4 +1,3 @@
-// Aniwa Projesi - Schemas Index
 // Bu dosya tüm şemaları merkezi olarak export eder
 
 // =============================================================================

@@ -1,4 +1,3 @@
-// Aniwa Projesi - Admin Domain Schemas
 // Bu dosya yönetim paneli ile ilgili doğrulama şemalarını içerir
 
 import { z } from 'zod'

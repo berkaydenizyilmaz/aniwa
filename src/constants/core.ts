@@ -1,4 +1,3 @@
-// Aniwa Projesi - Core Constants
 // Bu dosya temel uygulama sabitleri içerir
 
 // =============================================================================

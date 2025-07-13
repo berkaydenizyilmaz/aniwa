@@ -1,4 +1,3 @@
-// Aniwa Projesi - User Schemas
 // Bu dosya kullanıcı ile ilgili Zod şemalarını içerir
 
 import { z } from 'zod'

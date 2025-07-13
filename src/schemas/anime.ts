@@ -1,4 +1,3 @@
-// Aniwa Projesi - Anime Schemas
 // Bu dosya anime ile ilgili Zod şemalarını içerir
 
 import { z } from 'zod'

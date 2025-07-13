@@ -1,4 +1,3 @@
-// Aniwa Projesi - Common Schemas
 // Bu dosya ortak kullanılan Zod şemalarını içerir
 
 import { z } from 'zod'

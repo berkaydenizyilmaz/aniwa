@@ -1,4 +1,3 @@
-// Aniwa Projesi - Constants Index
 // Bu dosya tüm sabitleri merkezi olarak export eder
 
 // =============================================================================

@@ -1,4 +1,3 @@
-// Aniwa Projesi - Anime Constants
 // Bu dosya anime sistemi ile ilgili sabitleri içerir
 
 // =============================================================================

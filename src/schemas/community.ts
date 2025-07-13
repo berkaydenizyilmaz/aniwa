@@ -1,4 +1,3 @@
-// Aniwa Projesi - Community Schemas
 // Bu dosya topluluk ile ilgili Zod şemalarını içerir
 
 import { z } from 'zod'

@@ -1,4 +1,3 @@
-// Aniwa Projesi - Admin Domain Types
 // Bu dosya yönetim paneli ile ilgili tüm tip tanımlarını içerir
 
 import { 

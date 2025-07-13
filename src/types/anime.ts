@@ -1,4 +1,3 @@
-// Aniwa Projesi - Anime Domain Types
 // Bu dosya anime ve medya ile ilgili tüm tip tanımlarını içerir
 
 import { 

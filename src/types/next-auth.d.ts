@@ -1,4 +1,3 @@
-// NextAuth tip genişletmeleri
 // Bu dosya NextAuth'un varsayılan tiplerini proje ihtiyaçlarına göre genişletir
 
 import { UserRole } from "@prisma/client"
