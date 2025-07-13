@@ -24,10 +24,6 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   }
 }
 
-// =============================================================================
-// UTILITY TIPLERI
-// =============================================================================
-
 // Prisma'dan gelen ID'leri string olarak kullanmak için
 export type ID = string
 
