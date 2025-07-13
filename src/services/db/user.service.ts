@@ -1,244 +1,121 @@
-// Bu dosya kullanıcı CRUD işlemlerini yönetir
-
+import { PrismaClient, User, UserProfileSettings, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
-import { USER_ROLES } from '@/constants'
-import { AUTH } from '@/constants/auth'
-import { generateUserSlug } from '@/lib/utils'
-import { Prisma } from '@prisma/client'
-import bcrypt from 'bcryptjs'
-import { 
-  signupSchema, 
-  emailSchema, 
-  usernameSchema, 
-  passwordSchema
-} from '@/schemas/auth'
-import { idSchema, updateUserSchema } from '@/schemas/user'
-import type { ApiResponse, CreateUserParams, UserWithSettings, UpdateUserParams } from '@/types'
 
-// Kullanıcı oluştur (Transaction ile settings de oluştur)
-export async function createUser(params: CreateUserParams): Promise<ApiResponse<UserWithSettings>> {
-  try {
-    // 1. Girdi validasyonu
-    const validatedParams = signupSchema.parse(params)
-    const { email, password, username } = validatedParams
+// Bu tip, fonksiyonların hem ana PrismaClient hem de bir transaction içinde çalışmasını sağlar
+type PrismaClientOrTransaction = PrismaClient | Prisma.TransactionClient
 
-    // 2. Guard clauses
-    const existingUser = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() }
-    })
-
-    if (existingUser) {
-      return { success: false, error: 'Bu email adresi zaten kullanımda' }
-    }
-
-    const existingUsername = await prisma.user.findUnique({
-      where: { username }
-    })
-
-    if (existingUsername) {
-      return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
-    }
-
-    // 3. Ana işlem - Transaction ile kullanıcı + ayarları oluştur
-    const uniqueSlug = generateUserSlug(username)
-    const passwordHash = await bcrypt.hash(password, AUTH.BCRYPT_SALT_ROUNDS)
-
-    const result = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: {
-          email: email.toLowerCase(),
-          passwordHash,
-          username,
-          slug: uniqueSlug,
-          roles: [USER_ROLES.USER],
-        }
-      })
-
-      const userSettings = await tx.userProfileSettings.create({
-        data: {
-          userId: user.id,
-        }
-      })
-
-      return { user, userSettings }
-    })
-
-    // 4. Başarılı yanıt
-    const data: UserWithSettings = {
-      ...result.user,
-      userSettings: result.userSettings,
-    }
-
-    return { success: true, data }
-
-  } catch {
-    return { 
-      success: false, 
-      error: 'Kullanıcı kaydı gerçekleştirilemedi'
-    }
-  }
+// Yeni kullanıcı oluştur
+export async function createUser(
+  userData: Prisma.UserCreateInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<User> {
+  return client.user.create({ data: userData })
 }
 
 // ID ile kullanıcı bul
-export async function findUserById(userId: string): Promise<ApiResponse<UserWithSettings | null>> {
-  try {
-    const validatedUserId = idSchema.parse(userId)
-
-    const user = await prisma.user.findUnique({
-      where: { id: validatedUserId },
-      include: { userSettings: true }
-    })
-
-    return { success: true, data: user}
-  } catch {
-    return { success: false, error: 'Kullanıcı bulunamadı' }
-  }
+export async function findUserById(
+  id: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<User | null> {
+  return client.user.findUnique({ where: { id } })
 }
 
-// Email ile kullanıcı bul (Auth için önemli)
-export async function findUserByEmail(email: string): Promise<ApiResponse<UserWithSettings | null>> {
-  try {
-    const validatedEmail = emailSchema.parse(email)
-
-    const user = await prisma.user.findUnique({
-      where: { email: validatedEmail.toLowerCase() },
-      include: { userSettings: true }
-    })
-
-    return { success: true, data: user }
-  } catch {
-    return { success: false, error: 'Email ile kullanıcı bulunamadı' }
-  }
+// Email ile kullanıcı bul
+export async function findUserByEmail(
+  email: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<User | null> {
+  return client.user.findUnique({ where: { email } })
 }
 
-// Username ile kullanıcı bul (Auth için önemli)
-export async function findUserByUsername(username: string): Promise<ApiResponse<UserWithSettings | null>> {
-  try {
-    const validatedUsername = usernameSchema.parse(username)
-
-    const user = await prisma.user.findUnique({
-      where: { username: validatedUsername },
-      include: { userSettings: true }
-    })
-
-    return { success: true, data: user }
-  } catch {
-    return { success: false, error: 'Username ile kullanıcı bulunamadı' }
-  }
+// Username ile kullanıcı bul
+export async function findUserByUsername(
+  username: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<User | null> {
+  return client.user.findUnique({ where: { username } })
 }
 
 // Kullanıcı güncelle
-export async function updateUser(userId: string, params: UpdateUserParams): Promise<ApiResponse<UserWithSettings>> {
-  try {
-    const validatedUserId = idSchema.parse(userId)
-    const validatedParams = updateUserSchema.parse(params)
-
-    const user = await prisma.user.update({
-      where: { id: validatedUserId },
-      data: validatedParams,
-      include: { userSettings: true }
-    })
-
-    return { success: true, data: user }
-  } catch {
-    return { success: false, error: 'Kullanıcı güncellenemedi' }
-  }
+export async function updateUser(
+  id: string,
+  userData: Prisma.UserUpdateInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<User> {
+  return client.user.update({
+    where: { id },
+    data: userData,
+  })
 }
 
 // Kullanıcı sil
-export async function deleteUser(userId: string): Promise<ApiResponse<void>> {
-  try {
-    const validatedUserId = idSchema.parse(userId)
-
-    await prisma.user.delete({
-      where: { id: validatedUserId }
-    })
-
-    return { success: true, data: undefined }
-  } catch {
-    return { success: false, error: 'Kullanıcı silinemedi' }
-  }
+export async function deleteUser(
+  id: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<User> {
+  return client.user.delete({ where: { id } })
 }
 
-// Kullanıcı şifresini güncelle
-export async function updatePassword(userId: string, newPassword: string): Promise<ApiResponse<void>> {
-  try {
-    const validatedUserId = idSchema.parse(userId)
-    const validatedPassword = passwordSchema.parse(newPassword)
-
-    const hashedPassword = await bcrypt.hash(validatedPassword, AUTH.BCRYPT_SALT_ROUNDS)
-
-    await prisma.user.update({
-      where: { id: validatedUserId },
-      data: { passwordHash: hashedPassword }
-    })
-
-    return { success: true, data: undefined }
-  } catch {
-    return { success: false, error: 'Şifre güncellenemedi' }
-  }
-}
-
-// Login credentials doğrula
-export async function verifyCredentials(username: string, password: string): Promise<ApiResponse<UserWithSettings | null>> {
-  try {
-    const user = await findUserByUsername(username)
-    
-    if (!user.success || !user.data || !user.data.passwordHash) {
-      return { success: true, data: null } // Güvenlik için false bilgi verme
-    }
-
-    const isValid = await bcrypt.compare(password, user.data.passwordHash)
-    
-    if (!isValid) {
-      return { success: true, data: null }
-    }
-
-    return { success: true, data: user.data }
-  } catch {
-    return { success: false, error: 'Giriş doğrulaması yapılamadı' }
-  }
-}
-
-// Generic CRUD operations
+// Kullanıcıları listele
 export async function findUsers(
   where?: Prisma.UserWhereInput,
   take?: number,
-  skip?: number
-): Promise<ApiResponse<UserWithSettings[]>> {
-  try {
-    const users = await prisma.user.findMany({
-      where,
-      take,
-      skip,
-      include: { userSettings: true }
-    })
-
-    return { success: true, data: users }
-  } catch {
-    return { success: false, error: 'Kullanıcılar listelenemedi' }
-  }
+  skip?: number,
+  client: PrismaClientOrTransaction = prisma
+): Promise<User[]> {
+  return client.user.findMany({
+    where,
+    take,
+    skip,
+  })
 }
 
 // Kullanıcı sayısını hesapla
-export async function countUsers(where?: Prisma.UserWhereInput): Promise<ApiResponse<number>> {
-  try {
-    const count = await prisma.user.count({ where })
-    return { success: true, data: count }
-  } catch {
-    return { success: false, error: 'Kullanıcı sayısı hesaplanamadı' }
-  }
+export async function countUsers(
+  where?: Prisma.UserWhereInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<number> {
+  return client.user.count({ where })
 }
 
 // Kullanıcı varlığını kontrol et
-export async function userExists(userId: string): Promise<ApiResponse<boolean>> {
-  try {
-    const validatedUserId = idSchema.parse(userId)
-    const count = await prisma.user.count({
-      where: { id: validatedUserId }
-    })
-    return { success: true, data: count > 0 }
-  } catch {
-    return { success: false, error: 'Kullanıcı varlığı kontrol edilemedi' }
-  }
+export async function userExists(
+  id: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<boolean> {
+  const count = await client.user.count({ where: { id } })
+  return count > 0
+}
+
+// Kullanıcıyı ayarları ile birlikte getir
+export async function findUserWithSettings(
+  id: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<User & { userSettings: UserProfileSettings | null } | null> {
+  return client.user.findUnique({
+    where: { id },
+    include: { userSettings: true }
+  })
+}
+
+// Email ile kullanıcıyı ayarları ile birlikte getir
+export async function findUserByEmailWithSettings(
+  email: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<User & { userSettings: UserProfileSettings | null } | null> {
+  return client.user.findUnique({
+    where: { email },
+    include: { userSettings: true }
+  })
+}
+
+// Username ile kullanıcıyı ayarları ile birlikte getir
+export async function findUserByUsernameWithSettings(
+  username: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<User & { userSettings: UserProfileSettings | null } | null> {
+  return client.user.findUnique({
+    where: { username },
+    include: { userSettings: true }
+  })
 } 

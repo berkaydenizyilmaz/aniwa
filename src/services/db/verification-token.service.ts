@@ -1,173 +1,137 @@
-// Bu dosya doğrulama token'larının veritabanı işlemlerini yönetir
-
+import { PrismaClient, VerificationToken, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
-import { createVerificationTokenSchema, verifyTokenSchema } from '@/schemas/auth'
-import type { ApiResponse } from '@/types'
-import type { VerificationTokenType, CreateVerificationTokenParams, VerifyTokenParams } from '@/types/auth'
-import { randomBytes } from 'crypto'
 
-// Token oluştur
-export async function createToken(params: CreateVerificationTokenParams): Promise<ApiResponse<string>> {
+// Bu tip, fonksiyonların hem ana PrismaClient hem de bir transaction içinde çalışmasını sağlar
+type PrismaClientOrTransaction = PrismaClient | Prisma.TransactionClient
+
+// Yeni doğrulama token'ı oluştur
+export async function createVerificationToken(
+  data: Prisma.VerificationTokenCreateInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<VerificationToken> {
+  return client.verificationToken.create({ data })
+}
+
+// ID ile token bul
+export async function findVerificationTokenById(
+  id: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<VerificationToken | null> {
+  return client.verificationToken.findUnique({ where: { id } })
+}
+
+// Token string ile bul
+export async function findVerificationTokenByToken(
+  token: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<VerificationToken | null> {
+  return client.verificationToken.findUnique({ where: { token } })
+}
+
+// Email ve type ile token bul
+export async function findVerificationTokenByEmailAndType(
+  email: string,
+  type: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<VerificationToken | null> {
+  return client.verificationToken.findFirst({
+    where: { email, type }
+  })
+}
+
+// Token güncelle
+export async function updateVerificationToken(
+  id: string,
+  data: Prisma.VerificationTokenUpdateInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<VerificationToken> {
+  return client.verificationToken.update({
+    where: { id },
+    data,
+  })
+}
+
+// Token sil
+export async function deleteVerificationToken(
+  id: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<VerificationToken> {
+  return client.verificationToken.delete({ where: { id } })
+}
+
+// Token string ile sil
+export async function deleteVerificationTokenByToken(
+  token: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<VerificationToken | null> {
   try {
-    // 1. Girdi validasyonu
-    const validatedParams = createVerificationTokenSchema.parse(params)
-    const { email, type, expiryHours } = validatedParams
-
-    // 2. Güvenli token oluştur
-    const token = randomBytes(32).toString('hex')
-    const expiresAt = new Date(Date.now() + expiryHours * 60 * 60 * 1000)
-
-    // 3. Mevcut token'ları temizle (aynı email + type için)
-    await prisma.verificationToken.deleteMany({
-      where: {
-        email: email.toLowerCase(),
-        type
-      }
-    })
-
-    // 4. Yeni token oluştur
-    await prisma.verificationToken.create({
-      data: {
-        token,
-        email: email.toLowerCase(),
-        type,
-        expiresAt
-      }
-    })
-
-    return { success: true, data: token }
-
+    return await client.verificationToken.delete({ where: { token } })
   } catch {
-    return { 
-      success: false, 
-      error: 'Doğrulama token\'ı oluşturulamadı'
-    }
+    return null
   }
 }
 
-// Token doğrula ve sil
-export async function verifyToken(params: VerifyTokenParams): Promise<ApiResponse<{ email: string }>> {
-  try {
-    // 1. Girdi validasyonu
-    const validatedParams = verifyTokenSchema.parse(params)
-    const { token, type } = validatedParams
-
-    // 2. Token'ı bul
-    const verificationToken = await prisma.verificationToken.findFirst({
-      where: {
-        token,
-        type,
-        expiresAt: {
-          gt: new Date() // Süresi dolmamış
-        }
-      }
-    })
-
-    // 3. Token bulunamadı veya süresi dolmuş
-    if (!verificationToken) {
-      return { 
-        success: false, 
-        error: 'Geçersiz veya süresi dolmuş token'
-      }
-    }
-
-    // 4. Token'ı sil (tek kullanımlık)
-    await prisma.verificationToken.delete({
-      where: { id: verificationToken.id }
-    })
-
-    return { 
-      success: true, 
-      data: { email: verificationToken.email }
-    }
-
-  } catch {
-    return { 
-      success: false, 
-      error: 'Token doğrulaması başarısız'
-    }
-  }
+// Email ile token'ları sil
+export async function deleteVerificationTokensByEmail(
+  email: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Prisma.BatchPayload> {
+  return client.verificationToken.deleteMany({
+    where: { email }
+  })
 }
 
-// Belirli token'ı sil
-export async function deleteToken(token: string): Promise<ApiResponse<void>> {
-  try {
-    await prisma.verificationToken.deleteMany({
-      where: { token }
-    })
-
-    return { success: true, data: undefined }
-  } catch {
-    return { success: false, error: 'Token silinemedi' }
-  }
+// Email ve type ile token'ları sil
+export async function deleteVerificationTokensByEmailAndType(
+  email: string,
+  type: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Prisma.BatchPayload> {
+  return client.verificationToken.deleteMany({
+    where: { email, type }
+  })
 }
 
-// Belirli email için token'ları sil
-export async function deleteTokensByEmail(email: string, type?: VerificationTokenType): Promise<ApiResponse<void>> {
-  try {
-    const where = { 
-      email: email.toLowerCase(),
-      ...(type && { type })
-    }
-
-    await prisma.verificationToken.deleteMany({ where })
-
-    return { success: true, data: undefined }
-  } catch {
-    return { success: false, error: 'Token\'lar silinemedi' }
-  }
+// Token'ları listele
+export async function findVerificationTokens(
+  where?: Prisma.VerificationTokenWhereInput,
+  take?: number,
+  skip?: number,
+  client: PrismaClientOrTransaction = prisma
+): Promise<VerificationToken[]> {
+  return client.verificationToken.findMany({
+    where,
+    take,
+    skip,
+  })
 }
 
-// Süresi dolmuş token'ları temizle (Bu maintenance işlemi olduğu için log kalacak)
-export async function cleanupExpiredTokens(): Promise<ApiResponse<number>> {
-  try {
-    const result = await prisma.verificationToken.deleteMany({
-      where: {
-        expiresAt: {
-          lt: new Date()
-        }
-      }
-    })
-
-    return { success: true, data: result.count }
-  } catch {
-    return { success: false, error: 'Token temizliği başarısız' }
-  }
+// Token sayısını hesapla
+export async function countVerificationTokens(
+  where?: Prisma.VerificationTokenWhereInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<number> {
+  return client.verificationToken.count({ where })
 }
 
 // Token varlığını kontrol et
-export async function tokenExists(token: string): Promise<ApiResponse<boolean>> {
-  try {
-    const count = await prisma.verificationToken.count({
-      where: { 
-        token,
-        expiresAt: {
-          gt: new Date()
-        }
-      }
-    })
-
-    return { success: true, data: count > 0 }
-  } catch {
-    return { success: false, error: 'Token varlığı kontrol edilemedi' }
-  }
+export async function verificationTokenExists(
+  token: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<boolean> {
+  const count = await client.verificationToken.count({ where: { token } })
+  return count > 0
 }
 
-// Email için aktif token sayısını getir
-export async function getActiveTokenCount(email: string, type?: VerificationTokenType): Promise<ApiResponse<number>> {
-  try {
-    const where = { 
-      email: email.toLowerCase(),
+// Süresi dolmuş token'ları sil
+export async function deleteExpiredVerificationTokens(
+  client: PrismaClientOrTransaction = prisma
+): Promise<Prisma.BatchPayload> {
+  return client.verificationToken.deleteMany({
+    where: {
       expiresAt: {
-        gt: new Date()
-      },
-      ...(type && { type })
+        lt: new Date()
+      }
     }
-
-    const count = await prisma.verificationToken.count({ where })
-
-    return { success: true, data: count }
-  } catch {
-    return { success: false, error: 'Aktif token sayısı hesaplanamadı' }
-  }
+  })
 } 

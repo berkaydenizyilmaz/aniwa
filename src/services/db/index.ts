@@ -3,6 +3,9 @@
 // User operations
 export * from './user.service'
 
+// User settings operations
+export * from './user-settings.service'
+
 // Log operations
 export * from './log.service'
 
