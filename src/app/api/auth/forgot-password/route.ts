@@ -34,7 +34,7 @@ async function forgotPasswordHandler(
     const baseUrl = request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3001'
     
     // 3. Şifre sıfırlama token'ı oluştur ve email gönder
-    await createPasswordResetToken(email, baseUrl)
+    await createPasswordResetToken({ email, baseUrl })
 
     // 4. Güvenlik için her zaman başarılı yanıt döndür
     // Hata olsa bile, kullanıcının bir hesabının olup olmadığını belli etmemek için
