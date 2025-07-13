@@ -1,8 +1,9 @@
 // Sadece kullanılan logging fonksiyonlarını içerir
 
-import { createLog } from '@/services/db/log.db'
+import { createLogWithUser } from '@/services/db/log.db'
 import { LogLevel, SENSITIVE_FIELDS } from '@/constants/logging'
 import type { LogMetadata } from '@/types/admin'
+import { Prisma } from '@prisma/client'
 
 // Sensitive data'yı temizle
 const sanitizeMetadata = (metadata?: LogMetadata): LogMetadata | undefined => {
@@ -27,12 +28,12 @@ const logToDatabase = async (
   userId?: string
 ) => {
   try {
-    await createLog({
+    await createLogWithUser({
       level,
       event,
       message,
-      metadata: sanitizeMetadata(metadata),
-      userId: userId || undefined,
+      metadata: sanitizeMetadata(metadata) as Prisma.InputJsonValue,
+      user: userId ? { connect: { id: userId } } : undefined,
     })
   } catch (error) {
     // Database log hatası durumunda sadece console'a yaz (infinite loop'u önle)

@@ -1,5 +1,7 @@
 // Bu dosya tüm projenin temel tip tanımlarını içerir
 
+import { PrismaClient, Prisma } from '@prisma/client'
+
 // =============================================================================
 // API RESPONSE TIPLERI
 // =============================================================================
@@ -26,6 +28,9 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
 
 // Prisma'dan gelen ID'leri string olarak kullanmak için
 export type ID = string
+
+// Prisma transaction tipi
+export type PrismaClientOrTransaction = PrismaClient | Prisma.TransactionClient
 
 // Domain bazlı type dosyalarını export et
 export * from './auth'

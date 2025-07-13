@@ -1,10 +1,14 @@
-// Bu dosya log kayıtlarının CRUD işlemlerini yönetir
-
+import { Log, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
-import { Prisma, UserRole, LogLevel } from '@prisma/client'
-import { createLogSchema, logFiltersSchema } from '@/schemas/admin'
-import type { ApiResponse } from '@/types'
-import type { LogFilters, LogWithUser, LogListResponse, CreateLogParams } from '@/types/admin'
+import type { PrismaClientOrTransaction } from '@/types'
+
+// Log kullanıcı seçimi tipi
+type LogUserSelect = {
+  id: string
+  username: string
+  email: string
+  roles: string[]
+}
 
 // Log kullanıcı seçimi
 const logUserSelect = {
@@ -14,185 +18,138 @@ const logUserSelect = {
   roles: true,
 }
 
-// Yeni log kaydı oluşturur
-export async function createLog(params: CreateLogParams): Promise<ApiResponse<LogWithUser>> {
-  try {
-    // 1. Girdi validasyonu
-    const validatedParams = createLogSchema.parse(params)
-
-    // 2. Guard clauses
-    if (!validatedParams.event || !validatedParams.message) {
-      return { success: false, error: 'Event ve mesaj gerekli' }
-    }
-
-    // 3. Ana işlem - Log kaydı oluştur
-    const log = await prisma.log.create({
-      data: {
-        level: validatedParams.level,
-        event: validatedParams.event,
-        message: validatedParams.message,
-        metadata: (validatedParams.metadata as Prisma.JsonValue) || null,
-        userId: validatedParams.userId || null,
-      },
-      include: {
-        user: { select: logUserSelect },
-      },
-    })
-
-    return { success: true, data: log as LogWithUser }
-
-  } catch {
-    return { 
-      success: false, 
-      error: 'Log kaydı oluşturulamadı'
-    }
-  }
+// Yeni log kaydı oluştur
+export async function createLog(
+  data: Prisma.LogCreateInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Log> {
+  return client.log.create({ data })
 }
 
-// Logları filtreler ve listeler
-export async function getLogs(filters: LogFilters = {}): Promise<ApiResponse<LogListResponse>> {
-  try {
-    // 1. Girdi validasyonu
-    const validatedFilters = logFiltersSchema.parse(filters)
-    
-    const {
-      level,
-      event,
-      userId,
-      userRoles,
-      startDate,
-      endDate,
-      limit,
-      offset,
-    } = validatedFilters
+// Log kaydını kullanıcı bilgisiyle oluştur
+export async function createLogWithUser(
+  data: Prisma.LogCreateInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Log & { user: LogUserSelect | null }> {
+  return client.log.create({
+    data,
+    include: {
+      user: { select: logUserSelect },
+    },
+  })
+}
 
-    // 2. Guard clauses
-    if (limit > 100) {
-      return { success: false, error: 'Limit maksimum 100 olabilir' }
-    }
+// ID ile log bul
+export async function findLogById(
+  id: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Log | null> {
+  return client.log.findUnique({ where: { id } })
+}
 
-    // 3. Ana işlem - Filtreleme koşullarını oluştur
-    const where: Prisma.LogWhereInput = {}
+// ID ile log'u kullanıcı bilgisiyle bul
+export async function findLogByIdWithUser(
+  id: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Log & { user: LogUserSelect | null } | null> {
+  return client.log.findUnique({
+    where: { id },
+    include: {
+      user: { select: logUserSelect },
+    },
+  })
+}
 
-    if (level) where.level = { in: level as LogLevel[] }
-    if (event && event.length > 0) {
-      where.event = { in: event }
-    }
-    if (userId) where.userId = userId
-    
-    // Rol bazlı filtreleme
-    if (userRoles && userRoles.length > 0) {
-      where.user = {
-        roles: { hasSome: userRoles as UserRole[] }
+// Logları listele
+export async function findLogs(
+  where?: Prisma.LogWhereInput,
+  orderBy?: Prisma.LogOrderByWithRelationInput,
+  take?: number,
+  skip?: number,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Log[]> {
+  return client.log.findMany({
+    where,
+    orderBy,
+    take,
+    skip,
+  })
+}
+
+// Logları kullanıcı bilgisiyle listele
+export async function findLogsWithUser(
+  where?: Prisma.LogWhereInput,
+  orderBy?: Prisma.LogOrderByWithRelationInput,
+  take?: number,
+  skip?: number,
+  client: PrismaClientOrTransaction = prisma
+): Promise<(Log & { user: LogUserSelect | null })[]> {
+  return client.log.findMany({
+    where,
+    orderBy,
+    take,
+    skip,
+    include: {
+      user: { select: logUserSelect },
+    },
+  })
+}
+
+// Log sayısını hesapla
+export async function countLogs(
+  where?: Prisma.LogWhereInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<number> {
+  return client.log.count({ where })
+}
+
+// Log güncelle
+export async function updateLog(
+  id: string,
+  data: Prisma.LogUpdateInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Log> {
+  return client.log.update({
+    where: { id },
+    data,
+  })
+}
+
+// Log sil
+export async function deleteLog(
+  id: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Log> {
+  return client.log.delete({ where: { id } })
+}
+
+// Belirli koşullardaki logları sil
+export async function deleteLogs(
+  where: Prisma.LogWhereInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Prisma.BatchPayload> {
+  return client.log.deleteMany({ where })
+}
+
+// Belirli tarihten eski logları sil
+export async function deleteLogsBefore(
+  date: Date,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Prisma.BatchPayload> {
+  return client.log.deleteMany({
+    where: {
+      timestamp: {
+        lt: date
       }
     }
-    
-    if (startDate || endDate) {
-      where.timestamp = {}
-      if (startDate) where.timestamp.gte = startDate
-      if (endDate) where.timestamp.lte = endDate
-    }
-
-    // Logları getir
-    const [logs, total] = await Promise.all([
-      prisma.log.findMany({
-        where,
-        include: {
-          user: { select: logUserSelect },
-        },
-        orderBy: { timestamp: 'desc' },
-        take: limit,
-        skip: offset,
-      }),
-      prisma.log.count({ where }),
-    ])
-
-    return {
-      success: true,
-      data: {
-        logs: logs as LogWithUser[],
-        pagination: {
-          total,
-          limit,
-          offset,
-          hasMore: offset + limit < total,
-        },
-      },
-    }
-
-  } catch {
-    return { 
-      success: false, 
-      error: 'Loglar listelenemedi' 
-    }
-  }
+  })
 }
 
-// Log kaydını ID ile getirir
-export async function getLogById(id: string): Promise<ApiResponse<LogWithUser | null>> {
-  try {
-    // 1. Girdi validasyonu
-    if (!id || typeof id !== 'string') {
-      return { success: false, error: 'Geçersiz log ID' }
-    }
-
-    // 2. Guard clauses
-    if (id.length !== 24) {
-      return { success: false, error: 'Log ID formatı hatalı' }
-    }
-
-    // 3. Ana işlem - Log kaydını getir
-    const log = await prisma.log.findUnique({
-      where: { id },
-      include: {
-        user: { select: logUserSelect },
-      },
-    })
-
-    return { success: true, data: log as LogWithUser | null }
-
-  } catch {
-    return { 
-      success: false, 
-      error: 'Log kaydı getirilemedi' 
-    }
-  }
-}
-
-// Belirli tarihten eski logları siler (Maintenance işlemi)
-export async function deleteOldLogs(daysOld: number): Promise<ApiResponse<{ deletedCount: number }>> {
-  try {
-    // 1. Girdi validasyonu
-    if (!daysOld || typeof daysOld !== 'number' || daysOld <= 0) {
-      return { success: false, error: 'Geçersiz gün sayısı' }
-    }
-
-    // 2. Guard clauses
-    if (daysOld < 7) {
-      return { success: false, error: 'En az 7 günlük loglar tutulmalı' }
-    }
-
-    // 3. Ana işlem - Eski logları sil
-    const cutoffDate = new Date()
-    cutoffDate.setDate(cutoffDate.getDate() - daysOld)
-
-    const result = await prisma.log.deleteMany({
-      where: {
-        timestamp: {
-          lt: cutoffDate
-        }
-      }
-    })
-
-    return {
-      success: true,
-      data: { deletedCount: result.count }
-    }
-
-  } catch {
-    return {
-      success: false,
-      error: 'Eski loglar silinemedi'
-    }
-  }
+// Log varlığını kontrol et
+export async function logExists(
+  id: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<boolean> {
+  const count = await client.log.count({ where: { id } })
+  return count > 0
 } 

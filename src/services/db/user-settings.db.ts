@@ -1,8 +1,6 @@
-import { PrismaClient, UserProfileSettings, Prisma } from '@prisma/client'
+import { UserProfileSettings, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
-
-// Bu tip, fonksiyonların hem ana PrismaClient hem de bir transaction içinde çalışmasını sağlar
-type PrismaClientOrTransaction = PrismaClient | Prisma.TransactionClient
+import type { PrismaClientOrTransaction } from '@/types'
 
 // Yeni kullanıcı profil ayarları oluştur
 export async function createUserSettings(
