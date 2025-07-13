@@ -1,13 +1,29 @@
 // Bu dosya kimlik doğrulama iş mantığını yönetir (user creation + email verification)
 
-import { createUser, verifyCredentials, updatePassword, findUserByEmail } from '@/services/db/user.db'
-import { createToken, verifyToken, deleteToken } from '@/services/db/verification-token.db'
+import { 
+  createUser, 
+  findUserByEmail, 
+  findUserByUsername, 
+  updateUser,
+  findUserByUsernameWithSettings 
+} from '@/services/db/user.db'
+import { createUserSettings } from '@/services/db/user-settings.db'
+import { 
+  createVerificationToken, 
+  findVerificationTokenByToken, 
+  deleteVerificationTokenByToken, 
+  deleteVerificationTokensByEmailAndType 
+} from '@/services/db/verification-token.db'
 import { sendPasswordResetEmail } from '@/services/api/email.service'
 import { signupSchema, loginSchema } from '@/schemas/auth'
 import { logInfo, logError } from '@/services/business/logger.service'
-import { LOG_EVENTS, AUTH } from '@/constants'
+import { LOG_EVENTS, AUTH, USER_ROLES } from '@/constants'
+import { generateUserSlug } from '@/lib/utils'
+import { prisma } from '@/lib/db/prisma'
 import { z } from 'zod'
-import type { ApiResponse, CreateUserParams, UserWithSettings, VerificationTokenType } from '@/types'
+import { randomBytes } from 'crypto'
+import bcrypt from 'bcryptjs'
+import type { ApiResponse, CreateUserParams, UserWithSettings } from '@/types'
 
 // Kullanıcı girişi - Credential verification
 export async function loginUser(
@@ -18,22 +34,21 @@ export async function loginUser(
     // 1. Girdi validasyonu
     const validatedData = loginSchema.parse({ username, password })
 
-    // 2. Ana iş mantığı - Kimlik bilgilerini doğrula (database service)
-    const credentialsResult = await verifyCredentials(
-      validatedData.username,
-      validatedData.password
-    )
-
-    if (!credentialsResult.success) {
-      return credentialsResult
+    // 2. Kullanıcıyı bul
+    const user = await findUserByUsernameWithSettings(validatedData.username)
+    
+    if (!user || !user.passwordHash) {
+      return { success: true, data: null } // Güvenlik için false bilgi verme
     }
 
-    // Kullanıcı bulunamadı (wrong credentials)
-    if (!credentialsResult.data) {
+    // 3. Şifre kontrolü
+    const isValid = await bcrypt.compare(validatedData.password, user.passwordHash)
+    
+    if (!isValid) {
       return { success: true, data: null }
     }
 
-    return { success: true, data: credentialsResult.data }
+    return { success: true, data: user }
 
   } catch (error) {
     logError(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Giriş işlemi hatası', {
@@ -55,41 +70,67 @@ export async function loginUser(
   }
 }
 
-// Kullanıcı kaydı - Basit user creation
+// Kullanıcı kaydı - Transaction ile user + settings oluştur
 export async function registerUser(
   params: CreateUserParams
 ): Promise<ApiResponse<UserWithSettings>> {
   try {
     // 1. Girdi validasyonu
     const validatedParams = signupSchema.parse(params)
+    const { email, password, username } = validatedParams
 
-    // 2. Ana iş mantığı - Kullanıcı oluştur (database service)
-    const userResult = await createUser(validatedParams)
-    if (!userResult.success || !userResult.data) {
-      return userResult
+    // 2. Kullanıcı varlık kontrolü
+    const existingUser = await findUserByEmail(email.toLowerCase())
+    if (existingUser) {
+      return { success: false, error: 'Bu email adresi zaten kullanımda' }
     }
 
-    // Business log - Kullanıcı başarıyla kaydedildi
+    const existingUsername = await findUserByUsername(username)
+    if (existingUsername) {
+      return { success: false, error: 'Bu kullanıcı adı zaten kullanımda' }
+    }
+
+    // 3. Transaction ile kullanıcı + ayarları oluştur
+    const uniqueSlug = generateUserSlug(username)
+    const passwordHash = await bcrypt.hash(password, AUTH.BCRYPT_SALT_ROUNDS)
+
+    const result = await prisma.$transaction(async (tx) => {
+      const user = await createUser({
+        email: email.toLowerCase(),
+        passwordHash,
+        username,
+        slug: uniqueSlug,
+        roles: [USER_ROLES.USER],
+      }, tx)
+
+      const userSettings = await createUserSettings({
+        user: { connect: { id: user.id } },
+      }, tx)
+
+      return { user, userSettings }
+    })
+
+    // 4. Business log
     logInfo(LOG_EVENTS.AUTH_SIGNUP_SUCCESS, 'Yeni kullanıcı kaydı tamamlandı', {
-      userId: userResult.data.id,
-      email: userResult.data.email,
-      username: userResult.data.username
-    }, userResult.data.id)
+      userId: result.user.id,
+      email: result.user.email,
+      username: result.user.username
+    }, result.user.id)
 
-    // Başarılı yanıt
-    return {
-      success: true,
-      data: userResult.data
+    // 5. Başarılı yanıt
+    const data: UserWithSettings = {
+      ...result.user,
+      userSettings: result.userSettings,
     }
+
+    return { success: true, data }
 
   } catch (error) {
-    // Hata loglaması
     logError(LOG_EVENTS.AUTH_SIGNUP_FAILED, 'Kullanıcı kaydı hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       email: params.email
     })
 
-    // Hata yanıtı
     if (error instanceof z.ZodError) {
       return {
         success: false,
@@ -110,17 +151,15 @@ export async function updateUserPassword(
   newPassword: string
 ): Promise<ApiResponse<void>> {
   try {
-    // 1. Ana iş mantığı - Şifre güncelle (database service)
-    const updateResult = await updatePassword(userId, newPassword)
-    
-    if (!updateResult.success) {
-      return updateResult
-    }
+    // 1. Şifreyi hash'le
+    const hashedPassword = await bcrypt.hash(newPassword, AUTH.BCRYPT_SALT_ROUNDS)
+
+    // 2. Kullanıcıyı güncelle
+    await updateUser(userId, { passwordHash: hashedPassword })
 
     return { success: true, data: undefined }
 
   } catch (error) {
-    // Hata loglaması
     logError(LOG_EVENTS.AUTH_PASSWORD_RESET_FAILED, 'Şifre güncelleme hatası', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       userId
@@ -143,40 +182,43 @@ export async function createPasswordResetToken(
     const validatedEmail = z.string().email().parse(email)
 
     // 2. Kullanıcının varlığını kontrol et
-    const userResult = await findUserByEmail(validatedEmail)
+    const user = await findUserByEmail(validatedEmail)
     
-    if (!userResult.success || !userResult.data) {
+    if (!user) {
       return {
         success: false,
         error: 'Bu email adresi ile kayıtlı kullanıcı bulunamadı'
       }
     }
 
-    // 3. Password reset token'ı oluştur
-    const tokenResult = await createToken({
+    // 3. Mevcut token'ları temizle
+    await deleteVerificationTokensByEmailAndType(
+      validatedEmail, 
+      AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET
+    )
+
+    // 4. Yeni token oluştur
+    const token = randomBytes(32).toString('hex')
+    const expiresAt = new Date(Date.now() + AUTH.PASSWORD_RESET_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000)
+
+    await createVerificationToken({
+      token,
       email: validatedEmail,
-      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET as VerificationTokenType,
-      expiryHours: AUTH.PASSWORD_RESET_TOKEN_EXPIRY_HOURS
+      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET,
+      expiresAt
     })
 
-    if (!tokenResult.success || !tokenResult.data) {
-      return {
-        success: false,
-        error: 'Şifre sıfırlama token\'ı oluşturulamadı'
-      }
-    }
-
-    // 4. Email gönder
-    const resetUrl = `${baseUrl}/sifre-sifirlama?token=${tokenResult.data}`
+    // 5. Email gönder
+    const resetUrl = `${baseUrl}/sifre-sifirlama?token=${token}`
     const emailResult = await sendPasswordResetEmail({
       to: validatedEmail,
-      username: userResult.data.username || userResult.data.email.split('@')[0],
+      username: user.username || user.email.split('@')[0],
       resetUrl
     })
 
     if (!emailResult.success) {
       // Email gönderilemezse token'ı sil
-      await deleteToken(tokenResult.data)
+      await deleteVerificationTokenByToken(token)
       
       return {
         success: false,
@@ -186,7 +228,7 @@ export async function createPasswordResetToken(
 
     return {
       success: true,
-      data: { token: tokenResult.data }
+      data: { token }
     }
 
   } catch (error) {
@@ -207,13 +249,12 @@ export async function verifyPasswordResetToken(
   token: string
 ): Promise<ApiResponse<{ email: string }>> {
   try {
-    // Token'ı doğrula
-    const tokenResult = await verifyToken({
-      token,
-      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET as VerificationTokenType
-    })
+    // Token'ı bul
+    const verificationToken = await findVerificationTokenByToken(token)
 
-    if (!tokenResult.success || !tokenResult.data) {
+    if (!verificationToken || 
+        verificationToken.type !== AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET ||
+        verificationToken.expiresAt < new Date()) {
       return {
         success: false,
         error: 'Geçersiz veya süresi dolmuş token'
@@ -222,7 +263,7 @@ export async function verifyPasswordResetToken(
 
     return {
       success: true,
-      data: { email: tokenResult.data.email }
+      data: { email: verificationToken.email }
     }
 
   } catch (error) {
@@ -243,13 +284,12 @@ export async function resetPasswordWithToken(
   newPassword: string
 ): Promise<ApiResponse<void>> {
   try {
-    // 1. Token'ı doğrula ve sil
-    const tokenResult = await verifyToken({
-      token,
-      type: AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET as VerificationTokenType
-    })
+    // 1. Token'ı bul ve doğrula
+    const verificationToken = await findVerificationTokenByToken(token)
 
-    if (!tokenResult.success || !tokenResult.data) {
+    if (!verificationToken || 
+        verificationToken.type !== AUTH.VERIFICATION_TOKEN_TYPES.PASSWORD_RESET ||
+        verificationToken.expiresAt < new Date()) {
       return {
         success: false,
         error: 'Geçersiz veya süresi dolmuş token'
@@ -257,21 +297,24 @@ export async function resetPasswordWithToken(
     }
 
     // 2. Kullanıcıyı bul
-    const userResult = await findUserByEmail(tokenResult.data.email)
+    const user = await findUserByEmail(verificationToken.email)
     
-    if (!userResult.success || !userResult.data) {
+    if (!user) {
       return {
         success: false,
         error: 'Kullanıcı bulunamadı'
       }
     }
 
-    // 3. Şifreyi güncelle
-    const updateResult = await updateUserPassword(userResult.data.id, newPassword)
-    
-    if (!updateResult.success) {
-      return updateResult
-    }
+    // 3. Transaction ile şifre güncelle ve token'ı sil
+    await prisma.$transaction(async (tx) => {
+      // Şifreyi güncelle
+      const hashedPassword = await bcrypt.hash(newPassword, AUTH.BCRYPT_SALT_ROUNDS)
+      await updateUser(user.id, { passwordHash: hashedPassword }, tx)
+
+      // Token'ı sil
+      await deleteVerificationTokenByToken(token, tx)
+    })
 
     return { success: true, data: undefined }
 

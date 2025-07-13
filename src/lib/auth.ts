@@ -11,6 +11,8 @@ import { AUTH } from '@/constants/auth'
 import { ROUTES } from '@/constants'
 import { generateUsernameFromName, generateUserSlug } from '@/lib/utils'
 import { USER_ROLES } from '@/constants'
+import { findUserByUsername, createUser } from '@/services/db/user.db'
+import { createUserSettings } from '@/services/db/user-settings.db'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
@@ -36,9 +38,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
           // Kullanıcıyı username ile bul
-          const user = await prisma.user.findUnique({
-            where: { username: credentials.username }
-          })
+          const user = await findUserByUsername(credentials.username)
 
           if (!user || !user.passwordHash) {
             logWarn(LOG_EVENTS.AUTH_LOGIN_FAILED, 'Kullanıcı bulunamadı', {
@@ -152,22 +152,18 @@ export const authOptions: NextAuthOptions = {
 
           // Transaction ile kullanıcı + ayarları oluştur
           const newUser = await prisma.$transaction(async (tx) => {
-            const createdUser = await tx.user.create({
-              data: {
-                email: user.email!.toLowerCase(),
-                username,
-                slug,
-                roles: [USER_ROLES.USER],
-                image: profile.image,
-              }
-            })
+            const createdUser = await createUser({
+              email: user.email!.toLowerCase(),
+              username,
+              slug,
+              roles: [USER_ROLES.USER],
+              image: profile.image,
+            }, tx)
 
             // Varsayılan ayarları oluştur
-            await tx.userProfileSettings.create({
-              data: {
-                userId: createdUser.id,
-              }
-            })
+            await createUserSettings({
+              user: { connect: { id: createdUser.id } },
+            }, tx)
 
             return createdUser
           })
