@@ -21,7 +21,7 @@ export const usernameSchema = z
   .string()
   .min(AUTH.MIN_USERNAME_LENGTH, `Kullanıcı adı en az ${AUTH.MIN_USERNAME_LENGTH} karakter olmalı`)
   .max(AUTH.MAX_USERNAME_LENGTH, `Kullanıcı adı en fazla ${AUTH.MAX_USERNAME_LENGTH} karakter olabilir`)
-  .regex(AUTH.USERNAME_REGEX, 'Kullanıcı adı sadece harf, rakam, alt çizgi ve tire içerebilir')
+  .regex(AUTH.USERNAME_REGEX, 'Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir')
   .toLowerCase()
   .transform((username) => username.trim())
 

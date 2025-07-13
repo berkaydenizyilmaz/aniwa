@@ -15,7 +15,7 @@ export const AUTH = {
   // Username kuralları
   MIN_USERNAME_LENGTH: 3,
   MAX_USERNAME_LENGTH: 20,
-  USERNAME_REGEX: /^[a-zA-Z0-9_-]+$/,
+  USERNAME_REGEX: /^[a-zA-Z0-9_]+$/,
 
   // Email kuralları
   MAX_EMAIL_LENGTH: 254,
