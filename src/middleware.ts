@@ -1,5 +1,3 @@
-// Bu dosya route seviyesinde kimlik doğrulama, yetkilendirme ve rate limiting kontrolü yapar
-
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
 import { UserRole } from "@prisma/client"

@@ -1,5 +1,3 @@
-// Bu dosya topluluk ile ilgili Zod şemalarını içerir
-
 import { z } from 'zod'
 import { ANIME } from '@/constants'
 import { idSchema } from './user'

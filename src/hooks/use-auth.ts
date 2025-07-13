@@ -1,5 +1,3 @@
-// Bu dosya kimlik doğrulama ile ilgili custom hook'ları içerir
-
 'use client'
 
 import { useSession, signIn, signOut } from 'next-auth/react'

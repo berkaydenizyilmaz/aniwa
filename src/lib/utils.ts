@@ -1,5 +1,3 @@
-// Bu dosya genel kullanımı kolaylaştırıcı fonksiyonları içerir
-
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { prisma } from "./db/prisma"

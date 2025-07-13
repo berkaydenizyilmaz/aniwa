@@ -1,5 +1,3 @@
-// Bu dosya ana rate limiting fonksiyonalitesini sağlar
-
 import { Ratelimit } from '@upstash/ratelimit'
 import { kv } from '@vercel/kv'
 import { env, hasRateLimit } from '@/lib/env'

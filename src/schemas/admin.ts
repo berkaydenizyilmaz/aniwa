@@ -1,5 +1,3 @@
-// Bu dosya yönetim paneli ile ilgili doğrulama şemalarını içerir
-
 import { z } from 'zod'
 import { LogLevel, UserRole } from '@prisma/client'
 import { idSchema } from './user'

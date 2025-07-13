@@ -1,5 +1,3 @@
-// Bu dosya anime ile ilgili Zod şemalarını içerir
-
 import { z } from 'zod'
 import { ANIME, ANIME_STATUS, ANIME_TYPE, MEDIA_LIST_STATUS, SEASON, SOURCE } from '@/constants'
 import { idSchema, urlSchema } from './user'

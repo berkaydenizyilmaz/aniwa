@@ -1,6 +1,3 @@
-// Aniwa Projesi - Prisma Client Konfigürasyonu
-// Bu dosya Prisma client'ı optimize eder ve global instance yönetir
-
 import { PrismaClient } from '@prisma/client'
 import { env } from '@/lib/env'
 

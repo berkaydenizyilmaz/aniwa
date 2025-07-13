@@ -1,5 +1,3 @@
-// Bu dosya ortak kullanılan Zod şemalarını içerir
-
 import { z } from 'zod'
 import { ANIME } from '@/constants'
 

@@ -1,5 +1,3 @@
-// Bu dosya rate limiting için middleware yardımcı fonksiyonlarını içerir
-
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getClientIP } from './index'
 import { AUTH_RATE_LIMIT_TYPES, AUTH_RATE_LIMIT_CONFIG, GLOBAL_RATE_LIMIT_CONFIG } from '@/constants/rate-limits'

@@ -1,5 +1,3 @@
-// Bu dosya anime ve medya ile ilgili tüm tip tanımlarını içerir
-
 import { 
   AnimeSeries,
   AnimeMediaPart,

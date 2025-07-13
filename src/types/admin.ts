@@ -1,5 +1,3 @@
-// Bu dosya yönetim paneli ile ilgili tüm tip tanımlarını içerir
-
 import { 
   Log,
   LogLevel,

@@ -1,5 +1,3 @@
-// Bu dosya kimlik doğrulama ile ilgili Zod şemalarını içerir
-
 import { z } from 'zod'
 import { AUTH } from '@/constants'
 

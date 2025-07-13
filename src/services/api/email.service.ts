@@ -1,5 +1,3 @@
-// Bu dosya email gönderim işlemlerini yönetir (Resend API)
-
 import { Resend } from 'resend'
 import { env } from '@/lib/env'
 import { logInfo, logError } from '@/services/business/logger.service'

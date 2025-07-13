@@ -1,5 +1,3 @@
-// Sadece kullanılan logging fonksiyonlarını içerir
-
 import { createLogWithUser } from '@/services/db/log.db'
 import { LogLevel, SENSITIVE_FIELDS } from '@/constants/logging'
 import type { LogMetadata } from '@/types/admin'

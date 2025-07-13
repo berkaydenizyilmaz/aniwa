@@ -1,5 +1,3 @@
-// Bu dosya kimlik doğrulama iş mantığını yönetir (user creation + email verification)
-
 import { 
   createUser, 
   findUserByEmail, 

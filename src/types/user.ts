@@ -1,5 +1,3 @@
-// Bu dosya kullanıcı ve profil ile ilgili tüm tip tanımlarını içerir
-
 import { 
   User, 
   UserProfileSettings, 

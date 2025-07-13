@@ -1,5 +1,3 @@
-// Bu dosya environment değişkenlerini Zod ile doğrular
-
 import { z } from 'zod'
 
 // Environment değişkenleri için Zod şeması

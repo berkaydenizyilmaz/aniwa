@@ -1,5 +1,3 @@
-// Bu dosya tüm projenin temel tip tanımlarını içerir
-
 import { PrismaClient, Prisma } from '@prisma/client'
 
 // =============================================================================

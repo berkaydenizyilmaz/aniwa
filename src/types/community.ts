@@ -1,5 +1,3 @@
-// Bu dosya topluluk, yorum ve sosyal özellikler ile ilgili tüm tip tanımlarını içerir
-
 import { 
   Comment,
   CommentLike,

@@ -1,5 +1,3 @@
-// Bu dosya tüm servis katmanlarını export eder
-
 // Database services
 export * as db from './db'
 

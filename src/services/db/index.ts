@@ -1,5 +1,3 @@
-// Bu dosya tüm database servislerini export eder
-
 // User operations
 export * from './user.db'
 

@@ -1,5 +1,3 @@
-// Bu dosya logging ile ilgili sabitleri içerir
-
 import { LogLevel } from "@prisma/client"
 
 // =============================================================================

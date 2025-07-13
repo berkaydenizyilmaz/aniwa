@@ -1,5 +1,3 @@
-// Bu dosya kimlik doğrulama ile ilgili tüm tip tanımlarını içerir
-
 import { UserRole } from "@prisma/client"
 import type { ID } from './index'
 

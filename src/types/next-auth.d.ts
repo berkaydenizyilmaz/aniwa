@@ -1,5 +1,3 @@
-// Bu dosya NextAuth'un varsayılan tiplerini proje ihtiyaçlarına göre genişletir
-
 import { UserRole } from "@prisma/client"
 import type { DefaultSession } from "next-auth"
 
