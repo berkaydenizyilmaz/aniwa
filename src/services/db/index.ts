@@ -1,13 +1,13 @@
 // Bu dosya tüm database servislerini export eder
 
 // User operations
-export * from './user.service'
+export * from './user.db'
 
 // User settings operations
-export * from './user-settings.service'
+export * from './user-settings.db'
 
 // Log operations
-export * from './log.service'
+export * from './log.db'
 
 // Verification token operations
-export * from './verification-token.service' 
+export * from './verification-token.db' 

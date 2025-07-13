@@ -1,7 +1,7 @@
 // Bu dosya kimlik doğrulama iş mantığını yönetir (user creation + email verification)
 
-import { createUser, verifyCredentials, updatePassword, findUserByEmail } from '@/services/db/user.service'
-import { createToken, verifyToken, deleteToken } from '@/services/db/verification-token.service'
+import { createUser, verifyCredentials, updatePassword, findUserByEmail } from '@/services/db/user.db'
+import { createToken, verifyToken, deleteToken } from '@/services/db/verification-token.db'
 import { sendPasswordResetEmail } from '@/services/api/email.service'
 import { signupSchema, loginSchema } from '@/schemas/auth'
 import { logInfo, logError } from '@/services/business/logger.service'
