@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/use-auth'
 import { ROUTES } from '@/constants'
 import { signupSchema, type SignupData } from '@/schemas/auth'
+import type { ApiResponse } from '@/types'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -44,19 +45,20 @@ export default function SignupPage() {
         body: JSON.stringify(data),
       })
 
-      const result = await response.json()
+      const result: ApiResponse<{ message: string }> = await response.json()
 
-      if (!response.ok) {
-        throw new Error(result.error || result.message || 'Kayıt işlemi başarısız')
+      if (result.success) {
+        setSuccess('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...')
+        setTimeout(() => {
+          router.push(ROUTES.PAGES.AUTH.SIGN_IN)
+        }, 2000)
+      } else {
+        // Yeni API yapısına uygun error handling
+        setError(result.error || 'Kayıt işlemi başarısız')
       }
 
-      setSuccess('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...')
-      setTimeout(() => {
-        router.push(ROUTES.PAGES.AUTH.SIGN_IN)
-      }, 2000)
-
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kayıt işlemi sırasında bir hata oluştu')
+      setError('Bağlantı hatası. Lütfen tekrar deneyin.')
       console.error('Signup error:', err)
     } finally {
       setIsLoading(false)
