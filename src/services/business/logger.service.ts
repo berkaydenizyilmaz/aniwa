@@ -1,6 +1,6 @@
-import { createLogWithUser } from '@/services/db/log.db'
+import { createLog } from '@/services/db/log.db'
 import { LogLevel, SENSITIVE_FIELDS } from '@/constants/logging'
-import type { LogMetadata } from '@/types/admin'
+import type { LogMetadata } from '@/types'
 import { Prisma } from '@prisma/client'
 
 // Sensitive data'yı temizle
@@ -17,16 +17,16 @@ const sanitizeMetadata = (metadata?: LogMetadata): LogMetadata | undefined => {
   return sanitized
 }
 
-// MongoDB'ye kaydetme için wrapper fonksiyonu
+// Database'e log kaydetme
 const logToDatabase = async (
   level: LogLevel,
   event: string,
   message: string,
   metadata?: LogMetadata,
   userId?: string
-) => {
+): Promise<void> => {
   try {
-    await createLogWithUser({
+    await createLog({
       level,
       event,
       message,
@@ -39,7 +39,7 @@ const logToDatabase = async (
   }
 }
 
-// Console logging için formatlanmış çıktı
+// Console'a formatlanmış log yazdırma
 const formatConsoleLog = (level: LogLevel, event: string, message: string, metadata?: LogMetadata) => {
   const timestamp = new Date().toISOString()
   const emoji: Record<LogLevel, string> = {
@@ -56,36 +56,43 @@ const formatConsoleLog = (level: LogLevel, event: string, message: string, metad
   }
 }
 
-// Ana logging fonksiyonları
-// Error loglama
+// Ana logging fonksiyonları - hem console hem database
 export const logError = (
   event: string,
   message: string,
   metadata?: LogMetadata,
   userId?: string
-) => {
+): void => {
   formatConsoleLog(LogLevel.ERROR, event, message, metadata)
   void logToDatabase(LogLevel.ERROR, event, message, metadata, userId)
 }
 
-// Warning loglama
 export const logWarn = (
   event: string,
   message: string,
   metadata?: LogMetadata,
   userId?: string
-) => {
+): void => {
   formatConsoleLog(LogLevel.WARN, event, message, metadata)
   void logToDatabase(LogLevel.WARN, event, message, metadata, userId)
 }
 
-// Info loglama
 export const logInfo = (
   event: string,
   message: string,
   metadata?: LogMetadata,
   userId?: string
-) => {
+): void => {
   formatConsoleLog(LogLevel.INFO, event, message, metadata)
   void logToDatabase(LogLevel.INFO, event, message, metadata, userId)
+}
+
+export const logDebug = (
+  event: string,
+  message: string,
+  metadata?: LogMetadata,
+  userId?: string
+): void => {
+  formatConsoleLog(LogLevel.DEBUG, event, message, metadata)
+  void logToDatabase(LogLevel.DEBUG, event, message, metadata, userId)
 } 

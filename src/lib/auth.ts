@@ -59,11 +59,6 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
-          logInfo(LOG_EVENTS.AUTH_LOGIN_SUCCESS, 'Başarılı giriş', {
-            userId: user.id,
-            username: user.username
-          }, user.id)
-
           return {
             id: user.id,
             email: user.email,
