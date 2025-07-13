@@ -115,17 +115,6 @@ export interface VerifyTokenParams {
 }
 
 // =============================================================================
-// BUSINESS SERVICE TIPLERI
-// =============================================================================
-
-// Kullanıcı oluşturma parametreleri (business service için)
-export interface CreateUserParams {
-  email: string
-  password: string
-  username: string
-}
-
-// =============================================================================
 // EXPORTS
 // =============================================================================
 
