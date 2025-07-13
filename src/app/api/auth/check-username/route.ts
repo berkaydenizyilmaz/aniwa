@@ -1,30 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db/prisma'
+import { findUserByUsername } from '@/services/db/user.db'
 import { AUTH_RATE_LIMIT_TYPES } from '@/constants'
 import { checkUsernameSchema } from '@/schemas/auth'
 import { withAuthRateLimit } from '@/lib/rate-limit/middleware'
 import type { ApiResponse } from '@/types'
 
-async function checkUsernameHandler(request: NextRequest): Promise<NextResponse<ApiResponse<{ available: boolean, username: string }>>> {
+// Kullanıcı adı kullanılabilirliğini kontrol etmek için GET isteğini işler
+async function checkUsernameHandler(
+  request: NextRequest
+): Promise<NextResponse<ApiResponse<{ available: boolean, username: string }>>> {
   try {
     const { searchParams } = new URL(request.url)
     const username = searchParams.get('username')
 
+    // 1. Temel parametre kontrolü
     if (!username) {
       return NextResponse.json(
-        { success: false, error: 'Username parametresi gerekli' },
+        { success: false, error: 'Username parametresi gerekli.' },
         { status: 400 }
       )
     }
 
-    // Zod ile validasyon
+    // 2. Zod ile kullanıcı adı formatının validasyonu
     const validation = checkUsernameSchema.safeParse({ username })
     if (!validation.success) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'Geçersiz username',
-          details: validation.error.errors
+          error: 'Geçersiz kullanıcı adı formatı.',
+          details: validation.error.errors.map(err => ({ 
+            path: err.path.join('.'), 
+            message: err.message 
+          }))
         },
         { status: 400 }
       )
@@ -32,14 +39,11 @@ async function checkUsernameHandler(request: NextRequest): Promise<NextResponse<
 
     const validatedUsername = validation.data.username
 
-    // Veritabanında kontrol et
-    const existingUser = await prisma.user.findUnique({
-      where: { username: validatedUsername },
-      select: { id: true }
-    })
-
+    // 3. DB servisi aracılığıyla kullanıcı adının mevcut olup olmadığını kontrol et
+    const existingUser = await findUserByUsername(validatedUsername) 
     const isAvailable = !existingUser
 
+    // 4. Başarılı yanıt gönder
     return NextResponse.json({
       success: true,
       data: {
@@ -48,13 +52,14 @@ async function checkUsernameHandler(request: NextRequest): Promise<NextResponse<
       }
     })
 
-  } catch {
+  } catch (error) {
+    console.error('checkUsernameHandler hatası:', error)
+    
     return NextResponse.json(
-      { success: false, error: 'Sunucu hatası' },
+      { success: false, error: 'Kullanıcı adı kontrolü sırasında beklenmedik bir hata oluştu.' },
       { status: 500 }
     )
   }
 }
 
-// Rate limiting ile sarılmış export
-export const GET = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.USERNAME_CHECK, checkUsernameHandler) 
+export const GET = withAuthRateLimit(AUTH_RATE_LIMIT_TYPES.USERNAME_CHECK, checkUsernameHandler)
