@@ -120,4 +120,9 @@ export const ROUTE_ACCESS = {
   AUTH_REQUIRED_API_ROUTES: [
     '/api/user',
   ],
+
+  // Giriş GEREKTİREN sayfalar
+  AUTH_REQUIRED_ROUTES: [
+    '/ayarlar',
+  ],
 } as const 

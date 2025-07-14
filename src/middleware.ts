@@ -88,6 +88,13 @@ export default withAuth(
       }
     }
 
+    // 9. GİRİŞ GEREKTİREN SAYFALAR - Auth gerekli
+    if (ROUTE_ACCESS.AUTH_REQUIRED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+      if (!token) {
+        return NextResponse.redirect(new URL(ROUTES.PAGES.AUTH.SIGN_IN, req.url))
+      }
+    }
+
     return NextResponse.next()
   },
   {
@@ -127,7 +134,12 @@ export default withAuth(
           return !!token
         }
 
-        // 7. Diğer tüm sayfalar şu an için public
+        // 7. Auth gerekli sayfalar - Token gerekli
+        if (ROUTE_ACCESS.AUTH_REQUIRED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+          return !!token
+        }
+
+        // 8. Diğer tüm sayfalar şu an için public
         return true
       },
     },
