@@ -1,14 +1,6 @@
 import { Log, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
-import type { PrismaClientOrTransaction } from '@/types'
-
-// Log kullanıcı seçimi tipi
-type LogUserSelect = {
-  id: string
-  username: string
-  email: string
-  roles: string[]
-}
+import type { PrismaClientOrTransaction, SessionUser } from '@/types'
 
 // Log kullanıcı seçimi
 const logUserSelect = {
@@ -30,7 +22,7 @@ export async function createLog(
 export async function createLogWithUser(
   data: Prisma.LogCreateInput,
   client: PrismaClientOrTransaction = prisma
-): Promise<Log & { user: LogUserSelect | null }> {
+): Promise<Log & { user: SessionUser | null }> {
   return client.log.create({
     data,
     include: {
@@ -51,7 +43,7 @@ export async function findLogById(
 export async function findLogByIdWithUser(
   id: string,
   client: PrismaClientOrTransaction = prisma
-): Promise<Log & { user: LogUserSelect | null } | null> {
+): Promise<Log & { user: SessionUser | null } | null> {
   return client.log.findUnique({
     where: { id },
     include: {
@@ -83,7 +75,7 @@ export async function findLogsWithUser(
   take?: number,
   skip?: number,
   client: PrismaClientOrTransaction = prisma
-): Promise<(Log & { user: LogUserSelect | null })[]> {
+): Promise<(Log & { user: SessionUser | null })[]> {
   return client.log.findMany({
     where,
     orderBy,

@@ -2,7 +2,7 @@ import {
   UserRole
 } from "@prisma/client"
 import type { ID } from './index'
-import type { LogWithUser, LogMetadata, CreateLogParams, LogListResponse, LogFilters, LogStats } from './logging'
+import type { LogWithUser, LogMetadata, CreateLogParams, LogFilters, LogStats } from './logging'
 
 // =============================================================================
 // MODERATION SİSTEMİ
@@ -130,4 +130,4 @@ export interface DailyActivityStats {
 }
 
 // Re-export log types for backward compatibility
-export type { LogWithUser, LogMetadata, CreateLogParams, LogListResponse, LogFilters, LogStats } 
+export type { LogWithUser, LogMetadata, CreateLogParams, LogFilters, LogStats } 

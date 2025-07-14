@@ -39,17 +39,6 @@ export interface LogFunctionParams {
   userId?: string
 }
 
-// Log listesi response tipi
-export interface LogListResponse {
-  logs: LogWithUser[]
-  pagination: {
-    total: number
-    limit: number
-    offset: number
-    hasMore: boolean
-  }
-}
-
 // Log filtreleme parametreleri
 export interface LogFilters {
   level?: LogLevel[]
