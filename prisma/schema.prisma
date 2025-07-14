@@ -153,7 +153,6 @@ model User {
   id                   String                 @id @default(auto()) @map("_id") @db.ObjectId
   username             String                 @unique
   email                String                 @unique
-  image                String?
   passwordHash         String?
   profilePicture       String?
   profileBanner        String?

@@ -34,7 +34,6 @@ export interface UserProfile {
   id: ID
   username: string
   slug: string
-  image?: string
   profilePicture?: string
   profileBanner?: string
   bio?: string
@@ -67,7 +66,6 @@ export interface UpdateUserParams {
   bio?: string
   profilePicture?: string
   profileBanner?: string
-  image?: string
 }
 
 // Profil ayarları güncelleme parametreleri

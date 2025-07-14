@@ -8,6 +8,7 @@ declare module "next-auth" {
       id: ID
       username: string
       email: string
+      profilePicture?: string | null
       roles: UserRole[]
     } & DefaultSession["user"]
   }
@@ -16,6 +17,7 @@ declare module "next-auth" {
     id: ID
     username: string
     email: string
+    profilePicture?: string | null
     roles: UserRole[]
   }
 }

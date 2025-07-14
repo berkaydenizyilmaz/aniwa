@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
             id: user.id,
             email: user.email,
             username: user.username,
-            image: user.image || user.profilePicture,
+            profilePicture: user.profilePicture,
             roles: user.roles,
           }
         } catch (error) {
@@ -95,7 +95,6 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id
         token.username = user.username
         token.roles = user.roles
-        token.image = user.image
       }
 
       return token
@@ -106,6 +105,8 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string
         session.user.username = token.username as string
         session.user.roles = token.roles
+        // ProfilePicture bilgisini veritabanından al (gerekirse)
+        session.user.profilePicture = null
       }
 
       return session
@@ -140,7 +141,6 @@ export const authOptions: NextAuthOptions = {
               username,
               slug,
               roles: [USER_ROLES.USER],
-              image: profile.image,
             }, tx)
 
             // Varsayılan ayarları oluştur

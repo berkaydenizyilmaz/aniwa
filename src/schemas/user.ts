@@ -18,7 +18,6 @@ export const updateUserSchema = z.object({
   bio: z.string().max(500, 'Bio en fazla 500 karakter olabilir').optional(),
   profilePicture: urlSchema.optional(),
   profileBanner: urlSchema.optional(),
-  image: urlSchema.optional(),
 })
 
 export const updateUserSettingsSchema = z.object({

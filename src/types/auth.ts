@@ -55,7 +55,7 @@ export interface SessionUser {
   id: ID
   email: string
   username: string
-  image?: string | null
+  profilePicture?: string | null
   roles: UserRole[]
 }
 
