@@ -16,13 +16,13 @@ async function getLogsHandler(
     const queryParams = {
       level: searchParams.getAll('level'),
       event: searchParams.getAll('event'),
-      userId: searchParams.get('userId'),
-      startDate: searchParams.get('startDate'),
-      endDate: searchParams.get('endDate'),
-      limit: searchParams.get('limit'),
-      page: searchParams.get('page'),
-      sortBy: searchParams.get('sortBy'),
-      sortOrder: searchParams.get('sortOrder'),
+      userId: searchParams.get('userId') || undefined,
+      startDate: searchParams.get('startDate') || undefined,
+      endDate: searchParams.get('endDate') || undefined,
+      limit: searchParams.get('limit') || undefined,
+      page: searchParams.get('page') || undefined,
+      sortBy: searchParams.get('sortBy') || undefined,
+      sortOrder: searchParams.get('sortOrder') || undefined,
     }
 
     // 2. Zod ile validasyon
