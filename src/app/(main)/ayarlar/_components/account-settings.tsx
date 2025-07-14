@@ -48,7 +48,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       } else {
         alert('Hata: ' + result.error)
       }
-    } catch (error) {
+    } catch {
       alert('Bağlantı hatası!')
     } finally {
       setIsLoading(false)
@@ -71,7 +71,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       } else {
         alert('Hata: ' + result.error)
       }
-    } catch (error) {
+    } catch {
       alert('Bağlantı hatası!')
     } finally {
       setIsLoading(false)
@@ -94,7 +94,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       } else {
         alert('Hata: ' + result.error)
       }
-    } catch (error) {
+    } catch {
       alert('Bağlantı hatası!')
     } finally {
       setIsLoading(false)

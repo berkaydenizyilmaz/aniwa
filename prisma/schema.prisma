@@ -160,6 +160,7 @@ model User {
   roles                UserRole[]             @default([USER])
   slug                 String                 @unique
   lastLoginAt          DateTime?              // Son giriş zamanı
+  usernameChangedAt    DateTime?              // Son username değiştirme zamanı
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @updatedAt
 

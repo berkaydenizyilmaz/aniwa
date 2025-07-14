@@ -85,7 +85,6 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: ROUTES.PAGES.AUTH.SIGN_IN,
     error: ROUTES.PAGES.AUTH.ERROR,
-    verifyRequest: ROUTES.PAGES.AUTH.VERIFY_REQUEST,
   },
 
   callbacks: {
@@ -95,6 +94,12 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id
         token.username = user.username
         token.roles = user.roles
+        
+        // Son giriş zamanını güncelle
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { lastLoginAt: new Date() }
+        })
       }
 
       return token
@@ -126,6 +131,12 @@ export const authOptions: NextAuthOptions = {
             user.id = existingUser.id
             user.username = existingUser.username
             user.roles = existingUser.roles
+            
+            // Son giriş zamanını güncelle
+            await prisma.user.update({
+              where: { id: existingUser.id },
+              data: { lastLoginAt: new Date() }
+            })
         
             return true
           }
@@ -141,6 +152,7 @@ export const authOptions: NextAuthOptions = {
               username,
               slug,
               roles: [USER_ROLES.USER],
+              lastLoginAt: new Date(),
             }, tx)
 
             // Varsayılan ayarları oluştur

@@ -66,6 +66,7 @@ export interface UpdateUserParams {
   bio?: string
   profilePicture?: string
   profileBanner?: string
+  usernameChangedAt?: Date
 }
 
 // Profil ayarları güncelleme parametreleri
@@ -100,7 +101,7 @@ export interface UserListFilters {
   role?: UserRole
   isActive?: boolean
   hasProfilePicture?: boolean
-  sortBy?: 'username' | 'createdAt' | 'lastLoginAt'
+  sortBy?: 'username' | 'createdAt' | 'lastLoginAt' | 'usernameChangedAt'
   sortOrder?: 'asc' | 'desc'
 }
 
@@ -119,6 +120,7 @@ export interface UserStats {
 // Kullanıcı aktivite özeti
 export interface UserActivity {
   lastLoginAt?: Date
+  usernameChangedAt?: Date
   animeListCount: number
   favouriteAnimeCount: number
   customListsCount: number

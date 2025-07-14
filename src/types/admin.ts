@@ -65,6 +65,7 @@ export interface AdminUserListItem {
   profilePicture?: string
   createdAt: Date
   lastLoginAt?: Date
+  usernameChangedAt?: Date
   isActive: boolean
   stats: {
     animeListCount: number

@@ -135,7 +135,14 @@ export async function updateUserProfile(
     }
 
     // 2. Profil bilgilerini güncelle
-    await updateUser(userId, profileData)
+    const updateData = { ...profileData }
+    
+    // Username değişikliği varsa usernameChangedAt alanını güncelle
+    if (profileData.username) {
+      updateData.usernameChangedAt = new Date()
+    }
+    
+    await updateUser(userId, updateData)
 
     // 3. Güncellenmiş kullanıcıyı ayarlarıyla birlikte getir
     const userWithSettings = await findUserWithSettings(userId)
