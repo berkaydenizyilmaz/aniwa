@@ -81,10 +81,10 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
   const handleUsernameChange = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/user/change-username', {
-        method: 'POST',
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newUsername }),
+        body: JSON.stringify({ username: newUsername }),
       })
       
       const result = await response.json()
