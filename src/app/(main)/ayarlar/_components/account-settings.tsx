@@ -175,6 +175,11 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
           <p className="text-sm text-muted-foreground">
             Mevcut: @{user.username}
           </p>
+          {user.usernameChangedAt && (
+            <p className="text-xs text-muted-foreground">
+              Son değiştirilme: {new Date(user.usernameChangedAt).toLocaleDateString('tr-TR')}
+            </p>
+          )}
           <div className="space-y-2">
             <Label>Yeni Kullanıcı Adı</Label>
             <Input

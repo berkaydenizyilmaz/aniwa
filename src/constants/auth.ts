@@ -16,6 +16,7 @@ export const AUTH = {
   MIN_USERNAME_LENGTH: 3,
   MAX_USERNAME_LENGTH: 20,
   USERNAME_REGEX: /^[a-zA-Z0-9_]+$/,
+  USERNAME_CHANGE_LIMIT_DAYS: 30, // Ayda 1 kez değiştirebilir
 
   // Email kuralları
   MAX_EMAIL_LENGTH: 254,

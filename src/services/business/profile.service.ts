@@ -11,6 +11,7 @@ import {
 import { checkIfUserFollows } from '@/services/db/user-follow.db'
 import { logInfo, logError } from '@/services/business/logger.service'
 import { LOG_EVENTS } from '@/constants/logging'
+import { AUTH } from '@/constants/auth'
 import type { 
   UpdateUserParams,
   UpdateUserSettingsParams,
@@ -134,7 +135,25 @@ export async function updateUserProfile(
       }
     }
 
-    // 2. Profil bilgilerini güncelle
+    // 2. Username değişikliği kontrolü
+    if (profileData.username) {
+      // Username değişikliği limit kontrolü
+      if (existingUser.usernameChangedAt) {
+        const daysSinceLastChange = Math.floor(
+          (Date.now() - existingUser.usernameChangedAt.getTime()) / (1000 * 60 * 60 * 24)
+        )
+        
+        if (daysSinceLastChange < AUTH.USERNAME_CHANGE_LIMIT_DAYS) {
+          const remainingDays = AUTH.USERNAME_CHANGE_LIMIT_DAYS - daysSinceLastChange
+          return { 
+            success: false, 
+            error: `Username değiştirmek için ${remainingDays} gün daha beklemeniz gerekiyor.` 
+          }
+        }
+      }
+    }
+
+    // 3. Profil bilgilerini güncelle
     const updateData = { ...profileData }
     
     // Username değişikliği varsa usernameChangedAt alanını güncelle
