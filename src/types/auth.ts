@@ -98,7 +98,6 @@ export interface LogoutResult {
 // Verification token tipi
 export enum VerificationTokenType {
   PASSWORD_RESET = 'PASSWORD_RESET',
-  EMAIL_VERIFICATION = 'EMAIL_VERIFICATION'
 }
 
 // Verification token oluşturma parametreleri

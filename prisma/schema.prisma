@@ -119,12 +119,12 @@ enum AnimeStatus {
 
 // Medya Listesi İzleme Durumları
 enum MediaListStatus {
-  CURRENT          // Şu an izleniyor/okunuyor
-  PLANNING         // İzlemeyi/okumayı planlanıyor
-  COMPLETED        // İzleme/okuma tamamlandı
-  DROPPED          // İzleme/okuma yarıda bırakıldı
-  PAUSED           // İzleme/okuma duraklatıldı
-  REPEATING        // Tekrar izleniyor/okunuyor
+  CURRENT          // Şu an izleniyor
+  PLANNING         // İzlemeyi planlanıyor
+  COMPLETED        // İzleme tamamlandı
+  DROPPED          // İzleme yarıda bırakıldı
+  PAUSED           // İzleme duraklatıldı
+  REPEATING        // Tekrar izleniyor
 }
 
 // =============================================================================
@@ -136,7 +136,7 @@ model VerificationToken {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String
   token     String   @unique
-  type      String   // "password_reset" - sadece şifre sıfırlama
+  type      String   // "password_reset" - şifre sıfırlama
   expiresAt DateTime
   createdAt DateTime @default(now())
   
