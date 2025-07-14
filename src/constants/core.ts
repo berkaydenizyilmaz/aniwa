@@ -43,6 +43,10 @@ export const ROUTES = {
       ANIME: '/anime',
       CONTACT: '/iletisim',
     },
+    USER: {
+      SETTINGS: '/ayarlar',
+      PROFILE: (username: string) => `/${username}`,
+    },
     AUTH: {
       SIGN_IN: '/giris',
       SIGN_UP: '/kayit',
