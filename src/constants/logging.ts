@@ -5,38 +5,35 @@ import { LogLevel } from "@prisma/client"
 // =============================================================================
 
 export const LOG_EVENTS = {
-  // Auth events - Kullanımda olanlar
-  AUTH_LOGIN_FAILED: 'auth:login:failed',
-  AUTH_LOGIN_ERROR: 'auth:login:error',
-  AUTH_SIGNIN_ERROR: 'auth:signin:error',
-  
-  // User events - Kullanımda olanlar
-  USER_CREATED: 'user:created',
-  USER_REGISTERED: 'user:registered',
-  USER_REGISTRATION_FAILED: 'user:registration:failed',
-  
-  // Password events - Kullanımda olanlar
-  PASSWORD_UPDATE_FAILED: 'password:update:failed',
-  PASSWORD_RESET_REQUEST_FAILED: 'password:reset:request:failed', 
-  PASSWORD_RESET_TOKEN_VERIFICATION_FAILED: 'password:reset:token:verification:failed',
-  PASSWORD_RESET_FAILED: 'password:reset:failed',
-  
-  // Email events - Kullanımda olanlar
-  EMAIL_SEND_ERROR: 'email:send:error',
-  PASSWORD_RESET_EMAIL_SEND_ERROR: 'email:password_reset:send:error',
-  PASSWORD_CHANGE_NOTIFICATION_EMAIL_SEND_ERROR: 'email:password_change:notification:send:error',
-  
-  // System events - Temel olanlar
-  SYSTEM_ERROR: 'system:error',
-  SYSTEM_WARNING: 'system:warning', 
-  SYSTEM_INFO: 'system:info',
-  
-  // Rate limiting events
-  RATE_LIMIT_DISABLED: 'rate_limit:disabled',
-  RATE_LIMIT_CREATE_ERROR: 'rate_limit:create:error',
-  RATE_LIMIT_CHECK_ERROR: 'rate_limit:check:error',
-  RATE_LIMIT_EXCEEDED: 'rate_limit:exceeded',
-} as const
+  // Auth events
+  AUTH_LOGIN_FAILED: 'auth_login_failed',
+  AUTH_SIGNIN_ERROR: 'auth_signin_error',
+
+  // User events
+  USER_CREATED: 'user_created',
+  USER_REGISTERED: 'user_registered',
+  USER_REGISTRATION_FAILED: 'user_registration_failed',
+
+  // Password events
+  PASSWORD_RESET_REQUEST_FAILED: 'password_reset_request_failed',
+  PASSWORD_UPDATE_FAILED: 'password_update_failed',
+
+  // Email events
+  EMAIL_SEND_ERROR: 'email_send_error',
+  EMAIL_TEMPLATE_ERROR: 'email_template_error',
+  EMAIL_SERVICE_ERROR: 'email_service_error',
+
+  // Rate limit events
+  RATE_LIMIT_DISABLED: 'rate_limit_disabled',
+  RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
+  RATE_LIMIT_ERROR: 'rate_limit_error',
+  RATE_LIMIT_REDIS_ERROR: 'rate_limit_redis_error',
+
+  // System events
+  SYSTEM_ERROR: 'system_error',
+  SYSTEM_WARNING: 'system_warning',
+  SYSTEM_INFO: 'system_info',
+} as const;
 
 // Log level priority mapping
 export const LOG_LEVEL_PRIORITY = {
