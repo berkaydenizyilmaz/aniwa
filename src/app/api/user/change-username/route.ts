@@ -32,7 +32,7 @@ async function changeUsernameHandler(
     if (!result.success) {
       return NextResponse.json(
         { success: false, error: result.error },
-        { status: 422 } // Unprocessable Entity
+        { status: 422 }
       );
     }
 
