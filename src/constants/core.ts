@@ -76,6 +76,16 @@ export const ROUTES = {
       VERIFY_EMAIL: '/api/auth/verify-email',
       CHECK_USERNAME: '/api/auth/check-username',
     },
+    ADMIN: {
+      BASE: '/api/admin',
+      LOGS: '/api/admin/logs',
+    },
+    MODERATOR: {
+      BASE: '/api/moderator',
+    },
+    EDITOR: {
+      BASE: '/api/editor',
+    },
   },
 } as const
 

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { LogsFilter, type FilterState } from './_components/logs-filter'
 import { LogsList } from './_components/logs-list'
 import type { PaginatedResponse, LogWithUser } from '@/types'
+import { ROUTES } from '@/constants'
 
 export default function LogsPage() {
   const [data, setData] = useState<PaginatedResponse<LogWithUser> | null>(null)
@@ -45,7 +46,7 @@ export default function LogsPage() {
         params.set('endDate', newFilters.endDate)
       }
 
-      const response = await fetch(`/api/admin/logs?${params}`)
+      const response = await fetch(`${ROUTES.API.ADMIN.LOGS}?${params}`)
       const result = await response.json()
       
       if (result.success) {

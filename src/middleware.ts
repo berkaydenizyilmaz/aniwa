@@ -48,6 +48,36 @@ export default withAuth(
       }
     }
 
+    // 5. ADMIN API'LERİ - ADMIN rolü gerekli
+    if (pathname.startsWith(ROUTES.API.ADMIN.BASE)) {
+      if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.ADMIN)) {
+        return NextResponse.json(
+          { success: false, error: 'Bu işlem için admin yetkisi gereklidir.' },
+          { status: 403 }
+        )
+      }
+    }
+
+    // 6. MODERATOR API'LERİ - MODERATOR rolü gerekli
+    if (pathname.startsWith(ROUTES.API.MODERATOR.BASE)) {
+      if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.MODERATOR)) {
+        return NextResponse.json(
+          { success: false, error: 'Bu işlem için moderatör yetkisi gereklidir.' },
+          { status: 403 }
+        )
+      }
+    }
+
+    // 7. EDITOR API'LERİ - EDITOR rolü gerekli
+    if (pathname.startsWith(ROUTES.API.EDITOR.BASE)) {
+      if (!token || !(token.roles as UserRole[])?.includes(USER_ROLES.EDITOR)) {
+        return NextResponse.json(
+          { success: false, error: 'Bu işlem için editör yetkisi gereklidir.' },
+          { status: 403 }
+        )
+      }
+    }
+
     return NextResponse.next()
   },
   {
