@@ -95,8 +95,9 @@ function SetInitialPassword() {
 }
 
 // Normal şifre değiştirme bileşeni
-function ChangePassword() {
+function ChangePassword({ userEmail }: { userEmail: string }) {
   const [isLoading, setIsLoading] = useState(false)
+  const [isForgotLoading, setIsForgotLoading] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -134,16 +135,49 @@ function ChangePassword() {
     }
   }
 
+  const handleForgotPassword = async () => {
+    setIsForgotLoading(true)
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail }),
+      })
+      
+      const result = await response.json()
+      if (result.success) {
+        alert('Şifre sıfırlama bağlantısı email adresinize gönderildi!')
+      } else {
+        alert('Hata: ' + result.error)
+      }
+    } catch {
+      alert('Bağlantı hatası!')
+    } finally {
+      setIsForgotLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>Mevcut Şifre</Label>
-        <Input
-          type="password"
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-          placeholder="Mevcut şifrenizi girin"
-        />
+        <div className="flex gap-2">
+          <Input
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            placeholder="Mevcut şifrenizi girin"
+            className="flex-1"
+          />
+          <Button 
+            variant="outline" 
+            onClick={handleForgotPassword}
+            disabled={isForgotLoading}
+            className="whitespace-nowrap"
+          >
+            {isForgotLoading ? 'Gönderiliyor...' : 'Şifremi Unuttum'}
+          </Button>
+        </div>
       </div>
       
       <div className="space-y-2">
@@ -252,7 +286,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                      {isGoogleUser ? (
              <SetInitialPassword />
            ) : (
-             <ChangePassword />
+             <ChangePassword userEmail={user.email} />
            )}
         </div>
 
