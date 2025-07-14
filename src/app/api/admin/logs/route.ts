@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { findLogsWithUser, countLogs } from '@/services/db/log.db'
 import { LogLevel } from '@prisma/client'
+import { logQuerySchema } from '@/schemas/admin'
+import { ADMIN } from '@/constants'
 import type { PaginatedResponse, LogWithUser } from '@/types'
 
 // Admin loglarını getirmek için GET isteğini işler
@@ -10,30 +12,37 @@ async function getLogsHandler(
   try {
     const { searchParams } = new URL(request.url)
     
-    // 1. Query parametrelerini parse et
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const page = parseInt(searchParams.get('page') || '1')
+    // 1. Query parametrelerini parse et ve validate et
+    const queryParams = {
+      level: searchParams.getAll('level'),
+      event: searchParams.getAll('event'),
+      userId: searchParams.get('userId'),
+      startDate: searchParams.get('startDate'),
+      endDate: searchParams.get('endDate'),
+      limit: searchParams.get('limit'),
+      page: searchParams.get('page'),
+      sortBy: searchParams.get('sortBy'),
+      sortOrder: searchParams.get('sortOrder'),
+    }
+
+    // 2. Zod ile validasyon
+    const validation = logQuerySchema.safeParse(queryParams)
+    if (!validation.success) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Geçersiz parametreler.',
+          details: validation.error.errors.map(err => ({
+            path: err.path.join('.'),
+            message: err.message
+          }))
+        },
+        { status: 400 }
+      )
+    }
+
+    const { level, event, userId, startDate, endDate, limit, page, sortBy, sortOrder } = validation.data
     const offset = (page - 1) * limit
-    const level = searchParams.getAll('level')
-    const event = searchParams.getAll('event')
-    const userId = searchParams.get('userId')
-    const startDate = searchParams.get('startDate')
-    const endDate = searchParams.get('endDate')
-
-    // 2. Temel validasyonlar
-    if (limit < 1 || limit > 100) {
-      return NextResponse.json(
-        { success: false, error: 'Limit 1-100 arasında olmalıdır.' },
-        { status: 400 }
-      )
-    }
-
-    if (page < 1) {
-      return NextResponse.json(
-        { success: false, error: 'Sayfa numarası 1 veya daha büyük olmalıdır.' },
-        { status: 400 }
-      )
-    }
 
     // 3. Where koşullarını hazırla
     const where: {
@@ -43,11 +52,11 @@ async function getLogsHandler(
       timestamp?: { gte?: Date, lte?: Date }
     } = {}
     
-    if (level.length > 0) {
-      where.level = { in: level as LogLevel[] }
+    if (level && level.length > 0) {
+      where.level = { in: level }
     }
     
-    if (event.length > 0) {
+    if (event && event.length > 0) {
       where.event = { in: event }
     }
     
@@ -59,29 +68,32 @@ async function getLogsHandler(
       where.timestamp = {}
       if (startDate) {
         const parsedStartDate = new Date(startDate)
-        if (isNaN(parsedStartDate.getTime())) {
-          return NextResponse.json(
-            { success: false, error: 'Geçersiz başlangıç tarihi formatı.' },
-            { status: 400 }
-          )
-        }
         where.timestamp.gte = parsedStartDate
       }
       if (endDate) {
         const parsedEndDate = new Date(endDate)
-        if (isNaN(parsedEndDate.getTime())) {
+        where.timestamp.lte = parsedEndDate
+      }
+      
+      // Tarih aralığı kontrolü
+      if (startDate && endDate) {
+        const daysDiff = Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
+        if (daysDiff > ADMIN.LOGS.MAX_DAYS_RANGE) {
           return NextResponse.json(
-            { success: false, error: 'Geçersiz bitiş tarihi formatı.' },
+            { success: false, error: `Tarih aralığı en fazla ${ADMIN.LOGS.MAX_DAYS_RANGE} gün olabilir.` },
             { status: 400 }
           )
         }
-        where.timestamp.lte = parsedEndDate
       }
     }
 
     // 4. DB servisi aracılığıyla logları getir
+    const orderBy = {
+      [sortBy || 'timestamp']: sortOrder || 'desc'
+    }
+    
     const [logs, total] = await Promise.all([
-      findLogsWithUser(where, { timestamp: 'desc' }, limit, offset),
+      findLogsWithUser(where, orderBy, limit, offset),
       countLogs(where)
     ])
 

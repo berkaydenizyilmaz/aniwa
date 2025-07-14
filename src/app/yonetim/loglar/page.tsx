@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { LogsFilter, type FilterState } from './_components/logs-filter'
 import { LogsList } from './_components/logs-list'
 import type { PaginatedResponse, LogWithUser } from '@/types'
-import { ROUTES } from '@/constants'
+import { ROUTES, ADMIN } from '@/constants'
 
 export default function LogsPage() {
   const [data, setData] = useState<PaginatedResponse<LogWithUser> | null>(null)
@@ -23,7 +23,7 @@ export default function LogsPage() {
     try {
       const params = new URLSearchParams()
       
-      params.set('limit', '20')
+      params.set('limit', ADMIN.LOGS.DEFAULT_LIMIT.toString())
       params.set('page', page.toString())
       
       if (newFilters.level && newFilters.level.length > 0) {

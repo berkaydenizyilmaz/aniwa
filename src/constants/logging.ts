@@ -74,7 +74,6 @@ export const SENSITIVE_FIELDS = [
   'sessionId',
   'refreshToken',
   'accessToken',
-  'email',
 ] as const
 
 // LogLevel'ı re-export et
