@@ -12,6 +12,10 @@ export const urlSchema = z.string().url('Geçerli bir URL giriniz')
 // USER ŞEMALARI
 // =============================================================================
 
+export const changeUsernameSchema = z.object({
+  username: usernameSchema,
+})
+
 export const updateUserSchema = z.object({
   email: emailSchema.optional(),
   username: usernameSchema.optional(),
@@ -31,4 +35,8 @@ export const updateUserSettingsSchema = z.object({
   showAnimeList: z.boolean().optional(),
   showFavouriteAnimeSeries: z.boolean().optional(),
   showCustomLists: z.boolean().optional(),
-}) 
+})
+
+export type UpdateUserSettingsData = z.infer<typeof updateUserSettingsSchema>
+export type UpdateUserData = z.infer<typeof updateUserSchema>
+export type ChangeUsernameData = z.infer<typeof changeUsernameSchema> 

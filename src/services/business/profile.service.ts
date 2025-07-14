@@ -1,6 +1,8 @@
+import { User, ProfileVisibility } from '@prisma/client'
 import { 
   findUserById,
   updateUser,
+  findUserByUsername,
   findUserByUsernameWithSettings,
   findUserWithSettings
 } from '@/services/db/user.db'
@@ -9,16 +11,16 @@ import {
   findUserSettingsByUserId 
 } from '@/services/db/user-settings.db'
 import { checkIfUserFollows } from '@/services/db/user-follow.db'
-import { logInfo, logError } from '@/services/business/logger.service'
+import { logError } from '@/services/business/logger.service'
 import { LOG_EVENTS } from '@/constants/logging'
 import { AUTH } from '@/constants/auth'
+import { generateUserSlug } from '@/lib/utils'
 import type { 
   UpdateUserParams,
   UpdateUserSettingsParams,
   UserWithSettings,
   ServiceResult 
 } from '@/types'
-import { ProfileVisibility } from '@prisma/client'
 
 // Kullanıcı profil bilgilerini getir
 export async function getUserProfile(
@@ -135,33 +137,8 @@ export async function updateUserProfile(
       }
     }
 
-    // 2. Username değişikliği kontrolü
-    if (profileData.username) {
-      // Username değişikliği limit kontrolü
-      if (existingUser.usernameChangedAt) {
-        const daysSinceLastChange = Math.floor(
-          (Date.now() - existingUser.usernameChangedAt.getTime()) / (1000 * 60 * 60 * 24)
-        )
-        
-        if (daysSinceLastChange < AUTH.USERNAME_CHANGE_LIMIT_DAYS) {
-          const remainingDays = AUTH.USERNAME_CHANGE_LIMIT_DAYS - daysSinceLastChange
-          return { 
-            success: false, 
-            error: `Username değiştirmek için ${remainingDays} gün daha beklemeniz gerekiyor.` 
-          }
-        }
-      }
-    }
-
-    // 3. Profil bilgilerini güncelle
-    const updateData = { ...profileData }
-    
-    // Username değişikliği varsa usernameChangedAt alanını güncelle
-    if (profileData.username) {
-      updateData.usernameChangedAt = new Date()
-    }
-    
-    await updateUser(userId, updateData)
+    // 2. Profil bilgilerini doğrudan güncelle
+    await updateUser(userId, profileData)
 
     // 3. Güncellenmiş kullanıcıyı ayarlarıyla birlikte getir
     const userWithSettings = await findUserWithSettings(userId)
@@ -172,15 +149,6 @@ export async function updateUserProfile(
         error: 'Güncellenmiş kullanıcı bulunamadı' 
       }
     }
-
-    logInfo({
-      event: LOG_EVENTS.SYSTEM_INFO,
-      message: 'Kullanıcı profili güncellendi',
-      metadata: {
-        userId,
-        updatedFields: Object.keys(profileData)
-      }
-    })
 
     return { 
       success: true, 
@@ -203,6 +171,75 @@ export async function updateUserProfile(
     }
   }
 }
+
+// Kullanıcı adını değiştir
+export async function changeUsername(
+  userId: string,
+  newUsername: string
+): Promise<ServiceResult<User>> {
+  try {
+    // 1. Kullanıcıyı bul
+    const existingUser = await findUserById(userId);
+    if (!existingUser) {
+      return { 
+        success: false, 
+        error: 'Kullanıcı bulunamadı.' 
+      }
+    }
+
+    // 2. Yeni kullanıcı adının mevcut olup olmadığını kontrol et
+    const usernameTaken = await findUserByUsername(newUsername);
+    if (usernameTaken && usernameTaken.id !== userId) {
+      return { 
+        success: false, 
+        error: 'Bu kullanıcı adı zaten alınmış.' 
+      }
+    }
+
+    // 3. Kullanıcı adı değiştirme süresi limitini kontrol et
+    if (existingUser.usernameChangedAt) {
+      const daysSinceLastChange = Math.floor(
+        (Date.now() - existingUser.usernameChangedAt.getTime()) / (1000 * 60 * 60 * 24)
+      )
+      if (daysSinceLastChange < AUTH.USERNAME_CHANGE_LIMIT_DAYS) {
+        const remainingDays = AUTH.USERNAME_CHANGE_LIMIT_DAYS - daysSinceLastChange;
+        return {
+          success: false,
+          error: `Kullanıcı adınızı değiştirmek için ${remainingDays} gün daha beklemelisiniz.`,
+        }
+      }
+    }
+
+    // 4. Yeni slug oluştur ve veritabanını güncelle
+    const newSlug = generateUserSlug(newUsername);
+    const updatedUser = await updateUser(userId, {
+      username: newUsername,
+      slug: newSlug,
+      usernameChangedAt: new Date(),
+    })
+
+    return { 
+      success: true, 
+      data: updatedUser 
+    }
+  } catch (error) {
+    logError({
+      event: LOG_EVENTS.SYSTEM_ERROR,
+      message: 'Kullanıcı adı değiştirme hatası',
+      metadata: {
+        userId,
+        newUsername,
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      },
+    })
+
+    return {
+      success: false,
+      error: 'Kullanıcı adı değiştirilirken bir hata oluştu.',
+    }
+  }
+}
+
 
 // Kullanıcı ayarlarını güncelle
 export async function updateUserProfileSettings(
@@ -240,15 +277,6 @@ export async function updateUserProfileSettings(
         error: 'Güncellenmiş kullanıcı bulunamadı' 
       }
     }
-
-    logInfo({
-      event: LOG_EVENTS.SYSTEM_INFO,
-      message: 'Kullanıcı ayarları güncellendi',
-      metadata: {
-        userId,
-        updatedFields: Object.keys(settingsData)
-      }
-    })
 
     return { 
       success: true, 

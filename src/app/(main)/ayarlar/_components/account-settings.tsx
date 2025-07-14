@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -23,6 +24,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
   
   // Username değiştirme state'leri
   const [newUsername, setNewUsername] = useState('')
+  const { update } = useSession()
 
   const handlePasswordChange = async () => {
     if (newPassword !== confirmPassword) {
@@ -79,9 +81,10 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
   }
 
   const handleUsernameChange = async () => {
+    if (!newUsername) return
     setIsLoading(true)
     try {
-      const response = await fetch('/api/user/profile', {
+      const response = await fetch('/api/user/change-username', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: newUsername }),
@@ -89,8 +92,12 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       
       const result = await response.json()
       if (result.success) {
-        alert('Username başarıyla değiştirildi!')
-        window.location.reload()
+        await update({ username: newUsername })
+        alert('Kullanıcı adı başarıyla değiştirildi!')
+        // Arayüzdeki "Mevcut" kullanıcı adını da anında güncellemek için
+        // state'i tetiklemek yerine doğrudan session'dan gelen veriyi kullanmak
+        // daha robust olur, ancak şimdilik bu şekilde bırakıyoruz.
+        // Sayfa yenilendiğinde zaten header gibi yerlerde güncel olacaktır.
       } else {
         alert('Hata: ' + result.error)
       }
