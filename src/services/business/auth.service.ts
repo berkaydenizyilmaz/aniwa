@@ -52,7 +52,7 @@ export async function loginUser(
 
   } catch (error) {
     logError({
-      event: LOG_EVENTS.AUTH_LOGIN_ERROR,
+      event: LOG_EVENTS.AUTH_LOGIN_FAILED,
       message: `Giriş sırasında sistem hatası: ${params.username}`,
       metadata: { username: params.username, error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
     })
@@ -218,7 +218,7 @@ export async function verifyPasswordResetToken(
 
   } catch (error) {
     logError({
-      event: LOG_EVENTS.PASSWORD_RESET_TOKEN_VERIFICATION_FAILED,
+      event: LOG_EVENTS.PASSWORD_RESET_REQUEST_FAILED,
       message: 'Şifre sıfırlama token doğrulama hatası',
       metadata: { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
     })
@@ -258,7 +258,7 @@ export async function resetPasswordWithToken(
 
   } catch (error) {
     logError({
-      event: LOG_EVENTS.PASSWORD_RESET_FAILED,
+      event: LOG_EVENTS.PASSWORD_RESET_REQUEST_FAILED,
       message: 'Şifre sıfırlama hatası',
       metadata: { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
     })

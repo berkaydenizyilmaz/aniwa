@@ -147,7 +147,7 @@ export async function sendPasswordResetEmail(
   } catch (error) {
     // 6. Hata loglaması
     logError({
-      event: LOG_EVENTS.PASSWORD_RESET_EMAIL_SEND_ERROR,
+      event: LOG_EVENTS.EMAIL_SEND_ERROR,
       message: 'Şifre sıfırlama email gönderim hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -199,7 +199,7 @@ export async function sendPasswordChangeNotificationEmail(
 
   } catch (error) {
     logError({
-      event: LOG_EVENTS.PASSWORD_CHANGE_NOTIFICATION_EMAIL_SEND_ERROR,
+      event: LOG_EVENTS.EMAIL_SEND_ERROR,
       message: 'Şifre değişikliği bildirim email gönderim hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',

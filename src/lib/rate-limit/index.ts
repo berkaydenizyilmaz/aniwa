@@ -71,7 +71,7 @@ function createRateLimiter(config: RateLimitConfig): Ratelimit | null {
     })
   } catch (error) {
     logError({
-      event: LOG_EVENTS.RATE_LIMIT_CREATE_ERROR,
+      event: LOG_EVENTS.RATE_LIMIT_ERROR,
       message: 'Rate limiter oluşturma hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -152,7 +152,7 @@ export async function checkRateLimit(
     }
   } catch (error) {
     logError({
-      event: LOG_EVENTS.RATE_LIMIT_CHECK_ERROR,
+      event: LOG_EVENTS.RATE_LIMIT_ERROR,
       message: 'Rate limit kontrolü hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
