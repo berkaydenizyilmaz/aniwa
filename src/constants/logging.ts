@@ -5,47 +5,37 @@ import { LogLevel } from "@prisma/client"
 // =============================================================================
 
 export const LOG_EVENTS = {
-  // Auth events
-  AUTH_LOGIN_SUCCESS: 'auth:login:success',
+  // Auth events - Kullanımda olanlar
   AUTH_LOGIN_FAILED: 'auth:login:failed',
-  AUTH_LOGOUT: 'auth:logout',
-  AUTH_SIGNUP_SUCCESS: 'auth:signup:success',
-  AUTH_SIGNUP_FAILED: 'auth:signup:failed',
-  AUTH_PASSWORD_RESET_REQUESTED: 'auth:password_reset:requested',
-  AUTH_PASSWORD_RESET_SUCCESS: 'auth:password_reset:success',
-  AUTH_PASSWORD_RESET_FAILED: 'auth:password_reset:failed',
+  AUTH_LOGIN_ERROR: 'auth:login:error',
+  AUTH_SIGNIN_ERROR: 'auth:signin:error',
   
-  // User events
+  // User events - Kullanımda olanlar
   USER_CREATED: 'user:created',
-  USER_UPDATED: 'user:updated',
-  USER_DELETED: 'user:deleted',
-  USER_ROLE_CHANGED: 'user:role:changed',
+  USER_REGISTERED: 'user:registered',
+  USER_REGISTRATION_FAILED: 'user:registration:failed',
   
-  // Anime events
-  ANIME_CREATED: 'anime:created',
-  ANIME_UPDATED: 'anime:updated',
-  ANIME_DELETED: 'anime:deleted',
-  ANIME_LIST_UPDATED: 'anime:list:updated',
+  // Password events - Kullanımda olanlar
+  PASSWORD_UPDATE_FAILED: 'password:update:failed',
+  PASSWORD_RESET_REQUEST_FAILED: 'password:reset:request:failed', 
+  PASSWORD_RESET_TOKEN_VERIFICATION_FAILED: 'password:reset:token:verification:failed',
+  PASSWORD_RESET_FAILED: 'password:reset:failed',
   
-  // System events
+  // Email events - Kullanımda olanlar
+  EMAIL_SEND_ERROR: 'email:send:error',
+  PASSWORD_RESET_EMAIL_SEND_ERROR: 'email:password_reset:send:error',
+  PASSWORD_CHANGE_NOTIFICATION_EMAIL_SEND_ERROR: 'email:password_change:notification:send:error',
+  
+  // System events - Temel olanlar
   SYSTEM_ERROR: 'system:error',
-  SYSTEM_WARNING: 'system:warning',
+  SYSTEM_WARNING: 'system:warning', 
   SYSTEM_INFO: 'system:info',
   
-  // Rate limiting
+  // Rate limiting events
+  RATE_LIMIT_DISABLED: 'rate_limit:disabled',
+  RATE_LIMIT_CREATE_ERROR: 'rate_limit:create:error',
+  RATE_LIMIT_CHECK_ERROR: 'rate_limit:check:error',
   RATE_LIMIT_EXCEEDED: 'rate_limit:exceeded',
-  RATE_LIMIT_WARNING: 'rate_limit:warning',
-  
-  // API events
-  API_CALL: 'api:call',
-  
-  // Service events
-  SERVICE_ERROR: 'service:error',
-  
-  // OAuth events
-  AUTH_OAUTH_SUCCESS: 'auth:oauth:success',
-  AUTH_SIGNIN_ERROR: 'auth:signin:error',
-  AUTH_LOGOUT_SUCCESS: 'auth:logout:success',
 } as const
 
 // Log level priority mapping

@@ -14,6 +14,7 @@ import {
 } from '@/services/db/verification-token.db'
 import { sendPasswordResetEmail } from '@/services/api/email.service'
 import { logInfo, logError } from '@/services/business/logger.service'
+import { LOG_EVENTS } from '@/constants/logging'
 import { AUTH, USER_ROLES } from '@/constants'
 import { generateUserSlug } from '@/lib/utils'
 import { prisma } from '@/lib/db/prisma'
@@ -51,7 +52,7 @@ export async function loginUser(
 
   } catch (error) {
     logError({
-      event: 'LOGIN_SYSTEM_ERROR',
+      event: LOG_EVENTS.AUTH_LOGIN_ERROR,
       message: `Giriş sırasında sistem hatası: ${params.username}`,
       metadata: { username: params.username, error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
     })
@@ -97,7 +98,7 @@ export async function registerUser(
     })
 
     logInfo({
-      event: 'USER_REGISTERED',
+      event: LOG_EVENTS.USER_REGISTERED,
       message: `Yeni kullanıcı kaydoldu: ${result.user.email}`,
       metadata: { email: result.user.email, username: result.user.username },
       userId: result.user.id
@@ -112,7 +113,7 @@ export async function registerUser(
 
   } catch (error) {
     logError({
-      event: 'USER_REGISTRATION_FAILED',
+      event: LOG_EVENTS.USER_REGISTRATION_FAILED,
       message: `Kullanıcı kaydı başarısız: ${params.email}`,
       metadata: { 
         email: params.email,
@@ -136,7 +137,7 @@ export async function updateUserPassword(
     return { success: true, data: undefined }
   } catch (error) {
     logError({
-      event: 'PASSWORD_UPDATE_FAILED',
+      event: LOG_EVENTS.PASSWORD_UPDATE_FAILED,
       message: 'Şifre güncelleme hatası',
       metadata: { error: error instanceof Error ? error.message : 'Bilinmeyen hata' },
       userId: params.userId
@@ -189,7 +190,7 @@ export async function createPasswordResetToken(
 
   } catch (error) {
     logError({
-      event: 'PASSWORD_RESET_REQUEST_FAILED',
+      event: LOG_EVENTS.PASSWORD_RESET_REQUEST_FAILED,
       message: `Şifre sıfırlama token oluşturma hatası: ${params.email}`,
       metadata: { email: params.email, error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
     })
@@ -217,7 +218,7 @@ export async function verifyPasswordResetToken(
 
   } catch (error) {
     logError({
-      event: 'PASSWORD_RESET_TOKEN_VERIFICATION_FAILED',
+      event: LOG_EVENTS.PASSWORD_RESET_TOKEN_VERIFICATION_FAILED,
       message: 'Şifre sıfırlama token doğrulama hatası',
       metadata: { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
     })
@@ -257,7 +258,7 @@ export async function resetPasswordWithToken(
 
   } catch (error) {
     logError({
-      event: 'PASSWORD_RESET_FAILED',
+      event: LOG_EVENTS.PASSWORD_RESET_FAILED,
       message: 'Şifre sıfırlama hatası',
       metadata: { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
     })

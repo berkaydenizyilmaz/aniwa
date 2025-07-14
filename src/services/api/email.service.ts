@@ -1,6 +1,7 @@
 import { Resend } from 'resend'
 import { env } from '@/lib/env'
 import { logError } from '@/services/business/logger.service'
+import { LOG_EVENTS } from '@/constants/logging'
 import { z } from 'zod'
 import type { 
   ApiResponse, 
@@ -77,7 +78,7 @@ async function sendEmail(params: SendEmailParams): Promise<ApiResponse<EmailSend
 
   } catch (error) {
     logError({
-      event: 'EMAIL_SEND_ERROR',
+      event: LOG_EVENTS.EMAIL_SEND_ERROR,
       message: 'Email gönderim hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -146,7 +147,7 @@ export async function sendPasswordResetEmail(
   } catch (error) {
     // 6. Hata loglaması
     logError({
-      event: 'PASSWORD_RESET_EMAIL_SEND_ERROR',
+      event: LOG_EVENTS.PASSWORD_RESET_EMAIL_SEND_ERROR,
       message: 'Şifre sıfırlama email gönderim hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -198,7 +199,7 @@ export async function sendPasswordChangeNotificationEmail(
 
   } catch (error) {
     logError({
-      event: 'PASSWORD_CHANGE_NOTIFICATION_EMAIL_SEND_ERROR',
+      event: LOG_EVENTS.PASSWORD_CHANGE_NOTIFICATION_EMAIL_SEND_ERROR,
       message: 'Şifre değişikliği bildirim email gönderim hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',

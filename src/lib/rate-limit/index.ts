@@ -49,7 +49,7 @@ function adjustConfigForEnvironment(config: RateLimitConfig): RateLimitConfig {
 function createRateLimiter(config: RateLimitConfig): Ratelimit | null {
   if (!hasRateLimit) {
     logWarn({
-      event: LOG_EVENTS.AUTH_LOGIN_FAILED,
+      event: LOG_EVENTS.RATE_LIMIT_DISABLED,
       message: 'Rate limiting devre dışı - KV konfigürasyonu eksik'
     })
     return null
@@ -71,7 +71,7 @@ function createRateLimiter(config: RateLimitConfig): Ratelimit | null {
     })
   } catch (error) {
     logError({
-      event: LOG_EVENTS.AUTH_LOGIN_FAILED,
+      event: LOG_EVENTS.RATE_LIMIT_CREATE_ERROR,
       message: 'Rate limiter oluşturma hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -123,7 +123,7 @@ export async function checkRateLimit(
     // Sadece rate limit aşımlarını logla (başarılı olanları değil)
     if (!result.success) {
       logWarn({
-        event: LOG_EVENTS.AUTH_LOGIN_FAILED,
+        event: LOG_EVENTS.RATE_LIMIT_EXCEEDED,
         message: 'Rate limit aşıldı',
         metadata: {
           key: key.substring(0, 20) + '...', // Güvenlik için kısalt
@@ -152,7 +152,7 @@ export async function checkRateLimit(
     }
   } catch (error) {
     logError({
-      event: LOG_EVENTS.AUTH_LOGIN_FAILED,
+      event: LOG_EVENTS.RATE_LIMIT_CHECK_ERROR,
       message: 'Rate limit kontrolü hatası',
       metadata: {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
