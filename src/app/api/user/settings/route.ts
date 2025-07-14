@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { getUserProfile, updateUserProfile } from '@/services/business/profile.service'
-import { updateUserSchema } from '@/schemas/user'
+import { getUserProfile, updateUserProfileSettings } from '@/services/business/profile.service'
+import { updateUserSettingsSchema } from '@/schemas/user'
 import type { ApiResponse, UserWithSettings } from '@/types'
+import type { UserProfileSettings } from '@prisma/client'
 
-// Kullanıcı profil bilgilerini getirmek için GET isteğini işler
-async function getProfileHandler(): Promise<NextResponse<ApiResponse<{ user: UserWithSettings }>>> {
+// Kullanıcı ayarlarını getirmek için GET isteğini işler
+async function getSettingsHandler(): Promise<NextResponse<ApiResponse<{ settings: UserProfileSettings | null }>>> {
   try {
     // 1. Authentication kontrolü (middleware tarafından yapılıyor)
     const session = await getServerSession(authOptions)
     
-    // 2. Business service ile profil bilgilerini getir
+    // 2. Business service ile kullanıcı bilgilerini getir (ayarlar dahil)
     const result = await getUserProfile(session!.user.id)
     
     if (!result.success) {
@@ -21,26 +22,26 @@ async function getProfileHandler(): Promise<NextResponse<ApiResponse<{ user: Use
       )
     }
 
-    // 3. Başarılı yanıt gönder
+    // 3. Sadece ayarları döndür
     return NextResponse.json({
       success: true,
       data: {
-        user: result.data!
+        settings: result.data!.userSettings
       }
     })
 
   } catch (error) {
-    console.error('getProfileHandler hatası:', error)
+    console.error('getSettingsHandler hatası:', error)
     
     return NextResponse.json(
-      { success: false, error: 'Profil bilgileri alınırken beklenmedik bir hata oluştu.' },
+      { success: false, error: 'Ayarlar alınırken beklenmedik bir hata oluştu.' },
       { status: 500 }
     )
   }
 }
 
-// Kullanıcı profil bilgilerini güncellemek için PUT isteğini işler
-async function updateProfileHandler(
+// Kullanıcı ayarlarını güncellemek için PUT isteğini işler
+async function updateSettingsHandler(
   request: NextRequest
 ): Promise<NextResponse<ApiResponse<{ user: UserWithSettings }>>> {
   try {
@@ -49,7 +50,7 @@ async function updateProfileHandler(
     const body = await request.json()
     
     // 2. Zod ile veri formatının validasyonu
-    const validation = updateUserSchema.safeParse(body)
+    const validation = updateUserSettingsSchema.safeParse(body)
     if (!validation.success) {
       return NextResponse.json(
         { 
@@ -64,8 +65,8 @@ async function updateProfileHandler(
       )
     }
 
-    // 3. Business service ile profil güncelleme
-    const result = await updateUserProfile(session!.user.id, validation.data)
+    // 3. Business service ile ayarları güncelle
+    const result = await updateUserProfileSettings(session!.user.id, validation.data)
     
     if (!result.success) {
       return NextResponse.json(
@@ -77,21 +78,21 @@ async function updateProfileHandler(
     // 4. Başarılı yanıt gönder
     return NextResponse.json({
       success: true,
-      message: 'Profil başarıyla güncellendi!',
+      message: 'Ayarlar başarıyla güncellendi!',
       data: {
-        user: result.data
+        user: result.data!
       }
     })
 
   } catch (error) {
-    console.error('updateProfileHandler hatası:', error)
+    console.error('updateSettingsHandler hatası:', error)
     
     return NextResponse.json(
-      { success: false, error: 'Profil güncellenirken beklenmedik bir hata oluştu.' },
+      { success: false, error: 'Ayarlar güncellenirken beklenmedik bir hata oluştu.' },
       { status: 500 }
     )
   }
 }
 
-export const GET = getProfileHandler
-export const PUT = updateProfileHandler 
+export const GET = getSettingsHandler
+export const PUT = updateSettingsHandler 

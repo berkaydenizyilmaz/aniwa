@@ -15,14 +15,14 @@ export default withAuth(
       return rateLimitResponse
     }
     
-    // 1. GİRİŞ YAPMIŞ KULLANICILAR - Auth sayfalarına ve API'lerine erişemez
+    // 1. GİRİŞ YAPMIŞ KULLANICILAR - Guest-only sayfalarına ve API'lerine erişemez
     if (token) {
-      // Auth sayfalarına erişemez
-      if (ROUTE_ACCESS.PROTECTED_AUTH_ROUTES.some(route => pathname === route)) {
+      // Guest-only sayfalarına erişemez
+      if (ROUTE_ACCESS.GUEST_ONLY_ROUTES.some(route => pathname === route)) {
         return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, req.url))
       }
-      // Auth API'lerine erişemez
-      if (ROUTE_ACCESS.PROTECTED_API_ROUTES.some(route => pathname === route)) {
+      // Guest-only API'lerine erişemez
+      if (ROUTE_ACCESS.GUEST_ONLY_API_ROUTES.some(route => pathname === route)) {
         return NextResponse.json({ error: 'Zaten giriş yapmışsınız' }, { status: 403 })
       }
     }
@@ -78,6 +78,16 @@ export default withAuth(
       }
     }
 
+    // 8. GİRİŞ GEREKTİREN API'LER - Auth gerekli
+    if (ROUTE_ACCESS.AUTH_REQUIRED_API_ROUTES.some(route => pathname.startsWith(route))) {
+      if (!token) {
+        return NextResponse.json(
+          { success: false, error: 'Bu işlem için giriş yapmanız gereklidir.' },
+          { status: 401 }
+        )
+      }
+    }
+
     return NextResponse.next()
   },
   {
@@ -105,8 +115,8 @@ export default withAuth(
           return true
         }
 
-        // 5. Auth sayfaları - Token kontrolü middleware fonksiyonunda yapılacak
-        if (ROUTE_ACCESS.PROTECTED_AUTH_ROUTES.some(route => pathname === route)) {
+        // 5. Guest-only sayfaları - Token kontrolü middleware fonksiyonunda yapılacak
+        if (ROUTE_ACCESS.GUEST_ONLY_ROUTES.some(route => pathname === route)) {
           return true
         }
 
