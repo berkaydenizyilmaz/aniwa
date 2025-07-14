@@ -4,8 +4,15 @@ import { useAuth } from '@/hooks/use-auth'
 import { useRole } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { ROUTES } from '@/constants'
-import { Settings } from 'lucide-react'
+import { Settings, User, LogOut, Shield } from 'lucide-react'
 import Link from 'next/link'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 export default function AuthStatus() {
   const { user, isAuthenticated, isLoading, logout } = useAuth()
@@ -22,31 +29,48 @@ export default function AuthStatus() {
 
   if (isAuthenticated && user) {
     return (
-      <div className="flex items-center space-x-4">
-        <div className="text-sm">
-          <span className="text-muted-foreground">Merhaba, </span>
-          <span className="font-medium">
-            {user.username || user.email}
-          </span>
-        </div>
-        
-        {/* Admin Panel Linki - Sadece admin rolüne sahip kullanıcılara göster */}
-        {isAdmin() && (
-          <Button asChild variant="ghost" size="sm">
-            <Link href={ROUTES.PAGES.ADMIN.BASE} className="flex items-center space-x-1">
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">Yönetim</span>
-            </Link>
-          </Button>
-        )}
-        
-        <Button 
-          onClick={logout}
-          variant="outline"
-          size="sm"
-        >
-          Çıkış
-        </Button>
+      <div className="flex items-center space-x-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">{user.username || user.email}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem asChild>
+              <Link href={ROUTES.PAGES.USER.PROFILE(user.username || user.email || '')} className="flex items-center">
+                <User className="mr-2 h-4 w-4" />
+                <span>Profil</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={ROUTES.PAGES.USER.SETTINGS} className="flex items-center">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Ayarlar</span>
+              </Link>
+            </DropdownMenuItem>
+            
+            {/* Admin Panel - Sadece admin rolüne sahip kullanıcılara göster */}
+            {isAdmin() && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href={ROUTES.PAGES.ADMIN.BASE} className="flex items-center">
+                    <Shield className="mr-2 h-4 w-4" />
+                    <span>Yönetim</span>
+                  </Link>
+                </DropdownMenuItem>
+              </>
+            )}
+            
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={logout} className="flex items-center">
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Çıkış</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     )
   }
