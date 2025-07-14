@@ -89,6 +89,8 @@ export const ROUTES = {
       BASE: '/api/user',
       PROFILE: '/api/user/profile',
       SETTINGS: '/api/user/settings',
+      CHANGE_USERNAME: '/api/user/change-username',
+      CHANGE_PASSWORD: '/api/user/change-password',
     },
     PROFILE: {
       BASE: '/api/profile',
