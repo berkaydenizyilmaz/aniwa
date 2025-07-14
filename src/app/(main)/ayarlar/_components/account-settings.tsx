@@ -11,96 +11,18 @@ interface AccountSettingsProps {
   user: UserWithSettings
 }
 
-// İlk şifre belirleme bileşeni (Google OAuth kullanıcıları için)
-function SetInitialPassword() {
+export default function AccountSettings({ user }: AccountSettingsProps) {
   const [isLoading, setIsLoading] = useState(false)
+  
+  // Şifre değiştirme state'leri
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-
-  const handleSetPassword = async () => {
-    if (newPassword !== confirmPassword) {
-      alert('Şifreler eşleşmiyor!')
-      return
-    }
-    
-    if (newPassword.length < 8) {
-      alert('Şifre en az 8 karakter olmalı!')
-      return
-    }
-    
-    setIsLoading(true)
-    try {
-      const response = await fetch('/api/user/set-initial-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newPassword }),
-      })
-      
-      const result = await response.json()
-      if (result.success) {
-        alert('Şifre başarıyla belirlendi!')
-        window.location.reload()
-      } else {
-        alert('Hata: ' + result.error)
-      }
-    } catch {
-      alert('Bağlantı hatası!')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h4 className="font-medium text-blue-900">İlk Şifre Belirleme</h4>
-        <p className="text-sm text-blue-700 mt-1">
-          Google ile giriş yaptığınız için henüz şifreniz yok. İsteğe bağlı olarak şifre belirleyebilirsiniz.
-        </p>
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Yeni Şifre</Label>
-        <Input
-          type="password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          placeholder="En az 8 karakter"
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Yeni Şifre (Tekrar)</Label>
-        <Input
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder="Şifrenizi tekrar girin"
-        />
-      </div>
-      
-      <Button 
-        onClick={handleSetPassword} 
-        disabled={isLoading || !newPassword || !confirmPassword}
-        className="w-full"
-      >
-        {isLoading ? 'Belirleniyor...' : 'Şifre Belirle'}
-      </Button>
-      
-      <p className="text-xs text-muted-foreground">
-        Şifre belirledikten sonra hem Google hem de email/şifre ile giriş yapabilirsiniz.
-      </p>
-    </div>
-  )
-}
-
-// Normal şifre değiştirme bileşeni
-function ChangePassword({ userEmail }: { userEmail: string }) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [isForgotLoading, setIsForgotLoading] = useState(false)
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  
+  // Email değiştirme state'leri
+  const [newEmail, setNewEmail] = useState('')
+  
+  // Username değiştirme state'leri
+  const [newUsername, setNewUsername] = useState('')
 
   const handlePasswordChange = async () => {
     if (newPassword !== confirmPassword) {
@@ -114,7 +36,6 @@ function ChangePassword({ userEmail }: { userEmail: string }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          currentPassword,
           newPassword,
         }),
       })
@@ -122,105 +43,17 @@ function ChangePassword({ userEmail }: { userEmail: string }) {
       const result = await response.json()
       if (result.success) {
         alert('Şifre başarıyla değiştirildi!')
-        setCurrentPassword('')
         setNewPassword('')
         setConfirmPassword('')
       } else {
         alert('Hata: ' + result.error)
       }
-    } catch {
+    } catch (error) {
       alert('Bağlantı hatası!')
     } finally {
       setIsLoading(false)
     }
   }
-
-  const handleForgotPassword = async () => {
-    setIsForgotLoading(true)
-    try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userEmail }),
-      })
-      
-      const result = await response.json()
-      if (result.success) {
-        alert('Şifre sıfırlama bağlantısı email adresinize gönderildi!')
-      } else {
-        alert('Hata: ' + result.error)
-      }
-    } catch {
-      alert('Bağlantı hatası!')
-    } finally {
-      setIsForgotLoading(false)
-    }
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label>Mevcut Şifre</Label>
-        <div className="flex gap-2">
-          <Input
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            placeholder="Mevcut şifrenizi girin"
-            className="flex-1"
-          />
-          <Button 
-            variant="outline" 
-            onClick={handleForgotPassword}
-            disabled={isForgotLoading}
-            className="whitespace-nowrap"
-          >
-            {isForgotLoading ? 'Gönderiliyor...' : 'Şifremi Unuttum'}
-          </Button>
-        </div>
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Yeni Şifre</Label>
-        <Input
-          type="password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          placeholder="Yeni şifrenizi girin"
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Yeni Şifre (Tekrar)</Label>
-        <Input
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder="Yeni şifrenizi tekrar girin"
-        />
-      </div>
-      
-      <Button 
-        onClick={handlePasswordChange} 
-        disabled={isLoading || !currentPassword || !newPassword}
-      >
-        Şifreyi Değiştir
-      </Button>
-    </div>
-  )
-}
-
-export default function AccountSettings({ user }: AccountSettingsProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  
-  // Email değiştirme state'leri
-  const [newEmail, setNewEmail] = useState('')
-  
-  // Username değiştirme state'leri
-  const [newUsername, setNewUsername] = useState('')
-
-  // Google OAuth kullanıcısı mı kontrol et (passwordHash null ise)
-  const isGoogleUser = !user.passwordHash
 
   const handleEmailChange = async () => {
     setIsLoading(true)
@@ -238,7 +71,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       } else {
         alert('Hata: ' + result.error)
       }
-    } catch {
+    } catch (error) {
       alert('Bağlantı hatası!')
     } finally {
       setIsLoading(false)
@@ -261,7 +94,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
       } else {
         alert('Hata: ' + result.error)
       }
-    } catch {
+    } catch (error) {
       alert('Bağlantı hatası!')
     } finally {
       setIsLoading(false)
@@ -277,17 +110,40 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-8">
-        {/* Şifre Yönetimi */}
+        {/* Şifre Değiştirme */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium">
-            {isGoogleUser ? 'Şifre Belirle' : 'Şifre Değiştir'}
+            {user.passwordHash ? 'Şifre Değiştir' : 'Şifre Belirle'}
           </h3>
-          
-                     {isGoogleUser ? (
-             <SetInitialPassword />
-           ) : (
-             <ChangePassword userEmail={user.email} />
-           )}
+          <p className="text-sm text-muted-foreground">
+            {user.passwordHash 
+              ? 'Hesabınızın güvenliği için şifrenizi güncelleyin' 
+              : 'Google hesabınız için şifre belirleyin'}
+          </p>
+          <div className="space-y-2">
+            <Label>Yeni Şifre</Label>
+            <Input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Yeni şifrenizi girin"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Yeni Şifre (Tekrar)</Label>
+            <Input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Yeni şifrenizi tekrar girin"
+            />
+          </div>
+          <Button 
+            onClick={handlePasswordChange} 
+            disabled={isLoading || !newPassword || !confirmPassword}
+          >
+            {user.passwordHash ? 'Şifreyi Değiştir' : 'Şifre Belirle'}
+          </Button>
         </div>
 
         {/* Email Değiştirme */}

@@ -53,12 +53,12 @@ export const resetPasswordSchema = z.object({
   path: ['confirmPassword'],
 })
 
-export const checkUsernameSchema = z.object({
-  username: usernameSchema,
+export const changePasswordSchema = z.object({
+  newPassword: passwordSchema,
 })
 
-export const setInitialPasswordSchema = z.object({
-  newPassword: passwordSchema,
+export const checkUsernameSchema = z.object({
+  username: usernameSchema,
 })
 
 // =============================================================================
@@ -84,7 +84,7 @@ export type SignupData = z.infer<typeof signupSchema>
 export type LoginData = z.infer<typeof loginSchema>
 export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>
+export type ChangePasswordData = z.infer<typeof changePasswordSchema>
 export type CheckUsernameData = z.infer<typeof checkUsernameSchema>
-export type SetInitialPasswordData = z.infer<typeof setInitialPasswordSchema>
 export type CreateVerificationTokenData = z.infer<typeof createVerificationTokenSchema>
 export type VerifyTokenData = z.infer<typeof verifyTokenSchema> 
