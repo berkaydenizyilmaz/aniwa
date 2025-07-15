@@ -1,11 +1,10 @@
 // =============================================================================
-// DOMAIN BAZLI EXPORTS
+// SCHEMA EXPORTS
 // =============================================================================
 
-// Domain-specific schemas
+// Auth and user schemas
 export * from './auth'
 export * from './user'
-export * from './anime'
-export * from './community'
+
+// Admin schemas
 export * from './admin'
-export * from './common'
