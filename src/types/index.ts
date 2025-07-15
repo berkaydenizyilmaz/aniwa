@@ -50,7 +50,6 @@ export type PrismaClientOrTransaction = PrismaClient | Prisma.TransactionClient
 export * from './auth'
 export * from './anime'
 export * from './community'
-export * from './admin'
 export * from './user'
 export * from './email'
 export * from './rate-limit'
