@@ -7,10 +7,10 @@ import type { ApiResponse, UserWithSettings } from '@/types'
 // Public profil bilgilerini getirmek için GET isteğini işler
 async function getPublicProfileHandler(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ): Promise<NextResponse<ApiResponse<{ user: UserWithSettings }>>> {
   try {
-    const { username } = params
+    const { username } = await params
     
     // 1. Username parametresini kontrol et
     if (!username) {

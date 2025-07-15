@@ -6,31 +6,12 @@ export {
   UserRole as USER_ROLES,
   LogLevel as LOG_LEVELS,
   Theme as THEME,
-  TitleLanguage as TITLE_LANGUAGE,
-  ProfileVisibility as PROFILE_VISIBILITY,
-  ScoreFormat as SCORE_FORMAT,
-  NotificationType as NOTIFICATION_TYPE,
   AnimeType as ANIME_TYPE,
   AnimeStatus as ANIME_STATUS,
   Season as SEASON,
   Source as SOURCE,
   MediaListStatus as MEDIA_LIST_STATUS,
-  TagCategory as TAG_CATEGORY
 } from "@prisma/client"
-
-// =============================================================================
-// APP SABITLERI
-// =============================================================================
-
-export const APP = {
-  NAME: 'Aniwa',
-  DESCRIPTION: 'Anime takip ve topluluk platformu',
-  VERSION: '1.0.0',
-  AUTHOR: 'Krios',
-  URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-  CONTACT_EMAIL: 'iletisim@aniwa.com',
-  SUPPORT_EMAIL: 'destek@aniwa.com'
-} as const
 
 // =============================================================================
 // ROUTE SABITLERI

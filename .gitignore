@@ -51,3 +51,6 @@ next-env.d.ts
 
 # prettier
 .prettierrc
+
+# kiro
+.kiro/

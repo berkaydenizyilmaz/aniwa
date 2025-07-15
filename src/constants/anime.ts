@@ -13,23 +13,6 @@ export const ANIME = {
   SCORE: {
     MIN: 1,
     MAX: 10,
-    PRECISION: 1, // Ondalık basamak sayısı
-  },
-  
-  // Görsel boyutları
-  IMAGES: {
-    COVER: {
-      WIDTH: 230,
-      HEIGHT: 345,
-    },
-    BANNER: {
-      WIDTH: 1920,
-      HEIGHT: 1080,
-    },
-    THUMBNAIL: {
-      WIDTH: 150,
-      HEIGHT: 225,
-    },
   },
   
   // Metin limitleri
