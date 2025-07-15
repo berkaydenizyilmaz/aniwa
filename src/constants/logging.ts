@@ -35,22 +35,6 @@ export const LOG_EVENTS = {
   SYSTEM_INFO: 'system_info',
 } as const;
 
-// Log level priority mapping
-export const LOG_LEVEL_PRIORITY = {
-  [LogLevel.DEBUG]: 0,
-  [LogLevel.INFO]: 1,
-  [LogLevel.WARN]: 2,
-  [LogLevel.ERROR]: 3,
-} as const
-
-// Log retention periods (in days)
-export const LOG_RETENTION = {
-  ERROR: 90,   // 3 ay
-  WARN: 30,    // 1 ay
-  INFO: 7,     // 1 hafta
-  DEBUG: 1,    // 1 gün
-} as const
-
 // Hassas veri alanları - loglardan çıkarılacak
 export const SENSITIVE_FIELDS = [
   'password',

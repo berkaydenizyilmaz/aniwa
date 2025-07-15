@@ -7,7 +7,6 @@ export * from './core'
 
 // Domain-specific constants
 export * from './auth'
-export * from './anime'
 export * from './admin'
 export * from './logging'
-export * from './rate-limits' 
+export * from './rate-limits'

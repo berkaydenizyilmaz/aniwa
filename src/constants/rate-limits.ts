@@ -9,12 +9,6 @@ export const AUTH_RATE_LIMIT_TYPES = {
   USERNAME_CHECK: 'USERNAME_CHECK',
 } as const
 
-
-export const RATE_LIMIT_MULTIPLIERS = {
-  development: 10, // Development'ta daha gevşek
-  production: 1,   // Production'da normal
-} as const
-
 // Auth rate limit konfigürasyonları
 export const AUTH_RATE_LIMIT_CONFIG = {
   LOGIN: {
