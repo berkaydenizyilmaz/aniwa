@@ -161,8 +161,12 @@ model User {
   slug                 String                 @unique
   lastLoginAt          DateTime?              // Son giriş zamanı
   usernameChangedAt    DateTime?              // Son username değiştirme zamanı
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @updatedAt
+  isBanned            Boolean                @default(false) // Kullanıcı yasaklı mı?
+  banReason           String?                // Yasaklama nedeni
+  bannedAt            DateTime?              // Ne zaman yasaklandı
+  bannedById          String?                @db.ObjectId // Hangi admin yasakladı
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
 
   // İlişkiler
   userSettings         UserProfileSettings?

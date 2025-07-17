@@ -63,7 +63,7 @@ Bu doküman, Aniwa projesinin geliştirilmesinde kullanılacak temel teknolojile
 * **Zod:**
     * **Rolü:** Şema tabanlı veri doğrulama kütüphanesi.
     * **Neden:** React Hook Form ile birlikte input validasyonu yapmak ve API katmanında gelen verileri tip güvenli bir şekilde doğrulamak için kullanılır.
-    * **Nasıl Kullanılacak:** `lib/schemas/` klasöründe Zod şemaları tanımlanacak ve React Hook Form ile `@hookform/resolvers` aracılığıyla entegre edilecek. Backend'de de API rotalarında (Route Handlers) gelen verileri doğrulamak için kullanılacak.
+    * **Nasıl Kullanılacak:** `src/schemas/` klasöründe Zod şemaları tanımlanacak ve React Hook Form ile `@hookform/resolvers` aracılığıyla entegre edilecek. Backend'de de API rotalarında (Route Handlers) gelen verileri doğrulamak için kullanılacak.
 * **@hookform/resolvers:**
     * **Rolü:** React Hook Form'u Zod gibi doğrulama kütüphaneleriyle entegre etmek için bir köprü görevi görür.
     * **Neden:** Form doğrulama şemalarını Zod ile tanımlayıp React Hook Form'a bağlamak için.
