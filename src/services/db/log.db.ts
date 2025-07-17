@@ -31,25 +31,12 @@ export async function createLogWithUser(
   })
 }
 
-// ID ile log bul
-export async function findLogById(
-  id: string,
+// Log sayısını hesapla
+export async function countLogs(
+  where?: Prisma.LogWhereInput,
   client: PrismaClientOrTransaction = prisma
-): Promise<Log | null> {
-  return client.log.findUnique({ where: { id } })
-}
-
-// ID ile log'u kullanıcı bilgisiyle bul
-export async function findLogByIdWithUser(
-  id: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<Log & { user: SessionUser | null } | null> {
-  return client.log.findUnique({
-    where: { id },
-    include: {
-      user: { select: logUserSelect },
-    },
-  })
+): Promise<number> {
+  return client.log.count({ where })
 }
 
 // Logları listele
@@ -87,61 +74,3 @@ export async function findLogsWithUser(
   })
 }
 
-// Log sayısını hesapla
-export async function countLogs(
-  where?: Prisma.LogWhereInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<number> {
-  return client.log.count({ where })
-}
-
-// Log güncelle
-export async function updateLog(
-  id: string,
-  data: Prisma.LogUpdateInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<Log> {
-  return client.log.update({
-    where: { id },
-    data,
-  })
-}
-
-// Log sil
-export async function deleteLog(
-  id: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<Log> {
-  return client.log.delete({ where: { id } })
-}
-
-// Belirli koşullardaki logları sil
-export async function deleteLogs(
-  where: Prisma.LogWhereInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<Prisma.BatchPayload> {
-  return client.log.deleteMany({ where })
-}
-
-// Belirli tarihten eski logları sil
-export async function deleteLogsBefore(
-  date: Date,
-  client: PrismaClientOrTransaction = prisma
-): Promise<Prisma.BatchPayload> {
-  return client.log.deleteMany({
-    where: {
-      timestamp: {
-        lt: date
-      }
-    }
-  })
-}
-
-// Log varlığını kontrol et
-export async function logExists(
-  id: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<boolean> {
-  const count = await client.log.count({ where: { id } })
-  return count > 0
-} 

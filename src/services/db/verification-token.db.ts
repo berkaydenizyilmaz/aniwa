@@ -10,51 +10,12 @@ export async function createVerificationToken(
   return client.verificationToken.create({ data })
 }
 
-// ID ile token bul
-export async function findVerificationTokenById(
-  id: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<VerificationToken | null> {
-  return client.verificationToken.findUnique({ where: { id } })
-}
-
 // Token string ile bul
 export async function findVerificationTokenByToken(
   token: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<VerificationToken | null> {
   return client.verificationToken.findUnique({ where: { token } })
-}
-
-// Email ve type ile token bul
-export async function findVerificationTokenByEmailAndType(
-  email: string,
-  type: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<VerificationToken | null> {
-  return client.verificationToken.findFirst({
-    where: { email, type }
-  })
-}
-
-// Token güncelle
-export async function updateVerificationToken(
-  id: string,
-  data: Prisma.VerificationTokenUpdateInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<VerificationToken> {
-  return client.verificationToken.update({
-    where: { id },
-    data,
-  })
-}
-
-// Token sil
-export async function deleteVerificationToken(
-  id: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<VerificationToken> {
-  return client.verificationToken.delete({ where: { id } })
 }
 
 // Token string ile sil
@@ -69,16 +30,6 @@ export async function deleteVerificationTokenByToken(
   }
 }
 
-// Email ile token'ları sil
-export async function deleteVerificationTokensByEmail(
-  email: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<Prisma.BatchPayload> {
-  return client.verificationToken.deleteMany({
-    where: { email }
-  })
-}
-
 // Email ve type ile token'ları sil
 export async function deleteVerificationTokensByEmailAndType(
   email: string,
@@ -90,28 +41,6 @@ export async function deleteVerificationTokensByEmailAndType(
   })
 }
 
-// Token'ları listele
-export async function findVerificationTokens(
-  where?: Prisma.VerificationTokenWhereInput,
-  take?: number,
-  skip?: number,
-  client: PrismaClientOrTransaction = prisma
-): Promise<VerificationToken[]> {
-  return client.verificationToken.findMany({
-    where,
-    take,
-    skip,
-  })
-}
-
-// Token sayısını hesapla
-export async function countVerificationTokens(
-  where?: Prisma.VerificationTokenWhereInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<number> {
-  return client.verificationToken.count({ where })
-}
-
 // Token varlığını kontrol et
 export async function verificationTokenExists(
   token: string,
@@ -120,16 +49,3 @@ export async function verificationTokenExists(
   const count = await client.verificationToken.count({ where: { token } })
   return count > 0
 }
-
-// Süresi dolmuş token'ları sil
-export async function deleteExpiredVerificationTokens(
-  client: PrismaClientOrTransaction = prisma
-): Promise<Prisma.BatchPayload> {
-  return client.verificationToken.deleteMany({
-    where: {
-      expiresAt: {
-        lt: new Date()
-      }
-    }
-  })
-} 

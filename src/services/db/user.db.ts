@@ -96,17 +96,6 @@ export async function findUserWithSettings(
   })
 }
 
-// Email ile kullanıcıyı ayarları ile birlikte getir
-export async function findUserByEmailWithSettings(
-  email: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<User & { userSettings: UserProfileSettings | null } | null> {
-  return client.user.findUnique({
-    where: { email },
-    include: { userSettings: true }
-  })
-}
-
 // Username ile kullanıcıyı ayarları ile birlikte getir
 export async function findUserByUsernameWithSettings(
   username: string,

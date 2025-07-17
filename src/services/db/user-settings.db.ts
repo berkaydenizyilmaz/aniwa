@@ -60,11 +60,3 @@ export async function findAllUserSettings(
     skip,
   })
 }
-
-// Kullanıcı ayarlarını sayısını hesapla
-export async function countUserSettings(
-  where?: Prisma.UserProfileSettingsWhereInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<number> {
-  return client.userProfileSettings.count({ where })
-} 
