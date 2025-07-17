@@ -1,6 +1,6 @@
 import { VerificationToken, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
-import type { PrismaClientOrTransaction, ID } from '@/types'
+import type { PrismaClientOrTransaction } from '@/types'
 
 // Yeni doğrulama token'ı oluştur
 export async function createVerificationToken(
@@ -12,7 +12,7 @@ export async function createVerificationToken(
 
 // ID ile token bul
 export async function findVerificationTokenById(
-  id: ID,
+  id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<VerificationToken | null> {
   return client.verificationToken.findUnique({ where: { id } })
@@ -39,7 +39,7 @@ export async function findVerificationTokenByEmailAndType(
 
 // Token güncelle
 export async function updateVerificationToken(
-  id: ID,
+  id: string,
   data: Prisma.VerificationTokenUpdateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<VerificationToken> {
@@ -51,7 +51,7 @@ export async function updateVerificationToken(
 
 // Token sil
 export async function deleteVerificationToken(
-  id: ID,
+  id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<VerificationToken> {
   return client.verificationToken.delete({ where: { id } })

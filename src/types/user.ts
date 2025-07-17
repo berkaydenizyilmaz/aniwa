@@ -8,7 +8,6 @@ import {
   ScoreFormat,
   UserFollow
 } from "@prisma/client"
-import type { ID } from './index'
 
 // =============================================================================
 // TEMEL USER TIPLERI
@@ -31,7 +30,7 @@ export type UserWithFollows = User & {
 
 // Kullanıcı profil özeti (public bilgiler)
 export interface UserProfile {
-  id: ID
+  id: string
   username: string
   slug: string
   profilePicture?: string

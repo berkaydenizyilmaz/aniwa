@@ -8,7 +8,6 @@ import { AUTH } from '@/constants'
 export const emailSchema = z
   .string()
   .email('Geçerli bir email adresi giriniz')
-  .max(AUTH.MAX_EMAIL_LENGTH, `Email adresi en fazla ${AUTH.MAX_EMAIL_LENGTH} karakter olabilir`)
   .toLowerCase()
   .transform((email) => email.trim())
 

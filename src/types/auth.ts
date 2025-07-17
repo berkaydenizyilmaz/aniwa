@@ -1,5 +1,4 @@
 import { UserRole } from "@prisma/client"
-import type { ID } from './index'
 
 // =============================================================================
 // AUTH PARAMETRELERI
@@ -52,7 +51,7 @@ export interface TokenVerificationParams {
 
 // NextAuth session user tipi
 export interface SessionUser {
-  id: ID
+  id: string
   email: string
   username: string
   profilePicture?: string | null

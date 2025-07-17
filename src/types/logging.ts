@@ -3,7 +3,6 @@ import {
   LogLevel,
   UserRole
 } from "@prisma/client"
-import type { ID } from './index'
 
 // =============================================================================
 // LOG SİSTEMİ
@@ -12,7 +11,7 @@ import type { ID } from './index'
 // Log ile kullanıcı bilgisi
 export type LogWithUser = Log & {
   user?: {
-    id: ID
+    id: string
     username: string
     email: string
     roles: UserRole[]
@@ -42,7 +41,7 @@ export interface LogFunctionParams {
 // Log filtreleme parametreleri
 export interface LogFilters {
   level?: LogLevel[]
-  userId?: ID
+  userId?: string
   event?: string[]
   startDate?: Date
   endDate?: Date
@@ -62,7 +61,7 @@ export interface LogStats {
   errorRate: number
   mostActiveUsers: Array<{
     user: {
-      id: ID
+      id: string
       username: string
       email: string
     }

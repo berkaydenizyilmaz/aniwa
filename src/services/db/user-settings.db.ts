@@ -1,6 +1,6 @@
 import { UserProfileSettings, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
-import type { PrismaClientOrTransaction, ID } from '@/types'
+import type { PrismaClientOrTransaction } from '@/types'
 
 // Yeni kullanıcı profil ayarları oluştur
 export async function createUserSettings(
@@ -12,7 +12,7 @@ export async function createUserSettings(
 
 // Kullanıcı ID'sine göre ayarları bul
 export async function findUserSettingsByUserId(
-  userId: ID,
+  userId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<UserProfileSettings | null> {
   return client.userProfileSettings.findUnique({ where: { userId } })
@@ -20,7 +20,7 @@ export async function findUserSettingsByUserId(
 
 // Kullanıcı ayarlarını güncelle
 export async function updateUserSettings(
-  userId: ID,
+  userId: string,
   data: Prisma.UserProfileSettingsUpdateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<UserProfileSettings> {
@@ -32,7 +32,7 @@ export async function updateUserSettings(
 
 // Kullanıcı ayarlarını sil
 export async function deleteUserSettings(
-  userId: ID,
+  userId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<UserProfileSettings> {
   return client.userProfileSettings.delete({ where: { userId } })
@@ -40,7 +40,7 @@ export async function deleteUserSettings(
 
 // Kullanıcı ayarlarının varlığını kontrol et
 export async function userSettingsExists(
-  userId: ID,
+  userId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<boolean> {
   const count = await client.userProfileSettings.count({ where: { userId } })

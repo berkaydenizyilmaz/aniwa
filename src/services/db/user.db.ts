@@ -1,6 +1,6 @@
 import { User, UserProfileSettings, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
-import type { PrismaClientOrTransaction, ID } from '@/types'
+import type { PrismaClientOrTransaction } from '@/types'
 
 // Yeni kullanıcı oluştur
 export async function createUser(
@@ -12,7 +12,7 @@ export async function createUser(
 
 // ID ile kullanıcı bul
 export async function findUserById(
-  id: ID,
+  id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<User | null> {
   return client.user.findUnique({ where: { id } })
@@ -36,7 +36,7 @@ export async function findUserByUsername(
 
 // Kullanıcı güncelle
 export async function updateUser(
-  id: ID,
+  id: string,
   userData: Prisma.UserUpdateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<User> {
@@ -48,7 +48,7 @@ export async function updateUser(
 
 // Kullanıcı sil
 export async function deleteUser(
-  id: ID,
+  id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<User> {
   return client.user.delete({ where: { id } })
@@ -78,7 +78,7 @@ export async function countUsers(
 
 // Kullanıcı varlığını kontrol et
 export async function userExists(
-  id: ID,
+  id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<boolean> {
   const count = await client.user.count({ where: { id } })
@@ -87,7 +87,7 @@ export async function userExists(
 
 // Kullanıcıyı ayarları ile birlikte getir
 export async function findUserWithSettings(
-  id: ID,
+  id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<User & { userSettings: UserProfileSettings | null } | null> {
   return client.user.findUnique({

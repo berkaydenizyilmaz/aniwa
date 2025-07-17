@@ -1,6 +1,6 @@
 import { Log, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
-import type { PrismaClientOrTransaction, SessionUser, ID } from '@/types'
+import type { PrismaClientOrTransaction, SessionUser } from '@/types'
 
 // Log kullanıcı seçimi
 const logUserSelect = {
@@ -33,7 +33,7 @@ export async function createLogWithUser(
 
 // ID ile log bul
 export async function findLogById(
-  id: ID,
+  id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Log | null> {
   return client.log.findUnique({ where: { id } })
@@ -41,7 +41,7 @@ export async function findLogById(
 
 // ID ile log'u kullanıcı bilgisiyle bul
 export async function findLogByIdWithUser(
-  id: ID,
+  id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Log & { user: SessionUser | null } | null> {
   return client.log.findUnique({
@@ -97,7 +97,7 @@ export async function countLogs(
 
 // Log güncelle
 export async function updateLog(
-  id: ID,
+  id: string,
   data: Prisma.LogUpdateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Log> {
@@ -109,7 +109,7 @@ export async function updateLog(
 
 // Log sil
 export async function deleteLog(
-  id: ID,
+  id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Log> {
   return client.log.delete({ where: { id } })
@@ -139,7 +139,7 @@ export async function deleteLogsBefore(
 
 // Log varlığını kontrol et
 export async function logExists(
-  id: ID,
+  id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<boolean> {
   const count = await client.log.count({ where: { id } })

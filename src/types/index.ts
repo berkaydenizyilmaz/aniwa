@@ -40,16 +40,11 @@ export type ServiceResult<T> = {
 // UTILITY TIPLERI
 // =============================================================================
 
-// Prisma'dan gelen ID'leri string olarak kullanmak için
-export type ID = string
-
 // Prisma transaction tipi
 export type PrismaClientOrTransaction = PrismaClient | Prisma.TransactionClient
 
 // Domain bazlı type dosyalarını export et
 export * from './auth'
-export * from './anime'
-export * from './community'
 export * from './user'
 export * from './email'
 export * from './rate-limit'

@@ -1,6 +1,6 @@
 import { UserFollow, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
-import type { PrismaClientOrTransaction, ID } from '@/types'
+import type { PrismaClientOrTransaction } from '@/types'
 
 // Yeni takip ilişkisi oluştur
 export async function createUserFollow(
@@ -12,8 +12,8 @@ export async function createUserFollow(
 
 // Takip ilişkisini bul
 export async function findUserFollow(
-  followerId: ID,
-  followingId: ID,
+  followerId: string,
+  followingId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow | null> {
   return client.userFollow.findFirst({
@@ -26,7 +26,7 @@ export async function findUserFollow(
 
 // Kullanıcının takip ettiği kişileri listele
 export async function findUserFollowing(
-  userId: ID,
+  userId: string,
   take?: number,
   skip?: number,
   client: PrismaClientOrTransaction = prisma
@@ -50,7 +50,7 @@ export async function findUserFollowing(
 
 // Kullanıcıyı takip eden kişileri listele
 export async function findUserFollowers(
-  userId: ID,
+  userId: string,
   take?: number,
   skip?: number,
   client: PrismaClientOrTransaction = prisma
@@ -74,8 +74,8 @@ export async function findUserFollowers(
 
 // Takip ilişkisini sil
 export async function deleteUserFollow(
-  followerId: ID,
-  followingId: ID,
+  followerId: string,
+  followingId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow> {
   return client.userFollow.delete({
@@ -90,8 +90,8 @@ export async function deleteUserFollow(
 
 // Kullanıcının takip edip etmediğini kontrol et
 export async function checkIfUserFollows(
-  followerId: ID,
-  followingId: ID,
+  followerId: string,
+  followingId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<boolean> {
   const count = await client.userFollow.count({
@@ -105,7 +105,7 @@ export async function checkIfUserFollows(
 
 // Kullanıcının takip ettiği kişi sayısını say
 export async function countUserFollowing(
-  userId: ID,
+  userId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
   return client.userFollow.count({
@@ -115,7 +115,7 @@ export async function countUserFollowing(
 
 // Kullanıcıyı takip eden kişi sayısını say
 export async function countUserFollowers(
-  userId: ID,
+  userId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
   return client.userFollow.count({
