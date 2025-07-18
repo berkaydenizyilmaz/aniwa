@@ -1,8 +1,5 @@
-// Auth business logic
+// Business servisleri
 export * from './auth.service'
-
-// Logger business logic
+export * from './admin.service'
 export * from './logger.service'
-
-// Profile business logic
 export * from './profile.service'

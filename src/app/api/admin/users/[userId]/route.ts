@@ -6,6 +6,7 @@ import { updateUserByAdmin } from '@/services/business/admin.service'
 
 import type { ApiResponse } from '@/types'
 
+// Admin tarafından kullanıcı bilgilerini güncellemek için PATCH isteğini işler
 async function updateUserHandler(
   req: NextRequest,
   { params }: { params: Promise<{ userId: string }> }

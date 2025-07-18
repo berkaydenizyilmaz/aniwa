@@ -6,6 +6,7 @@ import { changeUsernameSchema } from '@/schemas/user'
 import type { ApiResponse } from '@/types'
 import { User } from '@prisma/client'
 
+// Kullanıcı adını değiştirmek için PUT isteğini işler
 async function changeUsernameHandler(
   request: NextRequest
 ): Promise<NextResponse<ApiResponse<{ user: User }>>> {

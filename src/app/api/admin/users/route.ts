@@ -3,6 +3,7 @@ import { getUsersForAdmin } from '@/services/business/admin.service'
 import { userListQuerySchema } from '@/schemas/admin'
 import type { ApiResponse } from '@/types'
 
+// Admin paneli için kullanıcı listesini getirmek için GET isteğini işler
 async function getUsersHandler(req: NextRequest): Promise<NextResponse<ApiResponse>> {
   try {
     const searchParams = req.nextUrl.searchParams
