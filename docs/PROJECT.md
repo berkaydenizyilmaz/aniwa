@@ -32,7 +32,7 @@ Aniwa, temel takip işlevselliğinin yanı sıra zengin bir topluluk ve etkileş
 
     Kullanıcı Yönetimi:
 
-        Kayıt, giriş (sadece e-posta/şifre ile), şifre yönetimi.
+        Kayıt, giriş.
 
         Kişisel profil sayfası (biyografi, profil resmi, banner).
 
@@ -91,9 +91,6 @@ Aniwa, modern, güncel ve projenin performans, ölçeklenebilirlik, bakım kolay
     Dosya Yükleme/Depolama: Cloudinary (next-cloudinary SDK'sı ile).
 
     Performans & Güvenlik:
-
-        API Caching (Next.js fetch otomatik).
-
         Rate Limiting (Vercel Edge Middleware + @upstash/ratelimit + Vercel KV).
 
         Web Font Optimizasyonu (next/font).
