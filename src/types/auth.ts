@@ -112,9 +112,5 @@ export interface VerifyTokenParams {
   type: VerificationTokenType
 }
 
-// =============================================================================
-// EXPORTS
-// =============================================================================
-
 // Prisma enum'larını re-export et
 export { UserRole } from "@prisma/client"

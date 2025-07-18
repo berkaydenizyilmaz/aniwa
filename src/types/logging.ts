@@ -4,10 +4,6 @@ import {
   UserRole
 } from "@prisma/client"
 
-// =============================================================================
-// LOG SİSTEMİ
-// =============================================================================
-
 // Log ile kullanıcı bilgisi
 export type LogWithUser = Log & {
   user?: {
