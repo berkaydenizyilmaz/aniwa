@@ -1,0 +1,670 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// ENUM TANIMLARI
+// =============================================================================
+
+// Kullanıcı Rolleri
+enum UserRole {
+  USER
+  MODERATOR
+  EDITOR
+  ADMIN
+}
+
+// Log Seviyeleri
+enum LogLevel {
+  ERROR
+  WARN
+  INFO
+  DEBUG
+}
+
+// Tema Tercihleri Enum'ı
+enum Theme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+// Profil Görünürlük Seviyeleri
+enum ProfileVisibility {
+  PUBLIC         // Herkes tarafından görülebilir
+  FOLLOWERS_ONLY // Sadece takipçiler tarafından görülebilir
+  PRIVATE        // Kimse tarafından görülemez (sahibi hariç)
+}
+
+// Puanlama Formatları
+enum ScoreFormat {
+  POINT_100 // 1-100 arası (örn: 85)
+  POINT_10  // 1-10 arası (örn: 8.5)
+  POINT_5   // 1-5 arası (örn: 4)
+}
+
+// Bildirim Tipleri
+enum NotificationType {
+  NEW_FOLLOWER        // Yeni takipçi bildirimi
+  NEW_EPISODE_AIRING  // Yeni bölüm yayınlandı bildirimi
+  NEW_MEDIA_PART      // Yeni medya parçası eklendi bildirimi
+}
+
+// Tag Kategorileri
+enum TagCategory {
+  DEMOGRAPHICS // Hedef kitle (Shounen, Shoujo vb.)
+  THEMES       // Ana temalar (Friendship, Revenge vb.)
+  CONTENT      // İçeriğin niteliği (Gore, Comedy vb.)
+  SETTING      // Ortam (School, Fantasy World vb.)
+  ELEMENTS     // Spesifik öğeler (Magic, Mecha vb.)
+}
+
+// Anime Tipleri
+enum AnimeType {
+  TV        // TV dizisi
+  TV_SHORT  // Kısa TV dizisi
+  MOVIE     // Film
+  SPECIAL   // Özel bölüm
+  OVA       // Original Video Animation
+  ONA       // Original Net Animation
+  MUSIC     // Müzik videosu
+}
+
+// Anime Başlık Dili Tercihleri
+enum TitleLanguage {
+  ROMAJI
+  ENGLISH
+  JAPANESE
+}
+
+// Sezonlar
+enum Season {
+  WINTER // Aralık, Ocak, Şubat
+  SPRING // Mart, Nisan, Mayıs
+  SUMMER // Haziran, Temmuz, Ağustos
+  FALL   // Eylül, Ekim, Kasım
+}
+
+// Kaynak Materyal Tipleri
+enum Source {
+  ORIGINAL      // Özgün yapım (uyarlama değil)
+  MANGA         // Manga'dan uyarlama
+  LIGHT_NOVEL   // Light Novel'dan uyarlama
+  VISUAL_NOVEL  // Görsel Roman'dan uyarlama
+  VIDEO_GAME    // Video oyunundan uyarlama
+  NOVEL         // Genel Roman'dan uyarlama (Light Novel dışında)
+  DOUJINSHI     // Doujinshi'den uyarlama (fan yapımı/self-published)
+  WEB_NOVEL     // Web Roman'dan uyarlama
+  LIVE_ACTION   // Live Action'dan uyarlama
+  GAME          // Oyun (video oyun dışında)
+  COMIC         // Genel çizgi romandan uyarlama (manga dışında)
+  MULTIMEDIA_PROJECT // Multimedya projesi
+  PICTURE_BOOK  // Resimli kitaptan uyarlama
+  OTHER         // Diğer
+}
+
+// Anime Durumları
+enum AnimeStatus {
+  FINISHED          // Yayını tamamlandı
+  RELEASING         // Şu an yayınlanıyor
+  NOT_YET_RELEASED  // Henüz yayınlanmadı (duyurulmuş)
+  CANCELLED         // Yayını iptal edildi
+  HIATUS            // Yayınına ara verildi
+}
+
+// Medya Listesi İzleme Durumları
+enum MediaListStatus {
+  CURRENT          // Şu an izleniyor
+  PLANNING         // İzlemeyi planlanıyor
+  COMPLETED        // İzleme tamamlandı
+  DROPPED          // İzleme yarıda bırakıldı
+  PAUSED           // İzleme duraklatıldı
+  REPEATING        // Tekrar izleniyor
+}
+
+// =============================================================================
+// DOĞRULAMA VE GÜVENLİK MODELLERİ
+// =============================================================================
+
+// Genel Doğrulama Token Modeli (Email doğrulama, şifre sıfırlama vb.)
+model VerificationToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  token     String   @unique
+  type      String   // "password_reset" - şifre sıfırlama
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  // TTL index - MongoDB otomatik silme için
+  @@index([expiresAt], map: "verification_ttl")
+}
+
+// =============================================================================
+// KULLANICI MODELLERİ
+// =============================================================================
+
+// Ana Kullanıcı Modeli
+model User {
+  id                   String                 @id @default(auto()) @map("_id") @db.ObjectId
+  username             String                 @unique
+  email                String                 @unique
+  passwordHash         String?
+  profilePicture       String?
+  profileBanner        String?
+  bio                  String?                @db.String
+  roles                UserRole[]             @default([USER])
+  slug                 String                 @unique
+  lastLoginAt          DateTime?              // Son giriş zamanı
+  usernameChangedAt    DateTime?              // Son username değiştirme zamanı
+  isBanned            Boolean                @default(false) // Kullanıcı yasaklı mı?
+  banReason           String?                // Yasaklama nedeni
+  bannedAt            DateTime?              // Ne zaman yasaklandı
+  bannedById          String?                @db.ObjectId // Hangi admin yasakladı
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+
+  // İlişkiler
+  userSettings         UserProfileSettings?
+  logs                 Log[]
+  commentLikes         CommentLike[]          // Beğendiği yorumlar (junction table)
+  comments             Comment[]              // Yazdığı yorumlar
+  userAnimeLists       UserAnimeList[]
+  favouriteAnimeSeries FavouriteAnimeSeries[]
+  customLists          CustomList[]
+  followingUser        UserFollow[]           @relation("FollowerRelations")
+  followedBy           UserFollow[]           @relation("FollowingRelations")
+  trackedAnimeSeries   UserAnimeTracking[]    @relation("UserTrackingAnime")
+  notifications        Notification[]
+}
+
+// Kullanıcı Profil Ayarları
+model UserProfileSettings {
+  id                        String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId                    String             @unique @db.ObjectId
+  
+  // Genel Tercihler
+  themePreference           Theme              @default(SYSTEM)
+  titleLanguagePreference   TitleLanguage      @default(ROMAJI)
+  displayAdultContent       Boolean            @default(false)
+  scoreFormat               ScoreFormat        @default(POINT_10)
+  autoTrackOnAniwaListAdd   Boolean            @default(true)
+
+  // Gizlilik Ayarları
+  profileVisibility         ProfileVisibility  @default(PUBLIC)
+  allowFollows              Boolean            @default(true)
+  showAnimeList             Boolean            @default(true)
+  showFavouriteAnimeSeries  Boolean            @default(true)
+  showCustomLists           Boolean            @default(true)
+
+  // Bildirim Ayarları
+  receiveNotificationOnNewFollow          Boolean  @default(true)
+  receiveNotificationOnEpisodeAiring      Boolean  @default(true)
+  receiveNotificationOnNewMediaPart       Boolean  @default(true)
+  
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
+
+  user                      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Kullanıcı Takip İlişkisi
+model UserFollow {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  followerId  String   @db.ObjectId // Takip eden
+  follower    User     @relation("FollowerRelations", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String   @db.ObjectId // Takip edilen
+  following   User     @relation("FollowingRelations", fields: [followingId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+// =============================================================================
+// ANIME İÇERİK MODELLERİ
+// =============================================================================
+
+// Anime Türleri
+model Genre {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  name      String        @unique // Tür adı (örn: "Action", "Fantasy")
+  slug      String        @unique // URL dostu slug (örn: "action", "fantasy")
+  
+  // İlişkiler
+  animeGenres AnimeGenre[] // Explicit many-to-many relation
+
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+// Anime Etiketleri
+model Tag {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String        @unique // Etiket adı (örn: "Shounen", "Mecha", "Ninja")
+  slug         String        @unique // URL dostu slug
+  description  String?       @db.String // Etiketin açıklaması
+  category     TagCategory?  // Etiket kategorisi
+  isAdult      Boolean       @default(false) // Yetişkin içeriğe mi ait?
+  isSpoiler    Boolean       @default(false) // Spoiler içeriyor mu?
+
+  // İlişkiler
+  animeTags AnimeTag[] // Explicit many-to-many relation
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+// Animasyon Stüdyoları
+model Studio {
+  id                String                 @id @default(auto()) @map("_id") @db.ObjectId
+  name              String                 @unique // Stüdyo adı (örn: "MAPPA", "ufotable")
+  slug              String                 @unique // URL dostu slug (örn: "mappa", "ufotable")
+  isAnimationStudio Boolean                @default(true) // Animasyon stüdyosu mu, yoksa farklı bir şirket mi (örn: prodüksiyon şirketi)
+
+  // İlişkiler
+  animeStudios      AnimeStudio[] // Explicit many-to-many relation
+  
+  // Kullanıcıların bu stüdyoyu favorilerine ekleme ilişkisi (ileride eklenebilir)
+  // favouritedBy      FavouriteStudio[]
+
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+}
+
+// AnimeSeries ve Genre arasındaki çoka-çok ilişki tablosu
+model AnimeGenre {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  animeSeriesId String      @db.ObjectId
+  genreId       String      @db.ObjectId
+  
+  animeSeries   AnimeSeries @relation(fields: [animeSeriesId], references: [id], onDelete: Cascade)
+  genre         Genre       @relation(fields: [genreId], references: [id], onDelete: Cascade)
+  
+  @@unique([animeSeriesId, genreId])
+}
+
+// AnimeSeries ve Tag arasındaki çoka-çok ilişki tablosu
+model AnimeTag {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  animeSeriesId String      @db.ObjectId
+  tagId         String      @db.ObjectId
+  
+  animeSeries   AnimeSeries @relation(fields: [animeSeriesId], references: [id], onDelete: Cascade)
+  tag           Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@unique([animeSeriesId, tagId])
+}
+
+// AnimeSeries ve Studio arasındaki çoka-çok ilişki tablosu
+model AnimeStudio {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  animeSeriesId String      @db.ObjectId
+  studioId      String      @db.ObjectId
+  
+  animeSeries   AnimeSeries @relation(fields: [animeSeriesId], references: [id], onDelete: Cascade)
+  studio        Studio      @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  
+  @@unique([animeSeriesId, studioId])
+}
+
+// User ve Comment beğenileri arasındaki çoka-çok ilişki tablosu
+model CommentLike {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String  @db.ObjectId
+  commentId String  @db.ObjectId
+  
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, commentId])
+}
+
+// Ana Anime Serisi Modeli
+model AnimeSeries {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  anilistId         Int?              @unique // Anilist API ID'si
+  idMal             Int?              @unique // MyAnimeList ID'si
+  aniwaPublicId     Int?              @unique // Aniwa'ya özel public ID
+  
+  // Başlık Bilgileri
+  title             String            // Ana başlık (romaji)
+  englishTitle      String?           // İngilizce başlık
+  japaneseTitle     String?           // Japonca başlık
+  synonyms          String[]          // Alternatif başlıklar
+  
+  // Temel Bilgiler
+  type              AnimeType         // Medya tipi
+  status            AnimeStatus       @default(RELEASING) // Yayın durumu
+  episodes          Int?              // Toplam bölüm sayısı
+  duration          Int?              // Bölüm süresi (dakika)
+  isAdult           Boolean?          // Yetişkin içeriği
+  season            Season?           // Çıkış sezonu
+  seasonYear        Int?              // Çıkış yılı
+  source            Source?           // Kaynak materyal
+  countryOfOrigin   String?           // Köken ülke
+
+  // Puanlama ve Popülerlik
+  anilistAverageScore Float?
+  anilistPopularity   Int?
+  averageScore        Float?          // Aniwa puanı
+  popularity          Int?            // Aniwa popülerlik
+
+  // Görsel İçerik
+  coverImage        String?           // Kapak resmi
+  bannerImage       String?           // Banner resmi
+  description       String?           @db.String // Açıklama
+  trailer           String?           // Tanıtım videosu
+
+  // İlişkiler (Explicit many-to-many)
+  animeGenres       AnimeGenre[]      // Genre ilişkisi
+  animeTags         AnimeTag[]        // Tag ilişkisi
+  animeStudios      AnimeStudio[]     // Studio ilişkisi
+  streamingLinks    StreamingLink[]   @relation("SeriesStreamingLinks")
+  mediaParts        AnimeMediaPart[]  // Sezonlar, filmler, OVA'lar
+  userAnimeLists    UserAnimeList[]
+  comments          Comment[]         @relation("AnimeSeriesComments")
+  favouritedBy      FavouriteAnimeSeries[]
+  trackedByUsers    UserAnimeTracking[] @relation("AnimeTrackedByUsers")
+
+  // Self-referencing relations için explicit junction table gerekli
+  // Şimdilik basit array olarak bırakıyorum
+  relatedAnimeIds   String[]          @db.ObjectId // İlgili anime ID'leri
+
+  // Çok Parçalı Kontrol
+  isMultiPart       Boolean           @default(false) // Çok sezonlu mu?
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+// Anime Medya Parçası (Sezon/Film/OVA)
+model AnimeMediaPart {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  anilistId         Int?              @unique // Anilist ID'si
+  
+  // Temel Bilgiler
+  title             String            // Parçanın başlığı
+  englishTitle      String?
+  japaneseTitle     String?
+  displayOrder      Int?              // İzleme sırası
+  notes             String?           @db.String // Ek notlar
+  type              AnimeType         // Parça tipi
+  episodes          Int?              // Bölüm sayısı
+  duration          Int?              // Bölüm/film süresi
+  releaseDate       DateTime?         // Yayın tarihi
+
+  // Puanlama
+  anilistAverageScore Float?
+  anilistPopularity   Int?
+  averageScore        Float?
+  popularity          Int?              
+
+  // İlişkiler
+  seriesId          String            @db.ObjectId
+  series            AnimeSeries       @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  streamingLinks    StreamingLink[]   @relation("MediaPartStreamingLinks")
+  partsEpisodes     Episode[]
+  comments          Comment[]         @relation("AnimeMediaPartComments")
+  userPartProgress  UserAnimePartProgress[] // Kullanıcı ilerleme kayıtları
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@unique([seriesId, title, type])
+}
+
+// Bölüm Modeli
+model Episode {
+  id                String          @id @default(auto()) @map("_id") @db.ObjectId
+  mediaPartId       String          @db.ObjectId
+  mediaPart         AnimeMediaPart  @relation(fields: [mediaPartId], references: [id], onDelete: Cascade)
+
+  // Bölüm Bilgileri
+  episodeNumber     Int             // Bölüm numarası
+  title             String?         // Bölüm başlığı
+  englishTitle      String?
+  japaneseTitle     String?
+  description       String?         // Bölüm açıklaması
+  thumbnailImage    String?         // Bölüm görseli
+  airDate           DateTime?       // Yayın tarihi
+  duration          Int?            // Süre (dakika)
+
+  // Filler Bilgisi
+  isFiller          Boolean         @default(false)
+  fillerNotes       String?         @db.String
+
+  // Puanlama
+  averageScore      Float?          
+
+  // İlişkiler
+  streamingLinks    StreamingLink[] @relation("EpisodeStreamingLinks")
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([mediaPartId, episodeNumber])
+}
+
+// =============================================================================
+// İZLEME PLATFORMU MODELLERİ
+// =============================================================================
+
+// İzleme Platformları
+model StreamingPlatform {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String    @unique // Platform adı
+  baseUrl   String    @unique // Ana URL
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // İlişkiler
+  streamingLinks StreamingLink[] @relation("PlatformToLinks")
+}
+
+// İzleme Linkleri
+model StreamingLink {
+  id                String          @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // Platform Bilgisi
+  platformId        String          @db.ObjectId
+  platform          StreamingPlatform @relation("PlatformToLinks", fields: [platformId], references: [id])
+  url               String          @unique // Tam URL
+
+  // Polymorphic İlişki (sadece biri dolu olacak)
+  animeSeriesId     String?         @db.ObjectId
+  animeSeries       AnimeSeries?    @relation("SeriesStreamingLinks", fields: [animeSeriesId], references: [id], onDelete: Cascade)
+  animeMediaPartId  String?         @db.ObjectId
+  animeMediaPart    AnimeMediaPart? @relation("MediaPartStreamingLinks", fields: [animeMediaPartId], references: [id], onDelete: Cascade)
+  episodeId         String?         @db.ObjectId
+  episode           Episode?        @relation("EpisodeStreamingLinks", fields: [episodeId], references: [id], onDelete: Cascade)
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+// =============================================================================
+// KULLANICI LİSTE MODELLERİ
+// =============================================================================
+
+// Ana Anime Listesi
+model UserAnimeList {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String           @db.ObjectId
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animeSeriesId    String           @db.ObjectId
+  animeSeries      AnimeSeries      @relation(fields: [animeSeriesId], references: [id], onDelete: Cascade)
+  
+  // Liste Bilgileri
+  status           MediaListStatus  // İzleme durumu
+  score            Float?           // Genel puan
+  progressEpisodes Int?             // İzlenen bölüm sayısı
+  repeatCount      Int              @default(0) // Tekrar izleme sayısı
+  notes            String?          @db.String // Kişisel notlar
+  private          Boolean          @default(false) // Özel mi?
+
+  // İlişkiler
+  customListEntries CustomListItem[] // Özel liste bağlantıları
+  userPartProgress UserAnimePartProgress[] // Medya parçası ilerlemeleri
+
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@unique([userId, animeSeriesId])
+}
+
+// Medya Parçası İlerlemesi
+model UserAnimePartProgress {
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  userAnimeListId  String          @db.ObjectId
+  userAnimeList    UserAnimeList   @relation(fields: [userAnimeListId], references: [id], onDelete: Cascade)
+  animeMediaPartId String          @db.ObjectId
+  animeMediaPart   AnimeMediaPart  @relation(fields: [animeMediaPartId], references: [id], onDelete: Cascade)
+  
+  // İlerleme Bilgileri
+  status           MediaListStatus? @default(CURRENT)
+  score            Float?           // Parça puanı
+  progressEpisodes Int?             // Parçadaki izlenen bölüm sayısı
+  repeatCount      Int             @default(0)
+  notes            String?         @db.String
+
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@unique([userAnimeListId, animeMediaPartId])
+}
+
+// Favori Anime Listesi
+model FavouriteAnimeSeries {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String      @db.ObjectId
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animeSeriesId   String      @db.ObjectId
+  animeSeries     AnimeSeries @relation(fields: [animeSeriesId], references: [id], onDelete: Cascade)
+  
+  // Favori Bilgileri
+  order           Int         @default(0) // Manuel sıralama
+  isPrivate       Boolean     @default(false) // Özel mi?
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([userId, animeSeriesId])
+}
+
+// Özel Listeler
+model CustomList {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String         @db.ObjectId
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Liste Bilgileri
+  name        String         // Liste adı
+  description String?        @db.String // Açıklama
+  isPublic    Boolean        @default(true) // Herkese açık mı?
+  
+  // İlişkiler
+  listItems   CustomListItem[] // Liste öğeleri
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([userId, name])
+}
+
+// Özel Liste Öğeleri
+model CustomListItem {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  customListId  String        @db.ObjectId
+  customList    CustomList    @relation(fields: [customListId], references: [id], onDelete: Cascade)
+  userAnimeListId String      @db.ObjectId
+  userAnimeList UserAnimeList @relation(fields: [userAnimeListId], references: [id], onDelete: Cascade)
+  
+  // Sıralama
+  order         Int           @default(0) // Manuel sıralama
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([customListId, userAnimeListId])
+}
+
+// =============================================================================
+// SOSYAL VE İNTERAKSİYON MODELLERİ
+// =============================================================================
+
+// Yorumlar
+model Comment {
+  id                String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String         @db.ObjectId
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Yorum İçeriği
+  content           String         @db.String
+  likeCount         Int            @default(0)
+  commentLikes      CommentLike[]  // Beğeniler (junction table)
+  
+  // Polymorphic İlişki (sadece biri dolu olacak)
+  animeSeriesId     String?        @db.ObjectId
+  animeSeries       AnimeSeries?   @relation("AnimeSeriesComments", fields: [animeSeriesId], references: [id], onDelete: Cascade)
+  animeMediaPartId  String?        @db.ObjectId
+  animeMediaPart    AnimeMediaPart? @relation("AnimeMediaPartComments", fields: [animeMediaPartId], references: [id], onDelete: Cascade)
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+// Anime Takip Sistemi
+model UserAnimeTracking {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String      @db.ObjectId
+  user          User        @relation("UserTrackingAnime", fields: [userId], references: [id], onDelete: Cascade)
+  animeSeriesId String      @db.ObjectId
+  animeSeries   AnimeSeries @relation("AnimeTrackedByUsers", fields: [animeSeriesId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime    @default(now())
+
+  @@unique([userId, animeSeriesId])
+}
+
+// =============================================================================
+// SİSTEM MODELLERİ
+// =============================================================================
+
+// Log Sistemi
+model Log {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  timestamp DateTime @default(now())
+  level     LogLevel
+  event     String
+  message   String
+  metadata  Json?
+
+  // İlişkiler
+  userId    String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+// Kullanıcı Bildirim Modeli
+model Notification {
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String         @db.ObjectId
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type            NotificationType
+  message         String         @db.String
+  isRead          Boolean        @default(false)
+
+  relatedEntityId String?        @db.ObjectId 
+  
+  metadata        Json?
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
