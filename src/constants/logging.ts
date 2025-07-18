@@ -31,6 +31,11 @@ export const LOG_EVENTS = {
   SYSTEM_ERROR: 'system_error',
   SYSTEM_WARNING: 'system_warning',
   SYSTEM_INFO: 'system_info',
+
+  // Admin olayları
+  ADMIN_GET_USERS_FAILED: 'admin_get_users_failed',
+  ADMIN_USER_UPDATE: 'admin_user_update',
+  ADMIN_USER_UPDATE_FAILED: 'admin_user_update_failed',
 } as const;
 
 // Hassas veri alanları - loglardan çıkarılacak

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { USER_ROLES } from '@/constants'
 import { LogLevel } from '@prisma/client'
 import { ADMIN } from '@/constants'
 
@@ -22,3 +23,23 @@ export const logQuerySchema = z.object({
   sortBy: z.enum(['timestamp', 'level', 'event']).nullish(),
   sortOrder: z.enum(['asc', 'desc']).nullish(),
 })
+
+// Admin kullanıcı listeleme sorgu parametreleri için şema
+export const userListQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(10),
+  sort: z.string().optional().default('createdAt-desc'),
+  search: z.string().optional(),
+})
+
+export type UserListQueryValues = z.infer<typeof userListQuerySchema>
+
+// Admin tarafından kullanıcı güncelleme şeması
+export const adminUpdateUserSchema = z.object({
+  email: z.string().email('Geçerli bir e-posta adresi giriniz.').optional(),
+  roles: z.array(z.nativeEnum(USER_ROLES)).optional(),
+  isBanned: z.boolean().optional(),
+  isDeleted: z.boolean().optional(),
+})
+
+export type AdminUpdateUserValues = z.infer<typeof adminUpdateUserSchema>

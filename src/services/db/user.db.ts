@@ -105,4 +105,60 @@ export async function findUserByUsernameWithSettings(
     where: { username },
     include: { userSettings: true }
   })
-} 
+}
+
+// Admin paneli için kullanıcıları listele (arama, sıralama, sayfalama ile)
+export async function findUsersForAdmin(
+  params: {
+    page?: number
+    limit?: number
+    sort?: string
+    search?: string
+  },
+  client: PrismaClientOrTransaction = prisma
+) {
+  const { page = 1, limit = 10, sort = 'createdAt-desc', search } = params
+
+  const [sortField, sortOrder] = sort.split('-') as [string, 'asc' | 'desc']
+
+  const where: Prisma.UserWhereInput = search
+    ? {
+        OR: [
+          { username: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+        ],
+      }
+    : {}
+
+  return client.user.findMany({
+    where,
+    take: limit,
+    skip: (page - 1) * limit,
+    orderBy: {
+      [sortField]: sortOrder,
+    },
+    include: {
+      userSettings: true,
+    },
+  })
+}
+
+// Admin paneli için kullanıcı sayısını hesapla (arama ile)
+export async function countUsersForAdmin(
+  params: { search?: string },
+  client: PrismaClientOrTransaction = prisma
+) {
+  const { search } = params
+
+  const where: Prisma.UserWhereInput = search
+    ? {
+        OR: [
+          { username: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+        ],
+      }
+    : {}
+
+  return client.user.count({ where })
+}
+ 

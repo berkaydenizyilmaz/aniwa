@@ -38,6 +38,7 @@ export const ROUTES = {
     ADMIN: {
       BASE: '/yonetim',
       LOGS: '/yonetim/loglar',
+      USERS: '/yonetim/kullanicilar',
     },
     MODERATOR: {
       BASE: '/moderasyon',
@@ -59,6 +60,7 @@ export const ROUTES = {
     ADMIN: {
       BASE: '/api/admin',
       LOGS: '/api/admin/logs',
+      USERS: '/api/admin/users',
     },
     MODERATOR: {
       BASE: '/api/moderator',
