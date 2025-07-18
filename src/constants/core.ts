@@ -1,7 +1,4 @@
-// =============================================================================
-// PRISMA ENUM'LARINI RE-EXPORT ET
-// =============================================================================
-
+// Prisma enum'larını re-export et
 export {
   UserRole as USER_ROLES,
   LogLevel as LOG_LEVELS,
@@ -13,11 +10,9 @@ export {
   MediaListStatus as MEDIA_LIST_STATUS,
 } from "@prisma/client"
 
-// =============================================================================
-// ROUTE SABITLERI
-// =============================================================================
-
+// Route sabitleri
 export const ROUTES = {
+  // Sayfa route'ları
   PAGES: {
     HOME: '/',
     MAIN: {
@@ -47,6 +42,8 @@ export const ROUTES = {
       BASE: '/editor',
     },
   },
+
+  // API route'ları
   API: {
     AUTH: {
       BASE: '/api/auth',
@@ -90,7 +87,7 @@ export const ROUTE_ACCESS = {
     ROUTES.PAGES.AUTH.ERROR,
   ],
   
-  // Giriş yapmışların ERİŞEMEYECEĞİ auth sayfaları
+  // Giriş yapmışların erişemeyeceği auth sayfaları
   GUEST_ONLY_ROUTES: [
     ROUTES.PAGES.AUTH.SIGN_IN,
     ROUTES.PAGES.AUTH.SIGN_UP,
@@ -98,19 +95,19 @@ export const ROUTE_ACCESS = {
     ROUTES.PAGES.AUTH.RESET_PASSWORD,
   ],
   
-  // Giriş yapmışların ERİŞEMEYECEĞİ auth API'leri
+  // Giriş yapmışların erişemeyeceği auth API'leri
   GUEST_ONLY_API_ROUTES: [
     ROUTES.API.AUTH.SIGNUP,
     ROUTES.API.AUTH.RESET_PASSWORD,
     ROUTES.API.AUTH.FORGOT_PASSWORD,
   ],
 
-  // Giriş GEREKTİREN API'ler
+  // Giriş gerektiren API'ler
   AUTH_REQUIRED_API_ROUTES: [
     '/api/user',
   ],
 
-  // Giriş GEREKTİREN sayfalar
+  // Giriş gerektiren sayfalar
   AUTH_REQUIRED_ROUTES: [
     '/ayarlar',
   ],

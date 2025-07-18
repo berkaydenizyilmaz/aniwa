@@ -1,6 +1,9 @@
 import { UserRole } from "@prisma/client"
 import type { DefaultSession } from "next-auth"
 
+// NextAuth tip genişletmeleri
+
+// NextAuth session tipini genişlet
 declare module "next-auth" {
   interface Session {
     user: {
@@ -12,6 +15,7 @@ declare module "next-auth" {
     } & DefaultSession["user"]
   }
 
+  // NextAuth user tipini genişlet
   interface User {
     id: string
     username: string
@@ -21,10 +25,11 @@ declare module "next-auth" {
   }
 }
 
+// NextAuth JWT tipini genişlet
 declare module "next-auth/jwt" {
   interface JWT {
     id: string
     username: string
     roles: UserRole[]
   }
-} 
+}

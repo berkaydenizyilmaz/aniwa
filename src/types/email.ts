@@ -1,6 +1,4 @@
-// =============================================================================
-// EMAIL SERVICE TIPLERI
-// =============================================================================
+// Email tipleri
 
 // Email gönderme sonuç tipi
 export interface EmailSendResult {

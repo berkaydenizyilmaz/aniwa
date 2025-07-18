@@ -1,6 +1,4 @@
-// =============================================================================
-// RATE LIMIT TIPLERI
-// =============================================================================
+// Rate limit tipleri
 
 // Rate limit konfigürasyonu
 export interface RateLimitConfig {

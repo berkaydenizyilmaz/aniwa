@@ -1,8 +1,6 @@
 import { PrismaClient, Prisma } from '@prisma/client'
 
-// =============================================================================
-// API RESPONSE TIPLERI
-// =============================================================================
+// Genel API response tipleri
 
 export interface ApiResponse<T = unknown> {
   success: boolean
@@ -24,9 +22,7 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   }
 }
 
-// =============================================================================
-// BUSINESS SERVICE RESPONSE TIPLERI
-// =============================================================================
+// Business service response tipleri
 
 export type ServiceResult<T> = {
   success: true;
@@ -36,9 +32,7 @@ export type ServiceResult<T> = {
   error: string;
 }
 
-// =============================================================================
-// UTILITY TIPLERI
-// =============================================================================
+// Utility tipleri
 
 // Prisma transaction tipi
 export type PrismaClientOrTransaction = PrismaClient | Prisma.TransactionClient

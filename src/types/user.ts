@@ -9,9 +9,7 @@ import {
   UserFollow
 } from "@prisma/client"
 
-// =============================================================================
-// TEMEL USER TIPLERI
-// =============================================================================
+// User tipleri
 
 // Kullanıcı ile ilişkili ayarları içeren tip
 export type UserWithSettings = User & {
@@ -46,9 +44,7 @@ export interface UserProfile {
   }
 }
 
-// =============================================================================
-// CRUD PARAMETRELERI
-// =============================================================================
+// CRUD parametreleri
 
 // Kullanıcı oluşturma parametreleri
 export interface CreateUserParams {
@@ -82,9 +78,7 @@ export interface UpdateUserSettingsParams {
   showCustomLists?: boolean
 }
 
-// =============================================================================
-// ARAMA VE FİLTRELEME
-// =============================================================================
+// Arama ve filtreleme
 
 // Kullanıcı arama parametreleri
 export interface UserSearchParams {
@@ -104,9 +98,7 @@ export interface UserListFilters {
   sortOrder?: 'asc' | 'desc'
 }
 
-// =============================================================================
-// RESPONSE TIPLERI
-// =============================================================================
+// Response tipleri
 
 // Kullanıcı istatistikleri
 export interface UserStats {
@@ -128,9 +120,7 @@ export interface UserActivity {
   followingCount: number
 }
 
-// =============================================================================
-// EXPORTS
-// =============================================================================
+// Exports
 
 // Prisma enum'larını re-export et
 export { UserRole, Theme, TitleLanguage, ProfileVisibility, ScoreFormat } from "@prisma/client" 

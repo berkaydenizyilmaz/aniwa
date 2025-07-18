@@ -1,7 +1,4 @@
-// =============================================================================
-// LOGGING SABITLERI
-// =============================================================================
-
+// Logging event sabitleri
 export const LOG_EVENTS = {
   // Auth events
   AUTH_LOGIN_FAILED: 'auth_login_failed',

@@ -1,7 +1,4 @@
-// =============================================================================
-// RATE LIMIT TIPLERI
-// =============================================================================
-
+// Rate limit tipleri
 export const AUTH_RATE_LIMIT_TYPES = {
   LOGIN: 'LOGIN',
   SIGNUP: 'SIGNUP',

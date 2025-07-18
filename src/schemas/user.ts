@@ -1,21 +1,18 @@
 import { z } from 'zod'
 import { emailSchema, usernameSchema } from './auth'
 
-// =============================================================================
-// COMMON FIELD ŞEMALARI
-// =============================================================================
-
+// Common field şemaları
 export const idSchema = z.string().min(1, 'ID gerekli')
 export const urlSchema = z.string().url('Geçerli bir URL giriniz')
 
-// =============================================================================
-// USER ŞEMALARI
-// =============================================================================
+// User şemaları
 
+// Kullanıcı adı değiştirme şeması
 export const changeUsernameSchema = z.object({
   username: usernameSchema,
 })
 
+// Kullanıcı profil güncelleme şeması
 export const updateUserSchema = z.object({
   email: emailSchema.optional(),
   username: usernameSchema.optional(),
@@ -24,6 +21,7 @@ export const updateUserSchema = z.object({
   profileBanner: urlSchema.optional(),
 })
 
+// Kullanıcı ayarları güncelleme şeması
 export const updateUserSettingsSchema = z.object({
   themePreference: z.enum(['LIGHT', 'DARK', 'SYSTEM']).optional(),
   titleLanguagePreference: z.enum(['ROMAJI', 'ENGLISH', 'JAPANESE']).optional(),
@@ -37,6 +35,7 @@ export const updateUserSettingsSchema = z.object({
   showCustomLists: z.boolean().optional(),
 })
 
+// Type exports
 export type UpdateUserSettingsData = z.infer<typeof updateUserSettingsSchema>
 export type UpdateUserData = z.infer<typeof updateUserSchema>
 export type ChangeUsernameData = z.infer<typeof changeUsernameSchema> 

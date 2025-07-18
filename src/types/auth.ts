@@ -1,8 +1,6 @@
 import { UserRole } from "@prisma/client"
 
-// =============================================================================
-// AUTH PARAMETRELERI
-// =============================================================================
+// Auth parameter tipleri
 
 // Giriş parametreleri
 export interface LoginParams {
@@ -45,9 +43,7 @@ export interface TokenVerificationParams {
   token: string
 }
 
-// =============================================================================
-// SESSION VE USER TIPLERI
-// =============================================================================
+// Session ve user tipleri
 
 // NextAuth session user tipi
 export interface SessionUser {
@@ -58,9 +54,7 @@ export interface SessionUser {
   roles: UserRole[]
 }
 
-// =============================================================================
-// HOOK RETURN TIPLERI
-// =============================================================================
+// Hook return tipleri
 
 // useAuth hook return tipi
 export interface UseAuthReturn {
@@ -75,9 +69,7 @@ export interface UseAuthReturn {
   requireAnyRole: (roles: UserRole[]) => boolean
 }
 
-// =============================================================================
-// AUTH RESULT TIPLERI
-// =============================================================================
+// Auth result tipleri
 
 // Login sonucu
 export interface LoginResult {
@@ -90,9 +82,7 @@ export interface LogoutResult {
   redirectUrl?: string
 }
 
-// =============================================================================
-// VERIFICATION TOKEN TIPLERI
-// =============================================================================
+// Verification token tipleri
 
 // Verification token tipi
 export enum VerificationTokenType {
