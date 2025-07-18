@@ -1,14 +1,9 @@
 // User modeli için CRUD operasyonları
 
-import { Prisma } from '@prisma/client';
-import { prisma } from '../../prisma';
-import {
-    BusinessError,
-    NotFoundError,
-    ConflictError
-} from '../../errors';
-import { UserWithSettings } from '../../types/db/user';
-import { PrismaClientOrTransaction } from '../../types/db';
+import { Prisma, User } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { UserWithSettings } from '@/lib/types/db/user';
+import { PrismaClientOrTransaction } from '@/lib/types/db';
 
 // User CRUD operasyonları
 
@@ -17,42 +12,25 @@ export async function createUser(
     data: Prisma.UserCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserWithSettings> {
-    try {
-        return await client.user.create({
-            data,
-            include: {
-                userSettings: true,
-            },
-        });
-    } catch (error: unknown) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === 'P2002') {
-                throw new ConflictError('Kullanıcı adı veya e-posta zaten kullanımda', { 
-                    field: error.meta?.target 
-                });
-            }
-        }
-        throw new BusinessError('Kullanıcı oluşturulamadı');
-    }
+    return await client.user.create({
+        data,
+        include: {
+            userSettings: true,
+        },
+    });
 }
 
 // ID ile kullanıcı bulur
 export async function findUserById(
     id: string,
     client: PrismaClientOrTransaction = prisma
-): Promise<UserWithSettings> {
-    const user = await client.user.findUnique({
+): Promise<UserWithSettings | null> {
+    return await client.user.findUnique({
         where: { id },
         include: {
             userSettings: true,
         },
     });
-
-    if (!user) {
-        throw new NotFoundError('Kullanıcı bulunamadı');
-    }
-
-    return user;
 }
 
 // E-posta ile kullanıcı bulur
@@ -94,33 +72,27 @@ export async function findUserBySlug(
     });
 }
 
+// Kullanıcının son giriş zamanını günceller
+export async function updateUserLastLogin(
+    userId: string,
+    client: PrismaClientOrTransaction = prisma
+): Promise<void> {
+    await client.user.update({
+        where: { id: userId },
+        data: { lastLoginAt: new Date() }
+    });
+}
+
 // Kullanıcı bilgilerini günceller
 export async function updateUser(
     where: Prisma.UserWhereUniqueInput,
     data: Prisma.UserUpdateInput,
     client: PrismaClientOrTransaction = prisma
-): Promise<UserWithSettings> {
-    try {
-        return await client.user.update({
-            where,
-            data,
-            include: {
-                userSettings: true,
-            },
-        });
-    } catch (error: unknown) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === 'P2002') {
-                throw new ConflictError('Kullanıcı adı veya e-posta zaten kullanımda', {
-                    field: error.meta?.target
-                });
-            }
-            if (error.code === 'P2025') {
-                throw new NotFoundError('Kullanıcı bulunamadı');
-            }
-        }
-        throw new BusinessError('Kullanıcı güncellenemedi');
-    }
+): Promise<User> {
+    return await client.user.update({
+        where,
+        data,
+    });
 }
 
 // Kullanıcıyı siler
@@ -128,16 +100,7 @@ export async function deleteUser(
     where: Prisma.UserWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ) {
-    try {
-        return await client.user.delete({ where });
-    } catch (error: unknown) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === 'P2025') {
-                throw new NotFoundError('Kullanıcı bulunamadı');
-            }
-        }
-        throw new BusinessError('Kullanıcı silinemedi');
-    }
+    return await client.user.delete({ where });
 }
 
 // Kullanıcı sayısını döner

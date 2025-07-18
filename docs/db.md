@@ -1,6 +1,6 @@
-Aniwa Projesi: Veritabanı Erişim Katmanı (lib/services/db/) Standardı (Loglamasız Versiyon - AI Rehberi)
+Aniwa Projesi: Veritabanı Erişim Katmanı (lib/services/db/) Standardı (Saf CRUD Versiyon - AI Rehberi)
 
-Bu doküman, Aniwa projesindeki Veritabanı Erişim Katmanı'nın (DAL) nasıl yapılandırılacağını ve kullanılacağını açıklar. Bu katman, veritabanı etkileşimlerinin en temel seviyesidir ve kendi içinde loglama yapmaz.
+Bu doküman, Aniwa projesindeki Veritabanı Erişim Katmanı'nın (DAL) nasıl yapılandırılacağını ve kullanılacağını açıklar. Bu katman, veritabanı etkileşimlerinin en temel seviyesidir ve sadece saf CRUD operasyonları içerir.
 
 1. Genel Prensipler ve Amacı
 
@@ -12,7 +12,7 @@ Bu doküman, Aniwa projesindeki Veritabanı Erişim Katmanı'nın (DAL) nasıl y
 
     "Thin" Katman: Mümkün olduğunca ince ve sadece Prisma sorgularını içerir.
 
-    Loglama Yok: Bu katman, kendi içinde logError gibi bir loglama fonksiyonu çağırmaz. Hatalar üst katmanlarda loglanır.
+    Hata Yakalama Yok: Bu katman, hiçbir hata yakalama (try-catch) içermez. Hatalar üst katmanlarda (business/ katmanında) yakalanır ve işlenir.
 
 2. Klasör Yapısı (src/lib/services/db/ altında)
 
@@ -22,7 +22,8 @@ src/
 ├── lib/
 │   └── services/
 │       └── db/                 # Veritabanı Erişim Katmanı (DAL)
-│           ├── user.db.ts      # User ve UserProfileSettings modelleri için CRUD
+│           ├── user.db.ts      # User modeli için CRUD
+│           ├── userProfileSettings.db.ts # UserProfileSettings modeli için CRUD
 │           ├── anime.db.ts     # AnimeSeries, AnimeMediaPart, Episode modelleri için CRUD
 │           ├── list.db.ts      # UserAnimeList, UserAnimePartProgress, FavouriteAnimeSeries, CustomList, CustomListItem modelleri için CRUD
 │           ├── comment.db.ts   # Comment ve CommentLike modelleri için CRUD
@@ -65,10 +66,18 @@ src/
 
         count(where?): Kayıt sayısını hesaplar.
 
-    Hata Yönetimi (Bu Katmanda - Loglamasız):
+    Hata Yönetimi (Bu Katmanda - Yok):
 
-        Bu katman, PrismaClientKnownRequestError gibi düşük seviyeli Prisma hatalarını yakalamalıdır.
+        Bu katman hiçbir hata yakalama (try-catch) içermez.
 
-        Yakalanan hataları, business/ katmanının işleyebileceği ve anlayabileceği yapılandırılmış Error objeleri (örn. BusinessError veya ConflictError) olarak yeniden fırlatmalıdır.
+        Prisma'dan gelen tüm hatalar (PrismaClientKnownRequestError, PrismaClientUnknownRequestError vb.) doğrudan business/ katmanına iletilir.
 
-        Bu katmanda hiçbir logError çağrısı yapılmaz. Hatanın loglanması sorumluluğu tamamen business/ katmanına aittir.
+        Hataların yakalanması, dönüştürülmesi ve loglanması sorumluluğu tamamen business/ katmanına aittir.
+
+    Model Ayrımı:
+
+        Her model için ayrı dosya tutulur (örn. user.db.ts, userProfileSettings.db.ts).
+
+        İlişkili modeller aynı dosyada tutulabilir ancak her modelin kendi CRUD fonksiyonları olmalıdır.
+
+        update fonksiyonları sadece kendi modelini günceller, ilişkili modelleri include etmez.

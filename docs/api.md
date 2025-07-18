@@ -64,13 +64,30 @@ src/
 
         Yetkilendirme başarısız olursa, 401 Unauthorized veya 403 Forbidden yanıtı dönülür.
 
-    Hata Yönetimi ve Yanıt Standardizasyonu (Son Güncelleme):
+    Hata Yönetimi ve Yanıt Standardizasyonu (Güncellenmiş):
 
-        try-catch blokları kullanarak hatalar yakalanır.
+        Ortak Error Handler: Tüm API handler'ları, src/lib/utils/api-error-handler.ts içindeki handleApiError() fonksiyonunu kullanır.
 
-        ZodError: Input validasyon hataları yakalanır ve kullanıcıya spesifik mesajlarla (HTTP 400 Bad Request) döner. (Bu aşamada loglanmaz, loglama sorumluluğu Business katmanındadır.)
+        try-catch blokları kullanarak hatalar yakalanır ve handleApiError() fonksiyonuna iletilir.
 
-        BusinessError (ve Alt Sınıfları): business/ katmanından fırlatılan BusinessError (veya alt sınıfları) yakalanır. Bu hatalar business katmanında zaten loglandığı için, API katmanında tekrar loglanmaz. Hatanın code'una bakılarak uygun HTTP durum kodu (404, 409, 401/403, 400) belirlenir ve standardized JSON yanıtı (ApiResponse formatında) döner.
+        ZodError: Input validasyon hataları yakalanır ve formatZodErrors() fonksiyonu ile frontend-friendly düz formata çevrilir. HTTP 400 Bad Request yanıtı döner.
 
-        Beklenmedik Diğer Hatalar: API katmanı içinde oluşan ve ZodError veya BusinessError olmayan tüm beklenmedik runtime hataları yakalanır. Bu hatalar bu aşamada API katmanında loglanmaz. Genel bir 500 Internal Server Error yanıtı döner.
+        BusinessError (ve Alt Sınıfları): business/ katmanından fırlatılan BusinessError (veya alt sınıfları) yakalanır. ERROR_CODES constants'ları kullanılarak uygun HTTP durum kodu belirlenir:
+            - 4XX Client Errors: VALIDATION_ERROR (400), UNAUTHORIZED (401), NOT_FOUND (404), CONFLICT (409), RATE_LIMIT_EXCEEDED (429)
+            - 5XX Server Errors: EXTERNAL_SERVICE_ERROR (502)
+            - Genel: INVALID_TOKEN, USER_BANNED, UNKNOWN_ERROR (400)
+
+        Beklenmedik Diğer Hatalar: API katmanı içinde oluşan ve ZodError veya BusinessError olmayan tüm beklenmedik runtime hataları yakalanır. Bu hatalar console.error() ile loglanır ve genel bir 500 Internal Server Error yanıtı döner.
+
         Yanıt Formatı: Tüm yanıtlar NextResponse.json() kullanılarak JSON formatında döndürülür ve ApiResponse tipine uygun olur.
+
+        Kullanım Örneği:
+        ```typescript
+        try {
+          const validatedData = schema.parse(body);
+          const result = await businessFunction(validatedData);
+          return NextResponse.json(result, { status: 201 });
+        } catch (error) {
+          return handleApiError(error);
+        }
+        ```
