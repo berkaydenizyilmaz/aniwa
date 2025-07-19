@@ -24,6 +24,13 @@ export const ROUTES = {
       NEXT_AUTH: '/api/auth/signin',
       SIGNOUT: '/api/auth/signout',
     },
+    
+    // Admin API'leri
+    ADMIN: {
+      GENRES: '/api/admin/genres',
+      TAGS: '/api/admin/tags',
+      STUDIOS: '/api/admin/studios',
+    },
   },
   
   // Middleware için route grupları
@@ -60,6 +67,9 @@ export const ROUTES = {
       ],
       API: [
         '/api/admin',         // Admin ana API
+        '/api/admin/genres',  // Genre yönetimi
+        '/api/admin/tags',    // Tag yönetimi
+        '/api/admin/studios', // Studio yönetimi
       ],
     },
     
