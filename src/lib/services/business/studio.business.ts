@@ -14,6 +14,7 @@ import {
   updateStudio as updateStudioDB, 
   deleteStudio as deleteStudioDB
 } from '@/lib/services/db/studio.db';
+import { Prisma } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
@@ -27,7 +28,6 @@ import {
   UpdateStudioRequest,
   GetStudiosRequest
 } from '@/lib/types/api/studio.api';
-import { StudioUpdateInput } from '@/lib/types/db/studio';
 
 // Studio oluşturma
 export async function createStudio(data: CreateStudioRequest): Promise<ApiResponse<CreateStudioResponse>> {
@@ -179,7 +179,7 @@ export async function updateStudio(
     }
 
     // Slug güncelleme
-    const updateData: StudioUpdateInput = {};
+    const updateData: Prisma.StudioUpdateInput = {};
     if (data.name) {
       updateData.name = data.name;
       updateData.slug = createSlug(data.name);

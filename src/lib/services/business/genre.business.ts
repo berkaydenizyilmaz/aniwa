@@ -14,6 +14,7 @@ import {
   updateGenre as updateGenreDB, 
   deleteGenre as deleteGenreDB, 
 } from '@/lib/services/db/genre.db';
+import { Prisma } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
@@ -27,7 +28,6 @@ import {
   UpdateGenreRequest,
   GetGenresRequest
 } from '@/lib/types/api/genre.api';
-import { GenreUpdateInput } from '@/lib/types/db/genre';
 
 // Genre oluşturma
 export async function createGenre(data: CreateGenreRequest): Promise<ApiResponse<CreateGenreResponse>> {
@@ -177,7 +177,7 @@ export async function updateGenre(
     }
 
     // Slug güncelleme
-    const updateData: GenreUpdateInput = {};
+    const updateData: Prisma.GenreUpdateInput = {};
     if (data.name) {
       updateData.name = data.name;
       updateData.slug = createSlug(data.name);

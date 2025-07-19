@@ -14,7 +14,7 @@ import {
   updateTag as updateTagDB, 
   deleteTag as deleteTagDB
 } from '@/lib/services/db/tag.db';
-import { TagUpdateInput } from '@/lib/types/db/tag';
+import { Prisma } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
@@ -190,7 +190,7 @@ export async function updateTag(
     }
 
     // Slug güncelleme
-    const updateData: TagUpdateInput = {};
+    const updateData: Prisma.TagUpdateInput = {};
     if (data.name) {
       updateData.name = data.name;
       updateData.slug = createSlug(data.name);
