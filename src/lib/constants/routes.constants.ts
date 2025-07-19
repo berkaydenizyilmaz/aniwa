@@ -25,4 +25,62 @@ export const ROUTES = {
       SIGNOUT: '/api/auth/signout',
     },
   },
+  
+  // Middleware için route grupları
+  MIDDLEWARE: {
+    // Giriş yapmış kullanıcıların erişemeyeceği (guest-only)
+    GUEST_ONLY: {
+      PAGES: [
+        '/auth/giris',
+        '/auth/kayit',
+        '/auth/sifremi-unuttum',
+        '/auth/sifremi-sifirla',
+      ],
+      API: [
+        '/api/auth/register',
+        '/api/auth/forgot-password',
+        '/api/auth/reset-password',
+      ],
+    },
+    
+    // Giriş yapmamış kullanıcıların erişemeyeceği (auth-required)
+    AUTH_REQUIRED: {
+      PAGES: [
+        // Şimdilik boş, ilerde eklenecek
+      ],
+      API: [
+        // Şimdilik boş, ilerde eklenecek
+      ],
+    },
+    
+    // Yönetici yetkisi gerektiren (admin)
+    ADMIN_ONLY: {
+      PAGES: [
+        '/yonetim',           // Yönetim ana sayfa
+      ],
+      API: [
+        '/api/admin',         // Admin ana API
+      ],
+    },
+    
+    // Editör yetkisi gerektiren
+    EDITOR_ONLY: {
+      PAGES: [
+        '/editor',            // Editör ana sayfa
+      ],
+      API: [
+        '/api/editor',        // Editör ana API
+      ],
+    },
+    
+    // Moderatör yetkisi gerektiren
+    MODERATOR_ONLY: {
+      PAGES: [
+        '/moderator',         // Moderatör ana sayfa
+      ],
+      API: [
+        '/api/moderator',     // Moderatör ana API
+      ],
+    },
+  },
 } as const;

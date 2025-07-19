@@ -5,6 +5,8 @@ import {
   createRateLimitResponse, 
   addRateLimitHeaders 
 } from '@/lib/utils/rate-limit.utils';
+import { ROUTES } from '@/lib/constants/routes.constants';
+import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -44,8 +46,211 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Diğer middleware işlemleri buraya eklenebilir
-  // (Auth kontrolü, redirect'ler vs.)
+  // Giriş yapan kullanıcıların erişemeyeceği sayfa kontrolü
+  if (ROUTES.MIDDLEWARE.GUEST_ONLY.PAGES.includes(pathname as typeof ROUTES.MIDDLEWARE.GUEST_ONLY.PAGES[number])) {
+    try {
+      const token = await getToken({ req: request });
+      
+      if (token) {
+        // Giriş yapmış kullanıcı, anasayfaya yönlendir
+        return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, request.url));
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+    }
+  }
+
+  // Giriş yapan kullanıcıların erişemeyeceği API kontrolü
+  if (ROUTES.MIDDLEWARE.GUEST_ONLY.API.includes(pathname as typeof ROUTES.MIDDLEWARE.GUEST_ONLY.API[number])) {
+    try {
+      const token = await getToken({ req: request });
+      
+      if (token) {
+        // Giriş yapmış kullanıcı, 403 döndür
+        return new NextResponse(
+          JSON.stringify({
+            success: false,
+            message: 'Bu işlem için giriş yapmamış olmanız gerekiyor',
+            code: 'ALREADY_AUTHENTICATED',
+          }),
+          {
+            status: 403,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+    }
+  }
+
+  // Giriş yapmamış kullanıcıların erişemeyeceği sayfa kontrolü
+  if (ROUTES.MIDDLEWARE.AUTH_REQUIRED.PAGES.includes(pathname as typeof ROUTES.MIDDLEWARE.AUTH_REQUIRED.PAGES[number])) {
+    try {
+      const token = await getToken({ req: request });
+      
+      if (!token) {
+        // Giriş yapmamış kullanıcı, giriş sayfasına yönlendir
+        return NextResponse.redirect(new URL(ROUTES.PAGES.AUTH.LOGIN, request.url));
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+    }
+  }
+
+  // Giriş yapmamış kullanıcıların erişemeyeceği API kontrolü
+  if (ROUTES.MIDDLEWARE.AUTH_REQUIRED.API.includes(pathname as typeof ROUTES.MIDDLEWARE.AUTH_REQUIRED.API[number])) {
+    try {
+      const token = await getToken({ req: request });
+      
+      if (!token) {
+        // Giriş yapmamış kullanıcı, 401 döndür
+        return new NextResponse(
+          JSON.stringify({
+            success: false,
+            message: 'Bu işlem için giriş yapmanız gerekiyor',
+            code: 'AUTHENTICATION_REQUIRED',
+          }),
+          {
+            status: 401,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+    }
+  }
+
+  // Admin yetkisi kontrolü
+  if (ROUTES.MIDDLEWARE.ADMIN_ONLY.PAGES.includes(pathname as typeof ROUTES.MIDDLEWARE.ADMIN_ONLY.PAGES[number]) ||
+      ROUTES.MIDDLEWARE.ADMIN_ONLY.API.includes(pathname as typeof ROUTES.MIDDLEWARE.ADMIN_ONLY.API[number])) {
+    try {
+      const token = await getToken({ req: request });
+      
+      if (!token) {
+        // Giriş yapmamış kullanıcı
+        if (pathname.startsWith('/api/')) {
+          return new NextResponse(
+            JSON.stringify({
+              success: false,
+              message: 'Bu işlem için giriş yapmanız gerekiyor',
+              code: 'AUTHENTICATION_REQUIRED',
+            }),
+            { status: 401, headers: { 'Content-Type': 'application/json' } }
+          );
+        } else {
+          return NextResponse.redirect(new URL(ROUTES.PAGES.AUTH.LOGIN, request.url));
+        }
+      }
+      
+      // Admin yetkisi kontrolü
+      if (token.role !== 'admin') {
+        if (pathname.startsWith('/api/')) {
+          return new NextResponse(
+            JSON.stringify({
+              success: false,
+              message: 'Bu işlem için admin yetkisi gerekiyor',
+              code: 'INSUFFICIENT_PERMISSIONS',
+            }),
+            { status: 403, headers: { 'Content-Type': 'application/json' } }
+          );
+        } else {
+          return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, request.url));
+        }
+      }
+    } catch (error) {
+      console.error('Admin check error:', error);
+    }
+  }
+
+  // Editör yetkisi kontrolü
+  if (ROUTES.MIDDLEWARE.EDITOR_ONLY.PAGES.includes(pathname as typeof ROUTES.MIDDLEWARE.EDITOR_ONLY.PAGES[number]) ||
+      ROUTES.MIDDLEWARE.EDITOR_ONLY.API.includes(pathname as typeof ROUTES.MIDDLEWARE.EDITOR_ONLY.API[number])) {
+    try {
+      const token = await getToken({ req: request });
+      
+      if (!token) {
+        // Giriş yapmamış kullanıcı
+        if (pathname.startsWith('/api/')) {
+          return new NextResponse(
+            JSON.stringify({
+              success: false,
+              message: 'Bu işlem için giriş yapmanız gerekiyor',
+              code: 'AUTHENTICATION_REQUIRED',
+            }),
+            { status: 401, headers: { 'Content-Type': 'application/json' } }
+          );
+        } else {
+          return NextResponse.redirect(new URL(ROUTES.PAGES.AUTH.LOGIN, request.url));
+        }
+      }
+      
+      // Editör yetkisi kontrolü (admin veya editor)
+      if (token.role !== 'admin' && token.role !== 'editor') {
+        if (pathname.startsWith('/api/')) {
+          return new NextResponse(
+            JSON.stringify({
+              success: false,
+              message: 'Bu işlem için editör yetkisi gerekiyor',
+              code: 'INSUFFICIENT_PERMISSIONS',
+            }),
+            { status: 403, headers: { 'Content-Type': 'application/json' } }
+          );
+        } else {
+          return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, request.url));
+        }
+      }
+    } catch (error) {
+      console.error('Editor check error:', error);
+    }
+  }
+
+  // Moderatör yetkisi kontrolü
+  if (ROUTES.MIDDLEWARE.MODERATOR_ONLY.PAGES.includes(pathname as typeof ROUTES.MIDDLEWARE.MODERATOR_ONLY.PAGES[number]) ||
+      ROUTES.MIDDLEWARE.MODERATOR_ONLY.API.includes(pathname as typeof ROUTES.MIDDLEWARE.MODERATOR_ONLY.API[number])) {
+    try {
+      const token = await getToken({ req: request });
+      
+      if (!token) {
+        // Giriş yapmamış kullanıcı
+        if (pathname.startsWith('/api/')) {
+          return new NextResponse(
+            JSON.stringify({
+              success: false,
+              message: 'Bu işlem için giriş yapmanız gerekiyor',
+              code: 'AUTHENTICATION_REQUIRED',
+            }),
+            { status: 401, headers: { 'Content-Type': 'application/json' } }
+          );
+        } else {
+          return NextResponse.redirect(new URL(ROUTES.PAGES.AUTH.LOGIN, request.url));
+        }
+      }
+      
+      // Moderatör yetkisi kontrolü (admin veya moderator)
+      if (token.role !== 'admin' && token.role !== 'moderator') {
+        if (pathname.startsWith('/api/')) {
+          return new NextResponse(
+            JSON.stringify({
+              success: false,
+              message: 'Bu işlem için moderatör yetkisi gerekiyor',
+              code: 'INSUFFICIENT_PERMISSIONS',
+            }),
+            { status: 403, headers: { 'Content-Type': 'application/json' } }
+          );
+        } else {
+          return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, request.url));
+        }
+      }
+    } catch (error) {
+      console.error('Moderator check error:', error);
+    }
+  }
 
   return NextResponse.next();
 }
