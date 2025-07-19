@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authConfig } from '@/lib/auth/auth.config';
 import { createTagSchema, tagFiltersSchema } from '@/lib/schemas/tag.schema';
 import { createTag, getAllTags } from '@/lib/services/business/tag.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
@@ -39,8 +41,14 @@ export async function POST(request: NextRequest) {
     // Input validasyonu
     const validatedData = createTagSchema.parse(body);
     
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+    
     // Business logic
-    const result = await createTag(validatedData);
+    const result = await createTag(validatedData, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
     
     // Başarılı yanıt
     return NextResponse.json(result, { status: 201 });

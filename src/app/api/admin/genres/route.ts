@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authConfig } from '@/lib/auth/auth.config';
 import { createGenreSchema, genreFiltersSchema } from '@/lib/schemas/genre.schema';
 import { createGenre, getAllGenres } from '@/lib/services/business/genre.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
@@ -36,8 +38,14 @@ export async function POST(request: NextRequest) {
     // Input validasyonu
     const validatedData = createGenreSchema.parse(body);
     
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+
     // Business logic
-    const result = await createGenre(validatedData);
+    const result = await createGenre(validatedData, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
     
     // Başarılı yanıt
     return NextResponse.json(result, { status: 201 });

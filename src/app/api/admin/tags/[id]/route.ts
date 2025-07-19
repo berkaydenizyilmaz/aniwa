@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authConfig } from '@/lib/auth/auth.config';
 import { updateTagSchema } from '@/lib/schemas/tag.schema';
 import { getTagById, updateTag, deleteTag } from '@/lib/services/business/tag.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
@@ -34,8 +36,14 @@ export async function PUT(
     // Input validasyonu
     const validatedData = updateTagSchema.parse(body);
     
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+    
     // Business logic
-    const result = await updateTag(id, validatedData);
+    const result = await updateTag(id, validatedData, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
     
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -53,8 +61,14 @@ export async function DELETE(
   try {
     const { id } = await params;
 
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+
     // Business logic
-    const result = await deleteTag(id);
+    const result = await deleteTag(id, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
     
     // Başarılı yanıt
     return NextResponse.json(result);

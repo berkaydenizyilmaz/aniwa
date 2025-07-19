@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authConfig } from '@/lib/auth/auth.config';
 import { createStudioSchema, studioFiltersSchema } from '@/lib/schemas/studio.schema';
 import { createStudio, getAllStudios } from '@/lib/services/business/studio.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
@@ -37,8 +39,14 @@ export async function POST(request: NextRequest) {
     // Input validasyonu
     const validatedData = createStudioSchema.parse(body);
     
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+    
     // Business logic
-    const result = await createStudio(validatedData);
+    const result = await createStudio(validatedData, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
     
     // Başarılı yanıt
     return NextResponse.json(result, { status: 201 });
