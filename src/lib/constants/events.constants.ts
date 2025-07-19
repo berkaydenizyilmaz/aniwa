@@ -6,6 +6,12 @@ export const EVENTS = {
     USER_REGISTERED: 'user_registered',
   },
   
+  // User Events
+  USER: {
+    PROFILE_UPDATED: 'user_profile_updated',
+    SETTINGS_UPDATED: 'user_settings_updated',
+  },
+  
   // System Events
   SYSTEM: {
     EMAIL_SEND_FAILED: 'email_send_failed',
