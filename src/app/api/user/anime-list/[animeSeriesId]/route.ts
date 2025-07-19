@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { addAnimeToList, removeAnimeFromList } from '@/lib/services/business/userAnimeList.business';
-import { findUserAnimeListByUserAndAnime } from '@/lib/services/db/userAnimeList.db';
+import { toggleAnimeInList } from '@/lib/services/business/userAnimeList.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 import { addAnimeToListSchema } from '@/lib/schemas/userAnimeList.schema';
 
@@ -21,23 +20,14 @@ export async function POST(
     const body = await request.json();
     const validatedData = addAnimeToListSchema.parse(body);
 
-    // Business logic - Anime zaten listede mi kontrol et
-    const existingList = await findUserAnimeListByUserAndAnime(session!.user.id, animeSeriesId);
-    
-    let result;
-    if (existingList) {
-      // Anime listede varsa çıkar
-      result = await removeAnimeFromList(session!.user.id, animeSeriesId, {
-        id: session!.user.id,
-        username: session!.user.username
-      });
-    } else {
-      // Anime listede yoksa ekle
-      result = await addAnimeToList(session!.user.id, validatedData, {
-        id: session!.user.id,
-        username: session!.user.username
-      });
-    }
+    // Business logic - Toggle
+    const result = await toggleAnimeInList(session!.user.id, { 
+      ...validatedData,
+      animeSeriesId
+    }, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
     
     // Başarılı yanıt
     return NextResponse.json(result);

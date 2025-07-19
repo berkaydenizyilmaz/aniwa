@@ -197,4 +197,42 @@ export async function getUserAnimeListByAnime(
 
     throw new BusinessError('Anime liste durumu getirme başarısız');
   }
+}
+
+// Anime'yi listeye ekle/çıkar (Toggle)
+export async function toggleAnimeInList(
+  userId: string,
+  data: AddAnimeToListRequest,
+  user: { id: string; username: string }
+): Promise<ApiResponse<AddAnimeToListResponse | RemoveAnimeFromListResponse>> {
+  try {
+    // Anime zaten listede mi kontrolü
+    const existingList = await findUserAnimeListByUserAndAnime(userId, data.animeSeriesId);
+    
+    if (existingList) {
+      // Anime listede varsa çıkar
+      return await removeAnimeFromList(userId, data.animeSeriesId, user);
+    } else {
+      // Anime listede yoksa ekle
+      return await addAnimeToList(userId, data, user);
+    }
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Anime listeye ekleme/çıkarma sırasında beklenmedik hata',
+      {
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+        userId,
+        animeSeriesId: data.animeSeriesId,
+        username: user.username,
+      }
+    );
+
+    throw new BusinessError('Anime listeye ekleme/çıkarma başarısız');
+  }
 } 
