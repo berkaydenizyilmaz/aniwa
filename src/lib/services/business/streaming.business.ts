@@ -293,7 +293,7 @@ export async function deleteStreamingPlatform(
 export async function updateAnimeStreamingLinks(
   animeSeriesId: string,
   data: UpdateStreamingLinksRequest,
-  adminUser: { id: string; username: string }
+  user: { id: string; username: string; role: string }
 ): Promise<ApiResponse<UpdateStreamingLinksResponse>> {
   try {
     // Transaction ile toplu güncelleme
@@ -324,8 +324,9 @@ export async function updateAnimeStreamingLinks(
       {
         animeSeriesId,
         linkCount: result,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username,
+        userId: user.id,
+        username: user.username,
+        userRole: user.role,
       }
     );
 
@@ -348,7 +349,7 @@ export async function updateAnimeStreamingLinks(
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         animeSeriesId,
-        adminId: adminUser.id,
+        userId: user.id,
       }
     );
 
@@ -360,7 +361,7 @@ export async function updateAnimeStreamingLinks(
 export async function updateMediaPartStreamingLinks(
   mediaPartId: string,
   data: UpdateStreamingLinksRequest,
-  adminUser: { id: string; username: string }
+  user: { id: string; username: string; role: string }
 ): Promise<ApiResponse<UpdateStreamingLinksResponse>> {
   try {
     // Transaction ile toplu güncelleme
@@ -391,8 +392,9 @@ export async function updateMediaPartStreamingLinks(
       {
         mediaPartId,
         linkCount: result,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username,
+        userId: user.id,
+        username: user.username,
+        userRole: user.role,
       }
     );
 
@@ -415,7 +417,7 @@ export async function updateMediaPartStreamingLinks(
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         mediaPartId,
-        adminId: adminUser.id,
+        userId: user.id,
       }
     );
 
@@ -427,7 +429,7 @@ export async function updateMediaPartStreamingLinks(
 export async function updateEpisodeStreamingLinks(
   episodeId: string,
   data: UpdateStreamingLinksRequest,
-  adminUser: { id: string; username: string }
+  user: { id: string; username: string; role: string }
 ): Promise<ApiResponse<UpdateStreamingLinksResponse>> {
   try {
     // Transaction ile toplu güncelleme
@@ -458,8 +460,9 @@ export async function updateEpisodeStreamingLinks(
       {
         episodeId,
         linkCount: result,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username,
+        userId: user.id,
+        username: user.username,
+        userRole: user.role,
       }
     );
 
@@ -482,7 +485,7 @@ export async function updateEpisodeStreamingLinks(
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         episodeId,
-        adminId: adminUser.id,
+        userId: user.id,
       }
     );
 
