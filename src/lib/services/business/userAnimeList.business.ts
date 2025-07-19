@@ -1,6 +1,6 @@
 // UserAnimeList iş mantığı katmanı
 
-import { BusinessError, ConflictError, NotFoundError } from '@/lib/errors';
+import { BusinessError } from '@/lib/errors';
 import {
   createUserAnimeList as createUserAnimeListDB,
   findUserAnimeListByUserAndAnime,
@@ -20,36 +20,48 @@ import {
   GetUserAnimeListByAnimeResponse,
 } from '@/lib/types/api/userAnimeList.api';
 
-// Anime'yi listeye ekleme
-export async function addAnimeToList(
+// Anime'yi listeye ekle/çıkar (Toggle)
+export async function toggleAnimeInList(
   userId: string,
   data: AddAnimeToListRequest,
   user: { id: string; username: string }
-): Promise<ApiResponse<AddAnimeToListResponse>> {
+): Promise<ApiResponse<AddAnimeToListResponse | RemoveAnimeFromListResponse>> {
   try {
     // Anime zaten listede mi kontrolü
     const existingList = await findUserAnimeListByUserAndAnime(userId, data.animeSeriesId);
+    
     if (existingList) {
-      throw new ConflictError('Bu anime zaten listenizde mevcut');
+      // Anime listede varsa çıkar
+      await prisma.$transaction(async (tx) => {
+        await deleteUserAnimeListDB(
+          { userId_animeSeriesId: { userId, animeSeriesId: data.animeSeriesId } },
+          tx
+        );
+      });
+
+      return {
+        success: true,
+        data: undefined,
+      };
+    } else {
+      // Anime listede yoksa ekle
+      const result = await prisma.$transaction(async (tx) => {
+        return await createUserAnimeListDB({
+          user: { connect: { id: userId } },
+          animeSeries: { connect: { id: data.animeSeriesId } },
+          status: data.status || 'PLANNING',
+          score: data.score,
+          progressEpisodes: data.progressEpisodes,
+          notes: data.notes,
+          private: data.private || false,
+        }, tx);
+      });
+
+      return {
+        success: true,
+        data: result,
+      };
     }
-
-    // Transaction ile güvenli işlem
-    const result = await prisma.$transaction(async (tx) => {
-      return await createUserAnimeListDB({
-        user: { connect: { id: userId } },
-        animeSeries: { connect: { id: data.animeSeriesId } },
-        status: data.status || 'PLANNING',
-        score: data.score,
-        progressEpisodes: data.progressEpisodes,
-        notes: data.notes,
-        private: data.private || false,
-      }, tx);
-    });
-
-    return {
-      success: true,
-      data: result,
-    };
   } catch (error) {
     if (error instanceof BusinessError) {
       throw error;
@@ -58,7 +70,7 @@ export async function addAnimeToList(
     // Beklenmedik hata logu
     await logger.error(
       EVENTS.SYSTEM.API_ERROR,
-      'Anime listeye ekleme sırasında beklenmedik hata',
+      'Anime listeye ekleme/çıkarma sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
@@ -67,7 +79,7 @@ export async function addAnimeToList(
       }
     );
 
-    throw new BusinessError('Anime listeye ekleme başarısız');
+    throw new BusinessError('Anime listeye ekleme/çıkarma başarısız');
   }
 }
 
@@ -120,52 +132,6 @@ export async function getUserAnimeLists(
   }
 }
 
-// Anime'yi listeden çıkarma
-export async function removeAnimeFromList(
-  userId: string,
-  animeSeriesId: string,
-  user: { id: string; username: string }
-): Promise<ApiResponse<RemoveAnimeFromListResponse>> {
-  try {
-    // Anime listede mi kontrolü
-    const existingList = await findUserAnimeListByUserAndAnime(userId, animeSeriesId);
-    if (!existingList) {
-      throw new NotFoundError('Bu anime listenizde bulunamadı');
-    }
-
-    // Transaction ile güvenli işlem
-    await prisma.$transaction(async (tx) => {
-      await deleteUserAnimeListDB(
-        { userId_animeSeriesId: { userId, animeSeriesId } },
-        tx
-      );
-    });
-
-    return {
-      success: true,
-      data: undefined,
-    };
-  } catch (error) {
-    if (error instanceof BusinessError) {
-      throw error;
-    }
-
-    // Beklenmedik hata logu
-    await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Anime listeden çıkarma sırasında beklenmedik hata',
-      {
-        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-        userId,
-        animeSeriesId,
-        username: user.username,
-      }
-    );
-
-    throw new BusinessError('Anime listeden çıkarma başarısız');
-  }
-}
-
 // Belirli anime'nin liste durumunu getirme
 export async function getUserAnimeListByAnime(
   userId: string,
@@ -196,43 +162,5 @@ export async function getUserAnimeListByAnime(
     );
 
     throw new BusinessError('Anime liste durumu getirme başarısız');
-  }
-}
-
-// Anime'yi listeye ekle/çıkar (Toggle)
-export async function toggleAnimeInList(
-  userId: string,
-  data: AddAnimeToListRequest,
-  user: { id: string; username: string }
-): Promise<ApiResponse<AddAnimeToListResponse | RemoveAnimeFromListResponse>> {
-  try {
-    // Anime zaten listede mi kontrolü
-    const existingList = await findUserAnimeListByUserAndAnime(userId, data.animeSeriesId);
-    
-    if (existingList) {
-      // Anime listede varsa çıkar
-      return await removeAnimeFromList(userId, data.animeSeriesId, user);
-    } else {
-      // Anime listede yoksa ekle
-      return await addAnimeToList(userId, data, user);
-    }
-  } catch (error) {
-    if (error instanceof BusinessError) {
-      throw error;
-    }
-
-    // Beklenmedik hata logu
-    await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Anime listeye ekleme/çıkarma sırasında beklenmedik hata',
-      {
-        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-        userId,
-        animeSeriesId: data.animeSeriesId,
-        username: user.username,
-      }
-    );
-
-    throw new BusinessError('Anime listeye ekleme/çıkarma başarısız');
   }
 } 
