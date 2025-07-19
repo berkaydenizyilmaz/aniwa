@@ -4,9 +4,7 @@ import { Prisma, AnimeSeries, AnimeMediaPart, Episode } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
 
-// =============================================================================
-// ANIME SERIES CRUD İŞLEMLERİ
-// =============================================================================
+// Anime Serisi CRUD İşlemleri
 
 // Anime serisi oluşturma
 export async function createAnimeSeries(
@@ -181,9 +179,7 @@ export async function findAllAnimeSeriesWithDetails(
   });
 }
 
-// =============================================================================
-// ANIME MEDIA PART CRUD İŞLEMLERİ
-// =============================================================================
+// Anime Medya Parçası CRUD İşlemleri
 
 // Anime medya parçası oluşturma
 export async function createAnimeMediaPart(
@@ -262,9 +258,7 @@ export async function countAnimeMediaParts(
   return await client.animeMediaPart.count({ where });
 }
 
-// =============================================================================
-// EPISODE CRUD İŞLEMLERİ
-// =============================================================================
+// Bölüm CRUD İşlemleri
 
 // Bölüm oluşturma
 export async function createEpisode(
@@ -351,9 +345,7 @@ export async function countEpisodes(
   return await client.episode.count({ where });
 } 
 
-// =============================================================================
-// ANIME İLİŞKİLERİ CRUD İŞLEMLERİ
-// =============================================================================
+// Anime İlişkileri CRUD İşlemleri
 
 // Anime-Genre ilişkisi oluşturma
 export async function createAnimeGenre(

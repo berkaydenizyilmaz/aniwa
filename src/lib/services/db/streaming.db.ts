@@ -4,9 +4,7 @@ import { Prisma, StreamingPlatform, StreamingLink } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
 
-// =============================================================================
-// STREAMING PLATFORM CRUD İŞLEMLERİ
-// =============================================================================
+// Streaming Platform CRUD İşlemleri
 
 // Streaming platform oluşturma
 export async function createStreamingPlatform(
@@ -65,9 +63,7 @@ export async function countStreamingPlatforms(
   return await client.streamingPlatform.count({ where });
 }
 
-// =============================================================================
-// STREAMING LINK CRUD İŞLEMLERİ
-// =============================================================================
+// Streaming Link CRUD İşlemleri
 
 // Streaming link oluşturma
 export async function createStreamingLink(
