@@ -11,8 +11,8 @@ import { getToken } from 'next-auth/jwt';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // API rate limit kontrolü
-  if (pathname.startsWith('/api/')) {
+  // API rate limit kontrolü (NextAuth API'leri hariç)
+  if (pathname.startsWith('/api/') && !pathname.startsWith('/api/auth/')) {
     try {
       // Genel API rate limit
       const rateLimitResult = await checkRateLimit(request);
