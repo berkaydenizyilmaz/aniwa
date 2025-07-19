@@ -120,7 +120,10 @@ export async function getTagById(id: string): Promise<ApiResponse<GetTagResponse
 }
 
 // Tüm tag'leri getirme (filtrelemeli)
-export async function getAllTags(filters?: GetTagsRequest): Promise<ApiResponse<GetTagsResponse>> {
+export async function getAllTags(
+  filters?: GetTagsRequest,
+  user?: { id: string; userSettings?: { displayAdultContent: boolean } }
+): Promise<ApiResponse<GetTagsResponse>> {
   try {
     const page = filters?.page || 1;
     const limit = filters?.limit || 50;
@@ -140,7 +143,10 @@ export async function getAllTags(filters?: GetTagsRequest): Promise<ApiResponse<
       tags = tags.filter(tag => tag.category === filters.category);
     }
 
-    if (filters?.isAdult !== undefined) {
+    // Yetişkin içerik kontrolü - kullanıcı ayarı yoksa adult tag'leri gizle
+    if (user && !user.userSettings?.displayAdultContent) {
+      tags = tags.filter(tag => !tag.isAdult);
+    } else if (filters?.isAdult !== undefined) {
       tags = tags.filter(tag => tag.isAdult === filters.isAdult);
     }
 

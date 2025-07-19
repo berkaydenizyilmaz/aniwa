@@ -60,6 +60,9 @@ export const createAnimeSeriesSchema = z.object({
   description: z.string().optional(),
   trailer: z.string().url('Geçerli bir URL girin').optional(),
   relatedAnimeIds: z.array(z.string()).optional(),
+  genreIds: z.array(z.string()).optional(),
+  tagIds: z.array(z.string()).optional(),
+  studioIds: z.array(z.string()).optional(),
   mediaParts: z.array(createAnimeMediaPartSchema).optional(),
 });
 
