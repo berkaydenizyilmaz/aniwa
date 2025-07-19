@@ -1,0 +1,92 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authConfig } from '@/lib/auth/auth.config';
+import { getListItems, updateCustomList, deleteCustomList } from '@/lib/services/business/customList.business';
+import { handleApiError } from '@/lib/utils/api-error-handler';
+import { updateCustomListSchema, customListFiltersSchema } from '@/lib/schemas/customList.schema';
+
+// Özel liste detayını getir (GET)
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    // Session'dan kullanıcı bilgisi al
+    const session = await getServerSession(authConfig);
+
+    // Query parametrelerini al
+    const { searchParams } = new URL(request.url);
+    const filters = {
+      page: parseInt(searchParams.get('page') || '1'),
+      limit: parseInt(searchParams.get('limit') || '50'),
+    };
+
+    // Input validasyonu
+    const validatedFilters = customListFiltersSchema.parse(filters);
+
+    // Business logic
+    const result = await getListItems(id, session!.user.id, validatedFilters);
+
+    // Başarılı yanıt
+    return NextResponse.json(result);
+
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Özel liste güncelle (PUT)
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    
+    // Input validasyonu
+    const validatedData = updateCustomListSchema.parse(body);
+    
+    // Session'dan kullanıcı bilgisi al
+    const session = await getServerSession(authConfig);
+    
+    // Business logic
+    const result = await updateCustomList(id, session!.user.id, validatedData, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
+    
+    // Başarılı yanıt
+    return NextResponse.json(result);
+    
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Özel liste sil (DELETE)
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    // Session'dan kullanıcı bilgisi al
+    const session = await getServerSession(authConfig);
+
+    // Business logic
+    const result = await deleteCustomList(id, session!.user.id, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
+    
+    // Başarılı yanıt
+    return NextResponse.json(result);
+    
+  } catch (error) {
+    return handleApiError(error);
+  }
+} 
