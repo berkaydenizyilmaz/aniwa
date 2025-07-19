@@ -12,7 +12,7 @@ export async function sendPasswordResetEmail(
   username: string
 ): Promise<boolean> {
   try {
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}${ROUTES.PAGES.AUTH.RESET_PASSWORD}?token=${token}`;
+    const resetUrl = `${process.env.NEXTAUTH_URL}${ROUTES.PAGES.AUTH.RESET_PASSWORD}?token=${token}`;
     
     await resend.emails.send({
       from: 'Aniwa <noreply@aniwa.tr>',
@@ -49,7 +49,7 @@ export async function sendVerificationEmail(
   username: string
 ): Promise<boolean> {
   try {
-    const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}${ROUTES.PAGES.AUTH.EMAIL_VERIFY}?token=${token}`;
+    const verifyUrl = `${process.env.NEXTAUTH_URL}${ROUTES.PAGES.AUTH.EMAIL_VERIFY}?token=${token}`;
     
     await resend.emails.send({
       from: 'Aniwa <noreply@aniwa.tr>',
