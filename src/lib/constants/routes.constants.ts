@@ -31,6 +31,7 @@ export const ROUTES = {
       TAGS: '/api/admin/tags',
       STUDIOS: '/api/admin/studios',
       ANIME: '/api/admin/anime',
+      STREAMING_PLATFORMS: '/api/admin/streaming-platforms',
     },
   },
   
@@ -72,6 +73,7 @@ export const ROUTES = {
         '/api/admin/tags',    // Tag yönetimi
         '/api/admin/studios', // Studio yönetimi
         '/api/admin/anime',   // Anime yönetimi
+        '/api/admin/streaming-platforms', // Streaming platform yönetimi
       ],
     },
     
@@ -82,6 +84,7 @@ export const ROUTES = {
       ],
       API: [
         '/api/editor',        // Editör ana API
+        '/api/editor/streaming-links', // Streaming link yönetimi
       ],
     },
     

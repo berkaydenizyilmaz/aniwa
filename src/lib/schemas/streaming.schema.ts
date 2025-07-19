@@ -50,6 +50,14 @@ export const streamingLinkFiltersSchema = z.object({
   limit: z.number().min(1).max(100).default(50),
 });
 
+// Streaming link toplu güncelleme şeması
+export const updateStreamingLinksSchema = z.object({
+  links: z.array(z.object({
+    platformId: z.string().min(1, 'Platform ID gerekli'),
+    url: z.string().url('Geçerli bir URL girin').max(500, 'URL çok uzun'),
+  })).min(0, 'En az 0 link olabilir'),
+});
+
 // Tip türetmeleri
 export type CreateStreamingPlatformInput = z.infer<typeof createStreamingPlatformSchema>;
 export type UpdateStreamingPlatformInput = z.infer<typeof updateStreamingPlatformSchema>;
