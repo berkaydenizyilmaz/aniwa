@@ -30,6 +30,10 @@ export const EVENTS = {
     ANIME_SERIES_CREATED: 'admin_anime_series_created',
     ANIME_SERIES_UPDATED: 'admin_anime_series_updated',
     ANIME_SERIES_DELETED: 'admin_anime_series_deleted',
+    STREAMING_PLATFORM_CREATED: 'admin_streaming_platform_created',
+    STREAMING_PLATFORM_UPDATED: 'admin_streaming_platform_updated',
+    STREAMING_PLATFORM_DELETED: 'admin_streaming_platform_deleted',
+    STREAMING_LINKS_UPDATED: 'admin_streaming_links_updated',
   },
   
   // System Events
