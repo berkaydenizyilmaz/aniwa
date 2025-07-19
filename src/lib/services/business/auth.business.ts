@@ -9,6 +9,7 @@ import {
 import { createUser, findUserByUsername, findUserByEmail, findUserBySlug, updateUserLastLogin, updateUser } from '@/lib/services/db/user.db';
 import { createUserSettings } from '@/lib/services/db/userProfileSettings.db';
 import { createVerificationToken, findVerificationTokenByToken, deleteVerificationTokenByToken } from '@/lib/services/db/verificationToken.db';
+import { prisma } from '@/lib/prisma';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { sendPasswordResetEmail } from '@/lib/utils/email.utils';
 import { logger } from '@/lib/utils/logger';
@@ -45,31 +46,36 @@ export async function registerUser(data: RegisterInput): Promise<ApiResponse<Reg
     const passwordHash = await bcrypt.hash(data.password, AUTH.BCRYPT_SALT_ROUNDS);
 
     // Transaction ile kullanıcı ve ayarları oluştur
-    const user = await createUser({
-      username: data.username,
-      email: data.email,
-      passwordHash,
-      slug,
-    });
+    const result = await prisma.$transaction(async (tx) => {
+      // Kullanıcı oluştur
+      const user = await createUser({
+        username: data.username,
+        email: data.email,
+        passwordHash,
+        slug,
+      }, tx);
 
-    // Varsayılan kullanıcı ayarlarını oluştur
-    await createUserSettings({
-      user: { connect: { id: user.id } },
+      // Varsayılan kullanıcı ayarlarını oluştur
+      await createUserSettings({
+        user: { connect: { id: user.id } },
+      }, tx);
+
+      return user;
     });
 
     // Başarılı kayıt logu
     await logger.info(
       EVENTS.AUTH.USER_REGISTERED,
       'Kullanıcı başarıyla kayıt oldu',
-      { userId: user.id, username: user.username, email: user.email }
+      { userId: result.id, username: result.username, email: result.email }
     );
 
     return {
       success: true,
       data: {
-        id: user.id,
-        username: user.username,
-        email: user.email
+        id: result.id,
+        username: result.username,
+        email: result.email
       }
     };
   } catch (error) {
@@ -222,11 +228,14 @@ export async function resetPassword(token: string, newPassword: string): Promise
     // Yeni şifreyi hashle
     const passwordHash = await bcrypt.hash(newPassword, AUTH.BCRYPT_SALT_ROUNDS);
 
-    // Şifreyi güncelle
-    await updateUser({ id: user.id }, { passwordHash });
+    // Transaction ile şifre güncelle ve token sil
+    await prisma.$transaction(async (tx) => {
+      // Şifreyi güncelle
+      await updateUser({ id: user.id }, { passwordHash }, tx);
 
-    // Token'ı sil
-    await deleteVerificationTokenByToken(token);
+      // Token'ı sil
+      await deleteVerificationTokenByToken(token, tx);
+    });
 
     return { success: true };
   } catch (error) {
