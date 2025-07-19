@@ -1,0 +1,252 @@
+// Genre iş mantığı katmanı
+
+import { 
+  BusinessError, 
+  ConflictError, 
+  NotFoundError
+} from '@/lib/errors';
+import { 
+  createGenre as createGenreDB, 
+  findGenreById, 
+  findGenreByName, 
+  findGenreBySlug, 
+  findAllGenres, 
+  updateGenre as updateGenreDB, 
+  deleteGenre as deleteGenreDB, 
+} from '@/lib/services/db/genre.db';
+import { createSlug } from '@/lib/utils/slug.utils';
+import { logger } from '@/lib/utils/logger';
+import { EVENTS } from '@/lib/constants/events.constants';
+import { ApiResponse } from '@/lib/types/api';
+import { 
+  CreateGenreResponse, 
+  GetGenreResponse, 
+  GetGenresResponse, 
+  UpdateGenreResponse,
+  CreateGenreRequest,
+  UpdateGenreRequest,
+  GetGenresRequest
+} from '@/lib/types/api/genre.api';
+import { GenreUpdateInput } from '@/lib/types/db/genre';
+
+// Genre oluşturma
+export async function createGenre(data: CreateGenreRequest): Promise<ApiResponse<CreateGenreResponse>> {
+  try {
+    // Name benzersizlik kontrolü
+    const existingGenre = await findGenreByName(data.name);
+    if (existingGenre) {
+      throw new ConflictError('Bu tür adı zaten kullanımda');
+    }
+
+    // Slug oluştur ve benzersizlik kontrolü
+    const slug = createSlug(data.name);
+    const existingSlug = await findGenreBySlug(slug);
+    if (existingSlug) {
+      throw new ConflictError('Bu tür adı zaten kullanımda');
+    }
+
+    // Genre oluştur
+    const result = await createGenreDB({
+      name: data.name,
+      slug,
+    });
+
+    // Başarılı oluşturma logu
+    await logger.info(
+      EVENTS.MASTER_DATA.GENRE_CREATED,
+      'Genre başarıyla oluşturuldu',
+      { genreId: result.id, name: result.name, slug: result.slug }
+    );
+
+    return {
+      success: true,
+      data: result
+    };
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Genre oluşturma sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', name: data.name }
+    );
+    
+    throw new BusinessError('Genre oluşturma başarısız');
+  }
+}
+
+// Genre getirme (ID ile)
+export async function getGenreById(id: string): Promise<ApiResponse<GetGenreResponse>> {
+  try {
+    const genre = await findGenreById(id);
+    if (!genre) {
+      throw new NotFoundError('Genre bulunamadı');
+    }
+
+    return {
+      success: true,
+      data: genre
+    };
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Genre getirme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id }
+    );
+    
+    throw new BusinessError('Genre getirme başarısız');
+  }
+}
+
+// Tüm genre'leri getirme (filtrelemeli)
+export async function getAllGenres(filters?: GetGenresRequest): Promise<ApiResponse<GetGenresResponse>> {
+  try {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 50;
+    const skip = (page - 1) * limit;
+
+    // Genre'leri getir
+    const genres = await findAllGenres();
+    
+    // Filtreleme (basit implementasyon)
+    let filteredGenres = genres;
+    if (filters?.search) {
+      filteredGenres = genres.filter(genre => 
+        genre.name.toLowerCase().includes(filters.search!.toLowerCase())
+      );
+    }
+    
+    const total = filteredGenres.length;
+
+    const paginatedGenres = filteredGenres.slice(skip, skip + limit);
+
+    const totalPages = Math.ceil(total / limit);
+    
+    return {
+      success: true,
+      data: {
+        genres: paginatedGenres,
+        total,
+        page,
+        limit,
+        totalPages
+      }
+    };
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Genre listeleme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters }
+    );
+    
+    throw new BusinessError('Genre listeleme başarısız');
+  }
+}
+
+// Genre güncelleme
+export async function updateGenre(
+  id: string, 
+  data: UpdateGenreRequest
+): Promise<ApiResponse<UpdateGenreResponse>> {
+  try {
+    // Genre mevcut mu kontrolü
+    const existingGenre = await findGenreById(id);
+    if (!existingGenre) {
+      throw new NotFoundError('Genre bulunamadı');
+    }
+
+    // Name güncelleniyorsa benzersizlik kontrolü
+    if (data.name && data.name !== existingGenre.name) {
+      const nameExists = await findGenreByName(data.name);
+      if (nameExists) {
+        throw new ConflictError('Bu tür adı zaten kullanımda');
+      }
+    }
+
+    // Slug güncelleme
+    const updateData: GenreUpdateInput = {};
+    if (data.name) {
+      updateData.name = data.name;
+      updateData.slug = createSlug(data.name);
+    }
+
+    // Genre güncelle
+    const result = await updateGenreDB({ id }, updateData);
+
+    // Başarılı güncelleme logu
+    await logger.info(
+      EVENTS.MASTER_DATA.GENRE_UPDATED,
+      'Genre başarıyla güncellendi',
+      { genreId: result.id, name: result.name, slug: result.slug }
+    );
+
+    return {
+      success: true,
+      data: result
+    };
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Genre güncelleme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id, data }
+    );
+    
+    throw new BusinessError('Genre güncelleme başarısız');
+  }
+}
+
+// Genre silme
+export async function deleteGenre(id: string): Promise<ApiResponse<void>> {
+  try {
+    // Genre mevcut mu kontrolü
+    const existingGenre = await findGenreById(id);
+    if (!existingGenre) {
+      throw new NotFoundError('Genre bulunamadı');
+    }
+
+    // Genre sil
+    await deleteGenreDB({ id });
+
+    // Başarılı silme logu
+    await logger.info(
+      EVENTS.MASTER_DATA.GENRE_DELETED,
+      'Genre başarıyla silindi',
+      { genreId: id, name: existingGenre.name }
+    );
+
+    return {
+      success: true
+    };
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Genre silme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id }
+    );
+    
+    throw new BusinessError('Genre silme başarısız');
+  }
+} 

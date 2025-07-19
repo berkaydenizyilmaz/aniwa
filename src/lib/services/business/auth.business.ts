@@ -14,14 +14,13 @@ import { createSlug } from '@/lib/utils/slug.utils';
 import { sendPasswordResetEmail } from '@/lib/utils/email.utils';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
-import { RegisterInput, LoginInput } from '@/lib/schemas/auth.schema';
 import { ApiResponse } from '@/lib/types/api';
-import { RegisterResponse, LoginResponse } from '@/lib/types/api/auth.api';
+import { RegisterResponse, LoginResponse, RegisterRequest, LoginRequest } from '@/lib/types/api/auth.api';
 import { AUTH } from '@/lib/constants/auth.constants';
 import crypto from 'crypto';
 
 // Kullanıcı kaydı
-export async function registerUser(data: RegisterInput): Promise<ApiResponse<RegisterResponse>> {
+export async function registerUser(data: RegisterRequest): Promise<ApiResponse<RegisterResponse>> {
   try {
     // Username benzersizlik kontrolü
     const existingUser = await findUserByUsername(data.username);
@@ -95,7 +94,7 @@ export async function registerUser(data: RegisterInput): Promise<ApiResponse<Reg
 }
 
 // Kullanıcı girişi (NextAuth ile entegre)
-export async function loginUser(data: LoginInput): Promise<ApiResponse<LoginResponse>> {
+export async function loginUser(data: LoginRequest): Promise<ApiResponse<LoginResponse>> {
   try {
     // Kullanıcıyı bul
     const user = await findUserByUsername(data.username);
