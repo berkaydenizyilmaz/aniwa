@@ -10,8 +10,9 @@ export const EVENTS = {
   USER: {
     PROFILE_UPDATED: 'user_profile_updated',
     SETTINGS_UPDATED: 'user_settings_updated',
-    FAVOURITE_ANIME_ADDED: 'user_favourite_anime_added',
-    FAVOURITE_ANIME_REMOVED: 'user_favourite_anime_removed',
+    CUSTOM_LIST_CREATED: 'user_custom_list_created',
+    CUSTOM_LIST_UPDATED: 'user_custom_list_updated',
+    CUSTOM_LIST_DELETED: 'user_custom_list_deleted',
   },
   
   // Admin Events
