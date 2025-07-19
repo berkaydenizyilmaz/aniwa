@@ -27,6 +27,9 @@ export const EVENTS = {
     STUDIO_CREATED: 'admin_studio_created',
     STUDIO_UPDATED: 'admin_studio_updated',
     STUDIO_DELETED: 'admin_studio_deleted',
+    ANIME_SERIES_CREATED: 'admin_anime_series_created',
+    ANIME_SERIES_UPDATED: 'admin_anime_series_updated',
+    ANIME_SERIES_DELETED: 'admin_anime_series_deleted',
   },
   
   // System Events
