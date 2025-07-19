@@ -15,7 +15,7 @@ export async function sendPasswordResetEmail(
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}${ROUTES.PAGES.AUTH.RESET_PASSWORD}?token=${token}`;
     
     await resend.emails.send({
-      from: 'Aniwa <noreply@aniwa.com>',
+      from: 'Aniwa <noreply@aniwa.tr>',
       to: email,
       subject: 'Şifrenizi Sıfırlayın - Aniwa',
       html: `
@@ -52,7 +52,7 @@ export async function sendVerificationEmail(
     const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}${ROUTES.PAGES.AUTH.EMAIL_VERIFY}?token=${token}`;
     
     await resend.emails.send({
-      from: 'Aniwa <noreply@aniwa.com>',
+      from: 'Aniwa <noreply@aniwa.tr>',
       to: email,
       subject: 'Email Adresinizi Doğrulayın - Aniwa',
       html: `
