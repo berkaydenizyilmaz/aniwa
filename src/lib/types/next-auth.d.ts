@@ -1,5 +1,4 @@
-// Auth.js tip genişletmeleri
-
+// NextAuth.js tip genişletmeleri
 import 'next-auth';
 import 'next-auth/jwt';
 import { DefaultSession } from 'next-auth';

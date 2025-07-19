@@ -12,12 +12,12 @@ export async function createUser(
     data: Prisma.UserCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserWithSettings> {
-    return await client.user.create({
-        data,
-        include: {
-            userSettings: true,
-        },
-    });
+        return await client.user.create({
+            data,
+            include: {
+                userSettings: true,
+            },
+        });
 }
 
 // ID ile kullanıcı bulur
@@ -89,18 +89,18 @@ export async function updateUser(
     data: Prisma.UserUpdateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<User> {
-    return await client.user.update({
-        where,
-        data,
-    });
-}
+        return await client.user.update({
+            where,
+            data,
+                });
+            }
 
 // Kullanıcıyı siler
 export async function deleteUser(
     where: Prisma.UserWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ) {
-    return await client.user.delete({ where });
+        return await client.user.delete({ where });
 }
 
 // Kullanıcı sayısını döner
