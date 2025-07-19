@@ -30,7 +30,10 @@ import {
 } from '@/lib/types/api/genre.api';
 
 // Genre oluşturma
-export async function createGenre(data: CreateGenreRequest): Promise<ApiResponse<CreateGenreResponse>> {
+export async function createGenre(
+  data: CreateGenreRequest,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<CreateGenreResponse>> {
   try {
     // Name benzersizlik kontrolü
     const existingGenre = await findGenreByName(data.name);
@@ -55,7 +58,13 @@ export async function createGenre(data: CreateGenreRequest): Promise<ApiResponse
     await logger.info(
       EVENTS.ADMIN.GENRE_CREATED,
       'Genre başarıyla oluşturuldu',
-      { genreId: result.id, name: result.name, slug: result.slug }
+      { 
+        genreId: result.id, 
+        name: result.name, 
+        slug: result.slug,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {
@@ -159,7 +168,8 @@ export async function getAllGenres(filters?: GetGenresRequest): Promise<ApiRespo
 // Genre güncelleme
 export async function updateGenre(
   id: string, 
-  data: UpdateGenreRequest
+  data: UpdateGenreRequest,
+  adminUser: { id: string; username: string }
 ): Promise<ApiResponse<UpdateGenreResponse>> {
   try {
     // Genre mevcut mu kontrolü
@@ -190,7 +200,13 @@ export async function updateGenre(
     await logger.info(
       EVENTS.ADMIN.GENRE_UPDATED,
       'Genre başarıyla güncellendi',
-      { genreId: result.id, name: result.name, slug: result.slug }
+      { 
+        genreId: result.id, 
+        name: result.name, 
+        slug: result.slug,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {
@@ -214,7 +230,10 @@ export async function updateGenre(
 }
 
 // Genre silme
-export async function deleteGenre(id: string): Promise<ApiResponse<void>> {
+export async function deleteGenre(
+  id: string,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<void>> {
   try {
     // Genre mevcut mu kontrolü
     const existingGenre = await findGenreById(id);
@@ -229,7 +248,12 @@ export async function deleteGenre(id: string): Promise<ApiResponse<void>> {
     await logger.info(
       EVENTS.ADMIN.GENRE_DELETED,
       'Genre başarıyla silindi',
-      { genreId: id, name: existingGenre.name }
+      { 
+        genreId: id, 
+        name: existingGenre.name,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {

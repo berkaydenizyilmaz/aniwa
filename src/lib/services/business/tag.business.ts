@@ -30,7 +30,10 @@ import {
 } from '@/lib/types/api/tag.api';
 
 // Tag oluşturma
-export async function createTag(data: CreateTagRequest): Promise<ApiResponse<CreateTagResponse>> {
+export async function createTag(
+  data: CreateTagRequest,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<CreateTagResponse>> {
   try {
     // Name benzersizlik kontrolü
     const existingTag = await findTagByName(data.name);
@@ -59,7 +62,13 @@ export async function createTag(data: CreateTagRequest): Promise<ApiResponse<Cre
     await logger.info(
       EVENTS.ADMIN.TAG_CREATED,
       'Tag başarıyla oluşturuldu',
-      { tagId: result.id, name: result.name, slug: result.slug }
+      { 
+        tagId: result.id, 
+        name: result.name, 
+        slug: result.slug,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {
@@ -172,7 +181,8 @@ export async function getAllTags(filters?: GetTagsRequest): Promise<ApiResponse<
 // Tag güncelleme
 export async function updateTag(
   id: string, 
-  data: UpdateTagRequest
+  data: UpdateTagRequest,
+  adminUser: { id: string; username: string }
 ): Promise<ApiResponse<UpdateTagResponse>> {
   try {
     // Tag mevcut mu kontrolü
@@ -207,7 +217,13 @@ export async function updateTag(
     await logger.info(
       EVENTS.ADMIN.TAG_UPDATED,
       'Tag başarıyla güncellendi',
-      { tagId: result.id, name: result.name, slug: result.slug }
+      { 
+        tagId: result.id, 
+        name: result.name, 
+        slug: result.slug,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {
@@ -231,7 +247,10 @@ export async function updateTag(
 }
 
 // Tag silme
-export async function deleteTag(id: string): Promise<ApiResponse<void>> {
+export async function deleteTag(
+  id: string,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<void>> {
   try {
     // Tag mevcut mu kontrolü
     const existingTag = await findTagById(id);
@@ -246,7 +265,12 @@ export async function deleteTag(id: string): Promise<ApiResponse<void>> {
     await logger.info(
       EVENTS.ADMIN.TAG_DELETED,
       'Tag başarıyla silindi',
-      { tagId: id, name: existingTag.name }
+      { 
+        tagId: id, 
+        name: existingTag.name,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {

@@ -30,7 +30,10 @@ import {
 } from '@/lib/types/api/studio.api';
 
 // Studio oluşturma
-export async function createStudio(data: CreateStudioRequest): Promise<ApiResponse<CreateStudioResponse>> {
+export async function createStudio(
+  data: CreateStudioRequest,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<CreateStudioResponse>> {
   try {
     // Name benzersizlik kontrolü
     const existingStudio = await findStudioByName(data.name);
@@ -56,7 +59,13 @@ export async function createStudio(data: CreateStudioRequest): Promise<ApiRespon
     await logger.info(
       EVENTS.ADMIN.STUDIO_CREATED,
       'Studio başarıyla oluşturuldu',
-      { studioId: result.id, name: result.name, slug: result.slug }
+      { 
+        studioId: result.id, 
+        name: result.name, 
+        slug: result.slug,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {
@@ -161,7 +170,8 @@ export async function getAllStudios(filters?: GetStudiosRequest): Promise<ApiRes
 // Studio güncelleme
 export async function updateStudio(
   id: string, 
-  data: UpdateStudioRequest
+  data: UpdateStudioRequest,
+  adminUser: { id: string; username: string }
 ): Promise<ApiResponse<UpdateStudioResponse>> {
   try {
     // Studio mevcut mu kontrolü
@@ -193,7 +203,13 @@ export async function updateStudio(
     await logger.info(
       EVENTS.ADMIN.STUDIO_UPDATED,
       'Studio başarıyla güncellendi',
-      { studioId: result.id, name: result.name, slug: result.slug }
+      { 
+        studioId: result.id, 
+        name: result.name, 
+        slug: result.slug,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {
@@ -217,7 +233,10 @@ export async function updateStudio(
 }
 
 // Studio silme
-export async function deleteStudio(id: string): Promise<ApiResponse<void>> {
+export async function deleteStudio(
+  id: string,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<void>> {
   try {
     // Studio mevcut mu kontrolü
     const existingStudio = await findStudioById(id);
@@ -232,7 +251,12 @@ export async function deleteStudio(id: string): Promise<ApiResponse<void>> {
     await logger.info(
       EVENTS.ADMIN.STUDIO_DELETED,
       'Studio başarıyla silindi',
-      { studioId: id, name: existingStudio.name }
+      { 
+        studioId: id, 
+        name: existingStudio.name,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {

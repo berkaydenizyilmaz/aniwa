@@ -117,7 +117,8 @@ export async function getUserById(id: string): Promise<ApiResponse<GetUserRespon
 // Kullanıcı güncelleme (admin)
 export async function updateUser(
   id: string, 
-  data: UpdateUserRequest
+  data: UpdateUserRequest,
+  adminUser: { id: string; username: string }
 ): Promise<ApiResponse<UpdateUserResponse>> {
   try {
     // Kullanıcı mevcut mu kontrolü
@@ -159,7 +160,13 @@ export async function updateUser(
     await logger.info(
       EVENTS.ADMIN.USER_UPDATED,
       'Admin kullanıcı güncellemesi yapıldı',
-      { userId: result.id, username: result.username, updatedFields: Object.keys(updateData) }
+      { 
+        userId: result.id, 
+        username: result.username, 
+        updatedFields: Object.keys(updateData),
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {
@@ -183,7 +190,10 @@ export async function updateUser(
 }
 
 // Kullanıcı banlama (admin)
-export async function banUser(id: string): Promise<ApiResponse<UpdateUserResponse>> {
+export async function banUser(
+  id: string,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<UpdateUserResponse>> {
   try {
     // Kullanıcı mevcut mu kontrolü
     const existingUser = await findUserById(id);
@@ -202,7 +212,12 @@ export async function banUser(id: string): Promise<ApiResponse<UpdateUserRespons
     await logger.info(
       EVENTS.ADMIN.USER_BANNED,
       'Kullanıcı yasaklandı',
-      { userId: result.id, username: result.username }
+      { 
+        userId: result.id, 
+        username: result.username,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {
@@ -226,7 +241,10 @@ export async function banUser(id: string): Promise<ApiResponse<UpdateUserRespons
 }
 
 // Kullanıcı ban kaldırma (admin)
-export async function unbanUser(id: string): Promise<ApiResponse<UpdateUserResponse>> {
+export async function unbanUser(
+  id: string,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<UpdateUserResponse>> {
   try {
     // Kullanıcı mevcut mu kontrolü
     const existingUser = await findUserById(id);
@@ -245,7 +263,12 @@ export async function unbanUser(id: string): Promise<ApiResponse<UpdateUserRespo
     await logger.info(
       EVENTS.ADMIN.USER_UNBANNED,
       'Kullanıcı yasağı kaldırıldı',
-      { userId: result.id, username: result.username }
+      { 
+        userId: result.id, 
+        username: result.username,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {
@@ -269,7 +292,10 @@ export async function unbanUser(id: string): Promise<ApiResponse<UpdateUserRespo
 }
 
 // Kullanıcı silme (admin)
-export async function deleteUser(id: string): Promise<ApiResponse<void>> {
+export async function deleteUser(
+  id: string,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<void>> {
   try {
     // Kullanıcı mevcut mu kontrolü
     const existingUser = await findUserById(id);
@@ -284,7 +310,12 @@ export async function deleteUser(id: string): Promise<ApiResponse<void>> {
     await logger.info(
       EVENTS.ADMIN.USER_DELETED,
       'Kullanıcı silindi',
-      { userId: id, username: existingUser.username }
+      { 
+        userId: id, 
+        username: existingUser.username,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
     );
 
     return {
