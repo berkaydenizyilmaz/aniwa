@@ -72,6 +72,22 @@ export async function findUserBySlug(
     });
 }
 
+// Tüm kullanıcıları getirir (filtrelemeli)
+export async function findAllUsers(
+    where?: Prisma.UserWhereInput,
+    skip?: number,
+    take?: number,
+    orderBy?: Prisma.UserOrderByWithRelationInput,
+    client: PrismaClientOrTransaction = prisma
+): Promise<User[]> {
+    return await client.user.findMany({
+        where,
+        skip,
+        take,
+        orderBy,
+    });
+}
+
 // Kullanıcının son giriş zamanını günceller
 export async function updateUserLastLogin(
     userId: string,
@@ -110,3 +126,4 @@ export async function countUsers(
 ): Promise<number> {
     return await client.user.count({ where });
 }
+

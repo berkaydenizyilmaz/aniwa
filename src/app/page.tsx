@@ -101,7 +101,7 @@ export default function HomePage() {
                 <Link
                   href="/auth/giris"
                   className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700"
-                >
+          >
                   Giriş Yap
                 </Link>
                 <Link

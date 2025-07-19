@@ -1,34 +1,25 @@
 // User API response tipleri
 
-import { UserProfileSettings } from '@prisma/client';
+import { User } from '@prisma/client';
+import { UserFilters, UpdateUserInput } from '@/lib/schemas/user.schema';
 
-// User profil response tipi
-export interface UserProfileResponse {
-  id: string;
-  username: string;
-  email: string;
-  slug: string;
-  roles: string[];
-  createdAt: Date;
-  lastLoginAt: Date | null;
-  settings: UserProfileSettings | null;
+// Admin user listeleme response tipi
+export interface GetUsersResponse {
+  users: User[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
-// User profil güncelleme response tipi
-export interface UserProfileUpdateResponse {
-  id: string;
-  username: string;
-  email: string;
-  slug: string;
-}
+// Admin user detay response tipi
+export type GetUserResponse = User;
 
-// User ayarlar response tipi
-export type UserSettingsResponse = UserProfileSettings;
+// Admin user güncelleme response tipi
+export type UpdateUserResponse = User;
 
-// User API istek tipleri
-export interface UpdateUserProfileRequest {
-  username?: string;
-  email?: string;
-}
+// Admin user filtreleme istek tipi
+export type GetUsersRequest = UserFilters;
 
-export type UpdateUserSettingsRequest = Partial<UserProfileSettings>; 
+// Admin user güncelleme istek tipi
+export type UpdateUserRequest = UpdateUserInput; 

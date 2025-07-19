@@ -57,7 +57,7 @@ export async function createTag(data: CreateTagRequest): Promise<ApiResponse<Cre
 
     // Başarılı oluşturma logu
     await logger.info(
-      EVENTS.MASTER_DATA.TAG_CREATED,
+      EVENTS.ADMIN.TAG_CREATED,
       'Tag başarıyla oluşturuldu',
       { tagId: result.id, name: result.name, slug: result.slug }
     );
@@ -205,7 +205,7 @@ export async function updateTag(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.MASTER_DATA.TAG_UPDATED,
+      EVENTS.ADMIN.TAG_UPDATED,
       'Tag başarıyla güncellendi',
       { tagId: result.id, name: result.name, slug: result.slug }
     );
@@ -244,7 +244,7 @@ export async function deleteTag(id: string): Promise<ApiResponse<void>> {
 
     // Başarılı silme logu
     await logger.info(
-      EVENTS.MASTER_DATA.TAG_DELETED,
+      EVENTS.ADMIN.TAG_DELETED,
       'Tag başarıyla silindi',
       { tagId: id, name: existingTag.name }
     );

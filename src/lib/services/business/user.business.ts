@@ -2,50 +2,72 @@
 
 import { 
   BusinessError, 
-  NotFoundError
+  NotFoundError,
+  ConflictError
 } from '@/lib/errors';
 import { 
   findUserById, 
-  updateUser,
   findUserByUsername,
-  findUserByEmail
+  findUserByEmail,
+  updateUser as updateUserDB,
+  deleteUser as deleteUserDB,
+  countUsers,
+  findAllUsers
 } from '@/lib/services/db/user.db';
-import { 
-  findUserSettings, 
-  updateUserSettings as updateUserSettingsDB
-} from '@/lib/services/db/userProfileSettings.db';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
 import { ApiResponse } from '@/lib/types/api';
 import { 
-  UserProfileResponse, 
-  UserProfileUpdateResponse, 
-  UserSettingsResponse,
-  UpdateUserProfileRequest,
-  UpdateUserSettingsRequest
+  GetUsersResponse, 
+  GetUserResponse, 
+  UpdateUserResponse,
+  GetUsersRequest,
+  UpdateUserRequest
 } from '@/lib/types/api/user.api';
 
-// Kullanıcı profilini getir (kendi profilini)
-export async function getUserProfile(userId: string): Promise<ApiResponse<UserProfileResponse>> {
+// Tüm kullanıcıları getirme (admin - filtrelemeli)
+export async function getAllUsers(filters?: GetUsersRequest): Promise<ApiResponse<GetUsersResponse>> {
   try {
-    const user = await findUserById(userId);
-    if (!user) {
-      throw new NotFoundError('Kullanıcı bulunamadı');
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 50;
+    const skip = (page - 1) * limit;
+
+    // Filtreleme koşulları
+    const where: Prisma.UserWhereInput = {};
+    
+    if (filters?.search) {
+      where.OR = [
+        { username: { contains: filters.search, mode: 'insensitive' } },
+        { email: { contains: filters.search, mode: 'insensitive' } }
+      ];
     }
+
+    if (filters?.role) {
+      where.roles = { has: filters.role as UserRole };
+    }
+
+    if (filters?.isBanned !== undefined) {
+      where.isBanned = filters.isBanned;
+    }
+
+    // Kullanıcıları getir
+    const [users, total] = await Promise.all([
+      findAllUsers(where, skip, limit, { createdAt: 'desc' }),
+      countUsers(where)
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
 
     return {
       success: true,
       data: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        slug: user.slug,
-        roles: user.roles,
-        createdAt: user.createdAt,
-        lastLoginAt: user.lastLoginAt,
-        settings: user.userSettings
+        users,
+        total,
+        page,
+        limit,
+        totalPages
       }
     };
   } catch (error) {
@@ -56,22 +78,50 @@ export async function getUserProfile(userId: string): Promise<ApiResponse<UserPr
     // Beklenmedik hata logu
     await logger.error(
       EVENTS.SYSTEM.API_ERROR,
-      'Kullanıcı profil getirme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
+      'Kullanıcı listeleme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters }
     );
     
-    throw new BusinessError('Profil getirme başarısız');
+    throw new BusinessError('Kullanıcı listeleme başarısız');
   }
 }
 
-// Kullanıcı profilini güncelle (kendi profilini)
-export async function updateUserProfile(
-  userId: string, 
-  data: UpdateUserProfileRequest
-): Promise<ApiResponse<UserProfileUpdateResponse>> {
+// Tek kullanıcı getirme (admin)
+export async function getUserById(id: string): Promise<ApiResponse<GetUserResponse>> {
+  try {
+    const user = await findUserById(id);
+    if (!user) {
+      throw new NotFoundError('Kullanıcı bulunamadı');
+    }
+
+    return {
+      success: true,
+      data: user
+    };
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Kullanıcı getirme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id }
+    );
+    
+    throw new BusinessError('Kullanıcı getirme başarısız');
+  }
+}
+
+// Kullanıcı güncelleme (admin)
+export async function updateUser(
+  id: string, 
+  data: UpdateUserRequest
+): Promise<ApiResponse<UpdateUserResponse>> {
   try {
     // Kullanıcı mevcut mu kontrolü
-    const existingUser = await findUserById(userId);
+    const existingUser = await findUserById(id);
     if (!existingUser) {
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
@@ -80,7 +130,7 @@ export async function updateUserProfile(
     if (data.username && data.username !== existingUser.username) {
       const usernameExists = await findUserByUsername(data.username);
       if (usernameExists) {
-        throw new BusinessError('Bu kullanıcı adı zaten kullanımda');
+        throw new ConflictError('Bu kullanıcı adı zaten kullanımda');
       }
     }
 
@@ -88,103 +138,28 @@ export async function updateUserProfile(
     if (data.email && data.email !== existingUser.email) {
       const emailExists = await findUserByEmail(data.email);
       if (emailExists) {
-        throw new BusinessError('Bu e-posta adresi zaten kullanımda');
+        throw new ConflictError('Bu e-posta adresi zaten kullanımda');
       }
     }
 
-    // Slug güncelleme
+    // Güncelleme verilerini hazırla
     const updateData: Prisma.UserUpdateInput = {};
     if (data.username) {
       updateData.username = data.username;
       updateData.slug = createSlug(data.username);
     }
-    if (data.email) {
-      updateData.email = data.email;
-    }
+    if (data.email) updateData.email = data.email;
+    if (data.roles) updateData.roles = data.roles as UserRole[];
+    if (data.isBanned !== undefined) updateData.isBanned = data.isBanned;
 
     // Kullanıcı güncelle
-    const result = await updateUser({ id: userId }, updateData);
+    const result = await updateUserDB({ id }, updateData);
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.USER.PROFILE_UPDATED,
-      'Kullanıcı profili başarıyla güncellendi',
-      { userId: result.id, username: result.username, email: result.email }
-    );
-
-    return {
-      success: true,
-      data: {
-        id: result.id,
-        username: result.username,
-        email: result.email,
-        slug: result.slug
-      }
-    };
-  } catch (error) {
-    if (error instanceof BusinessError) {
-      throw error;
-    }
-    
-    // Beklenmedik hata logu
-    await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Kullanıcı profil güncelleme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId, data }
-    );
-    
-    throw new BusinessError('Profil güncelleme başarısız');
-  }
-}
-
-// Kullanıcı ayarlarını getir
-export async function getUserSettings(userId: string): Promise<ApiResponse<UserSettingsResponse>> {
-  try {
-    const settings = await findUserSettings(userId);
-    if (!settings) {
-      throw new NotFoundError('Kullanıcı ayarları bulunamadı');
-    }
-
-    return {
-      success: true,
-      data: settings
-    };
-  } catch (error) {
-    if (error instanceof BusinessError) {
-      throw error;
-    }
-    
-    // Beklenmedik hata logu
-    await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Kullanıcı ayarları getirme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
-    );
-    
-    throw new BusinessError('Ayarlar getirme başarısız');
-  }
-}
-
-// Kullanıcı ayarlarını güncelle
-export async function updateUserSettings(
-  userId: string, 
-  data: UpdateUserSettingsRequest
-): Promise<ApiResponse<UserSettingsResponse>> {
-  try {
-    // Ayarlar mevcut mu kontrolü
-    const existingSettings = await findUserSettings(userId);
-    if (!existingSettings) {
-      throw new NotFoundError('Kullanıcı ayarları bulunamadı');
-    }
-
-    // Ayarları güncelle
-    const result = await updateUserSettingsDB({ userId }, data);
-
-    // Başarılı güncelleme logu
-    await logger.info(
-      EVENTS.USER.SETTINGS_UPDATED,
-      'Kullanıcı ayarları başarıyla güncellendi',
-      { userId, settings: data }
+      EVENTS.ADMIN.USER_UPDATED,
+      'Admin kullanıcı güncellemesi yapıldı',
+      { userId: result.id, username: result.username, updatedFields: Object.keys(updateData) }
     );
 
     return {
@@ -199,10 +174,134 @@ export async function updateUserSettings(
     // Beklenmedik hata logu
     await logger.error(
       EVENTS.SYSTEM.API_ERROR,
-      'Kullanıcı ayarları güncelleme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId, data }
+      'Kullanıcı güncelleme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id, data }
     );
     
-    throw new BusinessError('Ayarlar güncelleme başarısız');
+    throw new BusinessError('Kullanıcı güncelleme başarısız');
+  }
+}
+
+// Kullanıcı banlama (admin)
+export async function banUser(id: string): Promise<ApiResponse<UpdateUserResponse>> {
+  try {
+    // Kullanıcı mevcut mu kontrolü
+    const existingUser = await findUserById(id);
+    if (!existingUser) {
+      throw new NotFoundError('Kullanıcı bulunamadı');
+    }
+
+    if (existingUser.isBanned) {
+      throw new BusinessError('Kullanıcı zaten yasaklı');
+    }
+
+    // Kullanıcıyı banla
+    const result = await updateUserDB({ id }, { isBanned: true });
+
+    // Başarılı banlama logu
+    await logger.info(
+      EVENTS.ADMIN.USER_BANNED,
+      'Kullanıcı yasaklandı',
+      { userId: result.id, username: result.username }
+    );
+
+    return {
+      success: true,
+      data: result
+    };
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Kullanıcı banlama sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id }
+    );
+    
+    throw new BusinessError('Kullanıcı banlama başarısız');
+  }
+}
+
+// Kullanıcı ban kaldırma (admin)
+export async function unbanUser(id: string): Promise<ApiResponse<UpdateUserResponse>> {
+  try {
+    // Kullanıcı mevcut mu kontrolü
+    const existingUser = await findUserById(id);
+    if (!existingUser) {
+      throw new NotFoundError('Kullanıcı bulunamadı');
+    }
+
+    if (!existingUser.isBanned) {
+      throw new BusinessError('Kullanıcı zaten yasaklı değil');
+    }
+
+    // Kullanıcının banını kaldır
+    const result = await updateUserDB({ id }, { isBanned: false });
+
+    // Başarılı ban kaldırma logu
+    await logger.info(
+      EVENTS.ADMIN.USER_UNBANNED,
+      'Kullanıcı yasağı kaldırıldı',
+      { userId: result.id, username: result.username }
+    );
+
+    return {
+      success: true,
+      data: result
+    };
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Kullanıcı ban kaldırma sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id }
+    );
+    
+    throw new BusinessError('Kullanıcı ban kaldırma başarısız');
+  }
+}
+
+// Kullanıcı silme (admin)
+export async function deleteUser(id: string): Promise<ApiResponse<void>> {
+  try {
+    // Kullanıcı mevcut mu kontrolü
+    const existingUser = await findUserById(id);
+    if (!existingUser) {
+      throw new NotFoundError('Kullanıcı bulunamadı');
+    }
+
+    // Kullanıcıyı sil
+    await deleteUserDB({ id });
+
+    // Başarılı silme logu
+    await logger.info(
+      EVENTS.ADMIN.USER_DELETED,
+      'Kullanıcı silindi',
+      { userId: id, username: existingUser.username }
+    );
+
+    return {
+      success: true
+    };
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Kullanıcı silme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id }
+    );
+    
+    throw new BusinessError('Kullanıcı silme başarısız');
   }
 } 

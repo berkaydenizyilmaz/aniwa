@@ -53,7 +53,7 @@ export async function createGenre(data: CreateGenreRequest): Promise<ApiResponse
 
     // Başarılı oluşturma logu
     await logger.info(
-      EVENTS.MASTER_DATA.GENRE_CREATED,
+      EVENTS.ADMIN.GENRE_CREATED,
       'Genre başarıyla oluşturuldu',
       { genreId: result.id, name: result.name, slug: result.slug }
     );
@@ -188,7 +188,7 @@ export async function updateGenre(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.MASTER_DATA.GENRE_UPDATED,
+      EVENTS.ADMIN.GENRE_UPDATED,
       'Genre başarıyla güncellendi',
       { genreId: result.id, name: result.name, slug: result.slug }
     );
@@ -227,7 +227,7 @@ export async function deleteGenre(id: string): Promise<ApiResponse<void>> {
 
     // Başarılı silme logu
     await logger.info(
-      EVENTS.MASTER_DATA.GENRE_DELETED,
+      EVENTS.ADMIN.GENRE_DELETED,
       'Genre başarıyla silindi',
       { genreId: id, name: existingGenre.name }
     );

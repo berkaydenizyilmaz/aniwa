@@ -54,7 +54,7 @@ export async function createStudio(data: CreateStudioRequest): Promise<ApiRespon
 
     // Başarılı oluşturma logu
     await logger.info(
-      EVENTS.MASTER_DATA.STUDIO_CREATED,
+      EVENTS.ADMIN.STUDIO_CREATED,
       'Studio başarıyla oluşturuldu',
       { studioId: result.id, name: result.name, slug: result.slug }
     );
@@ -191,7 +191,7 @@ export async function updateStudio(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.MASTER_DATA.STUDIO_UPDATED,
+      EVENTS.ADMIN.STUDIO_UPDATED,
       'Studio başarıyla güncellendi',
       { studioId: result.id, name: result.name, slug: result.slug }
     );
@@ -230,7 +230,7 @@ export async function deleteStudio(id: string): Promise<ApiResponse<void>> {
 
     // Başarılı silme logu
     await logger.info(
-      EVENTS.MASTER_DATA.STUDIO_DELETED,
+      EVENTS.ADMIN.STUDIO_DELETED,
       'Studio başarıyla silindi',
       { studioId: id, name: existingStudio.name }
     );
