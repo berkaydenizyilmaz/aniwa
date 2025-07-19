@@ -1,6 +1,11 @@
 // FavouriteAnime API response tipleri
 
 import { FavouriteAnimeSeries } from '@prisma/client';
+import { ToggleFavouriteAnimeInput, FavouriteAnimeFilters } from '@/lib/schemas/favouriteAnime.schema';
+
+// Schema tiplerini yeniden adlandır
+export type ToggleFavouriteAnimeRequest = ToggleFavouriteAnimeInput;
+export type GetUserFavouriteAnimesRequest = FavouriteAnimeFilters;
 
 // Prisma FavouriteAnimeSeries tipini direkt kullan (küçük model)
 export type GetFavouriteAnimeResponse = FavouriteAnimeSeries;
@@ -29,18 +34,7 @@ export interface GetAnimeFavouritesResponse {
   totalPages: number;
 }
 
-// FavouriteAnime API istek tipleri
-export interface GetUserFavouriteAnimesRequest {
-  page?: number;
-  limit?: number;
-  order?: 'asc' | 'desc';
-}
-
 export interface GetAnimeFavouritesRequest {
   page?: number;
   limit?: number;
-}
-
-export interface ToggleFavouriteAnimeRequest {
-  animeSeriesId: string;
 } 
