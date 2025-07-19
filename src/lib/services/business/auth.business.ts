@@ -6,13 +6,16 @@ import {
   ConflictError, 
   UnauthorizedError
 } from '@/lib/errors';
-import { createUser, findUserByUsername, findUserByEmail, findUserBySlug, updateUserLastLogin } from '@/lib/services/db/user.db';
+import { createUser, findUserByUsername, findUserByEmail, findUserBySlug, updateUserLastLogin, updateUser } from '@/lib/services/db/user.db';
 import { createUserSettings } from '@/lib/services/db/userProfileSettings.db';
+import { createVerificationToken, findVerificationTokenByToken, deleteVerificationTokenByToken } from '@/lib/services/db/verificationToken.db';
 import { createSlug } from '@/lib/utils/slug.utils';
+import { sendPasswordResetEmail } from '@/lib/utils/email.utils';
 import { RegisterInput, LoginInput } from '@/lib/schemas/auth.schema';
 import { ApiResponse } from '@/lib/types/api';
 import { RegisterResponse, LoginResponse } from '@/lib/types/api/auth.api';
 import { AUTH } from '@/lib/constants/auth.constants';
+import crypto from 'crypto';
 
 // Kullanıcı kaydı
 export async function registerUser(data: RegisterInput): Promise<ApiResponse<RegisterResponse>> {
@@ -114,5 +117,83 @@ export async function logoutUser(): Promise<ApiResponse<void>> {
     };
   } catch {
     throw new BusinessError('Çıkış başarısız');
+  }
+}
+
+// Şifre sıfırlama isteği
+export async function forgotPassword(email: string): Promise<ApiResponse<void>> {
+  try {
+    // Kullanıcıyı bul
+    const user = await findUserByEmail(email);
+    if (!user) {
+      // Güvenlik için kullanıcı bulunamasa bile başarılı döner
+      return { success: true };
+    }
+
+    // Rastgele token oluştur
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + AUTH.TOKEN_EXPIRES.PASSWORD_RESET);
+
+    // Token'ı veritabanına kaydet
+    await createVerificationToken({
+      email,
+      token,
+      type: AUTH.TOKEN_TYPES.PASSWORD_RESET,
+      expiresAt
+    });
+
+    // Email gönder
+    const emailSent = await sendPasswordResetEmail(email, token, user.username);
+    if (!emailSent) {
+      throw new BusinessError('Email gönderilemedi');
+    }
+
+    return { success: true };
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+    throw new BusinessError('Şifre sıfırlama isteği başarısız');
+  }
+}
+
+// Şifre sıfırlama
+export async function resetPassword(token: string, newPassword: string): Promise<ApiResponse<void>> {
+  try {
+    // Token'ı bul ve doğrula
+    const verificationToken = await findVerificationTokenByToken(token);
+    if (!verificationToken) {
+      throw new UnauthorizedError('Geçersiz veya süresi dolmuş token');
+    }
+
+    if (verificationToken.type !== AUTH.TOKEN_TYPES.PASSWORD_RESET) {
+      throw new UnauthorizedError('Geçersiz token tipi');
+    }
+
+    if (verificationToken.expiresAt < new Date()) {
+      throw new UnauthorizedError('Token süresi dolmuş');
+    }
+
+    // Kullanıcıyı bul
+    const user = await findUserByEmail(verificationToken.email);
+    if (!user) {
+      throw new UnauthorizedError('Kullanıcı bulunamadı');
+    }
+
+    // Yeni şifreyi hashle
+    const passwordHash = await bcrypt.hash(newPassword, AUTH.BCRYPT_SALT_ROUNDS);
+
+    // Şifreyi güncelle
+    await updateUser({ id: user.id }, { passwordHash });
+
+    // Token'ı sil
+    await deleteVerificationTokenByToken(token);
+
+    return { success: true };
+  } catch (error) {
+    if (error instanceof BusinessError) {
+      throw error;
+    }
+    throw new BusinessError('Şifre sıfırlama başarısız');
   }
 } 

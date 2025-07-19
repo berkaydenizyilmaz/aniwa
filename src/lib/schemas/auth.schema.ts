@@ -19,6 +19,20 @@ export const loginSchema = z.object({
     .min(1, 'Şifre gerekli')
 });
 
+// Şifre sıfırlama isteği şeması
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Geçerli bir e-posta adresi girin')
+});
+
+// Şifre sıfırlama şeması
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, 'Token gerekli'),
+  password: z.string()
+    .min(AUTH.PASSWORD_MIN_LENGTH, `Şifre en az ${AUTH.PASSWORD_MIN_LENGTH} karakter olmalı`)
+});
+
 // Tip tanımları
 export type RegisterInput = z.infer<typeof registerSchema>;
-export type LoginInput = z.infer<typeof loginSchema>; 
+export type LoginInput = z.infer<typeof loginSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>; 
