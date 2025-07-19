@@ -30,6 +30,7 @@ export const ROUTES = {
       GENRES: '/api/admin/genres',
       TAGS: '/api/admin/tags',
       STUDIOS: '/api/admin/studios',
+      ANIME: '/api/admin/anime',
     },
   },
   
@@ -70,6 +71,7 @@ export const ROUTES = {
         '/api/admin/genres',  // Genre yönetimi
         '/api/admin/tags',    // Tag yönetimi
         '/api/admin/studios', // Studio yönetimi
+        '/api/admin/anime',   // Anime yönetimi
       ],
     },
     

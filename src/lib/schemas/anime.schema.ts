@@ -84,4 +84,7 @@ export const animeSeriesFiltersSchema = z.object({
 export type CreateAnimeSeriesInput = z.infer<typeof createAnimeSeriesSchema>;
 export type CreateAnimeMediaPartInput = z.infer<typeof createAnimeMediaPartSchema>;
 export type CreateEpisodeInput = z.infer<typeof createEpisodeSchema>;
-export type AnimeSeriesFilters = z.infer<typeof animeSeriesFiltersSchema>; 
+export type AnimeSeriesFilters = z.infer<typeof animeSeriesFiltersSchema>;
+
+// Anime serisi güncelleme şeması (tüm alanlar opsiyonel)
+export const updateAnimeSeriesSchema = createAnimeSeriesSchema.partial(); 
