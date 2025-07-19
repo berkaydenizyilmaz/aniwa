@@ -319,7 +319,7 @@ export async function updateAnimeStreamingLinks(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.ADMIN.STREAMING_LINKS_UPDATED,
+      EVENTS.EDITOR.STREAMING_LINKS_UPDATED,
       'Anime streaming linkleri başarıyla güncellendi',
       {
         animeSeriesId,
@@ -387,7 +387,7 @@ export async function updateMediaPartStreamingLinks(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.ADMIN.STREAMING_LINKS_UPDATED,
+      EVENTS.EDITOR.STREAMING_LINKS_UPDATED,
       'Medya parçası streaming linkleri başarıyla güncellendi',
       {
         mediaPartId,
@@ -455,7 +455,7 @@ export async function updateEpisodeStreamingLinks(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.ADMIN.STREAMING_LINKS_UPDATED,
+      EVENTS.EDITOR.STREAMING_LINKS_UPDATED,
       'Bölüm streaming linkleri başarıyla güncellendi',
       {
         episodeId,
