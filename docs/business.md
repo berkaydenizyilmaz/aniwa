@@ -27,7 +27,6 @@ src/
 │           ├── anime.business.ts # Anime serisi oluşturma (nested writes), anime arama/filtreleme gibi iş akışları
 │           ├── list.business.ts  # Anime listelerine ekleme, ilerleme güncelleme, özel liste yönetimi gibi iş akışları
 │           ├── comment.business.ts # Yorum yapma, yorum beğenme gibi iş akışları
-│           ├── masterData.business.ts # Genre, Tag, Studio gibi master data yönetimi (varsa kompleks logic)
 │           ├── social.business.ts # Kullanıcı takibi, anime takibi gibi iş akışları
 │           ├── notification.business.ts # Bildirim oluşturma ve gönderme (dahili) iş akışları
 │           └── ... (ihtiyaç halinde diğer mantıksal gruplar)
