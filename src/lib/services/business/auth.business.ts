@@ -11,6 +11,8 @@ import { createUserSettings } from '@/lib/services/db/userProfileSettings.db';
 import { createVerificationToken, findVerificationTokenByToken, deleteVerificationTokenByToken } from '@/lib/services/db/verificationToken.db';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { sendPasswordResetEmail } from '@/lib/utils/email.utils';
+import { logger } from '@/lib/utils/logger';
+import { EVENTS } from '@/lib/constants/events.constants';
 import { RegisterInput, LoginInput } from '@/lib/schemas/auth.schema';
 import { ApiResponse } from '@/lib/types/api';
 import { RegisterResponse, LoginResponse } from '@/lib/types/api/auth.api';
@@ -55,6 +57,13 @@ export async function registerUser(data: RegisterInput): Promise<ApiResponse<Reg
       user: { connect: { id: user.id } },
     });
 
+    // Başarılı kayıt logu
+    await logger.info(
+      EVENTS.AUTH.USER_REGISTERED,
+      'Kullanıcı başarıyla kayıt oldu',
+      { userId: user.id, username: user.username, email: user.email }
+    );
+
     return {
       success: true,
       data: {
@@ -67,6 +76,14 @@ export async function registerUser(data: RegisterInput): Promise<ApiResponse<Reg
     if (error instanceof BusinessError) {
       throw error;
     }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Kullanıcı kaydı sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
+    );
+    
     throw new BusinessError('Kullanıcı kaydı başarısız');
   }
 }
@@ -105,6 +122,14 @@ export async function loginUser(data: LoginInput): Promise<ApiResponse<LoginResp
     if (error instanceof BusinessError) {
       throw error;
     }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Kullanıcı girişi sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
+    );
+    
     throw new BusinessError('Giriş başarısız');
   }
 }
@@ -145,6 +170,12 @@ export async function forgotPassword(email: string): Promise<ApiResponse<void>> 
     // Email gönder
     const emailSent = await sendPasswordResetEmail(email, token, user.username);
     if (!emailSent) {
+      // Email gönderimi başarısız logu
+      await logger.error(
+        EVENTS.SYSTEM.EMAIL_SEND_FAILED,
+        'Şifre sıfırlama emaili gönderilemedi',
+        { email, userId: user.id }
+      );
       throw new BusinessError('Email gönderilemedi');
     }
 
@@ -153,6 +184,14 @@ export async function forgotPassword(email: string): Promise<ApiResponse<void>> 
     if (error instanceof BusinessError) {
       throw error;
     }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Şifre sıfırlama isteği sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', email }
+    );
+    
     throw new BusinessError('Şifre sıfırlama isteği başarısız');
   }
 }
@@ -194,6 +233,14 @@ export async function resetPassword(token: string, newPassword: string): Promise
     if (error instanceof BusinessError) {
       throw error;
     }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.API_ERROR,
+      'Şifre sıfırlama sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', token }
+    );
+    
     throw new BusinessError('Şifre sıfırlama başarısız');
   }
 } 
