@@ -13,6 +13,12 @@ export const EVENTS = {
     CUSTOM_LIST_CREATED: 'user_custom_list_created',
     CUSTOM_LIST_UPDATED: 'user_custom_list_updated',
     CUSTOM_LIST_DELETED: 'user_custom_list_deleted',
+    FAVOURITE_ANIME_ADDED: 'user_favourite_anime_added',
+    FAVOURITE_ANIME_REMOVED: 'user_favourite_anime_removed',
+    ANIME_ADDED_TO_LIST: 'user_anime_added_to_list',
+    ANIME_REMOVED_FROM_LIST: 'user_anime_removed_from_list',
+    CUSTOM_LIST_ITEM_ADDED: 'user_custom_list_item_added',
+    CUSTOM_LIST_ITEM_REMOVED: 'user_custom_list_item_removed',
   },
   
   // Admin Events

@@ -25,6 +25,13 @@ export const ROUTES = {
       SIGNOUT: '/api/auth/signout',
     },
     
+    // User API'leri
+    USER: {
+      FAVOURITES: '/api/user/favourites',
+      CUSTOM_LISTS: '/api/user/custom-lists',
+      ANIME_LIST: '/api/user/anime-list',
+    },
+    
     // Admin API'leri
     ADMIN: {
       GENRES: '/api/admin/genres',
@@ -58,7 +65,9 @@ export const ROUTES = {
         // Şimdilik boş, ilerde eklenecek
       ],
       API: [
-        // Şimdilik boş, ilerde eklenecek
+        '/api/user/favourites',
+        '/api/user/custom-lists',
+        '/api/user/anime-list',
       ],
     },
     
