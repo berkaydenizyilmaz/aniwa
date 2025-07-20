@@ -5,10 +5,11 @@ import { AUTH } from '@/lib/constants/auth.constants';
 export const registerSchema = z.object({
   email: z.string().email('Geçerli bir e-posta adresi girin'),
   username: z.string()
-    .min(1, 'Kullanıcı adı gerekli')
-    .regex(AUTH.USERNAME_REGEX, 'Kullanıcı adı sadece harf ve rakam içerebilir'),
+    .min(AUTH.USERNAME.MIN_LENGTH, 'Kullanıcı adı gerekli')
+    .max(AUTH.USERNAME.MAX_LENGTH, 'Kullanıcı adı çok uzun')
+    .regex(AUTH.USERNAME.REGEX, 'Kullanıcı adı sadece harf ve rakam içerebilir'),
   password: z.string()
-    .min(AUTH.PASSWORD_MIN_LENGTH, 'Şifre en az 6 karakter olmalı')
+    .min(AUTH.PASSWORD.MIN_LENGTH, 'Şifre en az 6 karakter olmalı')
 });
 
 // Kullanıcı girişi şeması
@@ -28,7 +29,7 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Token gerekli'),
   password: z.string()
-    .min(AUTH.PASSWORD_MIN_LENGTH, `Şifre en az ${AUTH.PASSWORD_MIN_LENGTH} karakter olmalı`)
+    .min(AUTH.PASSWORD.MIN_LENGTH, `Şifre en az ${AUTH.PASSWORD.MIN_LENGTH} karakter olmalı`)
 });
 
 // Tip tanımları

@@ -1,6 +1,7 @@
 // FavouriteAnime validasyon şemaları
 
 import { z } from 'zod';
+import { ANIME_LIST } from '@/lib/constants/animeList.constants';
 
 // Favori anime toggle şeması
 export const toggleFavouriteAnimeSchema = z.object({
@@ -9,8 +10,8 @@ export const toggleFavouriteAnimeSchema = z.object({
 
 // Favori anime filtreleme şeması
 export const favouriteAnimeFiltersSchema = z.object({
-  page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(100).default(50),
+  page: z.number().min(ANIME_LIST.PAGINATION.MIN_PAGE).default(ANIME_LIST.PAGINATION.MIN_PAGE),
+  limit: z.number().min(ANIME_LIST.PAGINATION.MIN_PAGE).max(ANIME_LIST.PAGINATION.MAX_LIMIT).default(ANIME_LIST.PAGINATION.DEFAULT_LIMIT),
 });
 
 // Tip türetmeleri

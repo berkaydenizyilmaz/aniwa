@@ -1,22 +1,23 @@
 // User validasyon şemaları
 
 import { z } from 'zod';
-import { UserRole } from '@prisma/client';
+import { USER } from '@/lib/constants/user.constants';
+import { AUTH } from '@/lib/constants/auth.constants';
 
 // User filtreleme şeması
 export const userFiltersSchema = z.object({
   search: z.string().optional(),
-  role: z.nativeEnum(UserRole).optional(),
+  role: z.nativeEnum(USER.ROLES).optional(),
   isBanned: z.boolean().optional(),
-  page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(100).default(50),
+  page: z.number().min(USER.PAGINATION.MIN_PAGE).default(USER.PAGINATION.MIN_PAGE),
+  limit: z.number().min(USER.PAGINATION.MIN_PAGE).max(USER.PAGINATION.MAX_LIMIT).default(USER.PAGINATION.DEFAULT_LIMIT),
 });
 
 // User güncelleme şeması
 export const updateUserSchema = z.object({
-  username: z.string().min(1, 'Kullanıcı adı gerekli').max(50, 'Kullanıcı adı çok uzun').optional(),
+  username: z.string().min(AUTH.USERNAME.MIN_LENGTH, 'Kullanıcı adı gerekli').max(AUTH.USERNAME.MAX_LENGTH, 'Kullanıcı adı çok uzun').optional(),
   email: z.string().email('Geçerli bir e-posta adresi girin').optional(),
-  roles: z.array(z.nativeEnum(UserRole)).optional(),
+  roles: z.array(z.nativeEnum(USER.ROLES)).optional(),
   isBanned: z.boolean().optional(),
 });
 

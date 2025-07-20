@@ -4,9 +4,17 @@ export const AUTH = {
   // Şifre hashleme
   BCRYPT_SALT_ROUNDS: 12,
   
-  // Validation kuralları
-  PASSWORD_MIN_LENGTH: 6,
-  USERNAME_REGEX: /^[a-zA-Z0-9]+$/,
+  // Username kuralları
+  USERNAME: {
+    MIN_LENGTH: 1,
+    MAX_LENGTH: 50,
+    REGEX: /^[a-zA-Z0-9]+$/,
+  },
+  
+  // Şifre kuralları
+  PASSWORD: {
+    MIN_LENGTH: 6,
+  },
   
   // Token tipleri
   TOKEN_TYPES: {

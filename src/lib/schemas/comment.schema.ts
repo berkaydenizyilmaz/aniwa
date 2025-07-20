@@ -1,12 +1,13 @@
 // Comment ve CommentLike Zod validasyon şemaları
 
 import { z } from 'zod';
+import { COMMENT } from '@/lib/constants/comment.constants';
 
 // Yorum oluşturma şeması
 export const createCommentSchema = z.object({
   content: z.string()
-    .min(1, 'Yorum içeriği boş olamaz')
-    .max(1000, 'Yorum içeriği 1000 karakterden uzun olamaz'),
+    .min(COMMENT.CONTENT.MIN_LENGTH, 'Yorum içeriği boş olamaz')
+    .max(COMMENT.CONTENT.MAX_LENGTH, 'Yorum içeriği 1000 karakterden uzun olamaz'),
   animeSeriesId: z.string().optional(),
   animeMediaPartId: z.string().optional(),
 }).refine(
@@ -20,20 +21,20 @@ export const createCommentSchema = z.object({
 // Yorum güncelleme şeması
 export const updateCommentSchema = z.object({
   content: z.string()
-    .min(1, 'Yorum içeriği boş olamaz')
-    .max(1000, 'Yorum içeriği 1000 karakterden uzun olamaz'),
+    .min(COMMENT.CONTENT.MIN_LENGTH, 'Yorum içeriği boş olamaz')
+    .max(COMMENT.CONTENT.MAX_LENGTH, 'Yorum içeriği 1000 karakterden uzun olamaz'),
 });
 
 // Yorum listeleme filtreleri şeması
 export const getUserCommentsSchema = z.object({
-  page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().positive().max(100).default(50),
+  page: z.coerce.number().int().positive().default(COMMENT.PAGINATION.MIN_PAGE),
+  limit: z.coerce.number().int().positive().max(COMMENT.PAGINATION.MAX_LIMIT).default(COMMENT.PAGINATION.DEFAULT_LIMIT),
 });
 
 // Anime yorumları filtreleri şeması
 export const getAnimeCommentsSchema = z.object({
-  page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().positive().max(100).default(50),
+  page: z.coerce.number().int().positive().default(COMMENT.PAGINATION.MIN_PAGE),
+  limit: z.coerce.number().int().positive().max(COMMENT.PAGINATION.MAX_LIMIT).default(COMMENT.PAGINATION.DEFAULT_LIMIT),
 });
 
 // Yorum beğenisi toggle şeması

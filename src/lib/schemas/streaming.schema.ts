@@ -1,11 +1,12 @@
 // Streaming validasyon şemaları
 
 import { z } from 'zod';
+import { STREAMING } from '@/lib/constants/streaming.constants';
 
 // Streaming platform oluşturma şeması
 export const createStreamingPlatformSchema = z.object({
-  name: z.string().min(1, 'Platform adı gerekli').max(100, 'Platform adı çok uzun'),
-  baseUrl: z.string().url('Geçerli bir URL girin').max(255, 'URL çok uzun'),
+  name: z.string().min(STREAMING.PLATFORM.NAME.MIN_LENGTH, 'Platform adı gerekli').max(STREAMING.PLATFORM.NAME.MAX_LENGTH, 'Platform adı çok uzun'),
+  baseUrl: z.string().url('Geçerli bir URL girin').max(STREAMING.PLATFORM.BASE_URL.MAX_LENGTH, 'URL çok uzun'),
 });
 
 // Streaming platform güncelleme şeması
@@ -14,14 +15,14 @@ export const updateStreamingPlatformSchema = createStreamingPlatformSchema.parti
 // Streaming platform filtreleme şeması
 export const streamingPlatformFiltersSchema = z.object({
   search: z.string().optional(),
-  page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(100).default(50),
+  page: z.number().min(STREAMING.PAGINATION.MIN_PAGE).default(STREAMING.PAGINATION.MIN_PAGE),
+  limit: z.number().min(STREAMING.PAGINATION.MIN_PAGE).max(STREAMING.PAGINATION.MAX_LIMIT).default(STREAMING.PAGINATION.DEFAULT_LIMIT),
 });
 
 // Streaming link oluşturma şeması
 export const createStreamingLinkSchema = z.object({
   platformId: z.string().min(1, 'Platform ID gerekli'),
-  url: z.string().url('Geçerli bir URL girin').max(500, 'URL çok uzun'),
+  url: z.string().url('Geçerli bir URL girin').max(STREAMING.LINK.URL.MAX_LENGTH, 'URL çok uzun'),
   // Polymorphic ilişki - sadece biri dolu olacak
   animeSeriesId: z.string().optional(),
   animeMediaPartId: z.string().optional(),
@@ -46,15 +47,15 @@ export const streamingLinkFiltersSchema = z.object({
   animeSeriesId: z.string().optional(),
   animeMediaPartId: z.string().optional(),
   episodeId: z.string().optional(),
-  page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(100).default(50),
+  page: z.number().min(STREAMING.PAGINATION.MIN_PAGE).default(STREAMING.PAGINATION.MIN_PAGE),
+  limit: z.number().min(STREAMING.PAGINATION.MIN_PAGE).max(STREAMING.PAGINATION.MAX_LIMIT).default(STREAMING.PAGINATION.DEFAULT_LIMIT),
 });
 
 // Streaming link toplu güncelleme şeması
 export const updateStreamingLinksSchema = z.object({
   links: z.array(z.object({
     platformId: z.string().min(1, 'Platform ID gerekli'),
-    url: z.string().url('Geçerli bir URL girin').max(500, 'URL çok uzun'),
+    url: z.string().url('Geçerli bir URL girin').max(STREAMING.LINK.URL.MAX_LENGTH, 'URL çok uzun'),
   })).min(0, 'En az 0 link olabilir'),
 });
 
