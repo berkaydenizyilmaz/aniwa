@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authConfig } from '@/lib/auth/auth.config';
 import { streamingLinkFiltersSchema } from '@/lib/schemas/streaming.schema';
 import { getAllStreamingLinks } from '@/lib/services/business/streaming.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
