@@ -31,7 +31,7 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        toast.error('Kullanıcı adı veya şifre hatalı');
+        toast.error('Kullanıcı adı veya şifre yanlış');
       } else {
         toast.success('Başarıyla giriş yaptınız!');
         router.push(ROUTES.PAGES.HOME);
