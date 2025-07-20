@@ -6,11 +6,10 @@ export const ROUTES = {
     
     // Auth sayfaları
     AUTH: {
-      LOGIN: '/auth/giris',
-      REGISTER: '/auth/kayit',
-      FORGOT_PASSWORD: '/auth/sifremi-unuttum',
-      RESET_PASSWORD: '/auth/sifremi-sifirla',
-      EMAIL_VERIFY: '/auth/email-dogrula',
+      LOGIN: '/giris',
+      REGISTER: '/kayit',
+      FORGOT_PASSWORD: '/sifremi-unuttum',
+      RESET_PASSWORD: '/sifremi-sifirla',
     },
   },
   
@@ -47,10 +46,10 @@ export const ROUTES = {
     // Giriş yapmış kullanıcıların erişemeyeceği (guest-only)
     GUEST_ONLY: {
       PAGES: [
-        '/auth/giris',
-        '/auth/kayit',
-        '/auth/sifremi-unuttum',
-        '/auth/sifremi-sifirla',
+        '/giris',
+        '/kayit',
+        '/sifremi-unuttum',
+        '/sifremi-sifirla',
       ],
       API: [
         '/api/auth/register',

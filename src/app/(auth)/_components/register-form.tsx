@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { loginSchema, type LoginInput } from '@/lib/schemas/auth.schema';
+import { registerSchema, type RegisterInput } from '@/lib/schemas/auth.schema';
+import { ROUTES } from '@/lib/constants/routes.constants';
 
-export function LoginForm() {
+export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -18,28 +19,36 @@ export function LoginForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterInput>({
+    resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (data: LoginInput) => {
+  const onSubmit = async (data: RegisterInput) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const result = await signIn('credentials', {
-        username: data.username,
-        password: data.password,
-        redirect: false,
+      const response = await fetch(ROUTES.API.AUTH.REGISTER, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
       });
 
-      if (result?.error) {
-        setError('Kullanıcı adı veya şifre hatalı');
+      const result = await response.json();
+
+      if (!response.ok) {
+        const errorMessage = result.error || 'Kayıt sırasında bir hata oluştu';
+        toast.error(errorMessage);
+        setError(errorMessage);
       } else {
-        router.push('/'); // Ana sayfaya yönlendir
-        router.refresh();
+        toast.success('Hesabınız başarıyla oluşturuldu! Giriş yapabilirsiniz.');
+        // Başarılı kayıt sonrası giriş sayfasına yönlendir
+        router.push(ROUTES.PAGES.AUTH.LOGIN);
       }
     } catch {
+      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
       setError('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
@@ -48,6 +57,24 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <label htmlFor="email" className="block text-sm font-medium mb-2">
+          E-posta
+        </label>
+        <Input
+          id="email"
+          type="email"
+          {...register('email')}
+          placeholder="E-posta adresinizi girin"
+          disabled={isLoading}
+        />
+        {errors.email && (
+          <p className="text-sm text-destructive mt-1">
+            {errors.email.message}
+          </p>
+        )}
+      </div>
+
       <div>
         <label htmlFor="username" className="block text-sm font-medium mb-2">
           Kullanıcı Adı
@@ -95,7 +122,7 @@ export function LoginForm() {
         className="w-full"
         disabled={isLoading}
       >
-        {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+        {isLoading ? 'Kayıt yapılıyor...' : 'Kayıt Ol'}
       </Button>
     </form>
   );

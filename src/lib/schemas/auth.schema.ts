@@ -15,9 +15,9 @@ export const registerSchema = z.object({
 // Kullanıcı girişi şeması
 export const loginSchema = z.object({
   username: z.string()
-    .min(1, 'Kullanıcı adı gerekli'),
+    .min(AUTH.USERNAME.MIN_LENGTH, 'Kullanıcı adı gerekli'),
   password: z.string()
-    .min(1, 'Şifre gerekli')
+    .min(AUTH.PASSWORD.MIN_LENGTH, `Şifre en az ${AUTH.PASSWORD.MIN_LENGTH} karakter olmalı`)
 });
 
 // Şifre sıfırlama isteği şeması

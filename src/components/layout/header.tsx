@@ -2,14 +2,16 @@
 
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { ROUTES } from '@/lib/constants/routes.constants';
 
 export function Header() {
   const { data: session, status } = useSession();
 
   const handleSignOut = () => {
-    signOut({ callbackUrl: '/' });
+    signOut({ callbackUrl: ROUTES.PAGES.HOME });
   };
 
   return (
@@ -18,14 +20,14 @@ export function Header() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <Link href="/" className="text-xl font-bold hover:text-primary">
+            <Link href={ROUTES.PAGES.HOME} className="text-xl font-bold hover:text-primary">
               Aniwa
             </Link>
           </div>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-sm hover:text-primary">
+            <Link href={ROUTES.PAGES.HOME} className="text-sm hover:text-primary">
               Ana Sayfa
             </Link>
             <Link href="/anime" className="text-sm hover:text-primary">
@@ -38,6 +40,13 @@ export function Header() {
 
           {/* Auth & Theme */}
           <div className="flex items-center space-x-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => toast.success('Test toast!')}
+            >
+              Test Toast
+            </Button>
             <ThemeToggle />
             
             {status === 'loading' ? (
@@ -54,10 +63,10 @@ export function Header() {
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="/giris">Giriş</Link>
+                  <Link href={ROUTES.PAGES.AUTH.LOGIN}>Giriş</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href="/kayit">Kayıt Ol</Link>
+                  <Link href={ROUTES.PAGES.AUTH.REGISTER}>Kayıt Ol</Link>
                 </Button>
               </div>
             )}
