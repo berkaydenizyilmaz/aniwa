@@ -19,6 +19,11 @@ export const EVENTS = {
     ANIME_REMOVED_FROM_LIST: 'user_anime_removed_from_list',
     CUSTOM_LIST_ITEM_ADDED: 'user_custom_list_item_added',
     CUSTOM_LIST_ITEM_REMOVED: 'user_custom_list_item_removed',
+    COMMENT_CREATED: 'user_comment_created',
+    COMMENT_UPDATED: 'user_comment_updated',
+    COMMENT_DELETED: 'user_comment_deleted',
+    COMMENT_LIKE_ADDED: 'user_comment_like_added',
+    COMMENT_LIKE_REMOVED: 'user_comment_like_removed',
   },
   
   // Admin Events
