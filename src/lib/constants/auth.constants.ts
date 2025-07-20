@@ -27,4 +27,9 @@ export const AUTH = {
     PASSWORD_RESET: 60 * 60 * 1000, // 1 saat
     EMAIL_VERIFICATION: 24 * 60 * 60 * 1000, // 24 saat
   },
-} as const; 
+  // Session süreleri (saniye)
+  SESSION: {
+    MAX_AGE: 30 * 24 * 60 * 60, // 30 gün
+    REFETCH_INTERVAL: 5 * 60, // 5 dakika
+  },
+  } as const; 
