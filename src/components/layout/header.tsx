@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export function Header() {
   const { data: session, status } = useSession();
@@ -35,8 +36,10 @@ export function Header() {
             </Link>
           </nav>
 
-          {/* Auth */}
+          {/* Auth & Theme */}
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
+            
             {status === 'loading' ? (
               <div className="text-sm text-muted-foreground">Yükleniyor...</div>
             ) : session ? (
@@ -51,10 +54,10 @@ export function Header() {
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="/auth/login">Giriş</Link>
+                  <Link href="/giris">Giriş</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href="/auth/register">Kayıt Ol</Link>
+                  <Link href="/kayit">Kayıt Ol</Link>
                 </Button>
               </div>
             )}
