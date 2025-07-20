@@ -29,7 +29,11 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Token gerekli'),
   password: z.string()
-    .min(AUTH.PASSWORD.MIN_LENGTH, `Şifre en az ${AUTH.PASSWORD.MIN_LENGTH} karakter olmalı`)
+    .min(AUTH.PASSWORD.MIN_LENGTH, `Şifre en az ${AUTH.PASSWORD.MIN_LENGTH} karakter olmalı`),
+  confirmPassword: z.string().min(1, 'Şifre tekrarı gerekli')
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Şifreler eşleşmiyor",
+  path: ["confirmPassword"],
 });
 
 // Tip tanımları

@@ -41,39 +41,3 @@ export async function sendPasswordResetEmail(
     return false;
   }
 }
-
-// Email doğrulama email'i gönder (gelecekte kullanım için)
-export async function sendVerificationEmail(
-  email: string,
-  token: string,
-  username: string
-): Promise<boolean> {
-  try {
-    const verifyUrl = `${process.env.NEXTAUTH_URL}${ROUTES.PAGES.AUTH.EMAIL_VERIFY}?token=${token}`;
-    
-    await resend.emails.send({
-      from: 'Aniwa <noreply@aniwa.tr>',
-      to: email,
-      subject: 'Email Adresinizi Doğrulayın - Aniwa',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Merhaba ${username}!</h2>
-          <p>Email adresinizi doğrulamak için aşağıdaki butona tıklayın:</p>
-          <a href="${verifyUrl}" style="display: inline-block; background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin: 20px 0;">
-            Email'i Doğrula
-          </a>
-          <p>Bu link ${AUTH.TOKEN_EXPIRES.EMAIL_VERIFICATION / 60 / 60 / 1000} saat sonra geçersiz olacaktır.</p>
-          <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-          <p style="color: #666; font-size: 12px;">
-            Bu email Aniwa tarafından gönderilmiştir.
-          </p>
-        </div>
-      `
-    });
-    
-    return true;
-  } catch (error) {
-    console.error('Email gönderme hatası:', error);
-    return false;
-  }
-} 
