@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { loginSchema, type LoginInput } from '@/lib/schemas/auth.schema';
 import { ROUTES } from '@/lib/constants/routes.constants';
 
@@ -16,11 +17,7 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginInput>({
+  const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -51,56 +48,59 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <label htmlFor="username" className="block text-sm font-medium mb-2">
-          Kullanıcı Adı
-        </label>
-        <Input
-          id="username"
-          type="text"
-          {...register('username')}
-          placeholder="Kullanıcı adınızı girin"
-          disabled={isLoading}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Kullanıcı Adı</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Kullanıcı adınızı girin"
+                  disabled={isLoading}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.username && (
-          <p className="text-sm text-destructive mt-1">
-            {errors.username.message}
-          </p>
-        )}
-      </div>
 
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium mb-2">
-          Şifre
-        </label>
-        <Input
-          id="password"
-          type="password"
-          {...register('password')}
-          placeholder="Şifrenizi girin"
-          disabled={isLoading}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Şifre</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Şifrenizi girin"
+                  disabled={isLoading}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.password && (
-          <p className="text-sm text-destructive mt-1">
-            {errors.password.message}
-          </p>
+
+        {error && (
+          <div className="text-sm text-destructive text-center">
+            {error}
+          </div>
         )}
-      </div>
 
-      {error && (
-        <div className="text-sm text-destructive text-center">
-          {error}
-        </div>
-      )}
-
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isLoading}
-      >
-        {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
-      </Button>
-    </form>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+        </Button>
+      </form>
+    </Form>
   );
 } 
