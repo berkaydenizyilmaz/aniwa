@@ -14,7 +14,6 @@ import { ROUTES } from '@/lib/constants/routes.constants';
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm<LoginInput>({
@@ -23,7 +22,6 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginInput) => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const result = await signIn('credentials', {
@@ -33,7 +31,7 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        setError('Kullanıcı adı veya şifre hatalı');
+        toast.error('Kullanıcı adı veya şifre hatalı');
       } else {
         toast.success('Başarıyla giriş yaptınız!');
         router.push(ROUTES.PAGES.HOME);
@@ -41,7 +39,6 @@ export function LoginForm() {
       }
     } catch {
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-      setError('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
@@ -86,12 +83,6 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-
-        {error && (
-          <div className="text-sm text-destructive text-center">
-            {error}
-          </div>
-        )}
 
         <Button
           type="submit"

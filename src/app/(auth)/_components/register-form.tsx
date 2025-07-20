@@ -13,7 +13,6 @@ import { ROUTES } from '@/lib/constants/routes.constants';
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm<RegisterInput>({
@@ -22,7 +21,6 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterInput) => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const response = await fetch(ROUTES.API.AUTH.REGISTER, {
@@ -38,7 +36,6 @@ export function RegisterForm() {
       if (!response.ok) {
         const errorMessage = result.error || 'Kayıt sırasında bir hata oluştu';
         toast.error(errorMessage);
-        setError(errorMessage);
       } else {
         toast.success('Hesabınız başarıyla oluşturuldu! Giriş yapabilirsiniz.');
         // Başarılı kayıt sonrası giriş sayfasına yönlendir
@@ -46,7 +43,6 @@ export function RegisterForm() {
       }
     } catch {
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-      setError('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
@@ -111,11 +107,7 @@ export function RegisterForm() {
           )}
         />
 
-        {error && (
-          <div className="text-sm text-destructive text-center">
-            {error}
-          </div>
-        )}
+
 
         <Button
           type="submit"
