@@ -26,6 +26,8 @@ export const EVENTS = {
     COMMENT_LIKE_REMOVED: 'user_comment_like_removed',
     USER_FOLLOWED: 'user_followed',
     USER_UNFOLLOWED: 'user_unfollowed',
+    ANIME_TRACKING_ADDED: 'user_anime_tracking_added',
+    ANIME_TRACKING_REMOVED: 'user_anime_tracking_removed',
   },
   
   // Admin Events
