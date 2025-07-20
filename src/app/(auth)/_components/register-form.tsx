@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { registerSchema, type RegisterInput } from '@/lib/schemas/auth.schema';
 import { ROUTES } from '@/lib/constants/routes.constants';
+import { registerUser } from '../_actions/auth.actions';
+import { setFormFieldErrors } from '@/lib/utils/server-action-error-handler';
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,19 +25,16 @@ export function RegisterForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(ROUTES.API.AUTH.REGISTER, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      const result = await registerUser(data);
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        const errorMessage = result.error || 'Kayıt sırasında bir hata oluştu';
-        toast.error(errorMessage);
+      if (!result.success) {
+        // Field errors varsa form'a set et
+        if (result.fieldErrors) {
+          setFormFieldErrors<RegisterInput>(result.fieldErrors, form.setError);
+        } else {
+          // Genel hata mesajı
+          toast.error(result.error);
+        }
       } else {
         toast.success('Hesabınız başarıyla oluşturuldu! Giriş yapabilirsiniz.');
         // Başarılı kayıt sonrası giriş sayfasına yönlendir
