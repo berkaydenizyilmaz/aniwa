@@ -24,6 +24,8 @@ export const EVENTS = {
     COMMENT_DELETED: 'user_comment_deleted',
     COMMENT_LIKE_ADDED: 'user_comment_like_added',
     COMMENT_LIKE_REMOVED: 'user_comment_like_removed',
+    USER_FOLLOWED: 'user_followed',
+    USER_UNFOLLOWED: 'user_unfollowed',
   },
   
   // Admin Events
