@@ -16,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ROUTES } from '@/lib/constants/routes.constants';
 import { USER } from '@/lib/constants/user.constants';
-import { User, Bell, Settings, LogOut, Shield, Users, Edit } from 'lucide-react';
+import { User, Bell, Settings, LogOut, Shield, Users, Edit, LogIn, UserPlus } from 'lucide-react';
 
 interface AuthSectionProps {
   variant?: 'header' | 'mobile';
@@ -102,19 +102,19 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
               size="icon"
               className="flex-1 h-12"
             >
-              <User className="h-6 w-6 text-card-foreground" />
+              <User className="h-6 w-6 text-secondary-foreground" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" side="top" className="w-48 mb-2">
-            <DropdownMenuItem asChild>
+          <DropdownMenuContent align="center" side="top" className="w-48 mb-2 bg-secondary border-secondary">
+            <DropdownMenuItem asChild className="text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200">
               <Link href={ROUTES.PAGES.AUTH.LOGIN}>
-                <User className="mr-2 h-4 w-4" />
-                <span>Giriş Yap</span>
+                <LogIn className="mr-2 h-4 w-4" />
+                <span>Giriş</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors duration-200 mt-1">
               <Link href={ROUTES.PAGES.AUTH.REGISTER}>
-                <User className="mr-2 h-4 w-4" />
+                <UserPlus className="mr-2 h-4 w-4" />
                 <span>Kayıt Ol</span>
               </Link>
             </DropdownMenuItem>
@@ -163,8 +163,8 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="center" side="top" className="w-48 mb-2">
-          <DropdownMenuItem asChild>
+        <DropdownMenuContent align="center" side="top" className="w-48 mb-2 bg-secondary border-secondary">
+          <DropdownMenuItem asChild className="text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200">
             <Link href="/profile">
               <User className="mr-2 h-4 w-4" />
               <span>Profil</span>

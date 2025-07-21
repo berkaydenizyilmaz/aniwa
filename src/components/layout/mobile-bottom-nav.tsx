@@ -13,7 +13,7 @@ export function MobileBottomNav() {
   // Loading durumu
   if (status === 'loading') {
     return (
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-secondary border-t border-border shadow-lg">
         <div className="flex items-center justify-around px-2 py-2">
           <div className="flex-1 h-12 bg-muted animate-pulse rounded" />
           <div className="flex-1 h-12 bg-muted animate-pulse rounded" />
@@ -27,7 +27,7 @@ export function MobileBottomNav() {
   // Giriş yapmamış kullanıcı
   if (!session) {
     return (
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-secondary border-t border-border shadow-lg">
         <div className="flex items-center justify-around px-2 py-2">
           {/* Ana Sayfa */}
           <Button 
@@ -37,7 +37,7 @@ export function MobileBottomNav() {
             className="flex-1 h-12"
           >
             <Link href={ROUTES.PAGES.HOME}>
-              <Home className="h-6 w-6 text-card-foreground" />
+              <Home className="h-6 w-6 text-secondary-foreground" />
             </Link>
           </Button>
 
@@ -49,7 +49,7 @@ export function MobileBottomNav() {
             className="flex-1 h-12"
           >
             <Link href="/anime">
-              <Film className="h-6 w-6 text-card-foreground" />
+              <Film className="h-6 w-6 text-secondary-foreground" />
             </Link>
           </Button>
 
@@ -61,7 +61,7 @@ export function MobileBottomNav() {
             className="flex-1 h-12"
           >
             <Link href="/lists">
-              <List className="h-6 w-6 text-card-foreground" />
+              <List className="h-6 w-6 text-secondary-foreground" />
             </Link>
           </Button>
 
@@ -74,7 +74,7 @@ export function MobileBottomNav() {
 
   // Giriş yapmış kullanıcı
   return (
-    <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
+    <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-secondary border-t border-border shadow-lg">
       <div className="flex items-center justify-around px-2 py-2">
         {/* Ana Sayfa */}
         <Button 
