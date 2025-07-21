@@ -25,9 +25,9 @@ export function AuthCard({ title, description, children, links }: AuthCardProps)
         <div className="relative z-10 p-6 md:p-8">
           {/* Header */}
           <div className="text-center space-y-3 mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-300 tracking-tight font-geist-sans">{title}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-muted-foreground tracking-tight">{title}</h1>
             {description && (
-              <p className="text-gray-400 text-sm md:text-base leading-relaxed font-geist-sans">{description}</p>
+              <p className="text-muted-foreground text-sm md:text-base leading-relaxed">{description}</p>
             )}
           </div>
           
@@ -40,7 +40,7 @@ export function AuthCard({ title, description, children, links }: AuthCardProps)
           {links && links.length > 0 && (
             <div className="text-center space-y-3 pt-6 border-t border-gray-200">
               {links.map((link, index) => (
-                <p key={index} className="text-xs md:text-sm text-gray-400 font-geist-sans">
+                <p key={index} className="text-xs md:text-sm text-gray-500">
                   {link.text}{' '}
                   <Link 
                     href={link.href} 

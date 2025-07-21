@@ -55,14 +55,14 @@ export function RegisterForm() {
           name="email"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel className="text-gray-700 text-sm font-semibold tracking-wide font-geist-sans">E-posta</FormLabel>
+              <FormLabel className="text-gray-500 text-sm font-semibold tracking-wide font-geist-sans">E-posta</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     type="email"
                     placeholder="E-posta adresinizi girin"
                     disabled={isLoading}
-                    className="bg-white/80 border-gray-300/50 text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-[#687FE5] focus:ring-[#687FE5]/20 transition-all duration-200 h-11 text-base rounded-lg font-geist-sans shadow-sm"
+                    className="bg-white border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-[#5bc0ff] focus:ring-[#5bc0ff]/10 transition-all duration-200 h-11 text-base"
                     {...field}
                   />
                 </div>
@@ -77,13 +77,13 @@ export function RegisterForm() {
           name="username"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel className="text-gray-700 text-sm font-semibold tracking-wide font-geist-sans">Kullanıcı Adı</FormLabel>
+              <FormLabel className="text-gray-500 text-sm font-semibold tracking-wide font-geist-sans">Kullanıcı Adı</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     placeholder="Kullanıcı adınızı girin"
                     disabled={isLoading}
-                    className="bg-white/80 border-gray-300/50 text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-[#687FE5] focus:ring-[#687FE5]/20 transition-all duration-200 h-11 text-base rounded-lg font-geist-sans shadow-sm"
+                    className="bg-white border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-[#5bc0ff] focus:ring-[#5bc0ff]/10 transition-all duration-200 h-11 text-base"
                     {...field}
                   />
                 </div>
@@ -98,14 +98,14 @@ export function RegisterForm() {
           name="password"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel className="text-gray-700 text-sm font-semibold tracking-wide font-geist-sans">Şifre</FormLabel>
+              <FormLabel className="text-gray-500 text-sm font-semibold tracking-wide font-geist-sans">Şifre</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     type="password"
                     placeholder="Şifrenizi girin"
                     disabled={isLoading}
-                    className="bg-white/80 border-gray-300/50 text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-[#687FE5] focus:ring-[#687FE5]/20 transition-all duration-200 h-11 text-base rounded-lg font-geist-sans shadow-sm"
+                    className="bg-white border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-[#5bc0ff] focus:ring-[#5bc0ff]/10 transition-all duration-200 h-11 text-base"
                     {...field}
                   />
                 </div>
@@ -117,7 +117,7 @@ export function RegisterForm() {
 
         <Button
           type="submit"
-          className="w-full bg-[#687FE5] hover:bg-[#5A6FD8] text-white font-bold py-3 md:py-4 text-base md:text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 font-geist-sans"
+          className="w-full bg-[#5bc0ff] hover:bg-[#5bc0ff]/90 text-white font-bold py-3 md:py-4 text-base md:text-lg shadow-sm hover:shadow-md transition-all duration-300 font-geist-sans cursor-pointer"
           disabled={isLoading}
         >
           {isLoading ? (

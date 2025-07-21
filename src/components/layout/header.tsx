@@ -72,17 +72,17 @@ export function Header() {
             ) : (
               <div className="flex items-center space-x-2">
                 <Button 
-                  variant="outline" 
+                  variant="ghost" 
                   size="sm" 
                   asChild
-                  className="!border-[#5bc0ff] !text-[#5bc0ff] hover:!border-[#5bc0ff]/80 hover:!text-[#5bc0ff]/80 !bg-transparent hover:!bg-transparent transition-all duration-200 font-geist-sans"
+                  className="!text-gray-300 hover:!text-white hover:!bg-white/10 !bg-transparent transition-all duration-200 font-geist-sans"
                 >
                   <Link href={ROUTES.PAGES.AUTH.LOGIN}>Giriş</Link>
                 </Button>
                 <Button 
-                  size="sm" 
+                  size="sm"
                   asChild
-                  className="!bg-[#5bc0ff] !text-white hover:!bg-[#5bc0ff]/90 !font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
+                  className="!bg-[#5bc0ff] !text-white hover:!bg-[#5bc0ff]/90 !font-bold shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
                 >
                   <Link href={ROUTES.PAGES.AUTH.REGISTER}>Kayıt Ol</Link>
                 </Button>
