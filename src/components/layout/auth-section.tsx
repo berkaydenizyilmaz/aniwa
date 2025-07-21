@@ -1,4 +1,4 @@
-    'use client';
+'use client';
 
 import { useSession, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
@@ -15,6 +15,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ROUTES } from '@/lib/constants/routes.constants';
+import { USER } from '@/lib/constants/user.constants';
 import { User, Bell, Settings, LogOut, Shield, Users, Edit } from 'lucide-react';
 
 interface AuthSectionProps {
@@ -24,6 +25,28 @@ interface AuthSectionProps {
 export function AuthSection({ variant = 'header' }: AuthSectionProps) {
   const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Role-based panel mapping
+  const rolePanels = [
+    {
+      role: USER.ROLES.ADMIN,
+      href: '/admin',
+      icon: Shield,
+      label: 'Admin Panel'
+    },
+    {
+      role: USER.ROLES.MODERATOR,
+      href: '/moderator',
+      icon: Users,
+      label: 'Moderator Panel'
+    },
+    {
+      role: USER.ROLES.EDITOR,
+      href: '/editor',
+      icon: Edit,
+      label: 'Editor Panel'
+    }
+  ];
 
   // Basit responsive kontrol
   useEffect(() => {
@@ -56,7 +79,7 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
         <div className="flex-1 h-12 bg-muted animate-pulse rounded" />
       );
     }
-    
+
     return (
       <div className="flex items-center space-x-4">
         <ThemeToggle />
@@ -74,9 +97,9 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
       return (
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               className="flex-1 h-12"
             >
               <User className="h-6 w-6 text-card-foreground" />
@@ -104,14 +127,14 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
       <div className="flex items-center space-x-4">
         <ThemeToggle />
         <div className="flex items-center space-x-2">
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             asChild
           >
             <Link href={ROUTES.PAGES.AUTH.LOGIN}>Giriş</Link>
           </Button>
-          <Button 
+          <Button
             size="sm"
             asChild
           >
@@ -127,9 +150,9 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
     return (
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="flex-1 h-12"
           >
             <Avatar className="h-6 w-6">
@@ -140,58 +163,45 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" side="top" className="w-48 mb-2">
-            <DropdownMenuItem asChild>
-              <Link href="/profile">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profil</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/notifications">
-                <Bell className="mr-2 h-4 w-4" />
-                <span>Bildirimler</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/settings">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Ayarlar</span>
-              </Link>
-            </DropdownMenuItem>
-            
-            {/* Role-based links */}
-            {session.user.roles.includes('ADMIN') && (
-              <DropdownMenuItem asChild>
-                <Link href="/admin">
-                  <Shield className="mr-2 h-4 w-4" />
-                  <span>Admin Panel</span>
+        <DropdownMenuContent align="center" side="top" className="w-48 mb-2">
+          <DropdownMenuItem asChild>
+            <Link href="/profile">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profil</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/notifications">
+              <Bell className="mr-2 h-4 w-4" />
+              <span>Bildirimler</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/settings">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Ayarlar</span>
+            </Link>
+          </DropdownMenuItem>
+
+          {/* Role-based links */}
+          {rolePanels.map((panel) => {
+            const IconComponent = panel.icon;
+            return session.user.roles.includes(panel.role) ? (
+              <DropdownMenuItem key={panel.role} asChild>
+                <Link href={panel.href}>
+                  <IconComponent className="mr-2 h-4 w-4" />
+                  <span>{panel.label}</span>
                 </Link>
               </DropdownMenuItem>
-            )}
-            {session.user.roles.includes('MODERATOR') && (
-              <DropdownMenuItem asChild>
-                <Link href="/moderator">
-                  <Users className="mr-2 h-4 w-4" />
-                  <span>Moderator Panel</span>
-                </Link>
-              </DropdownMenuItem>
-            )}
-            {session.user.roles.includes('EDITOR') && (
-              <DropdownMenuItem asChild>
-                <Link href="/editor">
-                  <Edit className="mr-2 h-4 w-4" />
-                  <span>Editor Panel</span>
-                </Link>
-              </DropdownMenuItem>
-            )}
-            
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="logout-item">
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Çıkış Yap</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+            ) : null;
+          })}
+
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleSignOut} className="logout-item">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Çıkış Yap</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
       </DropdownMenu>
     );
   }
@@ -227,33 +237,20 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
               <span>Ayarlar</span>
             </Link>
           </DropdownMenuItem>
-          
+
           {/* Role-based links */}
-          {session.user.roles.includes('ADMIN') && (
-            <DropdownMenuItem asChild>
-              <Link href="/admin">
-                <Shield className="mr-2 h-4 w-4" />
-                <span>Admin Panel</span>
-              </Link>
-            </DropdownMenuItem>
-          )}
-          {session.user.roles.includes('MODERATOR') && (
-            <DropdownMenuItem asChild>
-              <Link href="/moderator">
-                <Users className="mr-2 h-4 w-4" />
-                <span>Moderator Panel</span>
-              </Link>
-            </DropdownMenuItem>
-          )}
-          {session.user.roles.includes('EDITOR') && (
-            <DropdownMenuItem asChild>
-              <Link href="/editor">
-                <Edit className="mr-2 h-4 w-4" />
-                <span>Editor Panel</span>
-              </Link>
-            </DropdownMenuItem>
-          )}
-          
+          {rolePanels.map((panel) => {
+            const IconComponent = panel.icon;
+            return session.user.roles.includes(panel.role) ? (
+              <DropdownMenuItem key={panel.role} asChild>
+                <Link href={panel.href}>
+                  <IconComponent className="mr-2 h-4 w-4" />
+                  <span>{panel.label}</span>
+                </Link>
+              </DropdownMenuItem>
+            ) : null;
+          })}
+
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut} className="logout-item">
             <LogOut className="mr-2 h-4 w-4" />
