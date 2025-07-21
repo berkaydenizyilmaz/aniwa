@@ -60,7 +60,7 @@ function Toast(props: ToastProps) {
       
       {/* Close Button */}
       <button
-        className="ml-4 shrink-0 rounded p-1 hover:bg-black/10 transition-colors"
+        className="ml-4 shrink-0 rounded p-1 hover:bg-black/10 transition-colors cursor-pointer"
         onClick={() => sonnerToast.dismiss(id)}
       >
         <X size={16} />

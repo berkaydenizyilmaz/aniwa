@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ROUTES } from '@/lib/constants/routes.constants';
 import { toastSuccess, toastError, toastWarning, toastInfo } from '@/components/ui/toast';
@@ -91,7 +92,10 @@ export function Header() {
             <ThemeToggle />
             
             {status === 'loading' ? (
-              <div className="text-sm text-secondary-foreground/80">Yükleniyor...</div>
+              <div className="flex items-center space-x-4">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-8 w-16" />
+              </div>
             ) : session ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm font-medium text-secondary-foreground/90">
