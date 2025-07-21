@@ -72,7 +72,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium text-gray-700 font-geist-sans">
+              <FormLabel>
                 Yeni Şifre
               </FormLabel>
               <FormControl>
@@ -80,11 +80,10 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                   type="password"
                   placeholder="Yeni şifrenizi girin"
                   disabled={isLoading}
-                  className="h-11 bg-white/60 border-gray-300/50 focus:border-purple-500/70 focus:ring-purple-500/20 transition-all duration-200 font-geist-sans"
                   {...field}
                 />
               </FormControl>
-              <FormMessage className="text-xs font-geist-sans" />
+              <FormMessage className="text-red-400 text-xs md:text-sm font-medium" />
             </FormItem>
           )}
         />
@@ -94,7 +93,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium text-gray-700 font-geist-sans">
+              <FormLabel>
                 Şifre Tekrar
               </FormLabel>
               <FormControl>
@@ -102,18 +101,17 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                   type="password"
                   placeholder="Şifrenizi tekrar girin"
                   disabled={isLoading}
-                  className="h-11 bg-white/60 border-gray-300/50 focus:border-purple-500/70 focus:ring-purple-500/20 transition-all duration-200 font-geist-sans"
                   {...field}
                 />
               </FormControl>
-              <FormMessage className="text-xs font-geist-sans" />
+              <FormMessage className="text-red-400 text-xs md:text-sm font-medium" />
             </FormItem>
           )}
         />
 
         <Button
           type="submit"
-          className="w-full h-11 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-geist-sans"
+          className="w-full"
           disabled={isLoading}
         >
           {isLoading ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
