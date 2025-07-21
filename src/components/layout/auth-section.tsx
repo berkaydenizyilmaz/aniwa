@@ -28,52 +28,24 @@ export function AuthSection() {
     return username.slice(0, 2).toUpperCase();
   };
 
-  return (
-    <div className="flex items-center space-x-4">
-      <ThemeToggle />
-      
-      {status === 'loading' ? (
+  // Loading durumu
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center space-x-4">
+        <ThemeToggle />
         <div className="flex items-center space-x-4">
           <Skeleton className="h-4 w-20" />
           <Skeleton className="h-8 w-8 rounded-full" />
         </div>
-      ) : session ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
-              <AvatarImage src={session.user.image || undefined} alt={session.user.username} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                {getAvatarFallback(session.user.username)}
-              </AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" className="w-64">
-            <DropdownMenuItem asChild>
-              <Link href="/profile">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profil</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/notifications">
-                <Bell className="mr-2 h-4 w-4" />
-                <span>Bildirimler</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/settings">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Ayarlar</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="logout-item">
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Çıkış Yap</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ) : (
+      </div>
+    );
+  }
+
+  // Giriş yapmamış kullanıcı
+  if (!session) {
+    return (
+      <div className="flex items-center space-x-4">
+        <ThemeToggle />
         <div className="flex items-center space-x-2">
           <Button 
             variant="ghost" 
@@ -89,7 +61,49 @@ export function AuthSection() {
             <Link href={ROUTES.PAGES.AUTH.REGISTER}>Kayıt Ol</Link>
           </Button>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  // Giriş yapmış kullanıcı
+  return (
+    <div className="flex items-center space-x-4">
+      <ThemeToggle />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Avatar className="h-8 w-8 cursor-pointer">
+            <AvatarImage src={session.user.image || undefined} alt={session.user.username} />
+            <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+              {getAvatarFallback(session.user.username)}
+            </AvatarFallback>
+          </Avatar>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="center" className="w-64">
+          <DropdownMenuItem asChild>
+            <Link href="/profile">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profil</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/notifications">
+              <Bell className="mr-2 h-4 w-4" />
+              <span>Bildirimler</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/settings">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Ayarlar</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleSignOut} className="logout-item">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Çıkış Yap</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 } 
