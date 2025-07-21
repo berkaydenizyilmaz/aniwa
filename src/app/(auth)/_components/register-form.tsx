@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { toastError, toastSuccess } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -33,15 +33,15 @@ export function RegisterForm() {
           setFormFieldErrors<RegisterInput>(result.fieldErrors, form.setError);
         } else {
           // Genel hata mesajı
-          toast.error(result.error);
+          toastError('Kayıt Hatası', result.error);
         }
       } else {
-        toast.success('Hesabınız başarıyla oluşturuldu! Giriş yapabilirsiniz.');
+        toastSuccess('Kayıt Başarılı', 'Hesabınız başarıyla oluşturuldu! Giriş yapabilirsiniz.');
         // Başarılı kayıt sonrası giriş sayfasına yönlendir
         router.push(ROUTES.PAGES.AUTH.LOGIN);
       }
     } catch {
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
+      toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }

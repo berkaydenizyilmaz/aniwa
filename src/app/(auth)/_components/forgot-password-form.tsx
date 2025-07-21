@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
+import { toastError, toastSuccess } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -24,13 +24,13 @@ export function ForgotPasswordForm() {
       const result = await forgotPassword(data);
 
       if (!result.success) {
-        toast.error(result.error);
+        toastError('Hata', result.error);
       } else {
-        toast.success('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi!');
+        toastSuccess('Başarılı', 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi!');
         form.reset();
       }
     } catch {
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
+      toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }

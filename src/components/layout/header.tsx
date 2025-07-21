@@ -5,6 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ROUTES } from '@/lib/constants/routes.constants';
+import { toastSuccess, toastError, toastWarning, toastInfo } from '@/components/ui/toast';
 
 export function Header() {
   const { data: session, status } = useSession();
@@ -47,6 +48,42 @@ export function Header() {
             >
               Listeler
             </Link>
+            
+            {/* Toast Test Buttons */}
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => toastSuccess('Başarılı!', 'Bu bir başarı mesajıdır')}
+                className="text-xs"
+              >
+                Success
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => toastError('Hata!', 'Bu bir hata mesajıdır')}
+                className="text-xs"
+              >
+                Error
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => toastWarning('Uyarı!', 'Bu bir uyarı mesajıdır')}
+                className="text-xs"
+              >
+                Warning
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => toastInfo('Bilgi', 'Bu bir bilgi mesajıdır')}
+                className="text-xs"
+              >
+                Info
+              </Button>
+            </div>
           </nav>
 
           {/* Auth & Theme */}

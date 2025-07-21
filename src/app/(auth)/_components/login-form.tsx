@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { toastError, toastSuccess } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -31,14 +31,14 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        toast.error('Kullanıcı adı veya şifre yanlış');
+        toastError('Giriş Başarısız', 'Kullanıcı adı veya şifre yanlış');
       } else {
-        toast.success('Başarıyla giriş yaptınız!');
+        toastSuccess('Giriş Başarılı', 'Başarıyla giriş yaptınız!');
         router.push(ROUTES.PAGES.HOME);
         router.refresh();
       }
     } catch {
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
+      toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }

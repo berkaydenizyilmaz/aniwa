@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { toastError, toastSuccess } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -35,13 +35,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       const result = await resetPassword(data);
 
       if (!result.success) {
-        toast.error(result.error);
+        toastError('Hata', result.error);
       } else {
-        toast.success('Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.');
+        toastSuccess('Başarılı', 'Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.');
         router.push(ROUTES.PAGES.AUTH.LOGIN);
       }
     } catch {
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
+      toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
