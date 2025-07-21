@@ -60,8 +60,6 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-
-
   // Username'den avatar fallback oluştur
   const getAvatarFallback = (username: string) => {
     return username.slice(0, 2).toUpperCase();
@@ -72,14 +70,68 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
     signOut({ callbackUrl: ROUTES.PAGES.HOME });
   };
 
+  // Dropdown içeriği - tekrar kullanılabilir
+  const renderDropdownContent = () => {
+    if (!session) return null;
+    
+    return (
+      <>
+        <DropdownMenuItem asChild className="text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200">
+          <Link href="/profile">
+            <User className="mr-2 h-4 w-4 text-current" />
+            <span>Profil</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className="text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200">
+          <Link href="/notifications">
+            <Bell className="mr-2 h-4 w-4 text-current" />
+            <span>Bildirimler</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className="text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200">
+          <Link href="/settings">
+            <Settings className="mr-2 h-4 w-4 text-current" />
+            <span>Ayarlar</span>
+          </Link>
+        </DropdownMenuItem>
+
+        {/* Role-based links */}
+        {rolePanels.map((panel) => {
+          const IconComponent = panel.icon;
+          return session.user.roles.includes(panel.role) ? (
+            <DropdownMenuItem key={panel.role} asChild className="text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200">
+              <Link href={panel.href}>
+                <IconComponent className="mr-2 h-4 w-4 text-current" />
+                <span>{panel.label}</span>
+              </Link>
+            </DropdownMenuItem>
+          ) : null;
+        })}
+
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleSignOut} className="text-secondary-foreground hover:text-destructive hover:bg-destructive/10 transition-colors duration-200 group">
+          <LogOut className="mr-2 h-4 w-4 text-current group-hover:text-destructive transition-colors duration-200" />
+          <span className="group-hover:text-destructive transition-colors duration-200">Çıkış Yap</span>
+        </DropdownMenuItem>
+      </>
+    );
+  };
+
   // Loading durumu
   if (status === 'loading') {
     if (variant === 'mobile') {
       return (
-        <div className="flex-1 h-12 bg-muted animate-pulse rounded" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="flex-1 h-12"
+          disabled
+        >
+          <div className="h-6 w-6 bg-muted animate-pulse rounded-full" />
+        </Button>
       );
     }
-
+    
     return (
       <div className="flex items-center space-x-4">
         <ThemeToggle />
@@ -108,13 +160,13 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
           <DropdownMenuContent align="center" side="top" className="w-48 mb-2 bg-secondary border-secondary">
             <DropdownMenuItem asChild className="text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200">
               <Link href={ROUTES.PAGES.AUTH.LOGIN}>
-                <LogIn className="mr-2 h-4 w-4" />
+                <LogIn className="mr-2 h-4 w-4 text-current" />
                 <span>Giriş</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors duration-200 mt-1">
               <Link href={ROUTES.PAGES.AUTH.REGISTER}>
-                <UserPlus className="mr-2 h-4 w-4" />
+                <UserPlus className="mr-2 h-4 w-4 text-current" />
                 <span>Kayıt Ol</span>
               </Link>
             </DropdownMenuItem>
@@ -164,43 +216,7 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="center" side="top" className="w-48 mb-2 bg-secondary border-secondary">
-          <DropdownMenuItem asChild className="text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200">
-            <Link href="/profile">
-              <User className="mr-2 h-4 w-4" />
-              <span>Profil</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/notifications">
-              <Bell className="mr-2 h-4 w-4" />
-              <span>Bildirimler</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/settings">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Ayarlar</span>
-            </Link>
-          </DropdownMenuItem>
-
-          {/* Role-based links */}
-          {rolePanels.map((panel) => {
-            const IconComponent = panel.icon;
-            return session.user.roles.includes(panel.role) ? (
-              <DropdownMenuItem key={panel.role} asChild>
-                <Link href={panel.href}>
-                  <IconComponent className="mr-2 h-4 w-4" />
-                  <span>{panel.label}</span>
-                </Link>
-              </DropdownMenuItem>
-            ) : null;
-          })}
-
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleSignOut} className="logout-item">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Çıkış Yap</span>
-          </DropdownMenuItem>
+          {renderDropdownContent()}
         </DropdownMenuContent>
       </DropdownMenu>
     );
@@ -218,44 +234,8 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="center" className="w-64">
-          <DropdownMenuItem asChild>
-            <Link href="/profile">
-              <User className="mr-2 h-4 w-4" />
-              <span>Profil</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/notifications">
-              <Bell className="mr-2 h-4 w-4" />
-              <span>Bildirimler</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/settings">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Ayarlar</span>
-            </Link>
-          </DropdownMenuItem>
-
-          {/* Role-based links */}
-          {rolePanels.map((panel) => {
-            const IconComponent = panel.icon;
-            return session.user.roles.includes(panel.role) ? (
-              <DropdownMenuItem key={panel.role} asChild>
-                <Link href={panel.href}>
-                  <IconComponent className="mr-2 h-4 w-4" />
-                  <span>{panel.label}</span>
-                </Link>
-              </DropdownMenuItem>
-            ) : null;
-          })}
-
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleSignOut} className="logout-item">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Çıkış Yap</span>
-          </DropdownMenuItem>
+        <DropdownMenuContent align="center" side="bottom" className="w-64 bg-secondary border-secondary mt-4">
+          {renderDropdownContent()}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

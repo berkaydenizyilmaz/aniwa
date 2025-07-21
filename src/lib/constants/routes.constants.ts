@@ -29,6 +29,9 @@ export const ROUTES = {
       FAVOURITES: '/api/user/favourites',
       CUSTOM_LISTS: '/api/user/custom-lists',
       ANIME_LIST: '/api/user/anime-list',
+      ANIME_TRACKING: '/api/user/anime-tracking',
+      COMMENTS: '/api/user/comments',
+      FOLLOWS: '/api/user/follows',
     },
     
     // Admin API'leri
@@ -38,8 +41,16 @@ export const ROUTES = {
       STUDIOS: '/api/admin/studios',
       ANIME: '/api/admin/anime',
       STREAMING_PLATFORMS: '/api/admin/streaming-platforms',
+      USERS: '/api/admin/users',
+      STREAMING_LINKS: '/api/admin/streaming-links',
+    },
+
+    // Editor API'leri
+    EDITOR: {
+      STREAMING_LINKS: '/api/editor/streaming-links',
     },
   },
+  
   
   // Middleware için route grupları
   MIDDLEWARE: {
