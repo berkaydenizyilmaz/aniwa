@@ -12,7 +12,7 @@ export function Header() {
       <MobileBottomNav />
       
       {/* Desktop Header */}
-      <header className="hidden md:block border-b border-border/30 shadow-sm bg-secondary">
+      <header className="hidden sm:block border-b border-border/30 shadow-sm bg-secondary">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}

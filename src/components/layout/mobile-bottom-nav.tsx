@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -16,6 +17,21 @@ import { Home, Film, List, User, Bell, Settings, LogOut } from 'lucide-react';
 
 export function MobileBottomNav() {
   const { data: session, status } = useSession();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Desktop'ta dropdown'ı kapat
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 640px)'); // sm breakpoint
+    
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        setIsOpen(false);
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
   // Username'den avatar fallback oluştur
   const getAvatarFallback = (username: string) => {
@@ -25,7 +41,7 @@ export function MobileBottomNav() {
   // Loading durumu
   if (status === 'loading') {
     return (
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
         <div className="flex items-center justify-around px-2 py-2">
           <div className="flex-1 h-12 bg-muted animate-pulse rounded" />
           <div className="flex-1 h-12 bg-muted animate-pulse rounded" />
@@ -39,7 +55,7 @@ export function MobileBottomNav() {
   // Giriş yapmamış kullanıcı
   if (!session) {
     return (
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
         <div className="flex items-center justify-around px-2 py-2">
           {/* Ana Sayfa */}
           <Button 
@@ -95,7 +111,7 @@ export function MobileBottomNav() {
 
   // Giriş yapmış kullanıcı
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
+    <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
       <div className="flex items-center justify-around px-2 py-2">
         {/* Ana Sayfa */}
         <Button 
@@ -134,7 +150,7 @@ export function MobileBottomNav() {
         </Button>
 
         {/* Profil Dropdown */}
-        <DropdownMenu>
+        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <Button 
               variant="ghost" 
@@ -149,7 +165,7 @@ export function MobileBottomNav() {
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" side="top" className="w-64 mb-2 hidden md:hidden">
+          <DropdownMenuContent align="center" side="top" className="w-64 mb-2">
             <DropdownMenuItem asChild>
               <Link href="/profile">
                 <User className="mr-2 h-4 w-4" />
