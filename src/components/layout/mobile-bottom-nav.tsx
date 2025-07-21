@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -17,24 +16,11 @@ import { Home, Film, List, User, Bell, Settings, LogOut } from 'lucide-react';
 
 export function MobileBottomNav() {
   const { data: session } = useSession();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Username'den avatar fallback oluştur
   const getAvatarFallback = (username: string) => {
     return username.slice(0, 2).toUpperCase();
   };
-
-  // Ekran boyutu değiştiğinde dropdown'ı kapat
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) { // md breakpoint
-        setIsDropdownOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
@@ -77,7 +63,7 @@ export function MobileBottomNav() {
 
         {/* Profil/Auth */}
         {session ? (
-          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="ghost" 
@@ -92,31 +78,31 @@ export function MobileBottomNav() {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-                         <DropdownMenuContent align="center" side="top" className="w-64 mb-2">
-               <DropdownMenuItem asChild>
-                 <Link href="/profile">
-                   <User className="mr-2 h-4 w-4" />
-                   <span>Profil</span>
-                 </Link>
-               </DropdownMenuItem>
-               <DropdownMenuItem asChild>
-                 <Link href="/notifications">
-                   <Bell className="mr-2 h-4 w-4" />
-                   <span>Bildirimler</span>
-                 </Link>
-               </DropdownMenuItem>
-               <DropdownMenuItem asChild>
-                 <Link href="/settings">
-                   <Settings className="mr-2 h-4 w-4" />
-                   <span>Ayarlar</span>
-                 </Link>
-               </DropdownMenuItem>
-               <DropdownMenuSeparator />
-               <DropdownMenuItem className="logout-item">
-                 <LogOut className="mr-2 h-4 w-4" />
-                 <span>Çıkış Yap</span>
-               </DropdownMenuItem>
-             </DropdownMenuContent>
+            <DropdownMenuContent align="center" side="top" className="w-64 mb-2 hidden md:hidden">
+              <DropdownMenuItem asChild>
+                <Link href="/profile">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profil</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/notifications">
+                  <Bell className="mr-2 h-4 w-4" />
+                  <span>Bildirimler</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/settings">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Ayarlar</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => signOut({ callbackUrl: ROUTES.PAGES.HOME })} className="logout-item">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Çıkış Yap</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
           </DropdownMenu>
         ) : (
           <Button 

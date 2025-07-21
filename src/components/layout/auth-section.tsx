@@ -1,10 +1,8 @@
     'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -13,34 +11,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ROUTES } from '@/lib/constants/routes.constants';
-import { User, LogOut, Settings, Bell } from 'lucide-react';
+import { User, Bell, Settings, LogOut } from 'lucide-react';
 
 export function AuthSection() {
   const { data: session, status } = useSession();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  const handleSignOut = () => {
-    signOut({ callbackUrl: ROUTES.PAGES.HOME });
-  };
 
   // Username'den avatar fallback oluştur
   const getAvatarFallback = (username: string) => {
     return username.slice(0, 2).toUpperCase();
   };
 
-  // Ekran boyutu değiştiğinde dropdown'ı kapat
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) { // md breakpoint altına geçerse
-        setIsDropdownOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // Çıkış yapma işlemi
+  const handleSignOut = () => {
+    signOut({ callbackUrl: ROUTES.PAGES.HOME });
+  };
 
   // Loading durumu
   if (status === 'loading') {
@@ -83,8 +70,8 @@ export function AuthSection() {
   return (
     <div className="flex items-center space-x-4">
       <ThemeToggle />
-              <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-          <DropdownMenuTrigger asChild>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Avatar className="h-8 w-8 cursor-pointer">
             <AvatarImage src={session.user.image || undefined} alt={session.user.username} />
             <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
@@ -92,7 +79,7 @@ export function AuthSection() {
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="center" className="w-64">
+        <DropdownMenuContent align="center" className="w-64 md:block hidden">
           <DropdownMenuItem asChild>
             <Link href="/profile">
               <User className="mr-2 h-4 w-4" />
