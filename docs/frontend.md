@@ -91,3 +91,47 @@ Next.js App Router'ın ana gücü olan bu ayrımı bilinçli kullanıyoruz:
     Kod Bölümleme (Code Splitting): Next.js App Router ve dinamik importlar sayesinde otomatik kod bölümleme avantajlarından yararlanılır.
 
     Erişilebilirlik (Accessibility - A11y): Semantik HTML etiketleri kullanılır, klavye navigasyonu ve ekran okuyucuları için uygun aria- nitelikleri eklenir. shadcn/ui'nin komponentleri, bu konuda iyi bir başlangıç noktası ve A11y standartlarına uygun yapıdadır.
+
+7. Okunabilir Kod Yazma Kuralları
+
+    Çoklu Return Pattern: Koşullu render işlemlerinde, karmaşık ternary operatörler yerine çoklu return ifadeleri kullanılır. Bu yaklaşım kodun okunabilirliğini artırır ve bakımını kolaylaştırır.
+
+        Örnek Kullanım:
+        ```tsx
+        // ❌ Karmaşık ternary operatör
+        return (
+          <div>
+            {status === 'loading' ? (
+              <LoadingSpinner />
+            ) : session ? (
+              <UserProfile user={session.user} />
+            ) : (
+              <LoginForm />
+            )}
+          </div>
+        );
+
+        // ✅ Çoklu return pattern
+        if (status === 'loading') {
+          return <LoadingSpinner />;
+        }
+
+        if (!session) {
+          return <LoginForm />;
+        }
+
+        return <UserProfile user={session.user} />;
+        ```
+
+        Avantajları:
+        - Daha net durum yönetimi
+        - Daha kolay debug etme
+        - Daha iyi performans (gereksiz re-render'ları önler)
+        - Daha temiz kod yapısı
+        - Daha kolay test edilebilirlik
+
+    Erken Return (Early Return): Fonksiyonların başında edge case'leri kontrol edip erken return yapılır. Bu, nested if bloklarını azaltır ve kod akışını basitleştirir.
+
+    Açıklayıcı Yorumlar: Her durum için kısa ve açıklayıcı yorumlar eklenir (örn. "Loading durumu", "Giriş yapmamış kullanıcı", "Giriş yapmış kullanıcı").
+
+    Tutarlılık: Aynı pattern'i proje genelinde tutarlı bir şekilde uygulanır.
