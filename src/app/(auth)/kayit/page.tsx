@@ -1,7 +1,6 @@
 import { RegisterForm } from '../_components/register-form';
 import { AuthCard } from '../_components/auth-card';
 import { ROUTES } from '@/lib/constants/routes.constants';
-import Image from 'next/image';
 
 export default function RegisterPage() {
   const links = [
