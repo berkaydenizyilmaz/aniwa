@@ -46,12 +46,12 @@ export function LoginForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 md:space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="username"
           render={({ field }) => (
-            <FormItem className="space-y-2 md:space-y-3">
+            <FormItem className="space-y-1.5">
               <FormControl>
                 <div className="relative group">
                   <Input
@@ -70,7 +70,7 @@ export function LoginForm() {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem className="space-y-2 md:space-y-3">
+            <FormItem className="space-y-1.5">
               <FormControl>
                 <div className="relative group">
                   <Input
@@ -88,7 +88,7 @@ export function LoginForm() {
 
         <Button
           type="submit"
-          className="w-full"
+          className="w-full mt-6"
           disabled={isLoading}
         >
           {isLoading ? (
