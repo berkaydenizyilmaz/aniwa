@@ -130,16 +130,9 @@ export function RegisterForm() {
         <Button
           type="submit"
           className="w-full mt-6"
-          disabled={isLoading}
+          loading={isLoading}
         >
-          {isLoading ? (
-            <div className="flex items-center justify-center space-x-2">
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span>Kayıt yapılıyor...</span>
-            </div>
-          ) : (
-            'Kayıt Ol'
-          )}
+          Kayıt Ol
         </Button>
       </form>
     </Form>
