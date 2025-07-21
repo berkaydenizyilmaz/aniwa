@@ -18,7 +18,7 @@ export function AuthCard({ title, description, children, links }: AuthCardProps)
   return (
     <>
       {/* Mobile: Kart yok, form direkt ekranı kullanır */}
-      <div className="sm:hidden w-full min-h-screen flex flex-col justify-start pt-12 pb-20 p-4">
+      <div className="sm:hidden w-full min-h-screen flex flex-col justify-start pt-14 pb-20 p-4">
         {/* Header */}
         <div className="text-center space-y-2 mb-6">
           <h1 className="text-2xl text-foreground tracking-tight font-bold">{title}</h1>
