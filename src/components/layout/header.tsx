@@ -34,13 +34,13 @@ export function Header() {
                 Ana Sayfa
               </Link>
               <Link 
-                href="/anime" 
+                href={ROUTES.PAGES.ANIME} 
                 className="text-sm font-semibold text-secondary-foreground hover:text-secondary-foreground/80 hover:bg-secondary-foreground/10 px-3 py-2 rounded transition-all duration-200"
               >
                 Anime
               </Link>
               <Link 
-                href="/lists" 
+                href={ROUTES.PAGES.LISTS} 
                 className="text-sm font-semibold text-secondary-foreground hover:text-secondary-foreground/80 hover:bg-secondary-foreground/10 px-3 py-2 rounded transition-all duration-200"
               >
                 Listeler

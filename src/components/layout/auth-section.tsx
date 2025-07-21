@@ -30,19 +30,19 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
   const rolePanels = [
     {
       role: USER.ROLES.ADMIN,
-      href: '/admin',
+      href: ROUTES.PAGES.ADMIN.DASHBOARD,
       icon: Shield,
       label: 'Admin Panel'
     },
     {
       role: USER.ROLES.MODERATOR,
-      href: '/moderator',
+      href: ROUTES.PAGES.MODERATOR.DASHBOARD,
       icon: Users,
       label: 'Moderator Panel'
     },
     {
       role: USER.ROLES.EDITOR,
-      href: '/editor',
+      href: ROUTES.PAGES.EDITOR.DASHBOARD,
       icon: Edit,
       label: 'Editor Panel'
     }
@@ -77,19 +77,19 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
     return (
       <>
         <DropdownMenuItem asChild className="text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200">
-          <Link href="/profile">
+          <Link href={ROUTES.PAGES.PROFILE}>
             <User className="mr-2 h-4 w-4 text-current" />
             <span>Profil</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className="text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200">
-          <Link href="/notifications">
+          <Link href={ROUTES.PAGES.NOTIFICATIONS}>
             <Bell className="mr-2 h-4 w-4 text-current" />
             <span>Bildirimler</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className="text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200">
-          <Link href="/settings">
+          <Link href={ROUTES.PAGES.SETTINGS}>
             <Settings className="mr-2 h-4 w-4 text-current" />
             <span>Ayarlar</span>
           </Link>

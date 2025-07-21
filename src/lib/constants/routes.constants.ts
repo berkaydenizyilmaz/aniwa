@@ -4,12 +4,34 @@ export const ROUTES = {
   PAGES: {
     HOME: '/',
     
+    // Ana sayfalar
+    ANIME: '/anime',
+    LISTS: '/listeler',
+    PROFILE: '/profil',
+    NOTIFICATIONS: '/bildirimler',
+    SETTINGS: '/ayarlar',
+    
     // Auth sayfaları
     AUTH: {
       LOGIN: '/giris',
       REGISTER: '/kayit',
       FORGOT_PASSWORD: '/sifremi-unuttum',
       RESET_PASSWORD: '/sifremi-sifirla',
+    },
+    
+    // Admin sayfaları
+    ADMIN: {
+      DASHBOARD: '/admin',
+    },
+    
+    // Moderator sayfaları
+    MODERATOR: {
+      DASHBOARD: '/moderator',
+    },
+    
+    // Editor sayfaları
+    EDITOR: {
+      DASHBOARD: '/editor',
     },
   },
   

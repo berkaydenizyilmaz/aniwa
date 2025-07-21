@@ -30,7 +30,7 @@ export function MobileBottomNav() {
         asChild
         className="flex-1 h-12"
       >
-        <Link href="/anime">
+        <Link href={ROUTES.PAGES.ANIME}>
           <Film className="h-6 w-6 text-secondary-foreground" />
         </Link>
       </Button>
@@ -42,7 +42,7 @@ export function MobileBottomNav() {
         asChild
         className="flex-1 h-12"
       >
-        <Link href="/lists">
+        <Link href={ROUTES.PAGES.LISTS}>
           <List className="h-6 w-6 text-secondary-foreground" />
         </Link>
       </Button>
