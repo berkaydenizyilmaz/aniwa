@@ -52,13 +52,13 @@ export function LoginForm() {
           name="username"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel className="text-gray-500 text-sm font-semibold tracking-wide font-geist-sans">Kullanıcı Adı</FormLabel>
+              <FormLabel className="text-muted-foreground text-sm font-semibold tracking-wide">Kullanıcı Adı</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     placeholder="Kullanıcı adınızı girin"
                     disabled={isLoading}
-                    className="bg-white border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-[#5bc0ff] focus:ring-[#5bc0ff]/10 transition-all duration-200 h-11 text-base"
+                    className="bg-card border-border text-card-foreground placeholder:text-muted-foreground focus:bg-card focus:border-ring focus:ring-ring/10 transition-all duration-200 h-11 text-base"
                     {...field}
                   />
                 </div>
@@ -73,14 +73,14 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel className="text-gray-500 text-sm font-semibold tracking-wide font-geist-sans">Şifre</FormLabel>
+              <FormLabel className="text-muted-foreground text-sm font-semibold tracking-wide">Şifre</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     type="password"
                     placeholder="Şifrenizi girin"
                     disabled={isLoading}
-                    className="bg-white border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-[#5bc0ff] focus:ring-[#5bc0ff]/10 transition-all duration-200 h-11 text-base"
+                    className="bg-card border-border text-card-foreground placeholder:text-muted-foreground focus:bg-card focus:border-ring focus:ring-ring/10 transition-all duration-200 h-11 text-base"
                     {...field}
                   />
                 </div>
@@ -92,7 +92,7 @@ export function LoginForm() {
 
         <Button
           type="submit"
-          className="w-full bg-[#5bc0ff] hover:bg-[#5bc0ff]/90 text-white font-bold py-3 md:py-4 text-base md:text-lg shadow-sm hover:shadow-md transition-all duration-300 font-geist-sans cursor-pointer"
+          className="w-full bg-primary text-primary-foreground font-bold py-3 md:py-4 text-base md:text-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
           disabled={isLoading}
         >
           {isLoading ? (
