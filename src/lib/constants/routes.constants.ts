@@ -21,7 +21,7 @@ export const ROUTES = {
     
     // Admin sayfaları
     ADMIN: {
-      DASHBOARD: '/admin',
+      DASHBOARD: '/yonetim',
     },
     
     // Moderator sayfaları

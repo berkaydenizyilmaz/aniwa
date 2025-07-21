@@ -19,7 +19,7 @@ import { USER } from '@/lib/constants/user.constants';
 import { User, Bell, Settings, LogOut, Shield, Users, Edit, LogIn, UserPlus } from 'lucide-react';
 
 interface AuthSectionProps {
-  variant?: 'header' | 'mobile';
+  variant?: 'header' | 'mobile' | 'sidebar';
 }
 
 export function AuthSection({ variant = 'header' }: AuthSectionProps) {
@@ -132,6 +132,15 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
       );
     }
     
+    if (variant === 'sidebar') {
+      return (
+        <div className="flex items-center space-x-3">
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-4 w-20" />
+        </div>
+      );
+    }
+    
     return (
       <div className="flex items-center space-x-4">
         <ThemeToggle />
@@ -172,6 +181,22 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+      );
+    }
+
+    if (variant === 'sidebar') {
+      return (
+        <div className="flex items-center space-x-3">
+          <User className="h-6 w-6 text-secondary-foreground" />
+          <div className="flex flex-col">
+            <Link href={ROUTES.PAGES.AUTH.LOGIN} className="text-sm font-semibold text-secondary-foreground hover:text-secondary-foreground/80 transition-all duration-200">
+              Giriş
+            </Link>
+            <Link href={ROUTES.PAGES.AUTH.REGISTER} className="text-xs text-secondary-foreground/60 hover:text-secondary-foreground/80 transition-all duration-200">
+              Kayıt Ol
+            </Link>
+          </div>
+        </div>
       );
     }
 
@@ -216,6 +241,27 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="center" side="top" className="w-48 mb-2 bg-secondary border-secondary">
+          {renderDropdownContent()}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  if (variant === 'sidebar') {
+    return (
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+        <DropdownMenuTrigger asChild>
+          <div className="flex items-center space-x-2 cursor-pointer hover:bg-secondary-foreground/10 p-1 rounded transition-all duration-200">
+            <Avatar className="h-6 w-6">
+              <AvatarImage src={session.user.image || undefined} alt={session.user.username} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+                {getAvatarFallback(session.user.username)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-sm font-semibold text-secondary-foreground">{session.user.username}</span>
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" side="top" className="w-64 bg-secondary border-secondary mb-2">
           {renderDropdownContent()}
         </DropdownMenuContent>
       </DropdownMenu>
