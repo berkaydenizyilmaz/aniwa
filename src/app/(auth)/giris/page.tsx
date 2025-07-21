@@ -17,7 +17,7 @@ export default function LoginPage() {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-120px)] flex items-center justify-center p-4 md:p-6 lg:p-8">
+    <div className="min-h-[calc(100vh-120px)] flex items-center justify-center p-4 md:p-6 lg:p-8 sm:p-4">
       <AuthCard 
         title="Giriş Yap"
         description="Hesabınıza giriş yapın"
