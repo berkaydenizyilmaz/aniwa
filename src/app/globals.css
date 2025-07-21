@@ -120,21 +120,5 @@
     @apply bg-background text-foreground font-semibold;
   }
   
-  /* Placeholder font weight */
-  input::placeholder {
-    @apply font-medium;
-  }
-  
-  /* Shadcn component overrides */
-  .btn {
-    @apply font-bold shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer;
-  }
-  
-  .input {
-    @apply placeholder:text-muted-foreground;
-  }
-  
-  .form-label {
-    @apply text-muted-foreground font-semibold tracking-wide;
-  }
+  /* Global styles only */
 }

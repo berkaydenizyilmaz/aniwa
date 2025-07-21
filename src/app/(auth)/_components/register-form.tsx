@@ -55,14 +55,13 @@ export function RegisterForm() {
           name="email"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel className="text-gray-500 text-sm font-semibold tracking-wide font-geist-sans">E-posta</FormLabel>
+              <FormLabel>E-posta</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     type="email"
                     placeholder="E-posta adresinizi girin"
                     disabled={isLoading}
-                    className="bg-white border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-[#5bc0ff] focus:ring-[#5bc0ff]/10 transition-all duration-200 h-11 text-base"
                     {...field}
                   />
                 </div>
@@ -77,13 +76,12 @@ export function RegisterForm() {
           name="username"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel className="text-gray-500 text-sm font-semibold tracking-wide font-geist-sans">Kullanıcı Adı</FormLabel>
+              <FormLabel>Kullanıcı Adı</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     placeholder="Kullanıcı adınızı girin"
                     disabled={isLoading}
-                    className="bg-white border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-[#5bc0ff] focus:ring-[#5bc0ff]/10 transition-all duration-200 h-11 text-base"
                     {...field}
                   />
                 </div>
@@ -98,14 +96,13 @@ export function RegisterForm() {
           name="password"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel className="text-gray-500 text-sm font-semibold tracking-wide font-geist-sans">Şifre</FormLabel>
+              <FormLabel>Şifre</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     type="password"
                     placeholder="Şifrenizi girin"
                     disabled={isLoading}
-                    className="bg-white border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-[#5bc0ff] focus:ring-[#5bc0ff]/10 transition-all duration-200 h-11 text-base"
                     {...field}
                   />
                 </div>
@@ -117,7 +114,7 @@ export function RegisterForm() {
 
         <Button
           type="submit"
-          className="w-full bg-[#5bc0ff] hover:bg-[#5bc0ff]/90 text-white font-bold py-3 md:py-4 text-base md:text-lg shadow-sm hover:shadow-md transition-all duration-300 font-geist-sans cursor-pointer"
+          className="w-full"
           disabled={isLoading}
         >
           {isLoading ? (

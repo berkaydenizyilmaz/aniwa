@@ -14,14 +14,14 @@ export function Header() {
   };
 
   return (
-    <header className="border-b border-gray-200/30 shadow-sm" style={{ backgroundColor: '#2f325c' }}>
+    <header className="border-b border-gray-200/30 shadow-sm bg-secondary">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <Link 
               href={ROUTES.PAGES.HOME} 
-              className="text-2xl font-bold text-white hover:text-gray-200 transition-all duration-200 font-geist-sans"
+              className="text-2xl font-bold text-secondary-foreground hover:text-secondary-foreground/80 transition-all duration-200"
             >
               Aniwa
             </Link>
@@ -31,19 +31,19 @@ export function Header() {
           <nav className="hidden md:flex items-center space-x-6">
             <Link 
               href={ROUTES.PAGES.HOME} 
-              className="text-sm font-semibold text-gray-300 hover:text-gray-200 transition-colors duration-200 font-geist-sans"
+              className="text-sm font-semibold text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200"
             >
               Ana Sayfa
             </Link>
             <Link 
               href="/anime" 
-              className="text-sm font-semibold text-gray-300 hover:text-gray-200 transition-colors duration-200 font-geist-sans"
+              className="text-sm font-semibold text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200"
             >
               Anime
             </Link>
             <Link 
               href="/lists" 
-              className="text-sm font-semibold text-gray-300 hover:text-gray-200 transition-colors duration-200 font-geist-sans"
+              className="text-sm font-semibold text-secondary-foreground hover:text-secondary-foreground/80 transition-colors duration-200"
             >
               Listeler
             </Link>
@@ -54,17 +54,16 @@ export function Header() {
             <ThemeToggle />
             
             {status === 'loading' ? (
-              <div className="text-sm text-white/80 font-geist-sans">Yükleniyor...</div>
+              <div className="text-sm text-secondary-foreground/80">Yükleniyor...</div>
             ) : session ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-white/90 font-geist-sans">
+                <span className="text-sm font-medium text-secondary-foreground/90">
                   Merhaba, {session.user.username}
                 </span>
                 <Button 
-                  variant="outline" 
+                  variant="ghost" 
                   size="sm" 
                   onClick={handleSignOut}
-                  className="!border-[#5bc0ff] !text-[#5bc0ff] hover:!border-[#5bc0ff]/80 hover:!text-[#5bc0ff]/80 !bg-transparent hover:!bg-transparent transition-all duration-200 font-geist-sans"
                 >
                   Çıkış
                 </Button>
@@ -75,14 +74,12 @@ export function Header() {
                   variant="ghost" 
                   size="sm" 
                   asChild
-                  className="!text-gray-300 hover:!text-white hover:!bg-white/10 !bg-transparent transition-all duration-200 font-geist-sans"
                 >
                   <Link href={ROUTES.PAGES.AUTH.LOGIN}>Giriş</Link>
                 </Button>
                 <Button 
                   size="sm"
                   asChild
-                  className="!bg-[#5bc0ff] !text-white hover:!bg-[#5bc0ff]/90 !font-bold shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
                 >
                   <Link href={ROUTES.PAGES.AUTH.REGISTER}>Kayıt Ol</Link>
                 </Button>

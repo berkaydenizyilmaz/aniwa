@@ -52,13 +52,12 @@ export function LoginForm() {
           name="username"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel className="text-muted-foreground text-sm font-semibold tracking-wide">Kullanıcı Adı</FormLabel>
+              <FormLabel>Kullanıcı Adı</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     placeholder="Kullanıcı adınızı girin"
                     disabled={isLoading}
-                    className="bg-card border-border text-card-foreground placeholder:text-muted-foreground focus:bg-card focus:border-ring focus:ring-ring/10 transition-all duration-200 h-11 text-base"
                     {...field}
                   />
                 </div>
@@ -73,14 +72,13 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel className="text-muted-foreground text-sm font-semibold tracking-wide">Şifre</FormLabel>
+              <FormLabel>Şifre</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     type="password"
                     placeholder="Şifrenizi girin"
                     disabled={isLoading}
-                    className="bg-card border-border text-card-foreground placeholder:text-muted-foreground focus:bg-card focus:border-ring focus:ring-ring/10 transition-all duration-200 h-11 text-base"
                     {...field}
                   />
                 </div>
@@ -92,7 +90,7 @@ export function LoginForm() {
 
         <Button
           type="submit"
-          className="w-full bg-primary text-primary-foreground font-bold py-3 md:py-4 text-base md:text-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+          className="w-full"
           disabled={isLoading}
         >
           {isLoading ? (

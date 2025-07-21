@@ -44,7 +44,7 @@ export function ForgotPasswordForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-500 text-sm font-semibold tracking-wide font-geist-sans">
+              <FormLabel>
                 E-posta
               </FormLabel>
               <FormControl>
@@ -52,7 +52,6 @@ export function ForgotPasswordForm() {
                   type="email"
                   placeholder="ornek@email.com"
                   disabled={isLoading}
-                  className="bg-white border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-[#5bc0ff] focus:ring-[#5bc0ff]/10 transition-all duration-200 h-11 text-base"
                   {...field}
                 />
               </FormControl>
@@ -63,7 +62,7 @@ export function ForgotPasswordForm() {
 
         <Button
           type="submit"
-          className="w-full bg-[#5bc0ff] hover:bg-[#5bc0ff]/90 text-white font-bold py-3 md:py-4 text-base md:text-lg shadow-sm hover:shadow-md transition-all duration-300 font-geist-sans cursor-pointer"
+          className="w-full"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -72,7 +71,7 @@ export function ForgotPasswordForm() {
               <span>Gönderiliyor...</span>
             </div>
           ) : (
-            'Şifre Sıfırlama Bağlantısı Gönder'
+            'Gönder'
           )}
         </Button>
       </form>
