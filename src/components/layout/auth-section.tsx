@@ -15,7 +15,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ROUTES } from '@/lib/constants/routes.constants';
-import { User, Bell, Settings, LogOut } from 'lucide-react';
+import { User, Bell, Settings, LogOut, Shield, Users, Edit } from 'lucide-react';
 
 interface AuthSectionProps {
   variant?: 'header' | 'mobile';
@@ -159,6 +159,33 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
                 <span>Ayarlar</span>
               </Link>
             </DropdownMenuItem>
+            
+            {/* Role-based links */}
+            {session.user.roles.includes('ADMIN') && (
+              <DropdownMenuItem asChild>
+                <Link href="/admin">
+                  <Shield className="mr-2 h-4 w-4" />
+                  <span>Admin Panel</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
+            {session.user.roles.includes('MODERATOR') && (
+              <DropdownMenuItem asChild>
+                <Link href="/moderator">
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>Moderator Panel</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
+            {session.user.roles.includes('EDITOR') && (
+              <DropdownMenuItem asChild>
+                <Link href="/editor">
+                  <Edit className="mr-2 h-4 w-4" />
+                  <span>Editor Panel</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
+            
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut} className="logout-item">
               <LogOut className="mr-2 h-4 w-4" />
@@ -200,6 +227,33 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
               <span>Ayarlar</span>
             </Link>
           </DropdownMenuItem>
+          
+          {/* Role-based links */}
+          {session.user.roles.includes('ADMIN') && (
+            <DropdownMenuItem asChild>
+              <Link href="/admin">
+                <Shield className="mr-2 h-4 w-4" />
+                <span>Admin Panel</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+          {session.user.roles.includes('MODERATOR') && (
+            <DropdownMenuItem asChild>
+              <Link href="/moderator">
+                <Users className="mr-2 h-4 w-4" />
+                <span>Moderator Panel</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+          {session.user.roles.includes('EDITOR') && (
+            <DropdownMenuItem asChild>
+              <Link href="/editor">
+                <Edit className="mr-2 h-4 w-4" />
+                <span>Editor Panel</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+          
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut} className="logout-item">
             <LogOut className="mr-2 h-4 w-4" />
