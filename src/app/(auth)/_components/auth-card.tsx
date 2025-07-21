@@ -16,7 +16,7 @@ interface AuthCardProps {
 
 export function AuthCard({ title, description, children, links }: AuthCardProps) {
   return (
-    <div className="w-full max-w-md mx-auto min-w-[280px] md:min-w-[380px]">
+    <div className="w-full max-w-sm mx-auto min-w-[260px] md:min-w-[320px]">
       <div className="relative overflow-hidden rounded-lg bg-white border border-gray-100 shadow-sm">
         {/* Subtle gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#F8FAFC]/40 via-[#F1F5F9]/20 to-[#E2E8F0]/10" />

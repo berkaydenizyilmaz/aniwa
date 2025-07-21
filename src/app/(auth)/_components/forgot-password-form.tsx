@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toastError, toastSuccess } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '@/lib/schemas/auth.schema';
 import { forgotPassword } from '../_actions/auth.actions';
 
@@ -44,13 +44,10 @@ export function ForgotPasswordForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                E-posta
-              </FormLabel>
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="ornek@email.com"
+                  placeholder="E-posta"
                   disabled={isLoading}
                   {...field}
                 />

@@ -38,7 +38,7 @@ export default function RootLayout({
               <Header />
               <main className="relative overflow-hidden min-h-screen">
                 {/* Subtle anime-inspired background patterns */}
-                <div className="fixed inset-0 bg-[#edf2fb] pointer-events-none -z-10" />
+                <div className="fixed inset-0 bg-background pointer-events-none -z-10" />
                 
                 {/* Content */}
                 <div className="relative z-10">

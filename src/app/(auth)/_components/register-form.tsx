@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { toastError, toastSuccess } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { registerSchema, type RegisterInput } from '@/lib/schemas/auth.schema';
 import { ROUTES } from '@/lib/constants/routes.constants';
 import { registerUser } from '../_actions/auth.actions';
@@ -55,12 +55,11 @@ export function RegisterForm() {
           name="email"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel>E-posta</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     type="email"
-                    placeholder="E-posta adresinizi girin"
+                    placeholder="E-posta"
                     disabled={isLoading}
                     {...field}
                   />
@@ -76,11 +75,10 @@ export function RegisterForm() {
           name="username"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel>Kullanıcı Adı</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
-                    placeholder="Kullanıcı adınızı girin"
+                    placeholder="Kullanıcı Adı"
                     disabled={isLoading}
                     {...field}
                   />
@@ -96,12 +94,31 @@ export function RegisterForm() {
           name="password"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel>Şifre</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     type="password"
-                    placeholder="Şifrenizi girin"
+                    placeholder="Şifre"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage className="text-red-400 text-xs md:text-sm font-medium font-geist-sans" />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem className="space-y-2 md:space-y-3">
+              <FormControl>
+                <div className="relative group">
+                  <Input
+                    type="password"
+                    placeholder="Şifre Tekrar"
                     disabled={isLoading}
                     {...field}
                   />

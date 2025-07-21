@@ -9,7 +9,11 @@ export const registerSchema = z.object({
     .max(AUTH.USERNAME.MAX_LENGTH, 'Kullanıcı adı çok uzun')
     .regex(AUTH.USERNAME.REGEX, 'Kullanıcı adı sadece harf ve rakam içerebilir'),
   password: z.string()
-    .min(AUTH.PASSWORD.MIN_LENGTH, 'Şifre en az 6 karakter olmalı')
+    .min(AUTH.PASSWORD.MIN_LENGTH, 'Şifre en az 6 karakter olmalı'),
+  confirmPassword: z.string().min(1, 'Şifre tekrarı gerekli')
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Şifreler eşleşmiyor",
+  path: ["confirmPassword"],
 });
 
 // Kullanıcı girişi şeması

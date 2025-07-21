@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { toastError, toastSuccess } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { resetPasswordSchema, type ResetPasswordInput } from '@/lib/schemas/auth.schema';
 import { resetPassword } from '../_actions/auth.actions';
 import { ROUTES } from '@/lib/constants/routes.constants';
@@ -72,13 +72,10 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Yeni Şifre
-              </FormLabel>
               <FormControl>
                 <Input
                   type="password"
-                  placeholder="Yeni şifrenizi girin"
+                  placeholder="Yeni Şifre"
                   disabled={isLoading}
                   {...field}
                 />
@@ -93,13 +90,10 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Şifre Tekrar
-              </FormLabel>
               <FormControl>
                 <Input
                   type="password"
-                  placeholder="Şifrenizi tekrar girin"
+                  placeholder="Şifre Tekrar"
                   disabled={isLoading}
                   {...field}
                 />
@@ -114,7 +108,14 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           className="w-full"
           disabled={isLoading}
         >
-          {isLoading ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
+          {isLoading ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span>Güncelleniyor...</span>
+            </div>
+          ) : (
+            'Şifreyi Güncelle'
+          )}
         </Button>
       </form>
     </Form>

@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { toastError, toastSuccess } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { loginSchema, type LoginInput } from '@/lib/schemas/auth.schema';
 import { ROUTES } from '@/lib/constants/routes.constants';
 
@@ -52,11 +52,10 @@ export function LoginForm() {
           name="username"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel>Kullanıcı Adı</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
-                    placeholder="Kullanıcı adınızı girin"
+                    placeholder="Kullanıcı Adı"
                     disabled={isLoading}
                     {...field}
                   />
@@ -72,12 +71,11 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem className="space-y-2 md:space-y-3">
-              <FormLabel>Şifre</FormLabel>
               <FormControl>
                 <div className="relative group">
                   <Input
                     type="password"
-                    placeholder="Şifrenizi girin"
+                    placeholder="Şifre"
                     disabled={isLoading}
                     {...field}
                   />
