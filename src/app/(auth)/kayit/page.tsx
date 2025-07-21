@@ -14,7 +14,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-[calc(100vh-120px)] flex items-center justify-center p-4 md:p-6 lg:p-8">
       <AuthCard 
-        title="Kayıt Ol"
+        title="Aniwa'ya Kayıt Ol"
         description="Hesabınızı oluşturun"
         links={links}
       >
