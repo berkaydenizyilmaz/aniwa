@@ -25,6 +25,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     defaultValues: {
       token: token || '',
       password: '',
+      confirmPassword: '',
     }
   });
 
@@ -66,7 +67,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <FormField
           control={form.control}
           name="password"
@@ -80,7 +81,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                   {...field}
                 />
               </FormControl>
-              <FormMessage className="text-red-400 text-xs md:text-sm font-medium" />
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -98,7 +99,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                   {...field}
                 />
               </FormControl>
-              <FormMessage className="text-red-400 text-xs md:text-sm font-medium" />
+              <FormMessage />
             </FormItem>
           )}
         />

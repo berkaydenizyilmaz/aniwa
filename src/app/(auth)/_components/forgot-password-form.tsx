@@ -15,6 +15,9 @@ export function ForgotPasswordForm() {
 
   const form = useForm<ForgotPasswordInput>({
     resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: '',
+    },
   });
 
   const onSubmit = async (data: ForgotPasswordInput) => {
@@ -38,7 +41,7 @@ export function ForgotPasswordForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <FormField
           control={form.control}
           name="email"
@@ -52,7 +55,7 @@ export function ForgotPasswordForm() {
                   {...field}
                 />
               </FormControl>
-              <FormMessage className="text-red-400 text-xs md:text-sm font-medium" />
+              <FormMessage />
             </FormItem>
           )}
         />

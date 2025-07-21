@@ -19,6 +19,12 @@ export function RegisterForm() {
 
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      email: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+    },
   });
 
   const onSubmit = async (data: RegisterInput) => {
@@ -49,23 +55,21 @@ export function RegisterForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem className="space-y-1.5">
               <FormControl>
-                <div className="relative group">
-                  <Input
-                    type="email"
-                    placeholder="E-posta"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </div>
+                <Input
+                  type="email"
+                  placeholder="E-posta"
+                  disabled={isLoading}
+                  {...field}
+                />
               </FormControl>
-              <FormMessage className="text-red-400 text-xs md:text-sm font-medium font-geist-sans" />
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -76,15 +80,13 @@ export function RegisterForm() {
           render={({ field }) => (
             <FormItem className="space-y-1.5">
               <FormControl>
-                <div className="relative group">
-                  <Input
-                    placeholder="Kullanıcı Adı"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </div>
+                <Input
+                  placeholder="Kullanıcı Adı"
+                  disabled={isLoading}
+                  {...field}
+                />
               </FormControl>
-              <FormMessage className="text-red-400 text-xs md:text-sm font-medium font-geist-sans" />
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -95,16 +97,14 @@ export function RegisterForm() {
           render={({ field }) => (
             <FormItem className="space-y-1.5">
               <FormControl>
-                <div className="relative group">
-                  <Input
-                    type="password"
-                    placeholder="Şifre"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </div>
+                <Input
+                  type="password"
+                  placeholder="Şifre"
+                  disabled={isLoading}
+                  {...field}
+                />
               </FormControl>
-              <FormMessage className="text-red-400 text-xs md:text-sm font-medium font-geist-sans" />
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -115,16 +115,14 @@ export function RegisterForm() {
           render={({ field }) => (
             <FormItem className="space-y-1.5">
               <FormControl>
-                <div className="relative group">
-                  <Input
-                    type="password"
-                    placeholder="Şifre Tekrar"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </div>
+                <Input
+                  type="password"
+                  placeholder="Şifre Tekrar"
+                  disabled={isLoading}
+                  {...field}
+                />
               </FormControl>
-              <FormMessage className="text-red-400 text-xs md:text-sm font-medium font-geist-sans" />
+              <FormMessage />
             </FormItem>
           )}
         />

@@ -18,6 +18,10 @@ export function LoginForm() {
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+    },
   });
 
   const onSubmit = async (data: LoginInput) => {
@@ -46,22 +50,20 @@ export function LoginForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <FormField
           control={form.control}
           name="username"
           render={({ field }) => (
             <FormItem className="space-y-1.5">
               <FormControl>
-                <div className="relative group">
-                  <Input
-                    placeholder="Kullanıcı Adı"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </div>
+                <Input
+                  placeholder="Kullanıcı Adı"
+                  disabled={isLoading}
+                  {...field}
+                />
               </FormControl>
-              <FormMessage className="text-red-400 text-xs md:text-sm font-medium font-geist-sans" />
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -72,16 +74,14 @@ export function LoginForm() {
           render={({ field }) => (
             <FormItem className="space-y-1.5">
               <FormControl>
-                <div className="relative group">
-                  <Input
-                    type="password"
-                    placeholder="Şifre"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </div>
+                <Input
+                  type="password"
+                  placeholder="Şifre"
+                  disabled={isLoading}
+                  {...field}
+                />
               </FormControl>
-              <FormMessage className="text-red-400 text-xs md:text-sm font-medium font-geist-sans" />
+              <FormMessage />
             </FormItem>
           )}
         />
