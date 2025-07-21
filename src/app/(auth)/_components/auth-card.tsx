@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Link from 'next/link';
 
 interface AuthLink {
   text: string;
@@ -16,29 +16,44 @@ interface AuthCardProps {
 
 export function AuthCard({ title, description, children, links }: AuthCardProps) {
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">{title}</CardTitle>
-        {description && (
-          <CardDescription className="text-center">{description}</CardDescription>
-        )}
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {children}
+    <div className="w-full max-w-md mx-auto min-w-[280px] md:min-w-[380px]">
+      <div className="relative overflow-hidden rounded-lg bg-white border border-gray-100 shadow-sm">
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#F8FAFC]/40 via-[#F1F5F9]/20 to-[#E2E8F0]/10" />
         
-        {links && links.length > 0 && (
-          <div className="text-center space-y-2">
-            {links.map((link, index) => (
-              <p key={index} className="text-sm text-muted-foreground">
-                {link.text}{' '}
-                <a href={link.href} className="text-primary hover:underline">
-                  {link.label}
-                </a>
-              </p>
-            ))}
+        {/* Content */}
+        <div className="relative z-10 p-6 md:p-8">
+          {/* Header */}
+          <div className="text-center space-y-3 mb-6">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-300 tracking-tight font-geist-sans">{title}</h1>
+            {description && (
+              <p className="text-gray-400 text-sm md:text-base leading-relaxed font-geist-sans">{description}</p>
+            )}
           </div>
-        )}
-      </CardContent>
-    </Card>
+          
+          {/* Form */}
+          <div className="space-y-6">
+            {children}
+          </div>
+          
+          {/* Links */}
+          {links && links.length > 0 && (
+            <div className="text-center space-y-3 pt-6 border-t border-gray-200">
+              {links.map((link, index) => (
+                <p key={index} className="text-xs md:text-sm text-gray-400 font-geist-sans">
+                  {link.text}{' '}
+                  <Link 
+                    href={link.href} 
+                    className="text-[#5bc0ff] hover:text-[#5bc0ff]/80 transition-colors duration-200 font-semibold"
+                  >
+                    {link.label}
+                  </Link>
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 } 

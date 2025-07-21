@@ -17,12 +17,14 @@ export default function LoginPage() {
   ];
 
   return (
-    <AuthCard 
-      title="Giriş Yap"
-      description="Hesabınıza giriş yapın"
-      links={links}
-    >
-      <LoginForm />
-    </AuthCard>
+    <div className="min-h-[calc(100vh-120px)] flex items-center justify-center p-4 md:p-6 lg:p-8">
+      <AuthCard 
+        title="Giriş Yap"
+        description="Hesabınıza giriş yapın"
+        links={links}
+      >
+        <LoginForm />
+      </AuthCard>
+    </div>
   );
 } 

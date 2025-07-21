@@ -12,12 +12,14 @@ export default function RegisterPage() {
   ];
 
   return (
-    <AuthCard 
-      title="Kayıt Ol"
-      description="Hesabınızı oluşturun"
-      links={links}
-    >
-      <RegisterForm />
-    </AuthCard>
+    <div className="min-h-[calc(100vh-120px)] flex items-center justify-center p-4 md:p-6 lg:p-8">
+      <AuthCard 
+        title="Kayıt Ol"
+        description="Hesabınızı oluşturun"
+        links={links}
+      >
+        <RegisterForm />
+      </AuthCard>
+    </div>
   );
 } 

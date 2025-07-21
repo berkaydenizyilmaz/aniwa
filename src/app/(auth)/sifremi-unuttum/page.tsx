@@ -12,12 +12,14 @@ export default function ForgotPasswordPage() {
   ];
 
   return (
-    <AuthCard 
-      title="Şifremi Unuttum"
-      description="E-posta adresinizi girin, şifre sıfırlama bağlantısı gönderelim"
-      links={links}
-    >
-      <ForgotPasswordForm />
-    </AuthCard>
+    <div className="min-h-[calc(100vh-120px)] flex items-center justify-center p-4 md:p-6 lg:p-8">
+      <AuthCard 
+        title="Şifremi Unuttum"
+        description="E-posta adresinizi girin, şifre sıfırlama bağlantısı gönderelim"
+        links={links}
+      >
+        <ForgotPasswordForm />
+      </AuthCard>
+    </div>
   );
 } 

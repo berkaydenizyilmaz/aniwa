@@ -36,8 +36,14 @@ export default function RootLayout({
           <QueryProvider>
             <ThemeProvider>
               <Header />
-              <main>
-                {children}
+              <main className="relative overflow-hidden min-h-screen">
+                {/* Subtle anime-inspired background patterns */}
+                <div className="fixed inset-0 bg-[#edf2fb] pointer-events-none -z-10" />
+                
+                {/* Content */}
+                <div className="relative z-10">
+                  {children}
+                </div>
               </main>
             </ThemeProvider>
             <ToasterProvider />

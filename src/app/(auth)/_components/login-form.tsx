@@ -46,21 +46,24 @@ export function LoginForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 md:space-y-8">
         <FormField
           control={form.control}
           name="username"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Kullanıcı Adı</FormLabel>
+            <FormItem className="space-y-2 md:space-y-3">
+              <FormLabel className="text-gray-300 text-sm font-semibold tracking-wide font-geist-sans">Kullanıcı Adı</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Kullanıcı adınızı girin"
-                  disabled={isLoading}
-                  {...field}
-                />
+                <div className="relative group">
+                  <Input
+                    placeholder="Kullanıcı adınızı girin"
+                    disabled={isLoading}
+                    className="bg-white border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-[#5bc0ff] focus:ring-[#5bc0ff]/10 transition-all duration-200 h-11 text-base font-geist-sans"
+                    {...field}
+                  />
+                </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-400 text-xs md:text-sm font-medium font-geist-sans" />
             </FormItem>
           )}
         />
@@ -69,27 +72,37 @@ export function LoginForm() {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Şifre</FormLabel>
+            <FormItem className="space-y-2 md:space-y-3">
+              <FormLabel className="text-gray-300 text-sm font-semibold tracking-wide font-geist-sans">Şifre</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Şifrenizi girin"
-                  disabled={isLoading}
-                  {...field}
-                />
+                <div className="relative group">
+                  <Input
+                    type="password"
+                    placeholder="Şifrenizi girin"
+                    disabled={isLoading}
+                    className="bg-white border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-[#5bc0ff] focus:ring-[#5bc0ff]/10 transition-all duration-200 h-11 text-base font-geist-sans"
+                    {...field}
+                  />
+                </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-400 text-xs md:text-sm font-medium font-geist-sans" />
             </FormItem>
           )}
         />
 
         <Button
           type="submit"
-          className="w-full"
+          className="w-full bg-[#5bc0ff] hover:bg-[#5bc0ff]/90 text-white font-bold py-3 md:py-4 text-base md:text-lg shadow-sm hover:shadow-md transition-all duration-300 font-geist-sans"
           disabled={isLoading}
         >
-          {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+          {isLoading ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span>Giriş yapılıyor...</span>
+            </div>
+          ) : (
+            'Giriş Yap'
+          )}
         </Button>
       </form>
     </Form>
