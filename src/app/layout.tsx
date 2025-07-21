@@ -33,21 +33,21 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProvider>
-        <QueryProvider>
-          <ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider>
               <Header />
-              <main className="relative overflow-hidden min-h-screen">
+              <main className="relative overflow-hidden min-h-screen md:pt-0 pt-0 pb-20 md:pb-0">
                 {/* Subtle anime-inspired background patterns */}
                 <div className="fixed inset-0 bg-background pointer-events-none -z-10" />
-                
+
                 {/* Content */}
                 <div className="relative z-10">
-            {children}
+                  {children}
                 </div>
               </main>
-          </ThemeProvider>
+            </ThemeProvider>
             <ToasterProvider />
-        </QueryProvider>
+          </QueryProvider>
         </SessionProvider>
       </body>
     </html>
