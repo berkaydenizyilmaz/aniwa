@@ -37,6 +37,9 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -44,81 +47,116 @@
 }
 
 :root {
-  --radius: 0.375rem;
-  --background: #f1f5f9;
-  --foreground: oklch(0.3 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.5 0.05 240);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.3 0 0);
-  --primary: #5bc0ff;
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: #374259;
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.5 0.05 240);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: #f1f5f9;
-  --ring: #5bc0ff;
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.3 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.75rem;
+  
+  /* PASTEL MODERN ANIME TEMA */
+  --background: #f8fafc;  /* Açık ama beyaz değil - çok hafif gri-mavi */
+  --foreground: #334155;
+  --primary: #22d3ee;     /* Turkuazımsı mavi - cyan tonlu */
+  --primary-foreground: #0f172a;
+  
+  /* Pastel ikincil renkler */
+  --secondary: #f1f5f9;   /* Arkaplan renginden biraz daha açık */
+  --secondary-foreground: #475569;
+  --accent: #f8bbd9;      /* Turkuaza uygun yumuşak gül pembesi */
+  --accent-foreground: #0f172a;
+  
+  /* Pastel nötr tonlar */
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  
+  /* Pastel durum renkleri */
+  --success: #86efac;     /* Pastel yeşil */
+  --warning: #fde68a;     /* Pastel sarı */
+  --destructive: #e67bec; /* Pastel kırmızı */
+  --info: #a5f3fc;        /* Pastel cyan */
+  
+  /* UI elementleri */
+  --border: #e2e8f0;
+  --input: #ffffff;       /* Input beyaz - arkaplan renginden açık */
+  --ring: #7dd3fc;
+  
+  /* Kartlar ve modaller - arkaplan renginden daha açık */
+  --card: #ffffff;        /* Beyaz - arkaplan renginden açık */
+  --card-foreground: #334155;
+  --popover: #ffffff;     /* Beyaz - arkaplan renginden açık */
+  --popover-foreground: #334155;
+  
+  /* Pastel chart renkleri */
+  --chart-1: #22d3ee;     /* Turkuazımsı mavi */
+  --chart-2: #f8bbd9;     /* Uyumlu gül pembesi */
+  --chart-3: #86efac;     /* Pastel yeşil */
+  --chart-4: #fde68a;     /* Pastel sarı */
+  --chart-5: #c4b5fd;     /* Pastel mor */
+  
+  /* Sidebar */
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #334155;
+  --sidebar-primary: #22d3ee;
+  --sidebar-primary-foreground: #0f172a;
+  --sidebar-accent: #f8bbd9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #22d3ee;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.9 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.9 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.9 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.9 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.9 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.9 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.9 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.9 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Dark mode - pastel uyumlu */
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --primary: #67e8f9;     /* Dark modda daha açık turkuaz */
+  --primary-foreground: #0f172a;
+  
+  /* Dark pastel ikincil */
+  --secondary: #1e293b;   /* Dark arkaplan renginden açık */
+  --secondary-foreground: #f8fafc;
+  --accent: #fbb6ce;      /* Dark modda daha canlı pembe */
+  --accent-foreground: #0f172a;
+  
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  
+  /* Dark pastel durum renkleri */
+  --success: #6ee7b7;
+  --warning: #fcd34d;
+  --destructive: #f87171;
+  --info: #67e8f9;
+  
+  /* Dark UI */
+  --border: #334155;
+  --input: #1e293b;       /* Dark arkaplan renginden açık */
+  --ring: #93c5fd;
+  
+  /* Dark kartlar - arkaplan renginden açık */
+  --card: #1e293b;        /* Dark arkaplan renginden açık */
+  --card-foreground: #f8fafc;
+  --popover: #1e293b;     /* Dark arkaplan renginden açık */
+  --popover-foreground: #f8fafc;
+  
+  /* Dark pastel chart */
+  --chart-1: #67e8f9;
+  --chart-2: #fbb6ce;
+  --chart-3: #6ee7b7;
+  --chart-4: #fcd34d;
+  --chart-5: #d8b4fe;
+  
+  /* Dark sidebar */
+  --sidebar: #0f172a;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #67e8f9;
+  --sidebar-primary-foreground: #0f172a;
+  --sidebar-accent: #fbb6ce;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #334155;
+  --sidebar-ring: #67e8f9;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground font-semibold;
+    @apply border-border;
   }
   
-  /* Global styles only */
+  body {
+    @apply bg-background text-foreground font-normal;
+  }
 }

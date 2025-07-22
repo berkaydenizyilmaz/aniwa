@@ -95,4 +95,4 @@ export function toastWarning(title: string, description?: string) {
 
 export function toastInfo(title: string, description?: string) {
   return toast({ type: 'info', title, description });
-} 
+}
