@@ -15,12 +15,6 @@ export function AdminSidebar({ onClose }: AdminSidebarProps) {
 
   const navigationItems = [
     { href: ROUTES.PAGES.ADMIN.DASHBOARD, label: 'Dashboard', icon: '📊' },
-    { href: '/yonetim/anime', label: 'Anime Yönetimi', icon: '🎬' },
-    { href: '/yonetim/genres', label: 'Türler', icon: '🏷️' },
-    { href: '/yonetim/tags', label: 'Etiketler', icon: '🏷️' },
-    { href: '/yonetim/studios', label: 'Stüdyolar', icon: '🎭' },
-    { href: '/yonetim/users', label: 'Kullanıcılar', icon: '👥' },
-    { href: '/yonetim/streaming-platforms', label: 'Platformlar', icon: '📺' }
   ];
 
   return (
