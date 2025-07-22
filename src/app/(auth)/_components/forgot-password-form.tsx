@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState, useCallback, memo } from 'react';
+import { useForm, ControllerRenderProps } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toastError, toastSuccess } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { forgotPasswordSchema, type ForgotPasswordInput } from '@/lib/schemas/auth.schema';
 import { forgotPassword } from '../_actions/auth.actions';
 
-export function ForgotPasswordForm() {
+export const ForgotPasswordForm = memo(function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<ForgotPasswordInput>({
@@ -20,7 +20,10 @@ export function ForgotPasswordForm() {
     },
   });
 
-  const onSubmit = async (data: ForgotPasswordInput) => {
+  // Form submit handler - useCallback ile optimize edildi
+  const onSubmit = useCallback(async (data: ForgotPasswordInput) => {
+    if (isLoading) return; // Prevent double submission
+    
     setIsLoading(true);
 
     try {
@@ -32,12 +35,28 @@ export function ForgotPasswordForm() {
         toastSuccess('Başarılı', 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi!');
         form.reset();
       }
-    } catch {
+    } catch (error) {
+      console.error('Forgot password error:', error);
       toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isLoading, form]);
+
+  // Form field render fonksiyonu - useCallback ile optimize edildi
+  const renderEmailField = useCallback(({ field }: { field: ControllerRenderProps<ForgotPasswordInput, 'email'> }) => (
+    <FormItem className="space-y-1.5">
+      <FormControl>
+        <Input
+          type="email"
+          placeholder="E-posta"
+          disabled={isLoading}
+          {...field}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ), [isLoading]);
 
   return (
     <Form {...form}>
@@ -45,19 +64,7 @@ export function ForgotPasswordForm() {
         <FormField
           control={form.control}
           name="email"
-          render={({ field }) => (
-            <FormItem className="space-y-1.5">
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder="E-posta"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderEmailField}
         />
 
         <Button
@@ -70,4 +77,4 @@ export function ForgotPasswordForm() {
       </form>
     </Form>
   );
-} 
+}); 

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState, useCallback, memo } from 'react';
+import { useForm, ControllerRenderProps } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { loginSchema, type LoginInput } from '@/lib/schemas/auth.schema';
 import { ROUTES } from '@/lib/constants/routes.constants';
 
-export function LoginForm() {
+export const LoginForm = memo(function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -24,7 +24,10 @@ export function LoginForm() {
     },
   });
 
+  // Form submit handler - useCallback ile optimize edildi
   const onSubmit = useCallback(async (data: LoginInput) => {
+    if (isLoading) return; // Prevent double submission
+    
     setIsLoading(true);
 
     try {
@@ -41,12 +44,41 @@ export function LoginForm() {
         router.push(ROUTES.PAGES.HOME);
         router.refresh();
       }
-    } catch {
+    } catch (error) {
+      console.error('Login error:', error);
       toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
-  }, [router]);
+  }, [router, isLoading]);
+
+  // Form field render fonksiyonları - useCallback ile optimize edildi
+  const renderUsernameField = useCallback(({ field }: { field: ControllerRenderProps<LoginInput, 'username'> }) => (
+    <FormItem className="space-y-1.5">
+      <FormControl>
+        <Input
+          placeholder="Kullanıcı Adı"
+          disabled={isLoading}
+          {...field}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ), [isLoading]);
+
+  const renderPasswordField = useCallback(({ field }: { field: ControllerRenderProps<LoginInput, 'password'> }) => (
+    <FormItem className="space-y-1.5">
+      <FormControl>
+        <Input
+          type="password"
+          placeholder="Şifre"
+          disabled={isLoading}
+          {...field}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ), [isLoading]);
 
   return (
     <Form {...form}>
@@ -54,36 +86,13 @@ export function LoginForm() {
         <FormField
           control={form.control}
           name="username"
-          render={({ field }) => (
-            <FormItem className="space-y-1.5">
-              <FormControl>
-                <Input
-                  placeholder="Kullanıcı Adı"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderUsernameField}
         />
 
         <FormField
           control={form.control}
           name="password"
-          render={({ field }) => (
-            <FormItem className="space-y-1.5">
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Şifre"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderPasswordField}
         />
 
         <Button
@@ -96,4 +105,4 @@ export function LoginForm() {
       </form>
     </Form>
   );
-} 
+}); 

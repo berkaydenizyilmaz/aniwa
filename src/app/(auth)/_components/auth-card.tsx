@@ -1,4 +1,4 @@
-import { ReactNode, memo } from 'react';
+import { ReactNode, memo, useCallback } from 'react';
 import Link from 'next/link';
 
 interface AuthLink {
@@ -15,6 +15,30 @@ interface AuthCardProps {
 }
 
 export const AuthCard = memo(function AuthCard({ title, description, children, links }: AuthCardProps) {
+  // Link render fonksiyonu - useCallback ile optimize edildi
+  const renderLink = useCallback((link: AuthLink, index: number, isMobile = false) => (
+    <p key={index} className={`text-xs ${!isMobile ? 'md:text-sm' : ''} font-semibold text-muted-foreground`}>
+      {link.text}{' '}
+      <Link 
+        href={link.href} 
+        className="text-primary hover:text-primary/80 transition-colors duration-200 font-semibold"
+      >
+        {link.label}
+      </Link>
+    </p>
+  ), []);
+
+  // Links section render fonksiyonu
+  const renderLinks = useCallback((isMobile = false) => {
+    if (!links || links.length === 0) return null;
+    
+    return (
+      <div className={`text-center space-y-${isMobile ? '2' : '3'} ${isMobile ? 'pt-4 mt-6' : 'pt-6 border-t border-border/20 mt-8'}`}>
+        {links.map((link, index) => renderLink(link, index, isMobile))}
+      </div>
+    );
+  }, [links, renderLink]);
+
   return (
     <>
       {/* Mobile: Kart yok, form direkt ekranı kullanır */}
@@ -33,21 +57,7 @@ export const AuthCard = memo(function AuthCard({ title, description, children, l
         </div>
         
         {/* Links */}
-        {links && links.length > 0 && (
-          <div className="text-center space-y-2 pt-4 mt-6">
-            {links.map((link, index) => (
-              <p key={index} className="text-xs font-semibold text-muted-foreground">
-                {link.text}{' '}
-                <Link 
-                  href={link.href} 
-                  className="text-primary hover:text-primary/80 transition-colors duration-200 font-semibold"
-                >
-                  {link.label}
-                </Link>
-              </p>
-            ))}
-          </div>
-        )}
+        {renderLinks(true)}
       </div>
 
       {/* Desktop: Kart görünümü */}
@@ -68,24 +78,10 @@ export const AuthCard = memo(function AuthCard({ title, description, children, l
             </div>
             
             {/* Links */}
-            {links && links.length > 0 && (
-              <div className="text-center space-y-3 pt-6 border-t border-border/20 mt-8">
-                {links.map((link, index) => (
-                  <p key={index} className="text-xs md:text-sm font-semibold text-muted-foreground">
-                    {link.text}{' '}
-                    <Link 
-                      href={link.href} 
-                      className="text-primary hover:text-primary/80 transition-colors duration-200 font-semibold"
-                    >
-                      {link.label}
-                  </Link>
-                </p>
-              ))}
-            </div>
-          )}
+            {renderLinks(false)}
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }); 

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes.constants';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { AuthSection } from './auth-section';
+import { AdminSidebarAuth } from './admin-sidebar-auth';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -115,7 +115,7 @@ export function AdminSidebar({ onClose }: AdminSidebarProps) {
               "transition-all duration-300",
               collapsed ? "mt-1" : ""
             )}>
-              <AuthSection variant="sidebar" collapsed={collapsed} />
+              <AdminSidebarAuth collapsed={collapsed} />
             </div>
           </div>
         </div>

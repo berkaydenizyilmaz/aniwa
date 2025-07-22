@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState, useCallback, memo } from 'react';
+import { useForm, ControllerRenderProps } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toastError, toastSuccess } from '@/components/ui/toast';
@@ -16,7 +16,7 @@ interface ResetPasswordFormProps {
   token?: string;
 }
 
-export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+export const ResetPasswordForm = memo(function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -29,7 +29,10 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     }
   });
 
-  const onSubmit = async (data: ResetPasswordInput) => {
+  // Form submit handler - useCallback ile optimize edildi
+  const onSubmit = useCallback(async (data: ResetPasswordInput) => {
+    if (isLoading) return; // Prevent double submission
+    
     setIsLoading(true);
 
     try {
@@ -41,12 +44,47 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         toastSuccess('Başarılı', 'Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.');
         router.push(ROUTES.PAGES.AUTH.LOGIN);
       }
-    } catch {
+    } catch (error) {
+      console.error('Reset password error:', error);
       toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isLoading, router]);
+
+  // Form field render fonksiyonları - useCallback ile optimize edildi
+  const renderPasswordField = useCallback(({ field }: { field: ControllerRenderProps<ResetPasswordInput, 'password'> }) => (
+    <FormItem className="space-y-1.5">
+      <FormControl>
+        <Input
+          type="password"
+          placeholder="Yeni Şifre"
+          disabled={isLoading}
+          {...field}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ), [isLoading]);
+
+  const renderConfirmPasswordField = useCallback(({ field }: { field: ControllerRenderProps<ResetPasswordInput, 'confirmPassword'> }) => (
+    <FormItem className="space-y-1.5">
+      <FormControl>
+        <Input
+          type="password"
+          placeholder="Şifre Tekrar"
+          disabled={isLoading}
+          {...field}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ), [isLoading]);
+
+  // Error state handler - useCallback ile optimize edildi
+  const handleRequestNewLink = useCallback(() => {
+    router.push(ROUTES.PAGES.AUTH.FORGOT_PASSWORD);
+  }, [router]);
 
   // Token yoksa uyarı göster
   if (!token) {
@@ -57,7 +95,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         </p>
         <Button 
           variant="outline" 
-          onClick={() => router.push(ROUTES.PAGES.AUTH.FORGOT_PASSWORD)}
+          onClick={handleRequestNewLink}
           className="bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 border-primary/20 text-primary font-semibold shadow-md hover:shadow-lg transition-all duration-300"
         >
           Yeni Şifre Sıfırlama Bağlantısı İste
@@ -72,37 +110,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <FormField
           control={form.control}
           name="password"
-          render={({ field }) => (
-            <FormItem className="space-y-1.5">
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Yeni Şifre"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderPasswordField}
         />
 
         <FormField
           control={form.control}
           name="confirmPassword"
-          render={({ field }) => (
-            <FormItem className="space-y-1.5">
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Şifre Tekrar"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderConfirmPasswordField}
         />
 
         <Button
@@ -115,4 +129,4 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       </form>
     </Form>
   );
-} 
+}); 

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState, useCallback, memo } from 'react';
+import { useForm, ControllerRenderProps } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toastError, toastSuccess } from '@/components/ui/toast';
@@ -13,7 +13,7 @@ import { ROUTES } from '@/lib/constants/routes.constants';
 import { registerUser } from '../_actions/auth.actions';
 import { setFormFieldErrors } from '@/lib/utils/server-action-error-handler';
 
-export function RegisterForm() {
+export const RegisterForm = memo(function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -27,7 +27,10 @@ export function RegisterForm() {
     },
   });
 
+  // Form submit handler - useCallback ile optimize edildi
   const onSubmit = useCallback(async (data: RegisterInput) => {
+    if (isLoading) return; // Prevent double submission
+    
     setIsLoading(true);
 
     try {
@@ -46,12 +49,69 @@ export function RegisterForm() {
         // Başarılı kayıt sonrası giriş sayfasına yönlendir
         router.push(ROUTES.PAGES.AUTH.LOGIN);
       }
-    } catch {
+    } catch (error) {
+      console.error('Register error:', error);
       toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
-  }, [router, form.setError]);
+  }, [router, form.setError, isLoading]);
+
+  // Form field render fonksiyonları - useCallback ile optimize edildi
+  const renderEmailField = useCallback(({ field }: { field: ControllerRenderProps<RegisterInput, 'email'> }) => (
+    <FormItem className="space-y-1.5">
+      <FormControl>
+        <Input
+          type="email"
+          placeholder="E-posta"
+          disabled={isLoading}
+          {...field}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ), [isLoading]);
+
+  const renderUsernameField = useCallback(({ field }: { field: ControllerRenderProps<RegisterInput, 'username'> }) => (
+    <FormItem className="space-y-1.5">
+      <FormControl>
+        <Input
+          placeholder="Kullanıcı Adı"
+          disabled={isLoading}
+          {...field}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ), [isLoading]);
+
+  const renderPasswordField = useCallback(({ field }: { field: ControllerRenderProps<RegisterInput, 'password'> }) => (
+    <FormItem className="space-y-1.5">
+      <FormControl>
+        <Input
+          type="password"
+          placeholder="Şifre"
+          disabled={isLoading}
+          {...field}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ), [isLoading]);
+
+  const renderConfirmPasswordField = useCallback(({ field }: { field: ControllerRenderProps<RegisterInput, 'confirmPassword'> }) => (
+    <FormItem className="space-y-1.5">
+      <FormControl>
+        <Input
+          type="password"
+          placeholder="Şifre Tekrar"
+          disabled={isLoading}
+          {...field}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ), [isLoading]);
 
   return (
     <Form {...form}>
@@ -59,72 +119,25 @@ export function RegisterForm() {
         <FormField
           control={form.control}
           name="email"
-          render={({ field }) => (
-            <FormItem className="space-y-1.5">
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder="E-posta"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderEmailField}
         />
 
         <FormField
           control={form.control}
           name="username"
-          render={({ field }) => (
-            <FormItem className="space-y-1.5">
-              <FormControl>
-                <Input
-                  placeholder="Kullanıcı Adı"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderUsernameField}
         />
 
         <FormField
           control={form.control}
           name="password"
-          render={({ field }) => (
-            <FormItem className="space-y-1.5">
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Şifre"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderPasswordField}
         />
 
         <FormField
           control={form.control}
           name="confirmPassword"
-          render={({ field }) => (
-            <FormItem className="space-y-1.5">
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Şifre Tekrar"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderConfirmPasswordField}
         />
 
         <Button
@@ -137,4 +150,4 @@ export function RegisterForm() {
       </form>
     </Form>
   );
-} 
+}); 
