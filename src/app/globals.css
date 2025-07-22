@@ -177,7 +177,7 @@
   }
   
   .nav-item-mobile {
-    @apply flex-1 h-full flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all duration-200;
+    @apply flex-1 h-full flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all duration-200 rounded-none;
   }
   
   .nav-item-mobile-border {

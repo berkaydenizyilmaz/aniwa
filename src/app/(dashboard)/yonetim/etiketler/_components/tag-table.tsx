@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { Tag, TagCategory } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,11 +23,11 @@ import {
   DeleteAlert, 
   CreateDialog, 
   SearchInput, 
-  LoadingSkeleton,
-  EditDialog
+  LoadingSkeleton
 } from '../../_components';
+import { EditDialog } from '../../_components/edit-dialog';
 
-export function TagTable() {
+export const TagTable = memo(function TagTable() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,8 +38,8 @@ export function TagTable() {
     resolver: zodResolver(updateTagSchema),
   });
 
-  // Veri çekme
-  const fetchTags = async () => {
+  // Veri çekme - useCallback ile optimize edildi
+  const fetchTags = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/tags');
       const result = await response.json();
@@ -49,24 +49,28 @@ export function TagTable() {
       } else {
         toastError('Hata', 'Etiketler yüklenemedi');
       }
-    } catch {
+    } catch (error) {
+      console.error('Fetch tags error:', error);
       toastError('Hata', 'Etiketler yüklenemedi');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchTags();
-  }, []);
+  }, [fetchTags]);
 
-  // Filtreleme
-  const filteredTags = tags.filter(tag =>
-    tag.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filtreleme - useCallback ile optimize edildi
+  const filteredTags = useCallback(() => 
+    tags.filter(tag =>
+      tag.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ), [tags, searchTerm]);
 
-  // Edit işlemi
-  const handleEdit = async (tagId: string, data: UpdateTagInput) => {
+  // Edit işlemi - useCallback ile optimize edildi
+  const handleEdit = useCallback(async (tagId: string, data: UpdateTagInput) => {
+    if (isUpdating) return; // Prevent double submission
+    
     setIsUpdating(tagId);
     try {
       const result = await updateTag(tagId, data);
@@ -82,15 +86,16 @@ export function TagTable() {
         editForm.reset();
         fetchTags(); // Verileri yenile
       }
-    } catch {
+    } catch (error) {
+      console.error('Edit tag error:', error);
       toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsUpdating(null);
     }
-  };
+  }, [isUpdating, editForm, fetchTags]);
 
-  // Silme işlemi
-  const handleDelete = async (id: string) => {
+  // Silme işlemi - useCallback ile optimize edildi
+  const handleDelete = useCallback(async (id: string) => {
     try {
       const result = await deleteTag(id);
 
@@ -100,13 +105,14 @@ export function TagTable() {
         toastSuccess('Başarılı', 'Etiket başarıyla silindi!');
         fetchTags(); // Verileri yenile
       }
-    } catch {
+    } catch (error) {
+      console.error('Delete tag error:', error);
       toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     }
-  };
+  }, [fetchTags]);
 
-  // Edit dialog'u aç
-  const openEditDialog = (tag: Tag) => {
+  // Edit dialog'u aç - useCallback ile optimize edildi
+  const openEditDialog = useCallback((tag: Tag) => {
     editForm.reset({ 
       name: tag.name,
       description: tag.description || undefined,
@@ -114,18 +120,205 @@ export function TagTable() {
       isAdult: tag.isAdult,
       isSpoiler: tag.isSpoiler
     });
-  };
+  }, [editForm]);
+
+  // Loading skeleton render fonksiyonu - useCallback ile optimize edildi
+  const renderLoadingSkeleton = useCallback(() => (
+    <LoadingSkeleton itemCount={5} showSearch={true} showActionButton={true} />
+  ), []);
+
+  // Empty state render fonksiyonu - useCallback ile optimize edildi
+  const renderEmptyState = useCallback(() => (
+    <div className="text-center py-8 text-muted-foreground">
+      {searchTerm ? 'Arama sonucu bulunamadı.' : 'Henüz etiket eklenmemiş.'}
+    </div>
+  ), [searchTerm]);
+
+  // Tag item render fonksiyonu - useCallback ile optimize edildi
+  const renderTagItem = useCallback((tag: Tag) => (
+    <div
+      key={tag.id}
+      className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-border/20 rounded-lg hover:bg-muted/30 transition-all duration-200 gap-3 bg-card/80 backdrop-blur-sm"
+    >
+      <div className="flex-1 min-w-0">
+        <div className="font-medium truncate text-foreground">{tag.name}</div>
+        <div className="text-sm text-muted-foreground truncate">
+          {tag.description ? `${tag.description} | ` : ''}
+          {tag.category ? `Kategori: ${tag.category} | ` : ''}
+          {tag.isAdult ? 'Yetişkin İçerik | ' : ''}
+          {tag.isSpoiler ? 'Spoiler | ' : ''}
+          Slug: {tag.slug}
+        </div>
+      </div>
+      
+      <div className="flex items-center space-x-2 shrink-0">
+        {/* Edit Dialog */}
+        <EditDialog
+          title="Etiket Düzenle"
+          description={`"${tag.name}" etiketini güncelleyin.`}
+          onEdit={(data) => handleEdit(tag.id, data as UpdateTagInput)}
+          isLoading={isUpdating === tag.id}
+          trigger={
+            <Button
+              variant="outline"
+              size="sm"
+              loading={isUpdating === tag.id}
+              onClick={() => openEditDialog(tag)}
+              className="hover:bg-primary/10 hover:text-primary transition-all duration-200"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+          }
+        >
+          {({ onClose, onSubmit, isUpdating: isDialogUpdating }) => (
+            <Form {...editForm}>
+              <form onSubmit={editForm.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={editForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Etiket Adı</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Etiket adı"
+                          disabled={isDialogUpdating}
+                          className="bg-card/80 backdrop-blur-sm"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Açıklama</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          placeholder="Etiket açıklaması"
+                          disabled={isDialogUpdating}
+                          className="bg-card/80 backdrop-blur-sm"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editForm.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kategori</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-card/80 backdrop-blur-sm">
+                            <SelectValue placeholder="Kategori seçin" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.values(MASTER_DATA.TAG_CATEGORY).map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex items-center space-x-4">
+                  <FormField
+                    control={editForm.control}
+                    name="isAdult"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                        <div className="space-y-0.5">
+                          <FormLabel>Yetişkin İçerik</FormLabel>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={isDialogUpdating}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={editForm.control}
+                    name="isSpoiler"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                        <div className="space-y-0.5">
+                          <FormLabel>Spoiler</FormLabel>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={isDialogUpdating}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onClose}
+                    disabled={isDialogUpdating}
+                    className="hover:bg-muted/80 transition-all duration-200"
+                  >
+                    İptal
+                  </Button>
+                  <Button 
+                    type="submit"
+                    loading={isDialogUpdating}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
+                  >
+                    Güncelle
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          )}
+        </EditDialog>
+
+        {/* Delete Alert */}
+        <DeleteAlert
+          title="Etiketi Sil"
+          description={`"${tag.name}" etiketini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve etiket ile ilişkili tüm anime verileri etkilenebilir.`}
+          onDelete={() => handleDelete(tag.id)}
+        />
+      </div>
+    </div>
+  ), [handleEdit, handleDelete, openEditDialog, isUpdating, editForm]);
 
   // Loading skeleton
   if (isLoading) {
-    return <LoadingSkeleton itemCount={5} showSearch={true} showActionButton={true} />;
+    return renderLoadingSkeleton();
   }
 
   return (
-    <Card>
+    <Card className="bg-card/80 backdrop-blur-md border border-border/20 shadow-lg">
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <CardTitle>Etiketler ({filteredTags.length})</CardTitle>
+          <CardTitle className="text-foreground">Etiketler ({filteredTags().length})</CardTitle>
           <CreateDialog
             title="Yeni Etiket Ekle"
             description="Yeni bir anime etiketi ekleyin. Etiket adı benzersiz olmalıdır."
@@ -150,187 +343,13 @@ export function TagTable() {
       
       <CardContent>
         <div className="space-y-2">
-          {filteredTags.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {searchTerm ? 'Arama sonucu bulunamadı.' : 'Henüz etiket eklenmemiş.'}
-            </div>
+          {filteredTags().length === 0 ? (
+            renderEmptyState()
           ) : (
-            filteredTags.map((tag) => (
-              <div
-                key={tag.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors gap-3"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">{tag.name}</div>
-                  <div className="text-sm text-muted-foreground truncate">
-                    {tag.description ? `${tag.description} | ` : ''}
-                    {tag.category ? `Kategori: ${tag.category} | ` : ''}
-                    {tag.isAdult ? 'Yetişkin İçerik | ' : ''}
-                    {tag.isSpoiler ? 'Spoiler | ' : ''}
-                    Slug: {tag.slug}
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-2 shrink-0">
-                  {/* Edit Dialog */}
-                  <EditDialog
-                    title="Etiket Düzenle"
-                    description={`"${tag.name}" etiketini güncelleyin.`}
-                    onEdit={(data: UpdateTagInput) => handleEdit(tag.id, data)}
-                    isLoading={isUpdating === tag.id}
-                    trigger={
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        loading={isUpdating === tag.id}
-                        onClick={() => openEditDialog(tag)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    }
-                  >
-                    {({ onClose, onSubmit, isUpdating: isDialogUpdating }) => (
-                      <Form {...editForm}>
-                        <form onSubmit={editForm.handleSubmit(onSubmit)} className="space-y-4">
-                          <FormField
-                            control={editForm.control}
-                            name="name"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Etiket Adı</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    placeholder="Etiket adı"
-                                    disabled={isDialogUpdating}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={editForm.control}
-                            name="description"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Açıklama</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    {...field}
-                                    placeholder="Etiket açıklaması"
-                                    disabled={isDialogUpdating}
-                                    value={field.value || ''}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={editForm.control}
-                            name="category"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Kategori</FormLabel>
-                                <Select
-                                  disabled={isDialogUpdating}
-                                  onValueChange={field.onChange}
-                                  value={field.value || ''}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Kategori seçin" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {Object.values(MASTER_DATA.TAG_CATEGORY).map((category) => (
-                                      <SelectItem key={category} value={category}>
-                                        {category}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-                            <FormField
-                              control={editForm.control}
-                              name="isAdult"
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                  <div className="space-y-0.5">
-                                    <FormLabel>Yetişkin İçerik</FormLabel>
-                                  </div>
-                                  <FormControl>
-                                    <Switch
-                                      checked={field.value}
-                                      onCheckedChange={field.onChange}
-                                      disabled={isDialogUpdating}
-                                    />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={editForm.control}
-                              name="isSpoiler"
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                  <div className="space-y-0.5">
-                                    <FormLabel>Spoiler</FormLabel>
-                                  </div>
-                                  <FormControl>
-                                    <Switch
-                                      checked={field.value}
-                                      onCheckedChange={field.onChange}
-                                      disabled={isDialogUpdating}
-                                    />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
-                          </div>
-
-                          <DialogFooter>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={onClose}
-                              disabled={isDialogUpdating}
-                            >
-                              İptal
-                            </Button>
-                            <Button 
-                              type="submit"
-                              loading={isDialogUpdating}
-                            >
-                              Güncelle
-                            </Button>
-                          </DialogFooter>
-                        </form>
-                      </Form>
-                    )}
-                  </EditDialog>
-
-                  {/* Delete Alert */}
-                  <DeleteAlert
-                    title="Etiketi Sil"
-                    description={`"${tag.name}" etiketini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve etiket ile ilişkili tüm anime verileri etkilenebilir.`}
-                    onDelete={() => handleDelete(tag.id)}
-                  />
-                </div>
-              </div>
-            ))
+            filteredTags().map(renderTagItem)
           )}
         </div>
       </CardContent>
     </Card>
   );
-}
+});

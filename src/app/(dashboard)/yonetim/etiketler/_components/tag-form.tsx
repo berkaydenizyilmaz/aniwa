@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState, useCallback, memo } from 'react';
+import { ControllerRenderProps, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toastError, toastSuccess } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,7 @@ interface TagFormProps {
   onClose?: () => void;
 }
 
-export function TagForm({ onSuccess, onCancel, onClose }: TagFormProps) {
+export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: TagFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<CreateTagInput>({
@@ -35,7 +35,10 @@ export function TagForm({ onSuccess, onCancel, onClose }: TagFormProps) {
     },
   });
 
-  const onSubmit = async (data: CreateTagInput) => {
+  // Form submit handler - useCallback ile optimize edildi
+  const onSubmit = useCallback(async (data: CreateTagInput) => {
+    if (isLoading) return; // Prevent double submission
+    
     setIsLoading(true);
 
     try {
@@ -55,12 +58,110 @@ export function TagForm({ onSuccess, onCancel, onClose }: TagFormProps) {
         onSuccess?.();
         onClose?.(); // Dialog'u kapat
       }
-    } catch {
+    } catch (error) {
+      console.error('Create tag error:', error);
       toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isLoading, form, onSuccess, onClose]);
+
+  // Form field render fonksiyonları - useCallback ile optimize edildi
+  const renderNameField = useCallback(({ field }: { field: ControllerRenderProps<CreateTagInput, 'name'> }) => (
+    <FormItem>
+      <FormLabel>Etiket Adı</FormLabel>
+      <FormControl>
+        <Input
+          placeholder="Etiket Adı"
+          disabled={isLoading}
+          {...field}
+          className="bg-card/80 backdrop-blur-sm"
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ), [isLoading]);
+
+  const renderDescriptionField = useCallback(({ field }: { field: ControllerRenderProps<CreateTagInput, 'description'> }) => (
+    <FormItem>
+      <FormLabel>Açıklama</FormLabel>
+      <FormControl>
+        <Textarea
+          placeholder="Etiket açıklaması"
+          disabled={isLoading}
+          {...field}
+          className="bg-card/80 backdrop-blur-sm"
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ), [isLoading]);
+
+  const renderCategoryField = useCallback(({ field }: { field: ControllerRenderProps<CreateTagInput, 'category'> }) => (
+    <FormItem>
+      <FormLabel>Kategori</FormLabel>
+      <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <FormControl>
+          <SelectTrigger className="bg-card/80 backdrop-blur-sm">
+            <SelectValue placeholder="Kategori seçin" />
+          </SelectTrigger>
+        </FormControl>
+        <SelectContent>
+          {Object.values(MASTER_DATA.TAG_CATEGORY).map((category) => (
+            <SelectItem key={category} value={category}>
+              {category}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <FormMessage />
+    </FormItem>
+  ), []);
+
+  const renderAdultField = useCallback(({ field }: { field: ControllerRenderProps<CreateTagInput, 'isAdult'> }) => (
+    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+      <div className="space-y-0.5">
+        <FormLabel>Yetişkin İçerik</FormLabel>
+      </div>
+      <FormControl>
+        <Switch
+          checked={field.value}
+          onCheckedChange={field.onChange}
+          disabled={isLoading}
+        />
+      </FormControl>
+    </FormItem>
+  ), [isLoading]);
+
+  const renderSpoilerField = useCallback(({ field }: { field: ControllerRenderProps<CreateTagInput, 'isSpoiler'> }) => (
+    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+      <div className="space-y-0.5">
+        <FormLabel>Spoiler</FormLabel>
+      </div>
+      <FormControl>
+        <Switch
+          checked={field.value}
+          onCheckedChange={field.onChange}
+          disabled={isLoading}
+        />
+      </FormControl>
+    </FormItem>
+  ), [isLoading]);
+
+  // Cancel button render fonksiyonu - useCallback ile optimize edildi
+  const renderCancelButton = useCallback(() => (
+    onCancel && (
+      <Button
+        type="button"
+        variant="outline"
+        onClick={onCancel}
+        disabled={isLoading}
+        className="hover:bg-muted/80 transition-all duration-200"
+      >
+        İptal
+      </Button>
+    )
+  ), [onCancel, isLoading]);
 
   return (
     <Form {...form}>
@@ -68,122 +169,41 @@ export function TagForm({ onSuccess, onCancel, onClose }: TagFormProps) {
         <FormField
           control={form.control}
           name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Etiket Adı</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Etiket Adı"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderNameField}
         />
 
         <FormField
           control={form.control}
           name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Açıklama</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Etiket açıklaması"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderDescriptionField}
         />
 
         <FormField
           control={form.control}
           name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Kategori</FormLabel>
-              <Select
-                disabled={isLoading}
-                onValueChange={field.onChange}
-                value={field.value || ''}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Kategori seçin" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {Object.values(MASTER_DATA.TAG_CATEGORY).map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderCategoryField}
         />
 
-        <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+        <div className="flex items-center space-x-4">
           <FormField
             control={form.control}
             name="isAdult"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                <div className="space-y-0.5">
-                  <FormLabel>Yetişkin İçerik</FormLabel>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
+            render={renderAdultField}
           />
 
           <FormField
             control={form.control}
             name="isSpoiler"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                <div className="space-y-0.5">
-                  <FormLabel>Spoiler</FormLabel>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
+            render={renderSpoilerField}
           />
         </div>
 
         <div className="flex items-center justify-end space-x-2">
-          {onCancel && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              disabled={isLoading}
-            >
-              İptal
-            </Button>
-          )}
+          {renderCancelButton()}
           <Button
             type="submit"
             loading={isLoading}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
           >
             Oluştur
           </Button>
@@ -191,4 +211,4 @@ export function TagForm({ onSuccess, onCancel, onClose }: TagFormProps) {
       </form>
     </Form>
   );
-}
+});

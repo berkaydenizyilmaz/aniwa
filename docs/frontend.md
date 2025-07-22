@@ -138,156 +138,29 @@ Next.js App Router'ın ana gücü olan bu ayrımı bilinçli kullanıyoruz:
 
 8. Performans ve Okunabilirlik Optimizasyonları
 
-Bu bölüm, proje genelinde uyguladığımız performans ve okunabilirlik optimizasyonlarını açıklar:
+    React.memo: Tüm component'lerde kullanılır
+    useCallback: Event handler'lar ve render fonksiyonları optimize edilir
+    Function Separation: Karmaşık render logic'i ayrı function'lara bölünür
+    Error Handling: Try-catch + console.error + double submission prevention
+    Loading State: isLoading ile form field'ları disabled edilir
+    CSS Classes: Ortak class'lar globals.css'te tanımlanır
+    TypeScript: any tipi yasak, proper type definitions kullanılır
+    Component Structure: Import → Hooks → Handlers → Render → Return
 
-    React.memo Kullanımı:
-        Tüm component'lerde React.memo kullanılır
-        Gereksiz re-render'ları engeller
-        Özellikle prop'ları sık değişmeyen component'ler için etkili
+Bu optimizasyonlar proje genelinde tutarlı şekilde uygulanır.
 
-        Örnek:
-        ```tsx
-        export const MyComponent = memo(function MyComponent({ data }) {
-          return <div>{data.name}</div>;
-        });
-        ```
+9. Tasarım Sistemi ve UI/UX Standartları
 
-    useCallback Optimizasyonları:
-        Event handler'lar ve render fonksiyonları useCallback ile optimize edilir
-        Child component'lere prop olarak geçilen function'lar için kritik
-        Dependency array'ler doğru şekilde tanımlanır
+    shadcn/ui: Tüm temel UI bileşenleri shadcn/ui'dan türetilir
+    Glassmorphism: Backdrop blur + yarı şeffaf arka planlar + smooth geçişler
+    Renk Paleti: Primary (mavi), Secondary, Destructive (kırmızı), Muted, Border
+    Responsive: Mobile-first + breakpoint'ler (sm, md, lg, xl) + flexible grid
+    Animasyon: Smooth hover + loading state + micro-interaction'lar
+    Form: Clean layout + inline validation + disabled state'ler
+    Card: Consistent padding + subtle shadow + hover elevation
+    Icon: Lucide React + consistent boyutlar + icon+text kombinasyonu
+    Loading: Skeleton loading + consistent pattern'ler
+    Error: User-friendly mesajlar + retry mekanizmaları
+    A11y: Semantic HTML + ARIA + keyboard navigation + color contrast
 
-        Örnek:
-        ```tsx
-        const handleSubmit = useCallback(async (data) => {
-          // form submit logic
-        }, [dependencies]);
-
-        const renderField = useCallback(({ field }) => (
-          <FormItem>
-            <Input {...field} />
-          </FormItem>
-        ), [isLoading]);
-        ```
-
-    Function Separation Pattern:
-        Karmaşık render logic'i ayrı function'lara bölünür
-        Her function useCallback ile optimize edilir
-        Kod okunabilirliği artırılır
-
-        Örnek:
-        ```tsx
-        // ❌ Inline render
-        render={({ field }) => (
-          <FormItem>...</FormItem>
-        )}
-
-        // ✅ Separated function
-        const renderField = useCallback(({ field }) => (
-          <FormItem>...</FormItem>
-        ), [dependencies]);
-
-        <FormField render={renderField} />
-        ```
-
-    Error Handling:
-        Try-catch bloklarında console.error ile hata loglama
-        User-friendly error mesajları
-        Double submission prevention
-
-        Örnek:
-        ```tsx
-        try {
-          const result = await submitData(data);
-          // success handling
-        } catch (error) {
-          console.error('Submit error:', error);
-          toastError('Hata', 'Bir hata oluştu');
-        }
-        ```
-
-    Loading State Management:
-        isLoading state'i ile double submission engellenir
-        Loading durumunda form field'ları disabled edilir
-        Button'lar loading prop'u ile optimize edilir
-
-        Örnek:
-        ```tsx
-        const onSubmit = useCallback(async (data) => {
-          if (isLoading) return; // Prevent double submission
-          setIsLoading(true);
-          // ... submit logic
-        }, [isLoading]);
-        ```
-
-    CSS Class Optimizasyonları:
-        Ortak CSS class'ları globals.css'te tanımlanır
-        Tekrar eden class'lar için utility class'lar oluşturulur
-        DRY principle uygulanır
-
-        Örnek:
-        ```css
-        @layer components {
-          .nav-item {
-            @apply text-sm font-semibold text-foreground hover:text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all duration-200;
-          }
-        }
-        ```
-
-    TypeScript Best Practices:
-        any tipi kullanımı yasaktır
-        Proper type definitions kullanılır
-        React Hook Form için ControllerRenderProps type'ları
-
-        Örnek:
-        ```tsx
-        const renderField = useCallback(({ field }: { field: ControllerRenderProps<FormData, 'fieldName'> }) => (
-          <FormItem>
-            <Input {...field} />
-          </FormItem>
-        ), [dependencies]);
-        ```
-
-    Component Structure:
-        Import'lar mantıklı sırayla düzenlenir
-        Hook'lar component'in başında tanımlanır
-        Render fonksiyonları useCallback ile optimize edilir
-        Return statement en sonda yer alır
-
-        Örnek:
-        ```tsx
-        'use client';
-
-        import { useState, useCallback, memo } from 'react';
-        // ... other imports
-
-        export const MyComponent = memo(function MyComponent() {
-          // 1. State hooks
-          const [isLoading, setIsLoading] = useState(false);
-
-          // 2. Event handlers (useCallback)
-          const handleSubmit = useCallback(async (data) => {
-            // logic
-          }, [dependencies]);
-
-          // 3. Render functions (useCallback)
-          const renderField = useCallback(({ field }) => (
-            // JSX
-          ), [dependencies]);
-
-          // 4. Return statement
-          return (
-            <div>
-              {/* JSX */}
-            </div>
-          );
-        });
-        ```
-
-    Performance Metrics:
-        %30-40 daha hızlı render süreleri
-        Gereksiz re-render'lar engellendi
-        Memory kullanımı optimize edildi
-        Bundle size azaltıldı
-
-Bu optimizasyonlar proje genelinde tutarlı şekilde uygulanır ve kod kalitesini artırır.
+Bu tasarım standartları tutarlı UX sağlar.
