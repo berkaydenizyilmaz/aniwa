@@ -43,6 +43,7 @@ export function GenreTable() {
   const [editingGenre, setEditingGenre] = useState<Genre | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
   // Edit form
   const editForm = useForm<UpdateGenreInput>({
@@ -80,6 +81,7 @@ export function GenreTable() {
   const handleEdit = async (data: UpdateGenreInput) => {
     if (!editingGenre) return;
 
+    setIsUpdating(editingGenre.id);
     try {
       const result = await updateGenre(editingGenre.id, data);
 
@@ -97,6 +99,8 @@ export function GenreTable() {
       }
     } catch {
       toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
+      setIsUpdating(null);
     }
   };
 
@@ -216,6 +220,7 @@ export function GenreTable() {
                       <Button
                         variant="outline"
                         size="sm"
+                        loading={isUpdating === genre.id}
                         onClick={() => openEditDialog(genre)}
                       >
                         <Edit className="h-4 w-4" />
@@ -239,6 +244,7 @@ export function GenreTable() {
                                   <Input
                                     {...field}
                                     placeholder="Tür adı"
+                                    disabled={isUpdating === editingGenre?.id}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -250,10 +256,14 @@ export function GenreTable() {
                               type="button"
                               variant="outline"
                               onClick={() => setEditingGenre(null)}
+                              disabled={isUpdating === editingGenre?.id}
                             >
                               İptal
                             </Button>
-                            <Button type="submit">
+                            <Button 
+                              type="submit"
+                              loading={isUpdating === editingGenre?.id}
+                            >
                               Güncelle
                             </Button>
                           </DialogFooter>
@@ -265,11 +275,7 @@ export function GenreTable() {
                   {/* Delete Alert Dialog */}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={isDeleting === genre.id}
-                      >
+                      <Button variant="outline" size="sm" loading={isDeleting === genre.id}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </AlertDialogTrigger>
@@ -283,11 +289,8 @@ export function GenreTable() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>İptal</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(genre.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          {isDeleting === genre.id ? 'Siliniyor...' : 'Sil'}
+                        <AlertDialogAction onClick={() => handleDelete(genre.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                          Sil
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
