@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import {
@@ -19,7 +19,7 @@ interface CreateDialogProps {
   children: React.ReactNode | ((props: { onClose: () => void }) => React.ReactNode);
 }
 
-export function CreateDialog({ 
+export const CreateDialog = memo(function CreateDialog({ 
   title, 
   description, 
   trigger,
@@ -27,29 +27,38 @@ export function CreateDialog({
 }: CreateDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleClose = () => {
+  // Dialog close handler - useCallback ile optimize edildi
+  const handleClose = useCallback(() => {
     setIsOpen(false);
-  };
+  }, []);
+
+  // Default trigger render fonksiyonu - useCallback ile optimize edildi
+  const renderDefaultTrigger = useCallback(() => (
+    <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200">
+      <Plus className="h-4 w-4 mr-2" />
+      Yeni Ekle
+    </Button>
+  ), []);
+
+  // Children render fonksiyonu - useCallback ile optimize edildi
+  const renderChildren = useCallback(() => {
+    return typeof children === 'function' ? children({ onClose: handleClose }) : children;
+  }, [children, handleClose]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {trigger || (
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Yeni Ekle
-          </Button>
-        )}
+        {trigger || renderDefaultTrigger()}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-card/90 backdrop-blur-md border border-border/20 shadow-xl">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-foreground">{title}</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             {description}
           </DialogDescription>
         </DialogHeader>
-        {typeof children === 'function' ? children({ onClose: handleClose }) : children}
+        {renderChildren()}
       </DialogContent>
     </Dialog>
   );
-} 
+}); 
