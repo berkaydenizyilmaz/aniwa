@@ -53,13 +53,13 @@
   /* PASTEL MODERN ANIME TEMA */
   --background: #f8fafc;  /* Açık ama beyaz değil - çok hafif gri-mavi */
   --foreground: #334155;
-  --primary: #0284c7;     /* Daha mavi - sky blue */
+  --primary: #0eb6d4;     /* Turkuaz-mavi arası - cyan */
   --primary-foreground: #ffffff;
   
   /* Pastel ikincil renkler */
   --secondary: #f1f5f9;   /* Arkaplan renginden biraz daha açık */
   --secondary-foreground: #475569;
-  --accent: #d946ef;      /* Daha pembe - fuchsia */
+  --accent: #e277e4;      /* Lavanta-pembe arası - daha pembe */
   --accent-foreground: #ffffff;
   
   /* Pastel nötr tonlar */
@@ -79,7 +79,7 @@
   /* UI elementleri */
   --border: #e2e8f0;
   --input: #ffffff;       /* Input beyaz - arkaplan renginden açık */
-  --ring: #0284c7;        /* Primary ile uyumlu */
+  --ring: #06b6d4;        /* Primary ile uyumlu */
   
   /* Kartlar ve modaller - arkaplan renginden daha açık */
   --card: #ffffff;        /* Beyaz - arkaplan renginden açık */
@@ -88,34 +88,34 @@
   --popover-foreground: #334155;
   
   /* Pastel chart renkleri */
-  --chart-1: #0284c7;     /* Daha mavi */
-  --chart-2: #d946ef;     /* Daha pembe */
+  --chart-1: #06b6d4;     /* Turkuaz-mavi arası */
+  --chart-2: #c026d3;     /* Lavanta-pembe arası - daha pembe */
   --chart-3: #86efac;     /* Pastel yeşil */
   --chart-4: #fde68a;     /* Pastel sarı */
-  --chart-5: #ec4899;     /* Daha pembe ton */
+  --chart-5: #d946ef;     /* Açık pembe */
   
   /* Sidebar */
   --sidebar: #f8fafc;
   --sidebar-foreground: #334155;
-  --sidebar-primary: #0284c7;
+  --sidebar-primary: #06b6d4;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #d946ef;
+  --sidebar-accent: #c036d2;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #e2e8f0;
-  --sidebar-ring: #0284c7;
+  --sidebar-ring: #06b6d4;
 }
 
 .dark {
   /* Dark mode - pastel uyumlu */
   --background: #0f172a;
   --foreground: #f8fafc;
-  --primary: #0ea5e9;     /* Dark modda daha mavi */
+  --primary: #22d3ee;     /* Dark modda turkuaz-mavi arası */
   --primary-foreground: #ffffff;
   
   /* Dark pastel ikincil */
   --secondary: #1e293b;   /* Dark arkaplan renginden açık */
   --secondary-foreground: #f8fafc;
-  --accent: #ec4899;      /* Dark modda daha pembe */
+  --accent: #d946ef;      /* Dark modda daha pembe */
   --accent-foreground: #ffffff;
   
   --muted: #334155;
@@ -134,7 +134,7 @@
   /* Dark UI */
   --border: #334155;
   --input: #1e293b;       /* Dark arkaplan renginden açık */
-  --ring: #0ea5e9;        /* Primary ile uyumlu */
+  --ring: #22d3ee;        /* Primary ile uyumlu */
   
   /* Dark kartlar - arkaplan renginden açık */
   --card: #1e293b;        /* Dark arkaplan renginden açık */
@@ -143,21 +143,21 @@
   --popover-foreground: #f8fafc;
   
   /* Dark pastel chart */
-  --chart-1: #0ea5e9;
-  --chart-2: #ec4899;
+  --chart-1: #22d3ee;
+  --chart-2: #d946ef;
   --chart-3: #6ee7b7;
   --chart-4: #fcd34d;
-  --chart-5: #f472b6;
+  --chart-5: #ec4899;
   
   /* Dark sidebar */
   --sidebar: #0f172a;
   --sidebar-foreground: #f8fafc;
-  --sidebar-primary: #0ea5e9;
+  --sidebar-primary: #22d3ee;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #ec4899;
+  --sidebar-accent: #d946ef;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #334155;
-  --sidebar-ring: #0ea5e9;
+  --sidebar-ring: #22d3ee;
 }
 
 @layer base {
