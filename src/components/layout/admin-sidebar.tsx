@@ -49,7 +49,7 @@ export function AdminSidebar({ onClose }: AdminSidebarProps) {
       </nav>
 
       {/* Auth Section at Bottom */}
-      <div className="border-t border-border/30 p-4">
+      <div className="border-t border-border/30">
         <div className="flex items-center justify-between">
           <Link 
             href={ROUTES.PAGES.HOME}

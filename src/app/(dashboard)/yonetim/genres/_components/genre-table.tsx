@@ -114,7 +114,7 @@ export function GenreTable() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <CardTitle>Türler ({filteredGenres.length})</CardTitle>
           <CreateDialog
             title="Yeni Tür Ekle"
@@ -148,16 +148,16 @@ export function GenreTable() {
             filteredGenres.map((genre) => (
               <div
                 key={genre.id}
-                className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors gap-3"
               >
-                <div className="flex-1">
-                  <div className="font-medium">{genre.name}</div>
-                  <div className="text-sm text-muted-foreground">
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium truncate">{genre.name}</div>
+                  <div className="text-sm text-muted-foreground truncate">
                     Slug: {genre.slug}
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 shrink-0">
                   {/* Edit Dialog */}
                   <EditDialog
                     title="Tür Düzenle"
