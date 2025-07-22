@@ -17,15 +17,15 @@ function Toast(props: ToastProps) {
   const getToastStyles = () => {
     switch (type) {
       case 'success':
-        return 'bg-[#86efac] border-[#4ade80] text-gray-800';
+        return 'bg-success/90 backdrop-blur-md border-success text-success-foreground';
       case 'error':
-        return 'bg-[#FF7171] border-[#f87171] text-white';
+        return 'bg-destructive/90 backdrop-blur-md border-destructive text-destructive-foreground';
       case 'warning':
-        return 'bg-[#FBF3B9] border-[#facc15] text-gray-800';
+        return 'bg-warning/90 backdrop-blur-md border-warning text-warning-foreground';
       case 'info':
-        return 'bg-[#93c5fd] border-[#60a5fa] text-white';
+        return 'bg-info/90 backdrop-blur-md border-info text-info-foreground';
       default:
-        return 'bg-[#93c5fd] border-[#60a5fa] text-white';
+        return 'bg-info/90 backdrop-blur-md border-info text-info-foreground';
     }
   };
 
@@ -45,7 +45,7 @@ function Toast(props: ToastProps) {
   };
 
   return (
-    <div className={`flex rounded-md border shadow-lg w-full min-w-[300px] md:max-w-[420px] items-center p-3 ${getToastStyles()}`}>
+    <div className={`flex rounded-md border shadow-xl w-full min-w-[300px] md:max-w-[420px] items-center p-3 ${getToastStyles()}`}>
       {/* Icon */}
       <div className="mr-3 shrink-0">
         {getToastIcon()}
