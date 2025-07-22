@@ -95,6 +95,17 @@ export async function getGenreById(id: string): Promise<ApiResponse<GetGenreResp
       throw new NotFoundError('Genre bulunamadı');
     }
 
+    // Başarılı getirme logu
+    await logger.info(
+      EVENTS.ADMIN.GENRE_RETRIEVED,
+      'Genre başarıyla getirildi',
+      { 
+        genreId: genre.id, 
+        name: genre.name, 
+        slug: genre.slug
+      }
+    );
+
     return {
       success: true,
       data: genre
@@ -138,6 +149,19 @@ export async function getAllGenres(filters?: GetGenresRequest): Promise<ApiRespo
     const paginatedGenres = filteredGenres.slice(skip, skip + limit);
 
     const totalPages = Math.ceil(total / limit);
+    
+    // Başarılı listeleme logu
+    await logger.info(
+      EVENTS.ADMIN.GENRES_RETRIEVED,
+      'Genre listesi başarıyla getirildi',
+      { 
+        total,
+        page,
+        limit,
+        totalPages,
+        search: filters?.search || null
+      }
+    );
     
     return {
       success: true,

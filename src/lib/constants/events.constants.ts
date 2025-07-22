@@ -37,6 +37,8 @@ export const EVENTS = {
     USER_UNBANNED: 'admin_user_unbanned',
     USER_DELETED: 'admin_user_deleted',
     GENRE_CREATED: 'admin_genre_created',
+    GENRE_RETRIEVED: 'admin_genre_retrieved',
+    GENRES_RETRIEVED: 'admin_genres_retrieved',
     GENRE_UPDATED: 'admin_genre_updated',
     GENRE_DELETED: 'admin_genre_deleted',
     TAG_CREATED: 'admin_tag_created',
