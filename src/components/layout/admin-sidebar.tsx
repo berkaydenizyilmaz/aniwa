@@ -15,6 +15,7 @@ export function AdminSidebar({ onClose }: AdminSidebarProps) {
 
   const navigationItems = [
     { href: ROUTES.PAGES.ADMIN.DASHBOARD, label: 'Dashboard', icon: '📊' },
+    { href: ROUTES.PAGES.ADMIN.GENRES, label: 'Türler', icon: '🎭' },
   ];
 
   return (

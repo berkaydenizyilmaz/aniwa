@@ -22,6 +22,16 @@ const rateLimiter = new Ratelimit({
 
 // Rate limit kontrolü
 export async function checkRateLimit(request: Request): Promise<RateLimitResult> {
+  // Development ortamında rate limiting'i devre dışı bırak
+  if (process.env.NODE_ENV === 'development') {
+    return {
+      success: true,
+      limit: 1000,
+      remaining: 999,
+      reset: Date.now() + 60000,
+    };
+  }
+
   try {
     // Next.js middleware'de request.ip direkt kullan
     const clientIP = (request as Request & { ip?: string }).ip;
