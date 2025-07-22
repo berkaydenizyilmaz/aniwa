@@ -35,14 +35,8 @@ export default function RootLayout({
         <SessionProvider>
           <QueryProvider>
             <ThemeProvider>
-              <main className="relative overflow-hidden min-h-screen md:pt-0 pt-0 pb-20 md:pb-0">
-                {/* Subtle anime-inspired background patterns */}
-                <div className="fixed inset-0 bg-background pointer-events-none -z-10" />
-
-                {/* Content */}
-                <div className="relative z-10">
-                  {children}
-                </div>
+              <main className="relative min-h-screen pb-20 md:pb-0">
+                {children}
               </main>
             </ThemeProvider>
             <ToasterProvider />

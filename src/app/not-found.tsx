@@ -10,8 +10,8 @@ export default function NotFound() {
         <CardContent className="pt-6">
           <div className="text-center space-y-6">
             <div className="space-y-4">
-              <h1 className="text-8xl font-bold text-muted-foreground">404</h1>
-              <h2 className="text-2xl font-bold text-muted-foreground">Sayfa Bulunamadı</h2>
+              <h1 className="text-8xl font-bold text-foreground">404</h1>
+              <h2 className="text-2xl font-bold text-foreground">Sayfa Bulunamadı</h2>
               <p className="text-muted-foreground">
                 Aradığınız sayfa mevcut değil veya taşınmış olabilir.
               </p>

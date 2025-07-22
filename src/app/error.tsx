@@ -21,7 +21,7 @@ export default function Error({ error, reset }: ErrorProps) {
         <CardContent className="pt-6">
       <div className="text-center space-y-6">
             <div className="space-y-4">
-              <h1 className="text-2xl font-bold text-muted-foreground">Bir Hata Oluştu</h1>
+              <h1 className="text-2xl font-bold text-foreground">Bir Hata Oluştu</h1>
           <p className="text-muted-foreground">
             Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.
           </p>
