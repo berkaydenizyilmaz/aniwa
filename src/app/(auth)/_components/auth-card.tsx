@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 import Link from 'next/link';
 
 interface AuthLink {
@@ -14,7 +14,7 @@ interface AuthCardProps {
   links?: AuthLink[];
 }
 
-export function AuthCard({ title, description, children, links }: AuthCardProps) {
+export const AuthCard = memo(function AuthCard({ title, description, children, links }: AuthCardProps) {
   return (
     <>
       {/* Mobile: Kart yok, form direkt ekranı kullanır */}
@@ -88,4 +88,4 @@ export function AuthCard({ title, description, children, links }: AuthCardProps)
     </div>
     </>
   );
-} 
+}); 

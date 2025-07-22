@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -27,7 +27,7 @@ export function RegisterForm() {
     },
   });
 
-  const onSubmit = async (data: RegisterInput) => {
+  const onSubmit = useCallback(async (data: RegisterInput) => {
     setIsLoading(true);
 
     try {
@@ -51,7 +51,7 @@ export function RegisterForm() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [router, form.setError]);
 
   return (
     <Form {...form}>

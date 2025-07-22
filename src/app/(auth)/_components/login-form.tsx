@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
@@ -24,7 +24,7 @@ export function LoginForm() {
     },
   });
 
-  const onSubmit = async (data: LoginInput) => {
+  const onSubmit = useCallback(async (data: LoginInput) => {
     setIsLoading(true);
 
     try {
@@ -46,7 +46,7 @@ export function LoginForm() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [router]);
 
   return (
     <Form {...form}>

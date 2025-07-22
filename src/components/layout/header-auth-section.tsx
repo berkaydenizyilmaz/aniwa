@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession, signOut } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -17,17 +17,17 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ROUTES } from '@/lib/constants/routes.constants';
 import { User, Bell, Settings, LogOut } from 'lucide-react';
 
-export function HeaderAuthSection() {
+export const HeaderAuthSection = memo(function HeaderAuthSection() {
   const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
 
   // Çıkış yapma işlemi
-  const handleSignOut = () => {
+  const handleSignOut = useCallback(() => {
     signOut({ callbackUrl: ROUTES.PAGES.HOME });
-  };
+  }, []);
 
-  // Dropdown içeriği
-  const renderDropdownContent = () => {
+  // Dropdown içeriği - useCallback ile optimize edildi
+  const renderDropdownContent = useCallback(() => {
     if (!session) return null;
     
     return (
@@ -58,7 +58,7 @@ export function HeaderAuthSection() {
         </DropdownMenuItem>
       </>
     );
-  };
+  }, [session, handleSignOut]);
 
   // Loading durumu
   if (status === 'loading') {
@@ -118,4 +118,4 @@ export function HeaderAuthSection() {
       </DropdownMenu>
     </div>
   );
-} 
+}); 

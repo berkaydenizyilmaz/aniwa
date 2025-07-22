@@ -53,13 +53,13 @@
   /* PASTEL MODERN ANIME TEMA */
   --background: #f8fafc;  /* Açık ama beyaz değil - çok hafif gri-mavi */
   --foreground: #334155;
-  --primary: #22d3ee;     /* Turkuazımsı mavi - cyan tonlu */
+  --primary: #0284c7;     /* Daha mavi - sky blue */
   --primary-foreground: #ffffff;
   
   /* Pastel ikincil renkler */
   --secondary: #f1f5f9;   /* Arkaplan renginden biraz daha açık */
   --secondary-foreground: #475569;
-  --accent: #a78bfa;      /* Lavanta moru - turkuaza uyumlu */
+  --accent: #d946ef;      /* Daha pembe - fuchsia */
   --accent-foreground: #ffffff;
   
   /* Pastel nötr tonlar */
@@ -79,7 +79,7 @@
   /* UI elementleri */
   --border: #e2e8f0;
   --input: #ffffff;       /* Input beyaz - arkaplan renginden açık */
-  --ring: #7dd3fc;
+  --ring: #0284c7;        /* Primary ile uyumlu */
   
   /* Kartlar ve modaller - arkaplan renginden daha açık */
   --card: #ffffff;        /* Beyaz - arkaplan renginden açık */
@@ -88,34 +88,34 @@
   --popover-foreground: #334155;
   
   /* Pastel chart renkleri */
-  --chart-1: #22d3ee;     /* Turkuazımsı mavi */
-  --chart-2: #a78bfa;     /* Lavanta moru */
+  --chart-1: #0284c7;     /* Daha mavi */
+  --chart-2: #d946ef;     /* Daha pembe */
   --chart-3: #86efac;     /* Pastel yeşil */
   --chart-4: #fde68a;     /* Pastel sarı */
-  --chart-5: #c4b5fd;     /* Açık lavanta */
+  --chart-5: #ec4899;     /* Daha pembe ton */
   
   /* Sidebar */
   --sidebar: #f8fafc;
   --sidebar-foreground: #334155;
-  --sidebar-primary: #22d3ee;
+  --sidebar-primary: #0284c7;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #a78bfa;
+  --sidebar-accent: #d946ef;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #e2e8f0;
-  --sidebar-ring: #22d3ee;
+  --sidebar-ring: #0284c7;
 }
 
 .dark {
   /* Dark mode - pastel uyumlu */
   --background: #0f172a;
   --foreground: #f8fafc;
-  --primary: #67e8f9;     /* Dark modda daha açık turkuaz */
+  --primary: #0ea5e9;     /* Dark modda daha mavi */
   --primary-foreground: #ffffff;
   
   /* Dark pastel ikincil */
   --secondary: #1e293b;   /* Dark arkaplan renginden açık */
   --secondary-foreground: #f8fafc;
-  --accent: #c4b5fd;      /* Açık lavanta - dark modda daha canlı */
+  --accent: #ec4899;      /* Dark modda daha pembe */
   --accent-foreground: #ffffff;
   
   --muted: #334155;
@@ -134,7 +134,7 @@
   /* Dark UI */
   --border: #334155;
   --input: #1e293b;       /* Dark arkaplan renginden açık */
-  --ring: #93c5fd;
+  --ring: #0ea5e9;        /* Primary ile uyumlu */
   
   /* Dark kartlar - arkaplan renginden açık */
   --card: #1e293b;        /* Dark arkaplan renginden açık */
@@ -143,21 +143,21 @@
   --popover-foreground: #f8fafc;
   
   /* Dark pastel chart */
-  --chart-1: #67e8f9;
-  --chart-2: #c4b5fd;
+  --chart-1: #0ea5e9;
+  --chart-2: #ec4899;
   --chart-3: #6ee7b7;
   --chart-4: #fcd34d;
-  --chart-5: #d8b4fe;
+  --chart-5: #f472b6;
   
   /* Dark sidebar */
   --sidebar: #0f172a;
   --sidebar-foreground: #f8fafc;
-  --sidebar-primary: #67e8f9;
+  --sidebar-primary: #0ea5e9;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #c4b5fd;
+  --sidebar-accent: #ec4899;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #334155;
-  --sidebar-ring: #67e8f9;
+  --sidebar-ring: #0ea5e9;
 }
 
 @layer base {
@@ -167,5 +167,50 @@
   
   body {
     @apply bg-background text-foreground font-normal;
+  }
+}
+
+@layer components {
+  /* Navigasyon öğeleri için ortak stiller */
+  .nav-item {
+    @apply text-sm font-semibold text-foreground hover:text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all duration-200;
+  }
+  
+  .nav-item-mobile {
+    @apply flex-1 h-full flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all duration-200;
+  }
+  
+  .nav-item-mobile-border {
+    @apply border-r border-border/20;
+  }
+  
+  .nav-item-mobile-border-left {
+    @apply border-l border-border/20;
+  }
+  
+  /* Auth section ortak stilleri */
+  .auth-dropdown {
+    @apply bg-card/80 backdrop-blur-md border-border/20 shadow-xl;
+  }
+  
+  .auth-dropdown-item {
+    @apply text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200;
+  }
+  
+  .auth-dropdown-item-danger {
+    @apply text-foreground hover:text-red-500 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-500 transition-all duration-200;
+  }
+  
+  /* İkon ortak stilleri */
+  .icon-nav {
+    @apply h-5 w-5 stroke-[1.5];
+  }
+  
+  .icon-dropdown {
+    @apply mr-2 h-4 w-4 stroke-[1.5];
+  }
+  
+  .icon-avatar {
+    @apply h-3 w-3 stroke-[1.5];
   }
 }

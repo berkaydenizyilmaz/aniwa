@@ -9,16 +9,16 @@ import { Home, Film, List } from 'lucide-react';
 export function MobileBottomNav() {
   return (
     <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/30 backdrop-blur-md border-t border-border/20 shadow-xl">
-      <div className="flex items-center justify-around px-2 py-3">
+      <div className="flex items-center h-14">
         {/* Ana Sayfa */}
         <Button 
           variant="ghost" 
           size="icon" 
           asChild
-          className="flex-1 h-14 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-200"
+          className="nav-item-mobile nav-item-mobile-border rounded-none"
         >
           <Link href={ROUTES.PAGES.HOME}>
-            <Home className="h-6 w-6" />
+            <Home className="icon-nav" />
           </Link>
         </Button>
 
@@ -27,10 +27,10 @@ export function MobileBottomNav() {
           variant="ghost" 
           size="icon" 
           asChild
-          className="flex-1 h-14 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-200"
+          className="nav-item-mobile nav-item-mobile-border rounded-none"
         >
           <Link href={ROUTES.PAGES.ANIME}>
-            <Film className="h-6 w-6" />
+            <Film className="icon-nav" />
           </Link>
         </Button>
 
@@ -39,10 +39,10 @@ export function MobileBottomNav() {
           variant="ghost" 
           size="icon" 
           asChild
-          className="flex-1 h-14 rounded-xl hover:bg-primary/10 hover:text-primary transition-all duration-200"
+          className="nav-item-mobile nav-item-mobile-border rounded-none"
         >
           <Link href={ROUTES.PAGES.LISTS}>
-            <List className="h-6 w-6" />
+            <List className="icon-nav" />
           </Link>
         </Button>
 
