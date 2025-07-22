@@ -54,8 +54,8 @@ export async function createTag(
       slug,
       description: data.description,
       category: data.category,
-      isAdult: data.isAdult,
-      isSpoiler: data.isSpoiler,
+      isAdult: data.isAdult ?? false,
+      isSpoiler: data.isSpoiler ?? false,
     });
 
     // Başarılı oluşturma logu

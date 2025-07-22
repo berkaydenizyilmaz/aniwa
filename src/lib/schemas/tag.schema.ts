@@ -8,8 +8,8 @@ export const createTagSchema = z.object({
   name: z.string().min(MASTER_DATA.NAME.MIN_LENGTH, 'Etiket adı gerekli').max(MASTER_DATA.NAME.MAX_LENGTH, 'Etiket adı çok uzun'),
   description: z.string().max(MASTER_DATA.DESCRIPTION.MAX_LENGTH, 'Açıklama çok uzun').optional(),
   category: z.nativeEnum(MASTER_DATA.TAG_CATEGORY).optional(),
-  isAdult: z.boolean().default(false),
-  isSpoiler: z.boolean().default(false),
+  isAdult: z.boolean(),
+  isSpoiler: z.boolean(),
 });
 
 // Tag güncelleme şeması

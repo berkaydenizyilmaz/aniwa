@@ -110,7 +110,7 @@ export function TagForm({ onSuccess, onCancel, onClose }: TagFormProps) {
               <Select
                 disabled={isLoading}
                 onValueChange={field.onChange}
-                value={field.value}
+                value={field.value || ''}
               >
                 <FormControl>
                   <SelectTrigger>

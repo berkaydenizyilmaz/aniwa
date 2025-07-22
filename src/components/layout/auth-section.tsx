@@ -20,9 +20,10 @@ import { User, Bell, Settings, LogOut, Shield, Users, Edit, LogIn, UserPlus } fr
 
 interface AuthSectionProps {
   variant?: 'header' | 'mobile' | 'sidebar';
+  collapsed?: boolean;
 }
 
-export function AuthSection({ variant = 'header' }: AuthSectionProps) {
+export function AuthSection({ variant = 'header', collapsed = false }: AuthSectionProps) {
   const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -134,7 +135,7 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
     
     if (variant === 'sidebar') {
       return (
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 p-2">
           <Skeleton className="h-8 w-8 rounded-full" />
           <Skeleton className="h-4 w-20" />
         </div>
@@ -186,13 +187,13 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
 
     if (variant === 'sidebar') {
       return (
-        <div className="flex items-center space-x-3">
-          <User className="h-6 w-6 text-secondary-foreground" />
+        <div className="flex items-center space-x-3 p-2">
+          <User className="h-8 w-8 text-secondary-foreground" />
           <div className="flex flex-col">
             <Link href={ROUTES.PAGES.AUTH.LOGIN} className="text-sm font-semibold text-secondary-foreground hover:text-secondary-foreground/80 transition-all duration-200">
               Giriş
             </Link>
-            <Link href={ROUTES.PAGES.AUTH.REGISTER} className="text-xs text-secondary-foreground/60 hover:text-secondary-foreground/80 transition-all duration-200">
+            <Link href={ROUTES.PAGES.AUTH.REGISTER} className="text-sm text-secondary-foreground/60 hover:text-secondary-foreground/80 transition-all duration-200">
               Kayıt Ol
             </Link>
           </div>
@@ -251,14 +252,14 @@ export function AuthSection({ variant = 'header' }: AuthSectionProps) {
     return (
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <div className="flex items-center space-x-2 cursor-pointer hover:bg-secondary-foreground/10 p-1 rounded transition-all duration-200">
-            <Avatar className="h-6 w-6">
+          <div className="flex items-center space-x-2 cursor-pointer hover:bg-secondary-foreground/10 p-2 rounded transition-all duration-200">
+            <Avatar className="h-8 w-8">
               <AvatarImage src={session.user.image || undefined} alt={session.user.username} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+              <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
                 {getAvatarFallback(session.user.username)}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-semibold text-secondary-foreground">{session.user.username}</span>
+            {!collapsed && <span className="text-sm font-semibold text-secondary-foreground">{session.user.username}</span>}
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" side="top" className="w-64 bg-secondary border-secondary mb-2">

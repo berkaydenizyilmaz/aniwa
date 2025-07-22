@@ -110,7 +110,7 @@ export function TagTable() {
     editForm.reset({ 
       name: tag.name,
       description: tag.description || undefined,
-      category: tag.category,
+      category: tag.category as TagCategory,
       isAdult: tag.isAdult,
       isSpoiler: tag.isSpoiler
     });
@@ -238,7 +238,7 @@ export function TagTable() {
                                 <Select
                                   disabled={isDialogUpdating}
                                   onValueChange={field.onChange}
-                                  value={field.value}
+                                  value={field.value || ''}
                                 >
                                   <FormControl>
                                     <SelectTrigger>
