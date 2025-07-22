@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -21,7 +20,11 @@ interface EditDialogProps<T = Record<string, unknown>> {
   isLoading?: boolean;
   variant?: 'outline' | 'default';
   size?: 'sm' | 'default';
-  children: React.ReactNode;
+  children: React.ReactNode | ((props: { 
+    onClose: () => void; 
+    onSubmit: (data: T) => Promise<void>;
+    isUpdating: boolean;
+  }) => React.ReactNode);
 }
 
 export function EditDialog<T = Record<string, unknown>>({ 
@@ -37,7 +40,11 @@ export function EditDialog<T = Record<string, unknown>>({
   const [isOpen, setIsOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleEdit = async (data: T) => {
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  const handleSubmit = async (data: T) => {
     setIsUpdating(true);
     try {
       await onEdit(data);
@@ -64,25 +71,11 @@ export function EditDialog<T = Record<string, unknown>>({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          {children}
+          {typeof children === 'function' 
+            ? children({ onClose: handleClose, onSubmit: handleSubmit, isUpdating }) 
+            : children
+          }
         </div>
-        <DialogFooter>
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={() => setIsOpen(false)}
-            disabled={isUpdating}
-          >
-            İptal
-          </Button>
-          <Button 
-            type="submit" 
-            loading={isUpdating}
-            onClick={() => handleEdit({} as T)} // Bu form submit ile değişecek
-          >
-            Güncelle
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

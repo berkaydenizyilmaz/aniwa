@@ -16,7 +16,7 @@ interface CreateDialogProps {
   title: string;
   description: string;
   trigger?: React.ReactNode;
-  children: React.ReactNode;
+  children: React.ReactNode | ((props: { onClose: () => void }) => React.ReactNode);
 }
 
 export function CreateDialog({ 
@@ -26,6 +26,10 @@ export function CreateDialog({
   children
 }: CreateDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -44,7 +48,7 @@ export function CreateDialog({
             {description}
           </DialogDescription>
         </DialogHeader>
-        {children}
+        {typeof children === 'function' ? children({ onClose: handleClose }) : children}
       </DialogContent>
     </Dialog>
   );

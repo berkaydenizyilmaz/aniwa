@@ -14,9 +14,10 @@ import { setFormFieldErrors } from '@/lib/utils/server-action-error-handler';
 interface GenreFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
+  onClose?: () => void;
 }
 
-export function GenreForm({ onSuccess, onCancel }: GenreFormProps) {
+export function GenreForm({ onSuccess, onCancel, onClose }: GenreFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<CreateGenreInput>({
@@ -44,6 +45,7 @@ export function GenreForm({ onSuccess, onCancel }: GenreFormProps) {
         toastSuccess('Başarılı', 'Tür başarıyla oluşturuldu!');
         form.reset();
         onSuccess?.();
+        onClose?.(); // Dialog'u kapat
       }
     } catch {
       toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');

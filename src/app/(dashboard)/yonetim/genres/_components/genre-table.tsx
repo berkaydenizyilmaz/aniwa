@@ -14,26 +14,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { updateGenreSchema, type UpdateGenreInput } from '@/lib/schemas/genre.schema';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { DialogFooter } from '@/components/ui/dialog';
 import { 
   DeleteAlert, 
   CreateDialog, 
   SearchInput, 
-  LoadingSkeleton 
+  LoadingSkeleton,
+  EditDialog
 } from '../../_components';
 
 export function GenreTable() {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [editingGenre, setEditingGenre] = useState<Genre | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
@@ -70,12 +62,10 @@ export function GenreTable() {
   );
 
   // Edit işlemi
-  const handleEdit = async (data: UpdateGenreInput) => {
-    if (!editingGenre) return;
-
-    setIsUpdating(editingGenre.id);
+  const handleEdit = async (genreId: string, data: UpdateGenreInput) => {
+    setIsUpdating(genreId);
     try {
-      const result = await updateGenre(editingGenre.id, data);
+      const result = await updateGenre(genreId, data);
 
       if (!result.success) {
         if (result.fieldErrors) {
@@ -85,7 +75,6 @@ export function GenreTable() {
         }
       } else {
         toastSuccess('Başarılı', 'Tür başarıyla güncellendi!');
-        setEditingGenre(null);
         editForm.reset();
         fetchGenres(); // Verileri yenile
       }
@@ -114,7 +103,6 @@ export function GenreTable() {
 
   // Edit dialog'u aç
   const openEditDialog = (genre: Genre) => {
-    setEditingGenre(genre);
     editForm.reset({ name: genre.name });
   };
 
@@ -132,11 +120,14 @@ export function GenreTable() {
             title="Yeni Tür Ekle"
             description="Yeni bir anime türü ekleyin. Tür adı benzersiz olmalıdır."
           >
-            <GenreForm
-              onSuccess={() => {
-                fetchGenres();
-              }}
-            />
+            {({ onClose }) => (
+              <GenreForm
+                onSuccess={() => {
+                  fetchGenres();
+                }}
+                onClose={onClose}
+              />
+            )}
           </CreateDialog>
         </div>
         
@@ -168,8 +159,12 @@ export function GenreTable() {
                 
                 <div className="flex items-center space-x-2">
                   {/* Edit Dialog */}
-                  <Dialog open={editingGenre?.id === genre.id} onOpenChange={(open) => !open && setEditingGenre(null)}>
-                    <DialogTrigger asChild>
+                  <EditDialog
+                    title="Tür Düzenle"
+                    description={`"${genre.name}" türünün adını güncelleyin.`}
+                    onEdit={(data: UpdateGenreInput) => handleEdit(genre.id, data)}
+                    isLoading={isUpdating === genre.id}
+                    trigger={
                       <Button
                         variant="outline"
                         size="sm"
@@ -178,16 +173,11 @@ export function GenreTable() {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Tür Düzenle</DialogTitle>
-                        <DialogDescription>
-                          &ldquo;{genre.name}&rdquo; türünün adını güncelleyin.
-                        </DialogDescription>
-                      </DialogHeader>
+                    }
+                  >
+                    {({ onClose, onSubmit, isUpdating: isDialogUpdating }) => (
                       <Form {...editForm}>
-                        <form onSubmit={editForm.handleSubmit(handleEdit)} className="space-y-4">
+                        <form onSubmit={editForm.handleSubmit(onSubmit)} className="space-y-4">
                           <FormField
                             control={editForm.control}
                             name="name"
@@ -197,7 +187,7 @@ export function GenreTable() {
                                   <Input
                                     {...field}
                                     placeholder="Tür adı"
-                                    disabled={isUpdating === editingGenre?.id}
+                                    disabled={isDialogUpdating}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -208,22 +198,22 @@ export function GenreTable() {
                             <Button
                               type="button"
                               variant="outline"
-                              onClick={() => setEditingGenre(null)}
-                              disabled={isUpdating === editingGenre?.id}
+                              onClick={onClose}
+                              disabled={isDialogUpdating}
                             >
                               İptal
                             </Button>
                             <Button 
                               type="submit"
-                              loading={isUpdating === editingGenre?.id}
+                              loading={isDialogUpdating}
                             >
                               Güncelle
                             </Button>
                           </DialogFooter>
                         </form>
                       </Form>
-                    </DialogContent>
-                  </Dialog>
+                    )}
+                  </EditDialog>
 
                   {/* Delete Alert */}
                   <DeleteAlert
