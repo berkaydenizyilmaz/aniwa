@@ -22,8 +22,8 @@ const rateLimiter = new Ratelimit({
 
 // Rate limit kontrolü
 export async function checkRateLimit(request: Request): Promise<RateLimitResult> {
-  // Development ortamında rate limiting'i devre dışı bırak
-  if (process.env.NODE_ENV === 'development') {
+  // Development ve production ortamında rate limiting'i devre dışı bırak
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'production') {
     return {
       success: true,
       limit: 1000,

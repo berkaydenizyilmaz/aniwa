@@ -62,7 +62,7 @@ export const MobileAuthSection = memo(function MobileAuthSection() {
   // Loading durumu
   if (status === 'loading') {
     return (
-      <div className="flex-1 h-14 flex items-center justify-center nav-item-mobile-border-left">
+      <div className="flex-1 h-14 flex items-center justify-center border-l border-border/20">
         <Skeleton className="h-5 w-5 bg-muted animate-pulse rounded-full" />
       </div>
     );
@@ -71,15 +71,14 @@ export const MobileAuthSection = memo(function MobileAuthSection() {
   // Giriş yapmamış kullanıcı
   if (!session) {
     return (
-      <div className="flex-1 h-14 flex items-center justify-center nav-item-mobile-border-left">
+      <div className="flex-1 h-14 flex items-center justify-center border-l border-border/20">
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              size="icon"
-              className="w-full h-full nav-item-mobile"
+              className="w-full h-full rounded-none hover:bg-primary/10 hover:text-primary transition-all duration-200"
             >
-              <User className="icon-nav" />
+              <User className="h-5 w-5 stroke-[1.5]" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="center" side="top" className="w-48 mb-2 auth-dropdown">
@@ -103,18 +102,17 @@ export const MobileAuthSection = memo(function MobileAuthSection() {
 
   // Giriş yapmış kullanıcı
   return (
-    <div className="flex-1 h-14 flex items-center justify-center nav-item-mobile-border-left">
+    <div className="flex-1 h-14 flex items-center justify-center border-l border-border/20">
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            size="icon"
-            className="w-full h-full nav-item-mobile"
+            className="w-full h-full rounded-none hover:bg-primary/10 hover:text-primary transition-all duration-200"
           >
             <Avatar className="h-5 w-5">
               <AvatarImage src={session.user.image || undefined} alt={session.user.username} />
               <AvatarFallback className="bg-primary text-primary-foreground">
-                <User className="icon-avatar" />
+                <User className="h-3 w-3 stroke-[1.5]" />
               </AvatarFallback>
             </Avatar>
           </Button>
