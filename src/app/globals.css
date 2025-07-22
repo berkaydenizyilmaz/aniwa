@@ -25,6 +25,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -53,13 +54,13 @@
   --background: #f8fafc;  /* Açık ama beyaz değil - çok hafif gri-mavi */
   --foreground: #334155;
   --primary: #22d3ee;     /* Turkuazımsı mavi - cyan tonlu */
-  --primary-foreground: #0f172a;
+  --primary-foreground: #ffffff;
   
   /* Pastel ikincil renkler */
   --secondary: #f1f5f9;   /* Arkaplan renginden biraz daha açık */
   --secondary-foreground: #475569;
-  --accent: #f8bbd9;      /* Turkuaza uygun yumuşak gül pembesi */
-  --accent-foreground: #0f172a;
+  --accent: #a78bfa;      /* Lavanta moru - turkuaza uyumlu */
+  --accent-foreground: #ffffff;
   
   /* Pastel nötr tonlar */
   --muted: #f1f5f9;
@@ -69,7 +70,11 @@
   --success: #86efac;     /* Pastel yeşil */
   --warning: #fde68a;     /* Pastel sarı */
   --destructive: #e67bec; /* Pastel kırmızı */
+  --destructive-foreground: #ffffff;
   --info: #a5f3fc;        /* Pastel cyan */
+  
+  /* Özel kırmızı renk */
+  --red: #ef4444;
   
   /* UI elementleri */
   --border: #e2e8f0;
@@ -84,18 +89,18 @@
   
   /* Pastel chart renkleri */
   --chart-1: #22d3ee;     /* Turkuazımsı mavi */
-  --chart-2: #f8bbd9;     /* Uyumlu gül pembesi */
+  --chart-2: #a78bfa;     /* Lavanta moru */
   --chart-3: #86efac;     /* Pastel yeşil */
   --chart-4: #fde68a;     /* Pastel sarı */
-  --chart-5: #c4b5fd;     /* Pastel mor */
+  --chart-5: #c4b5fd;     /* Açık lavanta */
   
   /* Sidebar */
   --sidebar: #f8fafc;
   --sidebar-foreground: #334155;
   --sidebar-primary: #22d3ee;
-  --sidebar-primary-foreground: #0f172a;
-  --sidebar-accent: #f8bbd9;
-  --sidebar-accent-foreground: #0f172a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #a78bfa;
+  --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #e2e8f0;
   --sidebar-ring: #22d3ee;
 }
@@ -105,13 +110,13 @@
   --background: #0f172a;
   --foreground: #f8fafc;
   --primary: #67e8f9;     /* Dark modda daha açık turkuaz */
-  --primary-foreground: #0f172a;
+  --primary-foreground: #ffffff;
   
   /* Dark pastel ikincil */
   --secondary: #1e293b;   /* Dark arkaplan renginden açık */
   --secondary-foreground: #f8fafc;
-  --accent: #fbb6ce;      /* Dark modda daha canlı pembe */
-  --accent-foreground: #0f172a;
+  --accent: #c4b5fd;      /* Açık lavanta - dark modda daha canlı */
+  --accent-foreground: #ffffff;
   
   --muted: #334155;
   --muted-foreground: #94a3b8;
@@ -120,7 +125,11 @@
   --success: #6ee7b7;
   --warning: #fcd34d;
   --destructive: #f87171;
+  --destructive-foreground: #ffffff;
   --info: #67e8f9;
+  
+  /* Özel kırmızı renk */
+  --red: #f87171;
   
   /* Dark UI */
   --border: #334155;
@@ -135,7 +144,7 @@
   
   /* Dark pastel chart */
   --chart-1: #67e8f9;
-  --chart-2: #fbb6ce;
+  --chart-2: #c4b5fd;
   --chart-3: #6ee7b7;
   --chart-4: #fcd34d;
   --chart-5: #d8b4fe;
@@ -144,9 +153,9 @@
   --sidebar: #0f172a;
   --sidebar-foreground: #f8fafc;
   --sidebar-primary: #67e8f9;
-  --sidebar-primary-foreground: #0f172a;
-  --sidebar-accent: #fbb6ce;
-  --sidebar-accent-foreground: #0f172a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #c4b5fd;
+  --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #334155;
   --sidebar-ring: #67e8f9;
 }

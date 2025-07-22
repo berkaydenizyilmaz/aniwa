@@ -52,9 +52,9 @@ export function HeaderAuthSection() {
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut} className="text-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200 group">
-          <LogOut className="mr-2 h-4 w-4 group-hover:text-destructive transition-colors duration-200" />
-          <span className="group-hover:text-destructive transition-colors duration-200">Çıkış Yap</span>
+        <DropdownMenuItem onClick={handleSignOut} className="text-foreground hover:text-red-500 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-500 transition-all duration-200 group">
+          <LogOut className="mr-2 h-4 w-4 group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200" />
+          <span className="group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200">Çıkış Yap</span>
         </DropdownMenuItem>
       </>
     );
@@ -81,14 +81,12 @@ export function HeaderAuthSection() {
         <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
-            size="sm"
             asChild
             className="hover:text-primary hover:bg-primary/10 transition-all duration-200"
           >
             <Link href={ROUTES.PAGES.AUTH.LOGIN}>Giriş</Link>
           </Button>
           <Button
-            size="sm"
             asChild
             className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
           >
