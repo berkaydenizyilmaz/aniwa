@@ -58,6 +58,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <Button 
           variant="outline" 
           onClick={() => router.push(ROUTES.PAGES.AUTH.FORGOT_PASSWORD)}
+          className="bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 border-primary/20 text-primary font-semibold shadow-md hover:shadow-lg transition-all duration-300"
         >
           Yeni Şifre Sıfırlama Bağlantısı İste
         </Button>
@@ -106,7 +107,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
         <Button
           type="submit"
-          className="w-full mt-6"
+          className="w-full mt-6 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
           loading={isLoading}
         >
           Şifreyi Güncelle

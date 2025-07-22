@@ -19,7 +19,7 @@ export function Header() {
             <div className="flex items-center space-x-2">
               <Link 
                 href={ROUTES.PAGES.HOME} 
-                className="text-2xl font-bold text-primary hover:text-primary/80 transition-colors duration-200 group"
+                className="text-xl font-bold text-primary hover:text-primary/80 transition-colors duration-200 group"
               >
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent group-hover:from-primary/80 group-hover:to-accent/80 transition-all duration-200">
                   Aniwa
@@ -31,19 +31,19 @@ export function Header() {
             <nav className="flex items-center space-x-2">
               <Link 
                 href={ROUTES.PAGES.HOME} 
-                className="text-base font-semibold text-foreground hover:text-primary hover:bg-primary/10 px-4 py-2 rounded-lg transition-all duration-200"
+                className="text-sm font-semibold text-foreground hover:text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all duration-200"
               >
                 Ana Sayfa
               </Link>
               <Link 
                 href={ROUTES.PAGES.ANIME} 
-                className="text-base font-semibold text-foreground hover:text-primary hover:bg-primary/10 px-4 py-2 rounded-lg transition-all duration-200"
+                className="text-sm font-semibold text-foreground hover:text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all duration-200"
               >
                 Anime
               </Link>
               <Link 
                 href={ROUTES.PAGES.LISTS} 
-                className="text-base font-semibold text-foreground hover:text-primary hover:bg-primary/10 px-4 py-2 rounded-lg transition-all duration-200"
+                className="text-sm font-semibold text-foreground hover:text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all duration-200"
               >
                 Listeler
               </Link>

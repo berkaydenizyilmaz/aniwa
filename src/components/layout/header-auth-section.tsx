@@ -66,8 +66,8 @@ export function HeaderAuthSection() {
       <div className="flex items-center space-x-3">
         <ThemeToggle />
         <div className="flex items-center space-x-3">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-7 w-7 rounded-full" />
         </div>
       </div>
     );
@@ -81,12 +81,14 @@ export function HeaderAuthSection() {
         <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
+            size="sm"
             asChild
             className="hover:text-primary hover:bg-primary/10 transition-all duration-200"
           >
             <Link href={ROUTES.PAGES.AUTH.LOGIN}>Giriş</Link>
           </Button>
           <Button
+            size="sm"
             asChild
             className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
           >
@@ -103,10 +105,10 @@ export function HeaderAuthSection() {
       <ThemeToggle />
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <Avatar className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all duration-200">
+          <Avatar className="h-7 w-7 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all duration-200">
             <AvatarImage src={session.user.image || undefined} alt={session.user.username} />
             <AvatarFallback className="bg-primary text-primary-foreground">
-              <User className="h-4 w-4" />
+              <User className="h-3.5 w-3.5" />
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>

@@ -88,7 +88,7 @@ export function LoginForm() {
 
         <Button
           type="submit"
-          className="w-full mt-6"
+          className="w-full mt-6 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
           loading={isLoading}
         >
           Giriş Yap
