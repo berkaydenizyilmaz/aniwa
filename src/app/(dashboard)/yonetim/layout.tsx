@@ -2,7 +2,7 @@
 
 import { useState, useCallback, memo } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { AdminSidebar } from '@/components/layout/admin-sidebar';
+import { AdminSidebar } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { HeaderAuthSection } from './header-auth-section';
+import { HeaderAuthSection } from '../auth';
 import { MobileBottomNav } from './mobile-bottom-nav';
 import { ROUTES } from '@/lib/constants/routes.constants';
 

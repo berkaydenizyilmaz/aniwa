@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { MobileAuthSection } from './mobile-auth-section';
+import { MobileAuthSection } from '../auth';
 import { ROUTES } from '@/lib/constants/routes.constants';
 import { Home, Film, List } from 'lucide-react';
 

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes.constants';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { AdminSidebarAuth } from './admin-sidebar-auth';
+import { AdminSidebarAuth } from '../auth';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
