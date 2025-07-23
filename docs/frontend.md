@@ -157,7 +157,10 @@ Bu optimizasyonlar proje genelinde tutarlı şekilde uygulanır ve over-optimiza
     Glassmorphism: Backdrop blur + yarı şeffaf arka planlar + smooth geçişler
     Renk Paleti: Primary (mavi), Secondary, Destructive (kırmızı), Muted, Border
     Responsive: Mobile-first + breakpoint'ler (sm, md, lg, xl) + flexible grid
-    Animasyon: Smooth hover + loading state + micro-interaction'lar
+    Animasyon: 
+        CSS: Basit animasyonlar (fade, scale, pulse) ve background elementler
+        Framer Motion: Kompleks animasyonlar, page transitions, micro-interactions
+        Performans: CSS tercih edilir, gerektiğinde Motion kullanılır
     Form: Clean layout + inline validation + disabled state'ler
     Card: Consistent padding + subtle shadow + hover elevation
     Icon: Lucide React + consistent boyutlar + icon+text kombinasyonu
