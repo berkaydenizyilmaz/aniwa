@@ -1,12 +1,10 @@
 // Auth API istek/yanıt tipleri
 
 import { User } from '@prisma/client';
-import { RegisterInput, LoginInput } from '@/lib/schemas/auth.schema';
+import { RegisterInput } from '@/lib/schemas/auth.schema';
 
 // Prisma User tipinden seçim yap
 export type RegisterResponse = Pick<User, 'id' | 'username' | 'email'>;
-export type LoginResponse = Pick<User, 'id' | 'username' | 'email'>;
 
 // Auth API istek tipleri
-export type RegisterRequest = RegisterInput;
-export type LoginRequest = LoginInput; 
+export type RegisterRequest = RegisterInput; 

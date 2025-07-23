@@ -6,19 +6,27 @@ Bu doküman, Aniwa projesinin frontend geliştirme süreçlerinde izlenecek teme
 
 1. Komponent Yapısı ve Yerleşimi
 
-Next.js App Router mimarisinin sağladığı esneklikle, komponentleri sorumluluklarına göre iki ana kategoriye ayırıyoruz:
+Next.js App Router mimarisinin sağladığı esneklikle, komponentleri sorumluluklarına göre özellik bazlı (feature-based) olarak organize ediyoruz:
 
-    Global/Paylaşımlı Komponentler (src/components/): Uygulama genelinde, farklı bölümlerde tekrar kullanılan, genel amaçlı ve yeniden kullanılabilir (reusable) bileşenler buraya yerleşir.
+    Özellik Bazlı Komponentler (src/components/modules/): Her özellik (feature) kendi klasörü altında organize edilir. Bu yaklaşım, ilgili komponentlerin bir arada tutulmasını ve kodun daha kolay bulunmasını sağlar.
 
-        src/components/ui/: shadcn/ui'dan türetilen veya senin özel olarak yazdığın temel UI elemanları (örn. Button.tsx, Input.tsx, Card.tsx). Bu klasördeki komponentler, shadcn/ui'nin sağladığı altyapıyı kullanarak projenin görsel kimliğini oluşturur.
+        src/components/modules/auth/: Kimlik doğrulama ile ilgili tüm komponentler (LoginForm.tsx, RegisterForm.tsx, ForgotPasswordForm.tsx, AuthCard.tsx)
 
-        src/components/shared/: Proje genelinde kullanılan daha spesifik ama jenerik bileşenler (örn. AnimeCard.tsx, UserAvatar.tsx, Pagination.tsx).
+        src/components/modules/anime/: Anime ile ilgili komponentler (AnimeCard.tsx, AnimeList.tsx, AnimeFilter.tsx)
 
-        src/components/layouts/: Uygulamanın farklı ana düzenleri (örn. MainLayout.tsx, AdminLayout.tsx).
+        src/components/modules/user/: Kullanıcı profili ile ilgili komponentler (UserProfile.tsx, UserAvatar.tsx, UserSettings.tsx)
 
-    Rota Bazlı/Özel Komponentler (app/rota_adı/_components/): Belirli bir rotaya veya özelliğe sıkı sıkıya bağlı olan, başka bir yerde doğrudan yeniden kullanılması beklenmeyen bileşenler, ilgili rotanın altında _components klasöründe tutulur.
+        src/components/modules/admin/: Yönetim paneli komponentleri (AdminDashboard.tsx, GenreForm.tsx, UserManagement.tsx)
 
-        Örnek: src/app/admin/genres/_components/GenreForm.tsx, src/app/profil/[username]/_components/ProfileHeader.tsx.
+    Temel UI Komponentler (src/components/ui/): shadcn/ui'dan türetilen veya özel olarak yazılan temel UI elemanları (Button.tsx, Input.tsx, Card.tsx). Bu komponentler, projenin görsel kimliğini oluşturur ve tüm modüller tarafından kullanılır.
+
+    Layout Komponentler (src/components/layout/): Uygulamanın farklı ana düzenleri (Header.tsx, Footer.tsx, Sidebar.tsx, AuthLayout.tsx).
+
+    Provider Komponentler (src/components/providers/): Context provider'ları (ThemeProvider.tsx, QueryProvider.tsx, SessionProvider.tsx).
+
+    Rota Bazlı Komponentler (app/rota_adı/_components/): Sadece belirli bir rotaya özel, başka yerde kullanılmayan komponentler için kullanılır. Mümkün olduğunca modules altına taşınmaya çalışılır.
+
+        Örnek: src/app/admin/genres/_components/GenreForm.tsx → src/components/modules/admin/GenreForm.tsx
 
 2. Server Components ve Client Components Kullanımı
 
@@ -56,15 +64,59 @@ Next.js App Router'ın ana gücü olan bu ayrımı bilinçli kullanıyoruz:
 
         Basit, hafif ve global uygulama durumlarının (örn. kullanıcı oturum bilgileri, tema ayarları, global bildirimler) yönetimi için kullanılır. React Query'nin yönetmediği, uygulamanın farklı yerlerinde erişilmesi gereken durumlar için uygundur.
 
-4. Form Yönetimi ve Validasyon
+4. Server Actions ve Form Yönetimi
 
-    React Hook Form ve Zod: Form verilerini yönetmek ve validasyon yapmak için birlikte kullanılır.
+    Server Actions: Form gönderimleri ve sunucu işlemleri için Server Actions kullanılır. Bu yaklaşım, API endpoint'lerine ihtiyaç duymadan doğrudan sunucu fonksiyonlarını çağırmayı sağlar.
 
-        Zod: Form şemalarını tanımlar ve güçlü, tip güvenli validasyon kuralları sağlar.
+        Özellik Bazlı Organizasyon: Server Actions, özellik bazlı olarak organize edilir (src/lib/actions/).
 
-        React Hook Form: Form durumunu performanslı bir şekilde yönetir, Zod ile entegre olur (zodResolver).
+            src/lib/actions/auth.action.ts: Kimlik doğrulama işlemleri (registerUser, forgotPassword, resetPassword)
 
-        Gönderim: Form gönderimleri genellikle Server Actions aracılığıyla yapılır. Bu sayede, Client Component'teki formdan gelen veri, Server Action içinde doğrulanıp (Zod ile) direkt business katmanına iletilir. shadcn/ui'nin Form komponentleri, react-hook-form ile entegrasyonu kolaylaştırır ve tercih edilir.
+            src/lib/actions/anime.action.ts: Anime ile ilgili işlemler (createAnime, updateAnime, deleteAnime)
+
+            src/lib/actions/user.action.ts: Kullanıcı profili işlemleri (updateProfile, changePassword)
+
+        Pattern: Her Server Action dosyası aşağıdaki pattern'i takip eder:
+
+            ```typescript
+            'use server';
+
+            import { schema, type Input } from '@/lib/schemas/feature.schema';
+            import { businessFunction } from '@/lib/services/business/feature.business';
+            import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
+
+            export async function actionName(data: Input): Promise<ServerActionResponse> {
+              try {
+                // Zod validation
+                const validatedData = schema.parse(data);
+
+                // Business logic
+                const result = await businessFunction(validatedData);
+
+                return {
+                  success: true,
+                  data: result.data
+                };
+
+              } catch (error) {
+                return handleServerActionError(error);
+              }
+            }
+            ```
+
+    Form Yönetimi ve Validasyon:
+
+        React Hook Form ve Zod: Form verilerini yönetmek ve validasyon yapmak için birlikte kullanılır.
+
+            Zod: Form şemalarını tanımlar ve güçlü, tip güvenli validasyon kuralları sağlar.
+
+            React Hook Form: Form durumunu performanslı bir şekilde yönetir, Zod ile entegre olur (zodResolver).
+
+            Gönderim: Form gönderimleri Server Actions aracılığıyla yapılır. Client Component'teki formdan gelen veri, Server Action içinde doğrulanıp (Zod ile) direkt business katmanına iletilir.
+
+        Error Handling: Server Actions'dan dönen hatalar, form field'larına veya root error olarak gösterilir.
+
+        Loading States: Form gönderimi sırasında loading state'leri yönetilir ve form field'ları disabled edilir.
 
 5. Tip, Sabit ve Şema Kullanımı
 
@@ -198,3 +250,57 @@ Bu optimizasyonlar proje genelinde tutarlı şekilde uygulanır ve over-optimiza
     A11y: Semantic HTML + ARIA + keyboard navigation + color contrast
 
 Bu tasarım standartları tutarlı UX sağlar.
+
+10. Proje Yapısı Örneği
+
+    Özellik Bazlı Organizasyon Örneği:
+
+    ```
+    src/
+    ├── app/
+    │   ├── (auth)/
+    │   │   ├── giris/
+    │   │   │   └── page.tsx                    # Sadece import
+    │   │   └── kayit/
+    │   │       └── page.tsx                    # Sadece import
+    │   └── (main)/
+    │       └── page.tsx
+    ├── components/
+    │   ├── modules/
+    │   │   ├── auth/
+    │   │   │   ├── auth-card.tsx               # Auth wrapper
+    │   │   │   ├── login-form.tsx              # Login form
+    │   │   │   ├── register-form.tsx           # Register form
+    │   │   │   └── forgot-password-form.tsx    # Forgot password form
+    │   │   ├── anime/
+    │   │   │   ├── anime-card.tsx              # Anime card
+    │   │   │   ├── anime-list.tsx              # Anime list
+    │   │   │   └── anime-filter.tsx            # Anime filter
+    │   │   └── user/
+    │   │       ├── user-profile.tsx            # User profile
+    │   │       └── user-avatar.tsx             # User avatar
+    │   ├── ui/
+    │   │   ├── button.tsx                      # shadcn/ui
+    │   │   ├── input.tsx                       # shadcn/ui
+    │   │   └── card.tsx                        # shadcn/ui
+    │   ├── layout/
+    │   │   ├── header.tsx                      # Header
+    │   │   └── footer.tsx                      # Footer
+    │   └── providers/
+    │       ├── theme-provider.tsx              # Theme provider
+    │       └── query-provider.tsx              # Query provider
+    └── lib/
+        ├── actions/
+        │   ├── auth.action.ts                  # Auth actions
+        │   ├── anime.action.ts                 # Anime actions
+        │   └── user.action.ts                  # User actions
+        ├── schemas/
+        │   ├── auth.schema.ts                  # Auth schemas
+        │   └── anime.schema.ts                 # Anime schemas
+        └── services/
+            └── business/
+                ├── auth.business.ts            # Auth business logic
+                └── anime.business.ts           # Anime business logic
+    ```
+
+    Bu yapı, kodun kolay bulunmasını, bakımını ve yeniden kullanılabilirliğini sağlar.

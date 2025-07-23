@@ -6,7 +6,7 @@ import {
   ConflictError, 
   UnauthorizedError
 } from '@/lib/errors';
-import { createUser, findUserByUsername, findUserByEmail, findUserBySlug, updateUserLastLogin, updateUser } from '@/lib/services/db/user.db';
+import { createUser, findUserByUsername, findUserByEmail, findUserBySlug, updateUser } from '@/lib/services/db/user.db';
 import { createUserSettings } from '@/lib/services/db/userProfileSettings.db';
 import { createVerificationToken, findVerificationTokenByToken, deleteVerificationTokenByToken } from '@/lib/services/db/verificationToken.db';
 import { prisma } from '@/lib/prisma';
@@ -15,7 +15,7 @@ import { sendPasswordResetEmail } from '@/lib/utils/email.utils';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
 import { ApiResponse } from '@/lib/types/api';
-import { RegisterResponse, LoginResponse, RegisterRequest, LoginRequest } from '@/lib/types/api/auth.api';
+import { RegisterResponse, RegisterRequest } from '@/lib/types/api/auth.api';
 import { AUTH } from '@/lib/constants/auth.constants';
 import crypto from 'crypto';
 
@@ -90,52 +90,6 @@ export async function registerUser(data: RegisterRequest): Promise<ApiResponse<R
     );
     
     throw new BusinessError('Kullanıcı kaydı başarısız');
-  }
-}
-
-// Kullanıcı girişi (NextAuth ile entegre)
-export async function loginUser(data: LoginRequest): Promise<ApiResponse<LoginResponse>> {
-  try {
-    // Kullanıcıyı bul
-    const user = await findUserByUsername(data.username);
-    if (!user) {
-      throw new UnauthorizedError('Geçersiz kullanıcı adı veya şifre');
-    }
-
-    // Şifre kontrolü
-    if (!user.passwordHash) {
-      throw new UnauthorizedError('Geçersiz kullanıcı adı veya şifre');
-    }
-
-    const isPasswordValid = await bcrypt.compare(data.password, user.passwordHash);
-    if (!isPasswordValid) {
-      throw new UnauthorizedError('Geçersiz kullanıcı adı veya şifre');
-    }
-
-    // Son giriş zamanını güncelle
-    await updateUserLastLogin(user.id);
-
-    return {
-      success: true,
-      data: {
-        id: user.id,
-        username: user.username,
-        email: user.email
-      }
-    };
-  } catch (error) {
-    if (error instanceof BusinessError) {
-      throw error;
-    }
-    
-    // Beklenmedik hata logu
-    await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Kullanıcı girişi sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
-    );
-    
-    throw new BusinessError('Giriş başarısız');
   }
 }
 

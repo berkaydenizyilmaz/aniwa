@@ -88,17 +88,6 @@ export async function findAllUsers(
     });
 }
 
-// Kullanıcının son giriş zamanını günceller
-export async function updateUserLastLogin(
-    userId: string,
-    client: PrismaClientOrTransaction = prisma
-): Promise<void> {
-    await client.user.update({
-        where: { id: userId },
-        data: { lastLoginAt: new Date() }
-    });
-}
-
 // Kullanıcı bilgilerini günceller
 export async function updateUser(
     where: Prisma.UserWhereUniqueInput,
