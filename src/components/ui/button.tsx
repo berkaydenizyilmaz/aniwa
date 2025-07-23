@@ -19,6 +19,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:shadow-md active:translate-y-0 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 before:ease-out",
         ghost:
           "hover:bg-accent hover:text-accent-foreground hover:shadow-sm active:translate-y-0 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-accent/10 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 before:ease-out",
+        mobile:
+          "active:bg-primary/20 active:text-primary focus:bg-primary/10 focus:text-primary transition-all duration-200",
         link: "text-primary underline-offset-4 hover:underline hover:text-primary/80",
       },
       size: {

@@ -12,9 +12,9 @@ export function MobileBottomNav() {
       <div className="flex items-stretch h-14">
         {/* Ana Sayfa */}
         <Button 
-          variant="ghost" 
+          variant="mobile" 
           asChild
-          className="flex-1 h-full rounded-none border-r border-border/20 transition-all duration-200 active:bg-primary/20 active:text-primary focus:bg-primary/10 focus:text-primary"
+          className="flex-1 h-full rounded-none border-r border-border/20"
         >
           <Link href={ROUTES.PAGES.HOME} className="flex items-center justify-center h-full">
             <Home className="h-5 w-5 stroke-[1.5]" />
@@ -23,9 +23,9 @@ export function MobileBottomNav() {
 
         {/* Anime */}
         <Button 
-          variant="ghost" 
+          variant="mobile" 
           asChild
-          className="flex-1 h-full rounded-none border-r border-border/20 transition-all duration-200 active:bg-primary/20 active:text-primary focus:bg-primary/10 focus:text-primary"
+          className="flex-1 h-full rounded-none border-r border-border/20"
         >
           <Link href={ROUTES.PAGES.ANIME} className="flex items-center justify-center h-full">
             <Film className="h-5 w-5 stroke-[1.5]" />
@@ -34,9 +34,9 @@ export function MobileBottomNav() {
 
         {/* Listeler */}
         <Button 
-          variant="ghost" 
+          variant="mobile" 
           asChild
-          className="flex-1 h-full rounded-none border-r border-border/20 transition-all duration-200 active:bg-primary/20 active:text-primary focus:bg-primary/10 focus:text-primary"
+          className="flex-1 h-full rounded-none border-r border-border/20"
         >
           <Link href={ROUTES.PAGES.LISTS} className="flex items-center justify-center h-full">
             <List className="h-5 w-5 stroke-[1.5]" />

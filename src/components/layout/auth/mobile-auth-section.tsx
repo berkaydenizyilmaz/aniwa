@@ -71,8 +71,8 @@ export const MobileAuthSection = memo(function MobileAuthSection() {
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="ghost"
-              className="w-full h-full rounded-none active:bg-primary/20 active:text-primary focus:bg-primary/10 focus:text-primary transition-all duration-200"
+              variant="mobile"
+              className="w-full h-full rounded-none"
             >
               <User className="h-5 w-5 stroke-[1.5]" />
             </Button>
@@ -102,8 +102,8 @@ export const MobileAuthSection = memo(function MobileAuthSection() {
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="ghost"
-            className="w-full h-full rounded-none active:bg-primary/20 active:text-primary focus:bg-primary/10 focus:text-primary transition-all duration-200"
+            variant="mobile"
+            className="w-full h-full rounded-none"
           >
             <Avatar className="h-5 w-5">
               <AvatarImage src={session.user.image || undefined} alt={session.user.username} />
