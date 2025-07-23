@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Genre } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +23,7 @@ import {
   EditDialog
 } from '../../_components';
 
-export const GenreTable = memo(function GenreTable() {
+export function GenreTable() {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,8 +34,8 @@ export const GenreTable = memo(function GenreTable() {
     resolver: zodResolver(updateGenreSchema),
   });
 
-  // Veri çekme - useCallback ile optimize edildi
-  const fetchGenres = useCallback(async () => {
+  // Veri çekme
+  const fetchGenres = async () => {
     try {
       const response = await fetch('/api/admin/genres');
       const result = await response.json();
@@ -51,17 +51,16 @@ export const GenreTable = memo(function GenreTable() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchGenres();
-  }, [fetchGenres]);
+  }, []);
 
-  // Filtreleme - useCallback ile optimize edildi
-  const filteredGenres = useCallback(() => 
-    genres.filter(genre =>
-      genre.name.toLowerCase().includes(searchTerm.toLowerCase())
-    ), [genres, searchTerm]);
+  // Filtreleme
+  const filteredGenres = genres.filter(genre =>
+    genre.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Edit işlemi - useCallback ile optimize edildi
   const handleEdit = useCallback(async (genreId: string, data: UpdateGenreInput) => {
@@ -80,7 +79,8 @@ export const GenreTable = memo(function GenreTable() {
       } else {
         toastSuccess('Başarılı', 'Tür başarıyla güncellendi!');
         editForm.reset();
-        fetchGenres(); // Verileri yenile
+        // Verileri yenilemek için state'i tetikle
+        setGenres(prev => [...prev]);
       }
     } catch (error) {
       console.error('Edit genre error:', error);
@@ -88,7 +88,7 @@ export const GenreTable = memo(function GenreTable() {
     } finally {
       setIsUpdating(null);
     }
-  }, [isUpdating, editForm, fetchGenres]);
+  }, [isUpdating, editForm]);
 
   // Silme işlemi - useCallback ile optimize edildi
   const handleDelete = useCallback(async (id: string) => {
@@ -99,13 +99,14 @@ export const GenreTable = memo(function GenreTable() {
         toastError('Hata', result.error);
       } else {
         toastSuccess('Başarılı', 'Tür başarıyla silindi!');
-        fetchGenres(); // Verileri yenile
+        // Verileri yenilemek için state'i tetikle
+        setGenres(prev => prev.filter(genre => genre.id !== id));
       }
     } catch (error) {
       console.error('Delete genre error:', error);
       toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     }
-  }, [fetchGenres]);
+  }, []);
 
   // Edit dialog'u aç - useCallback ile optimize edildi
   const openEditDialog = useCallback((genre: Genre) => {
@@ -218,7 +219,7 @@ export const GenreTable = memo(function GenreTable() {
     <Card className="bg-card/80 backdrop-blur-md border border-border/20 shadow-lg">
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <CardTitle className="text-foreground">Türler ({filteredGenres().length})</CardTitle>
+          <CardTitle className="text-foreground">Türler ({filteredGenres.length})</CardTitle>
           <CreateDialog
             title="Yeni Tür Ekle"
             description="Yeni bir anime türü ekleyin. Tür adı benzersiz olmalıdır."
@@ -243,10 +244,10 @@ export const GenreTable = memo(function GenreTable() {
       
       <CardContent>
         <div className="space-y-2">
-          {filteredGenres().length === 0 ? (
+          {filteredGenres.length === 0 ? (
             emptyState
           ) : (
-            filteredGenres().map((genre) => (
+            filteredGenres.map((genre) => (
               <GenreItem key={genre.id} genre={genre} />
             ))
           )}
@@ -254,4 +255,4 @@ export const GenreTable = memo(function GenreTable() {
       </CardContent>
     </Card>
   );
-}); 
+} 

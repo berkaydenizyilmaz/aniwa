@@ -1,7 +1,6 @@
-import { memo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-const AdminDashboardPage = memo(function AdminDashboardPage() {
+export default function AdminDashboardPage() {
   // Page header
   const pageHeader = (
     <div>
@@ -38,6 +37,4 @@ const AdminDashboardPage = memo(function AdminDashboardPage() {
       {welcomeCard}
     </div>
   );
-});
-
-export default AdminDashboardPage;
+}

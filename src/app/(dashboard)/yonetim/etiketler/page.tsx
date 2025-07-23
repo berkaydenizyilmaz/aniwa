@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { TagTable } from './_components/tag-table';
 
-const TagsPage = memo(function TagsPage() {
+export default function TagsPage() {
   // Page header
   const pageHeader = (
     <div>
@@ -21,6 +21,4 @@ const TagsPage = memo(function TagsPage() {
       <TagTable />
     </div>
   );
-});
-
-export default TagsPage;
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, memo } from 'react';
+import { useState } from 'react';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toastError, toastSuccess } from '@/components/ui/toast';
@@ -17,7 +17,7 @@ interface GenreFormProps {
   onClose?: () => void;
 }
 
-export const GenreForm = memo(function GenreForm({ onSuccess, onCancel, onClose }: GenreFormProps) {
+export function GenreForm({ onSuccess, onCancel, onClose }: GenreFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<CreateGenreInput>({
@@ -27,8 +27,8 @@ export const GenreForm = memo(function GenreForm({ onSuccess, onCancel, onClose 
     },
   });
 
-  // Form submit handler - useCallback ile optimize edildi
-  const onSubmit = useCallback(async (data: CreateGenreInput) => {
+  // Form submit handler
+  const onSubmit = async (data: CreateGenreInput) => {
     if (isLoading) return; // Prevent double submission
     
     setIsLoading(true);
@@ -56,7 +56,7 @@ export const GenreForm = memo(function GenreForm({ onSuccess, onCancel, onClose 
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, form, onSuccess, onClose]);
+  };
 
   // Form field component
   const NameField = ({ field }: { field: ControllerRenderProps<CreateGenreInput, 'name'> }) => (
@@ -108,4 +108,4 @@ export const GenreForm = memo(function GenreForm({ onSuccess, onCancel, onClose 
       </form>
     </Form>
   );
-}); 
+} 

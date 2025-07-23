@@ -27,7 +27,7 @@ interface EditDialogProps<T = Record<string, unknown>> {
   }) => React.ReactNode);
 }
 
-export const EditDialog = memo(function EditDialog<T = Record<string, unknown>>({ 
+export function EditDialog<T = Record<string, unknown>>({ 
   title, 
   description, 
   trigger,
@@ -95,4 +95,4 @@ export const EditDialog = memo(function EditDialog<T = Record<string, unknown>>(
       </DialogContent>
     </Dialog>
   );
-}); 
+} 

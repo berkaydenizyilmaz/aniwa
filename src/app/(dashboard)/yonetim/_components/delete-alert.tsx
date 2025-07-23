@@ -24,7 +24,7 @@ interface DeleteAlertProps {
   size?: 'sm' | 'default';
 }
 
-export const DeleteAlert = memo(function DeleteAlert({ 
+export function DeleteAlert({ 
   title, 
   description, 
   onDelete, 
@@ -91,4 +91,4 @@ export const DeleteAlert = memo(function DeleteAlert({
       </AlertDialogContent>
     </AlertDialog>
   );
-}); 
+} 

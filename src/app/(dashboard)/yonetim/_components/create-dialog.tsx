@@ -19,7 +19,7 @@ interface CreateDialogProps {
   children: React.ReactNode | ((props: { onClose: () => void }) => React.ReactNode);
 }
 
-export const CreateDialog = memo(function CreateDialog({ 
+export function CreateDialog({ 
   title, 
   description, 
   trigger,
@@ -59,4 +59,4 @@ export const CreateDialog = memo(function CreateDialog({
       </DialogContent>
     </Dialog>
   );
-}); 
+} 

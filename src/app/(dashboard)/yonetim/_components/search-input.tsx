@@ -13,7 +13,7 @@ interface SearchInputProps {
   debounceMs?: number;
 }
 
-export const SearchInput = memo(function SearchInput({ 
+export function SearchInput({ 
   value, 
   onChange, 
   placeholder = 'Ara...',
@@ -54,4 +54,4 @@ export const SearchInput = memo(function SearchInput({
       />
     </div>
   );
-}); 
+} 

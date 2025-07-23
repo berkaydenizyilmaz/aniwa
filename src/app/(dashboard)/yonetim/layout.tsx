@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, memo } from 'react';
+import { useState } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { AdminSidebar } from '@/components/layout';
 import { Button } from '@/components/ui/button';
@@ -10,18 +10,18 @@ interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
-const AdminLayout = memo(function AdminLayout({ children }: AdminLayoutProps) {
+export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Sidebar toggle handler - useCallback ile optimize edildi
-  const handleSidebarToggle = useCallback(() => {
+  // Sidebar toggle handler
+  const handleSidebarToggle = () => {
     setSidebarOpen(true);
-  }, []);
+  };
 
-  // Sidebar close handler - useCallback ile optimize edildi
-  const handleSidebarClose = useCallback(() => {
+  // Sidebar close handler
+  const handleSidebarClose = () => {
     setSidebarOpen(false);
-  }, []);
+  };
 
   // Mobile hamburger button
   const mobileButton = (
@@ -60,6 +60,4 @@ const AdminLayout = memo(function AdminLayout({ children }: AdminLayoutProps) {
       </div>
     </div>
   );
-});
-
-export default AdminLayout; 
+} 

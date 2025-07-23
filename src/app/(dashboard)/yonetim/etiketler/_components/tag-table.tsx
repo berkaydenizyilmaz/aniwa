@@ -38,8 +38,8 @@ export const TagTable = memo(function TagTable() {
     resolver: zodResolver(updateTagSchema),
   });
 
-  // Veri çekme - useCallback ile optimize edildi
-  const fetchTags = useCallback(async () => {
+  // Veri çekme
+  const fetchTags = async () => {
     try {
       const response = await fetch('/api/admin/tags');
       const result = await response.json();
@@ -55,19 +55,18 @@ export const TagTable = memo(function TagTable() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchTags();
-  }, [fetchTags]);
+  }, []);
 
-  // Filtreleme - useCallback ile optimize edildi
-  const filteredTags = useCallback(() => 
-    tags.filter(tag =>
-      tag.name.toLowerCase().includes(searchTerm.toLowerCase())
-    ), [tags, searchTerm]);
+  // Filtreleme
+  const filteredTags = tags.filter(tag =>
+    tag.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  // Edit işlemi - useCallback ile optimize edildi
+  // Edit işlemi
   const handleEdit = useCallback(async (tagId: string, data: UpdateTagInput) => {
     if (isUpdating) return; // Prevent double submission
     
@@ -84,7 +83,8 @@ export const TagTable = memo(function TagTable() {
       } else {
         toastSuccess('Başarılı', 'Etiket başarıyla güncellendi!');
         editForm.reset();
-        fetchTags(); // Verileri yenile
+        // Verileri yenilemek için state'i tetikle
+        setTags(prev => [...prev]);
       }
     } catch (error) {
       console.error('Edit tag error:', error);
@@ -92,9 +92,9 @@ export const TagTable = memo(function TagTable() {
     } finally {
       setIsUpdating(null);
     }
-  }, [isUpdating, editForm, fetchTags]);
+  }, [isUpdating, editForm]);
 
-  // Silme işlemi - useCallback ile optimize edildi
+  // Silme işlemi
   const handleDelete = useCallback(async (id: string) => {
     try {
       const result = await deleteTag(id);
@@ -103,16 +103,17 @@ export const TagTable = memo(function TagTable() {
         toastError('Hata', result.error);
       } else {
         toastSuccess('Başarılı', 'Etiket başarıyla silindi!');
-        fetchTags(); // Verileri yenile
+        // Verileri yenilemek için state'i tetikle
+        setTags(prev => prev.filter(tag => tag.id !== id));
       }
     } catch (error) {
       console.error('Delete tag error:', error);
       toastError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
     }
-  }, [fetchTags]);
+  }, []);
 
-  // Edit dialog'u aç - useCallback ile optimize edildi
-  const openEditDialog = useCallback((tag: Tag) => {
+  // Edit dialog'u aç
+  const openEditDialog = (tag: Tag) => {
     editForm.reset({ 
       name: tag.name,
       description: tag.description || undefined,
@@ -120,7 +121,7 @@ export const TagTable = memo(function TagTable() {
       isAdult: tag.isAdult,
       isSpoiler: tag.isSpoiler
     });
-  }, [editForm]);
+  };
 
   // Loading skeleton
   const loadingSkeleton = (
@@ -318,7 +319,7 @@ export const TagTable = memo(function TagTable() {
     <Card className="bg-card/80 backdrop-blur-md border border-border/20 shadow-lg">
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <CardTitle className="text-foreground">Etiketler ({filteredTags().length})</CardTitle>
+          <CardTitle className="text-foreground">Etiketler ({filteredTags.length})</CardTitle>
           <CreateDialog
             title="Yeni Etiket Ekle"
             description="Yeni bir anime etiketi ekleyin. Etiket adı benzersiz olmalıdır."
@@ -343,10 +344,10 @@ export const TagTable = memo(function TagTable() {
       
       <CardContent>
         <div className="space-y-2">
-          {filteredTags().length === 0 ? (
-            emptyState
-          ) : (
-            filteredTags().map((tag) => (
+                  {filteredTags.length === 0 ? (
+          emptyState
+        ) : (
+          filteredTags.map((tag) => (
               <TagItem key={tag.id} tag={tag} />
             ))
           )}

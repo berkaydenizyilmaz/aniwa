@@ -10,7 +10,7 @@ interface LoadingSkeletonProps {
   showActionButton?: boolean;
 }
 
-export const LoadingSkeleton = memo(function LoadingSkeleton({ 
+export function LoadingSkeleton({ 
   itemCount = 5,
   showSearch = true,
   showActionButton = true
@@ -48,4 +48,4 @@ export const LoadingSkeleton = memo(function LoadingSkeleton({
       </CardContent>
     </Card>
   );
-}); 
+} 

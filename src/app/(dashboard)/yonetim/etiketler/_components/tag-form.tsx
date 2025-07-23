@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, memo } from 'react';
+import { useState } from 'react';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toastError, toastSuccess } from '@/components/ui/toast';
@@ -21,7 +21,7 @@ interface TagFormProps {
   onClose?: () => void;
 }
 
-export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: TagFormProps) {
+export function TagForm({ onSuccess, onCancel, onClose }: TagFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<CreateTagInput>({
@@ -35,8 +35,8 @@ export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: T
     },
   });
 
-  // Form submit handler - useCallback ile optimize edildi
-  const onSubmit = useCallback(async (data: CreateTagInput) => {
+  // Form submit handler
+  const onSubmit = async (data: CreateTagInput) => {
     if (isLoading) return; // Prevent double submission
     
     setIsLoading(true);
@@ -64,7 +64,7 @@ export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: T
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, form, onSuccess, onClose]);
+  };
 
   // Form field components
   const NameField = ({ field }: { field: ControllerRenderProps<CreateTagInput, 'name'> }) => (
@@ -209,4 +209,4 @@ export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: T
       </form>
     </Form>
   );
-});
+}
