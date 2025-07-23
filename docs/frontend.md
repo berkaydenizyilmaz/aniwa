@@ -78,7 +78,29 @@ Next.js App Router'ın ana gücü olan bu ayrımı bilinçli kullanıyoruz:
 
     Fonksiyonel Komponentler: Tüm React bileşenleri fonksiyonel olarak yazılır.
 
-    Hooks Kullanımı: useEffect, useState, useCallback, useMemo gibi hook'lar bilinçli ve gerektiği yerde kullanılır. useCallback sadece gerçekten gerekli olan yerlerde (form submit, API call, async handler) kullanılır, over-optimization'dan kaçınılır.
+    Component Naming: PascalCase + descriptive (LoginForm, AnimeCardList, UserProfileModal)
+    
+    File Naming: kebab-case (login-form.tsx, anime-card-list.tsx)
+    
+    Props Interface: Component name + Props suffix (LoginFormProps, AnimeCardProps)
+    
+    Hook Naming: use prefix + descriptive (useAuthForm, useAnimeList, useDebounce)
+    
+    Import Organization: React → External → Internal → Relative
+    
+    Component Structure: Hooks → Handlers → Effects → Render
+
+    Performans Optimizasyonu - Pragmatik Yaklaşım:
+        ✅ Her Zaman Gerekli: Key prop'ları, gereksiz re-render engelleme, bundle size kontrolü, image optimization
+        🔍 Gerektiğinde: React.memo(), useCallback/useMemo, code splitting, virtualization
+        📊 Ölçüm Önce: Chrome DevTools, React DevTools Profiler, Lighthouse ile performans sorunlarını tespit et
+        🎯 Kural: Önce çalışır kod yaz, sonra gerektiğinde optimize et
+
+    Hooks Kullanımı: 
+        useCallback: Sadece gerçekten gerekli olan yerlerde (form submit, API call, async handler)
+        useMemo: Heavy calculations ve expensive operations için
+        useEffect: Bilinçli ve gerektiği yerde kullanılır
+        Over-optimization'dan kaçınılır
 
     Modüler İçe Aktarımlar: Sadece ihtiyaç duyulan fonksiyonlar veya bileşenler içe aktarılır, tüm kütüphane değil.
 
@@ -138,16 +160,23 @@ Next.js App Router'ın ana gücü olan bu ayrımı bilinçli kullanıyoruz:
 
 8. Performans ve Okunabilirlik Optimizasyonları
 
-    React.memo: Tüm component'lerde kullanılır
-    useCallback: Sadece gerçekten gerekli olan yerlerde kullanılır
-        ✅ Mantıklı Kullanım: Form submit handler'ları, API call fonksiyonları, async event handler'lar
-        ❌ Gereksiz Kullanım: Basit state setter'lar, render fonksiyonları, statik JSX
+    Performans Optimizasyonu Stratejisi:
+        📊 Ölçüm Tabanlı: Önce performans sorununu tespit et (DevTools, Profiler)
+        🎯 Hedefli Optimizasyon: Sadece gerçek sorunları çöz
+        ⚡ Temel Optimizasyonlar: Her zaman uygula (key props, image optimization)
+        🚀 İleri Optimizasyonlar: Gerektiğinde uygula (memo, callback, virtualization)
+
+    React.memo: Expensive components için kullanılır
+    useCallback: Form handlers, API calls, async operations için
+    useMemo: Heavy calculations ve complex data transformations için
     Function Separation: Karmaşık render logic'i ayrı function'lara bölünür
     Error Handling: Try-catch + console.error + double submission prevention
     Loading State: isLoading ile form field'ları disabled edilir
     CSS Classes: Ortak class'lar globals.css'te tanımlanır
     TypeScript: any tipi yasak, proper type definitions kullanılır
     Component Structure: Import → Hooks → Handlers → Render → Return
+
+    Performans Kuralı: "Premature optimization is the root of all evil" - Önce çalışır kod, sonra optimize et!
 
 Bu optimizasyonlar proje genelinde tutarlı şekilde uygulanır ve over-optimization'dan kaçınılır.
 
