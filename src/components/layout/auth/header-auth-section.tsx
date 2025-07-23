@@ -15,7 +15,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ROUTES } from '@/lib/constants/routes.constants';
-import { User, Bell, Settings, LogOut } from 'lucide-react';
+import { USER } from '@/lib/constants/user.constants';
+import { User, Bell, Settings, LogOut, Shield, Edit, Crown } from 'lucide-react';
 
 export const HeaderAuthSection = memo(function HeaderAuthSection() {
   const { data: session, status } = useSession();
@@ -25,6 +26,41 @@ export const HeaderAuthSection = memo(function HeaderAuthSection() {
   const handleSignOut = () => {
     signOut({ callbackUrl: ROUTES.PAGES.HOME });
   };
+
+  // Role-based menu items
+  const roleMenuItems = session && (
+    <>
+      {/* Admin Panel */}
+      {session.user.roles.includes(USER.ROLES.ADMIN) && (
+        <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200">
+          <Link href={ROUTES.PAGES.ADMIN.DASHBOARD}>
+            <Crown className="mr-2 h-4 w-4" />
+            <span>Admin Paneli</span>
+          </Link>
+        </DropdownMenuItem>
+      )}
+
+      {/* Editor Panel */}
+      {session.user.roles.includes(USER.ROLES.EDITOR) && (
+        <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200">
+          <Link href={ROUTES.PAGES.EDITOR.DASHBOARD}>
+            <Edit className="mr-2 h-4 w-4" />
+            <span>Editör Paneli</span>
+          </Link>
+        </DropdownMenuItem>
+      )}
+
+      {/* Moderator Panel */}
+      {session.user.roles.includes(USER.ROLES.MODERATOR) && (
+        <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200">
+          <Link href={ROUTES.PAGES.MODERATOR.DASHBOARD}>
+            <Shield className="mr-2 h-4 w-4" />
+            <span>Moderatör Paneli</span>
+          </Link>
+        </DropdownMenuItem>
+      )}
+    </>
+  );
 
   // Dropdown content
   const dropdownContent = session && (
@@ -48,7 +84,15 @@ export const HeaderAuthSection = memo(function HeaderAuthSection() {
         </Link>
       </DropdownMenuItem>
 
-      <DropdownMenuSeparator />
+      {/* Role-based menu items */}
+      {roleMenuItems && (
+        <>
+          <DropdownMenuSeparator className="dropdown-separator" />
+          {roleMenuItems}
+        </>
+      )}
+
+      <DropdownMenuSeparator className="dropdown-separator" />
       <DropdownMenuItem onClick={handleSignOut} className="text-foreground hover:text-red-500 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-500 transition-all duration-200 group">
         <LogOut className="mr-2 h-4 w-4 group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200" />
         <span className="group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200">Çıkış Yap</span>

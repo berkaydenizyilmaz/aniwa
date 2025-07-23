@@ -14,7 +14,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ROUTES } from '@/lib/constants/routes.constants';
-import { User, Bell, Settings, LogOut, LogIn, UserPlus } from 'lucide-react';
+import { USER } from '@/lib/constants/user.constants';
+import { User, Bell, Settings, LogOut, LogIn, UserPlus, Shield, Edit, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AdminSidebarAuthProps {
@@ -29,6 +30,41 @@ export const AdminSidebarAuth = memo(function AdminSidebarAuth({ collapsed = fal
   const handleSignOut = () => {
     signOut({ callbackUrl: ROUTES.PAGES.HOME });
   };
+
+  // Role-based menu items
+  const roleMenuItems = session && (
+    <>
+      {/* Admin Panel */}
+      {session.user.roles.includes(USER.ROLES.ADMIN) && (
+        <DropdownMenuItem asChild className="auth-dropdown-item">
+          <Link href={ROUTES.PAGES.ADMIN.DASHBOARD}>
+            <Crown className="icon-dropdown" />
+            <span>Admin Paneli</span>
+          </Link>
+        </DropdownMenuItem>
+      )}
+
+      {/* Editor Panel */}
+      {session.user.roles.includes(USER.ROLES.EDITOR) && (
+        <DropdownMenuItem asChild className="auth-dropdown-item">
+          <Link href={ROUTES.PAGES.EDITOR.DASHBOARD}>
+            <Edit className="icon-dropdown" />
+            <span>Editör Paneli</span>
+          </Link>
+        </DropdownMenuItem>
+      )}
+
+      {/* Moderator Panel */}
+      {session.user.roles.includes(USER.ROLES.MODERATOR) && (
+        <DropdownMenuItem asChild className="auth-dropdown-item">
+          <Link href={ROUTES.PAGES.MODERATOR.DASHBOARD}>
+            <Shield className="icon-dropdown" />
+            <span>Moderatör Paneli</span>
+          </Link>
+        </DropdownMenuItem>
+      )}
+    </>
+  );
 
   // Dropdown content
   const dropdownContent = session && (
@@ -52,7 +88,15 @@ export const AdminSidebarAuth = memo(function AdminSidebarAuth({ collapsed = fal
         </Link>
       </DropdownMenuItem>
 
-      <DropdownMenuSeparator />
+      {/* Role-based menu items */}
+      {roleMenuItems && (
+        <>
+          <DropdownMenuSeparator className="dropdown-separator" />
+          {roleMenuItems}
+        </>
+      )}
+
+      <DropdownMenuSeparator className="dropdown-separator" />
       <DropdownMenuItem onClick={handleSignOut} className="auth-dropdown-item-danger group">
         <LogOut className="icon-dropdown group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200" />
         <span className="group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200">Çıkış Yap</span>
