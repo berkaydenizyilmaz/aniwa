@@ -1,4 +1,5 @@
 import { Header } from "@/components/layout/header";
+import { BottomNav } from "@/components/layout/bottom-nav";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -8,7 +9,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
   return (
     <>
       <Header />
-      {children}
+      <main className="pb-16 md:pb-0">{children}</main>
+      <BottomNav />
     </>
   );
 }

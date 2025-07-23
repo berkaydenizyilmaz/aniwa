@@ -11,8 +11,8 @@ const navigationItems = [
 
 export function Header() {
   return (
-    <header className="glass-card border-b sticky top-0 z-50">
-      <div className="container mx-auto px-4 h-8 flex items-center justify-between">
+    <header className="glass-card border-b sticky top-0 z-50 hidden md:block">
+      <div className="container mx-auto px-4 h-10 flex items-center justify-between">
         {/* Logo */}
         <Link href={ROUTES.PAGES.HOME} className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center">
@@ -22,7 +22,7 @@ export function Header() {
         </Link>
 
         {/* Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="flex items-center space-x-6">
           {navigationItems.map((item) => (
             <Link 
               key={item.label}
