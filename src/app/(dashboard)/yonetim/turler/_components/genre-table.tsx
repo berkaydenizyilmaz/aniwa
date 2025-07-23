@@ -207,7 +207,7 @@ export const GenreTable = memo(function GenreTable() {
         />
       </div>
     </div>
-  ), [handleEdit, handleDelete, openEditDialog, isUpdating, editForm]);
+  );
 
   // Loading skeleton
   if (isLoading) {
