@@ -213,23 +213,4 @@
   .icon-avatar {
     @apply h-3 w-3 stroke-[1.5];
   }
-
-  /* Mobil hover sorunu çözümü */
-  @media (hover: none) and (pointer: coarse) {
-    /* Touch cihazlarda hover efektlerini devre dışı bırak */
-    .hover\:bg-primary\/10:hover,
-    .hover\:text-primary:hover,
-    .hover\:bg-primary\/20:hover,
-    .hover\:bg-accent\/10:hover,
-    .hover\:bg-muted\/30:hover,
-    .hover\:bg-muted\/50:hover,
-    .hover\:bg-muted\/80:hover,
-    .hover\:bg-red-500\/10:hover,
-    .hover\:text-red-500:hover,
-    .hover\:bg-secondary-foreground\/10:hover,
-    .hover\:text-secondary-foreground\/80:hover {
-      background-color: transparent !important;
-      color: inherit !important;
-    }
-  }
 }
