@@ -1,4 +1,5 @@
 import { Header } from "@/components/layout/header";
+import { BottomNav } from "@/components/layout/bottom-nav";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           {children}
         </div>
       </main>
+      <BottomNav />
     </div>
   );
 }
