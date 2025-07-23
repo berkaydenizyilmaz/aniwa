@@ -97,14 +97,14 @@ export function LoginForm() {
         )}
       </div>
 
-      {/* Giriş Butonu */}
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isLoading}
-      >
-        {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
-      </Button>
+       {/* Giriş Butonu */}
+        <Button
+          type="submit"
+          className="w-full"
+          loading={isLoading}
+        >
+          Giriş Yap
+        </Button>
 
     </form>
   );

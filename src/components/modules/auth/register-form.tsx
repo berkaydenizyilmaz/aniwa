@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -126,14 +125,14 @@ export function RegisterForm() {
         )}
       </div>
 
-      {/* Kayıt Butonu */}
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isLoading}
-      >
-        {isLoading ? 'Kayıt yapılıyor...' : 'Kayıt Ol'}
-      </Button>
+        {/* Kayıt Butonu */}
+        <Button
+          type="submit"
+          className="w-full"
+          loading={isLoading}
+        >
+          Kayıt Ol
+        </Button>
 
     </form>
   );

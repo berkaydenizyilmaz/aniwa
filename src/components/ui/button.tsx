@@ -55,7 +55,7 @@ function Button({
       data-slot="button"
       className={cn(
         buttonVariants({ variant, size, className }),
-        loading && "opacity-70 pointer-events-none"
+        loading && "opacity-60 pointer-events-none cursor-not-allowed"
       )}
       disabled={loading || props.disabled}
       {...props}
