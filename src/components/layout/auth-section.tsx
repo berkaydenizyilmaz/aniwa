@@ -53,7 +53,7 @@ export function AuthSection() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="cursor-pointer">
-            <Avatar className="h-8 w-8">
+            <Avatar className="h-10 w-10">
               <AvatarImage src={session.user?.image || ''} alt={session.user?.username || ''} />
               <AvatarFallback className="bg-muted text-sm">
                 {session.user?.username?.charAt(0).toUpperCase() || 'U'}
