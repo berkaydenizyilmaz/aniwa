@@ -9,7 +9,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   return (
     <>
       <Header />
-      <main className="pb-16 md:pb-0">{children}</main>
+      <main className="pb-12 md:pb-0">{children}</main>
       <BottomNav />
     </>
   );
