@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { createTagSchema, tagFiltersSchema } from '@/lib/schemas/tag.schema';
-import { createTag, getAllTags } from '@/lib/services/business/tag.business';
+import { createTagBusiness, getTagsBusiness } from '@/lib/services/business/tag.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tüm tag'leri listele (GET)
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const validatedFilters = tagFiltersSchema.parse(filters);
 
     // Business logic
-    const result = await getAllTags(validatedFilters);
+    const result = await getTagsBusiness(validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await createTag(validatedData, {
+    const result = await createTagBusiness(validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });

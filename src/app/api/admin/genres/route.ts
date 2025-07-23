@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { createGenreSchema, genreFiltersSchema } from '@/lib/schemas/genre.schema';
-import { createGenre, getAllGenres } from '@/lib/services/business/genre.business';
+import { createGenreBusiness, getGenresBusiness } from '@/lib/services/business/genre.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tüm genre'leri listele (GET)
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const validatedFilters = genreFiltersSchema.parse(filters);
 
     // Business logic
-    const result = await getAllGenres(validatedFilters);
+    const result = await getGenresBusiness(validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await createGenre(validatedData, {
+    const result = await createGenreBusiness(validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });

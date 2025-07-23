@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { updateGenreSchema } from '@/lib/schemas/genre.schema';
-import { getGenreById, updateGenre, deleteGenre } from '@/lib/services/business/genre.business';
+import { getGenreBusiness, updateGenreBusiness, deleteGenreBusiness } from '@/lib/services/business/genre.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tek genre detayı (GET)
@@ -14,7 +14,7 @@ export async function GET(
     const { id } = await params;
 
     // Business logic
-    const result = await getGenreById(id);
+    const result = await getGenreBusiness(id);
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -40,7 +40,7 @@ export async function PUT(
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await updateGenre(id, validatedData, {
+    const result = await updateGenreBusiness(id, validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });
@@ -65,7 +65,7 @@ export async function DELETE(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await deleteGenre(id, {
+    const result = await deleteGenreBusiness(id, {
       id: session!.user.id,
       username: session!.user.username
     });

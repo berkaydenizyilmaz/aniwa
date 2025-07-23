@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { updateTagSchema } from '@/lib/schemas/tag.schema';
-import { getTagById, updateTag, deleteTag } from '@/lib/services/business/tag.business';
+import { getTagBusiness, updateTagBusiness, deleteTagBusiness } from '@/lib/services/business/tag.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tek tag detayı (GET)
@@ -14,7 +14,7 @@ export async function GET(
     const { id } = await params;
 
     // Business logic
-    const result = await getTagById(id);
+    const result = await getTagBusiness(id);
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -40,7 +40,7 @@ export async function PUT(
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await updateTag(id, validatedData, {
+    const result = await updateTagBusiness(id, validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });
@@ -65,7 +65,7 @@ export async function DELETE(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await deleteTag(id, {
+    const result = await deleteTagBusiness(id, {
       id: session!.user.id,
       username: session!.user.username
     });
