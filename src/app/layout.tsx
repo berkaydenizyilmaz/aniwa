@@ -38,10 +38,10 @@ export default function RootLayout({
               <main className="relative min-h-screen pb-20 md:pb-0">
                 {children}
               </main>
-              <Toaster />
             </QueryProvider>
           </AuthSessionProvider>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );
