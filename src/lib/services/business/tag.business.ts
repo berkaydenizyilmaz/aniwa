@@ -30,7 +30,7 @@ import {
 } from '@/lib/types/api/tag.api';
 
 // Tag oluşturma
-export async function createTag(
+export async function createTagBusiness(
   data: CreateTagRequest,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<CreateTagResponse>> {
@@ -92,7 +92,7 @@ export async function createTag(
 }
 
 // Tag getirme (ID ile)
-export async function getTagById(id: string): Promise<ApiResponse<GetTagResponse>> {
+export async function getTagBusiness(id: string): Promise<ApiResponse<GetTagResponse>> {
   try {
     const tag = await findTagById(id);
     if (!tag) {
@@ -120,7 +120,7 @@ export async function getTagById(id: string): Promise<ApiResponse<GetTagResponse
 }
 
 // Tüm tag'leri getirme (filtrelemeli)
-export async function getAllTags(
+export async function getTagsBusiness(
   filters?: GetTagsRequest,
   user?: { id: string; userSettings?: { displayAdultContent: boolean } }
 ): Promise<ApiResponse<GetTagsResponse>> {
@@ -185,7 +185,7 @@ export async function getAllTags(
 }
 
 // Tag güncelleme
-export async function updateTag(
+export async function updateTagBusiness(
   id: string, 
   data: UpdateTagRequest,
   adminUser: { id: string; username: string }
@@ -253,7 +253,7 @@ export async function updateTag(
 }
 
 // Tag silme
-export async function deleteTag(
+export async function deleteTagBusiness(
   id: string,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<void>> {

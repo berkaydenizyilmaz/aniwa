@@ -30,7 +30,7 @@ import {
 } from '@/lib/types/api/genre.api';
 
 // Genre oluşturma
-export async function createGenre(
+export async function createGenreBusiness(
   data: CreateGenreRequest,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<CreateGenreResponse>> {
@@ -88,7 +88,7 @@ export async function createGenre(
 }
 
 // Genre getirme (ID ile)
-export async function getGenreById(id: string): Promise<ApiResponse<GetGenreResponse>> {
+export async function getGenreBusiness(id: string): Promise<ApiResponse<GetGenreResponse>> {
   try {
     const genre = await findGenreById(id);
     if (!genre) {
@@ -127,7 +127,7 @@ export async function getGenreById(id: string): Promise<ApiResponse<GetGenreResp
 }
 
 // Tüm genre'leri getirme (filtrelemeli)
-export async function getAllGenres(filters?: GetGenresRequest): Promise<ApiResponse<GetGenresResponse>> {
+export async function getGenresBusiness(filters?: GetGenresRequest): Promise<ApiResponse<GetGenresResponse>> {
   try {
     const page = filters?.page || 1;
     const limit = filters?.limit || 50;
@@ -190,7 +190,7 @@ export async function getAllGenres(filters?: GetGenresRequest): Promise<ApiRespo
 }
 
 // Genre güncelleme
-export async function updateGenre(
+export async function updateGenreBusiness(
   id: string, 
   data: UpdateGenreRequest,
   adminUser: { id: string; username: string }
@@ -254,7 +254,7 @@ export async function updateGenre(
 }
 
 // Genre silme
-export async function deleteGenre(
+export async function deleteGenreBusiness(
   id: string,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<void>> {
