@@ -41,25 +41,19 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        toast.error('Giriş Başarısız', {
-          description: 'Kullanıcı adı veya şifre yanlış'
-        });
+        toast.error('Kullanıcı adı veya şifre yanlış');
         return;
       }
 
       // Başarılı giriş
-      toast.success('Giriş Başarılı', {
-        description: 'Başarıyla giriş yaptınız!'
-      });
+      toast.success('Başarıyla giriş yaptınız!');
       
       router.push(ROUTES.PAGES.HOME);
       router.refresh();
 
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Hata', {
-        description: 'Bir hata oluştu. Lütfen tekrar deneyin.'
-      });
+      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }

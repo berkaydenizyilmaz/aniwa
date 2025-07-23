@@ -40,24 +40,18 @@ export function RegisterForm() {
       const result = await registerUser(data);
 
       if (!result.success) {
-        toast.error('Kayıt Başarısız', {
-          description: result.error || 'Kayıt işlemi başarısız oldu'
-        });
+        toast.error(result.error || 'Kayıt işlemi başarısız oldu');
         return;
       }
 
       // Başarılı kayıt - giriş sayfasına yönlendir
-      toast.success('Kayıt Başarılı', {
-        description: 'Hesabınız oluşturuldu! Giriş yapabilirsiniz.'
-      });
+      toast.success('Hesabınız oluşturuldu! Giriş yapabilirsiniz.');
       
       router.push(ROUTES.PAGES.AUTH.LOGIN);
 
     } catch (error) {
       console.error('Register error:', error);
-      toast.error('Hata', {
-        description: 'Bir hata oluştu. Lütfen tekrar deneyin.'
-      });
+      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }

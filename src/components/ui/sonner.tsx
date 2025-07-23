@@ -12,6 +12,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group [&_*]:font-semibold"
       position="top-center"
       richColors
+      duration={3000}
       style={
         {
           "--normal-bg": "var(--card)",

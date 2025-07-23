@@ -35,22 +35,16 @@ export function ForgotPasswordForm() {
       const result = await forgotPassword(data);
 
       if (!result.success) {
-        toast.error('İstek Başarısız', {
-          description: result.error || 'Şifre sıfırlama isteği başarısız oldu'
-        });
+        toast.error(result.error || 'Şifre sıfırlama isteği başarısız oldu');
         return;
       }
 
       // Başarılı istek
-      toast.success('E-posta Gönderildi', {
-        description: 'Şifre sıfırlama linki e-posta adresinize gönderildi.'
-      });
+      toast.success('Şifre sıfırlama linki e-posta adresinize gönderildi.');
 
     } catch (error) {
       console.error('Forgot password error:', error);
-      toast.error('Hata', {
-        description: 'Bir hata oluştu. Lütfen tekrar deneyin.'
-      });
+      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }

@@ -38,9 +38,7 @@ export function ResetPasswordForm() {
     if (tokenFromUrl) {
       setToken(tokenFromUrl);
     } else {
-      toast.error('Geçersiz Link', {
-        description: 'Şifre sıfırlama linki geçersiz.'
-      });
+      toast.error('Şifre sıfırlama linki geçersiz.');
       router.push(ROUTES.PAGES.AUTH.FORGOT_PASSWORD);
     }
   }, [searchParams, router]);
@@ -61,24 +59,18 @@ export function ResetPasswordForm() {
       const result = await resetPassword(formData);
 
       if (!result.success) {
-        toast.error('Şifre Sıfırlama Başarısız', {
-          description: result.error || 'Şifre sıfırlama işlemi başarısız oldu'
-        });
+        toast.error(result.error || 'Şifre sıfırlama işlemi başarısız oldu');
         return;
       }
 
       // Başarılı şifre sıfırlama
-      toast.success('Şifre Sıfırlandı', {
-        description: 'Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.'
-      });
+      toast.success('Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.');
       
       router.push(ROUTES.PAGES.AUTH.LOGIN);
 
     } catch (error) {
       console.error('Reset password error:', error);
-      toast.error('Hata', {
-        description: 'Bir hata oluştu. Lütfen tekrar deneyin.'
-      });
+      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
