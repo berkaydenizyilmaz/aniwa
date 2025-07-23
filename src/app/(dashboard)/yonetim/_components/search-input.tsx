@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
@@ -23,10 +23,10 @@ export const SearchInput = memo(function SearchInput({
   const [inputValue, setInputValue] = useState(value);
   const debouncedValue = useDebounce(inputValue, debounceMs);
 
-  // Input change handler - useCallback ile optimize edildi
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  // Input change handler
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
-  }, []);
+  };
 
   // Debounced value değiştiğinde parent'a bildir
   useEffect(() => {
@@ -38,14 +38,14 @@ export const SearchInput = memo(function SearchInput({
     setInputValue(value);
   }, [value]);
 
-  // Search icon render fonksiyonu - useCallback ile optimize edildi
-  const renderSearchIcon = useCallback(() => (
+  // Search icon
+  const searchIcon = (
     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-  ), []);
+  );
 
   return (
     <div className={`relative ${className}`}>
-      {renderSearchIcon()}
+      {searchIcon}
       <Input
         placeholder={placeholder}
         value={inputValue}

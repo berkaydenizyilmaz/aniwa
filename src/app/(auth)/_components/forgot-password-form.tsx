@@ -43,8 +43,8 @@ export const ForgotPasswordForm = memo(function ForgotPasswordForm() {
     }
   }, [isLoading, form]);
 
-  // Form field render fonksiyonu - useCallback ile optimize edildi
-  const renderEmailField = useCallback(({ field }: { field: ControllerRenderProps<ForgotPasswordInput, 'email'> }) => (
+  // Form field component
+  const EmailField = ({ field }: { field: ControllerRenderProps<ForgotPasswordInput, 'email'> }) => (
     <FormItem className="space-y-1.5">
       <FormControl>
         <Input
@@ -56,7 +56,7 @@ export const ForgotPasswordForm = memo(function ForgotPasswordForm() {
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
   return (
     <Form {...form}>
@@ -64,7 +64,7 @@ export const ForgotPasswordForm = memo(function ForgotPasswordForm() {
         <FormField
           control={form.control}
           name="email"
-          render={renderEmailField}
+          render={EmailField}
         />
 
         <Button

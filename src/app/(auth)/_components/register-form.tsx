@@ -57,8 +57,8 @@ export const RegisterForm = memo(function RegisterForm() {
     }
   }, [router, form.setError, isLoading]);
 
-  // Form field render fonksiyonları - useCallback ile optimize edildi
-  const renderEmailField = useCallback(({ field }: { field: ControllerRenderProps<RegisterInput, 'email'> }) => (
+  // Form field components
+  const EmailField = ({ field }: { field: ControllerRenderProps<RegisterInput, 'email'> }) => (
     <FormItem className="space-y-1.5">
       <FormControl>
         <Input
@@ -70,9 +70,9 @@ export const RegisterForm = memo(function RegisterForm() {
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
-  const renderUsernameField = useCallback(({ field }: { field: ControllerRenderProps<RegisterInput, 'username'> }) => (
+  const UsernameField = ({ field }: { field: ControllerRenderProps<RegisterInput, 'username'> }) => (
     <FormItem className="space-y-1.5">
       <FormControl>
         <Input
@@ -83,9 +83,9 @@ export const RegisterForm = memo(function RegisterForm() {
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
-  const renderPasswordField = useCallback(({ field }: { field: ControllerRenderProps<RegisterInput, 'password'> }) => (
+  const PasswordField = ({ field }: { field: ControllerRenderProps<RegisterInput, 'password'> }) => (
     <FormItem className="space-y-1.5">
       <FormControl>
         <Input
@@ -97,9 +97,9 @@ export const RegisterForm = memo(function RegisterForm() {
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
-  const renderConfirmPasswordField = useCallback(({ field }: { field: ControllerRenderProps<RegisterInput, 'confirmPassword'> }) => (
+  const ConfirmPasswordField = ({ field }: { field: ControllerRenderProps<RegisterInput, 'confirmPassword'> }) => (
     <FormItem className="space-y-1.5">
       <FormControl>
         <Input
@@ -111,7 +111,7 @@ export const RegisterForm = memo(function RegisterForm() {
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
   return (
     <Form {...form}>
@@ -119,25 +119,25 @@ export const RegisterForm = memo(function RegisterForm() {
         <FormField
           control={form.control}
           name="email"
-          render={renderEmailField}
+          render={EmailField}
         />
 
         <FormField
           control={form.control}
           name="username"
-          render={renderUsernameField}
+          render={UsernameField}
         />
 
         <FormField
           control={form.control}
           name="password"
-          render={renderPasswordField}
+          render={PasswordField}
         />
 
         <FormField
           control={form.control}
           name="confirmPassword"
-          render={renderConfirmPasswordField}
+          render={ConfirmPasswordField}
         />
 
         <Button

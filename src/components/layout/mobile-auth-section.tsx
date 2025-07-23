@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession, signOut } from 'next-auth/react';
-import { useState, useCallback, memo } from 'react';
+import { useState, memo } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -21,43 +21,39 @@ export const MobileAuthSection = memo(function MobileAuthSection() {
   const [isOpen, setIsOpen] = useState(false);
 
   // Çıkış yapma işlemi
-  const handleSignOut = useCallback(() => {
+  const handleSignOut = () => {
     signOut({ callbackUrl: ROUTES.PAGES.HOME });
-  }, []);
+  };
 
-  // Dropdown içeriği - useCallback ile optimize edildi
-  const renderDropdownContent = useCallback(() => {
-    if (!session) return null;
-    
-    return (
-      <>
-        <DropdownMenuItem asChild className="auth-dropdown-item">
-          <Link href={ROUTES.PAGES.PROFILE}>
-            <User className="icon-dropdown" />
-            <span>Profil</span>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild className="auth-dropdown-item">
-          <Link href={ROUTES.PAGES.NOTIFICATIONS}>
-            <Bell className="icon-dropdown" />
-            <span>Bildirimler</span>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild className="auth-dropdown-item">
-          <Link href={ROUTES.PAGES.SETTINGS}>
-            <Settings className="icon-dropdown" />
-            <span>Ayarlar</span>
-          </Link>
-        </DropdownMenuItem>
+  // Dropdown content
+  const dropdownContent = session && (
+    <>
+      <DropdownMenuItem asChild className="auth-dropdown-item">
+        <Link href={ROUTES.PAGES.PROFILE}>
+          <User className="icon-dropdown" />
+          <span>Profil</span>
+        </Link>
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild className="auth-dropdown-item">
+        <Link href={ROUTES.PAGES.NOTIFICATIONS}>
+          <Bell className="icon-dropdown" />
+          <span>Bildirimler</span>
+        </Link>
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild className="auth-dropdown-item">
+        <Link href={ROUTES.PAGES.SETTINGS}>
+          <Settings className="icon-dropdown" />
+          <span>Ayarlar</span>
+        </Link>
+      </DropdownMenuItem>
 
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut} className="auth-dropdown-item-danger group">
-          <LogOut className="icon-dropdown group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200" />
-          <span className="group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200">Çıkış Yap</span>
-        </DropdownMenuItem>
-      </>
-    );
-  }, [session, handleSignOut]);
+      <DropdownMenuSeparator />
+      <DropdownMenuItem onClick={handleSignOut} className="auth-dropdown-item-danger group">
+        <LogOut className="icon-dropdown group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200" />
+        <span className="group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200">Çıkış Yap</span>
+      </DropdownMenuItem>
+    </>
+  );
 
   // Loading durumu
   if (status === 'loading') {
@@ -118,7 +114,7 @@ export const MobileAuthSection = memo(function MobileAuthSection() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="center" side="top" className="w-48 mb-2 auth-dropdown">
-          {renderDropdownContent()}
+          {dropdownContent}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

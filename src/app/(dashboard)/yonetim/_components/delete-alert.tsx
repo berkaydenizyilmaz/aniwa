@@ -48,8 +48,8 @@ export const DeleteAlert = memo(function DeleteAlert({
     }
   }, [onDelete, isDeleting]);
 
-  // Trigger button render fonksiyonu - useCallback ile optimize edildi
-  const renderTriggerButton = useCallback(() => (
+  // Trigger button
+  const triggerButton = (
     <Button 
       variant={variant} 
       size={size} 
@@ -58,22 +58,22 @@ export const DeleteAlert = memo(function DeleteAlert({
     >
       <Trash2 className="h-4 w-4" />
     </Button>
-  ), [variant, size, isDeleting, isLoading]);
+  );
 
-  // Action button render fonksiyonu - useCallback ile optimize edildi
-  const renderActionButton = useCallback(() => (
+  // Action button
+  const actionButton = (
     <AlertDialogAction 
       onClick={handleDelete} 
       className="bg-red-500 text-white hover:bg-red-600 transition-all duration-200"
     >
       Sil
     </AlertDialogAction>
-  ), [handleDelete]);
+  );
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        {renderTriggerButton()}
+        {triggerButton}
       </AlertDialogTrigger>
       <AlertDialogContent className="bg-card/90 backdrop-blur-md border border-border/20 shadow-xl">
         <AlertDialogHeader>
@@ -86,7 +86,7 @@ export const DeleteAlert = memo(function DeleteAlert({
           <AlertDialogCancel className="hover:bg-muted/80 transition-all duration-200">
             İptal
           </AlertDialogCancel>
-          {renderActionButton()}
+          {actionButton}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

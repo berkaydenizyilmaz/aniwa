@@ -66,8 +66,8 @@ export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: T
     }
   }, [isLoading, form, onSuccess, onClose]);
 
-  // Form field render fonksiyonları - useCallback ile optimize edildi
-  const renderNameField = useCallback(({ field }: { field: ControllerRenderProps<CreateTagInput, 'name'> }) => (
+  // Form field components
+  const NameField = ({ field }: { field: ControllerRenderProps<CreateTagInput, 'name'> }) => (
     <FormItem>
       <FormLabel>Etiket Adı</FormLabel>
       <FormControl>
@@ -80,9 +80,9 @@ export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: T
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
-  const renderDescriptionField = useCallback(({ field }: { field: ControllerRenderProps<CreateTagInput, 'description'> }) => (
+  const DescriptionField = ({ field }: { field: ControllerRenderProps<CreateTagInput, 'description'> }) => (
     <FormItem>
       <FormLabel>Açıklama</FormLabel>
       <FormControl>
@@ -95,9 +95,9 @@ export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: T
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
-  const renderCategoryField = useCallback(({ field }: { field: ControllerRenderProps<CreateTagInput, 'category'> }) => (
+  const CategoryField = ({ field }: { field: ControllerRenderProps<CreateTagInput, 'category'> }) => (
     <FormItem>
       <FormLabel>Kategori</FormLabel>
       <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -116,9 +116,9 @@ export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: T
       </Select>
       <FormMessage />
     </FormItem>
-  ), []);
+  );
 
-  const renderAdultField = useCallback(({ field }: { field: ControllerRenderProps<CreateTagInput, 'isAdult'> }) => (
+  const AdultField = ({ field }: { field: ControllerRenderProps<CreateTagInput, 'isAdult'> }) => (
     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
       <div className="space-y-0.5">
         <FormLabel>Yetişkin İçerik</FormLabel>
@@ -131,9 +131,9 @@ export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: T
         />
       </FormControl>
     </FormItem>
-  ), [isLoading]);
+  );
 
-  const renderSpoilerField = useCallback(({ field }: { field: ControllerRenderProps<CreateTagInput, 'isSpoiler'> }) => (
+  const SpoilerField = ({ field }: { field: ControllerRenderProps<CreateTagInput, 'isSpoiler'> }) => (
     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
       <div className="space-y-0.5">
         <FormLabel>Spoiler</FormLabel>
@@ -146,22 +146,20 @@ export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: T
         />
       </FormControl>
     </FormItem>
-  ), [isLoading]);
+  );
 
-  // Cancel button render fonksiyonu - useCallback ile optimize edildi
-  const renderCancelButton = useCallback(() => (
-    onCancel && (
-      <Button
-        type="button"
-        variant="outline"
-        onClick={onCancel}
-        disabled={isLoading}
-        className="hover:bg-muted/80 transition-all duration-200"
-      >
-        İptal
-      </Button>
-    )
-  ), [onCancel, isLoading]);
+  // Cancel button
+  const cancelButton = onCancel && (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onCancel}
+      disabled={isLoading}
+      className="hover:bg-muted/80 transition-all duration-200"
+    >
+      İptal
+    </Button>
+  );
 
   return (
     <Form {...form}>
@@ -169,37 +167,37 @@ export const TagForm = memo(function TagForm({ onSuccess, onCancel, onClose }: T
         <FormField
           control={form.control}
           name="name"
-          render={renderNameField}
+          render={NameField}
         />
 
         <FormField
           control={form.control}
           name="description"
-          render={renderDescriptionField}
+          render={DescriptionField}
         />
 
         <FormField
           control={form.control}
           name="category"
-          render={renderCategoryField}
+          render={CategoryField}
         />
 
         <div className="flex items-center space-x-4">
           <FormField
             control={form.control}
             name="isAdult"
-            render={renderAdultField}
+            render={AdultField}
           />
 
           <FormField
             control={form.control}
             name="isSpoiler"
-            render={renderSpoilerField}
+            render={SpoilerField}
           />
         </div>
 
         <div className="flex items-center justify-end space-x-2">
-          {renderCancelButton()}
+          {cancelButton}
           <Button
             type="submit"
             loading={isLoading}

@@ -1,4 +1,4 @@
-import { ReactNode, memo, useCallback } from 'react';
+import { ReactNode, memo } from 'react';
 import Link from 'next/link';
 
 interface AuthLink {
@@ -15,8 +15,8 @@ interface AuthCardProps {
 }
 
 export const AuthCard = memo(function AuthCard({ title, description, children, links }: AuthCardProps) {
-  // Link render fonksiyonu - useCallback ile optimize edildi
-  const renderLink = useCallback((link: AuthLink, index: number, isMobile = false) => (
+  // Link component
+  const LinkItem = ({ link, index, isMobile = false }: { link: AuthLink; index: number; isMobile?: boolean }) => (
     <p key={index} className={`text-xs ${!isMobile ? 'md:text-sm' : ''} font-semibold text-muted-foreground`}>
       {link.text}{' '}
       <Link 
@@ -26,18 +26,20 @@ export const AuthCard = memo(function AuthCard({ title, description, children, l
         {link.label}
       </Link>
     </p>
-  ), []);
+  );
 
-  // Links section render fonksiyonu
-  const renderLinks = useCallback((isMobile = false) => {
+  // Links section
+  const LinksSection = ({ isMobile = false }: { isMobile?: boolean }) => {
     if (!links || links.length === 0) return null;
     
     return (
       <div className={`text-center space-y-${isMobile ? '2' : '3'} ${isMobile ? 'pt-4 mt-6' : 'pt-6 border-t border-border/20 mt-8'}`}>
-        {links.map((link, index) => renderLink(link, index, isMobile))}
+        {links.map((link, index) => (
+          <LinkItem key={index} link={link} index={index} isMobile={isMobile} />
+        ))}
       </div>
     );
-  }, [links, renderLink]);
+  };
 
   return (
     <>
@@ -57,7 +59,7 @@ export const AuthCard = memo(function AuthCard({ title, description, children, l
         </div>
         
         {/* Links */}
-        {renderLinks(true)}
+        <LinksSection isMobile={true} />
       </div>
 
       {/* Desktop: Kart görünümü */}
@@ -78,7 +80,7 @@ export const AuthCard = memo(function AuthCard({ title, description, children, l
             </div>
             
             {/* Links */}
-            {renderLinks(false)}
+            <LinksSection isMobile={false} />
           </div>
         </div>
       </div>

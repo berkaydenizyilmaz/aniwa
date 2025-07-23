@@ -52,8 +52,8 @@ export const LoginForm = memo(function LoginForm() {
     }
   }, [router, isLoading]);
 
-  // Form field render fonksiyonları - useCallback ile optimize edildi
-  const renderUsernameField = useCallback(({ field }: { field: ControllerRenderProps<LoginInput, 'username'> }) => (
+  // Form field components
+  const UsernameField = ({ field }: { field: ControllerRenderProps<LoginInput, 'username'> }) => (
     <FormItem className="space-y-1.5">
       <FormControl>
         <Input
@@ -64,9 +64,9 @@ export const LoginForm = memo(function LoginForm() {
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
-  const renderPasswordField = useCallback(({ field }: { field: ControllerRenderProps<LoginInput, 'password'> }) => (
+  const PasswordField = ({ field }: { field: ControllerRenderProps<LoginInput, 'password'> }) => (
     <FormItem className="space-y-1.5">
       <FormControl>
         <Input
@@ -78,7 +78,7 @@ export const LoginForm = memo(function LoginForm() {
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
   return (
     <Form {...form}>
@@ -86,13 +86,13 @@ export const LoginForm = memo(function LoginForm() {
         <FormField
           control={form.control}
           name="username"
-          render={renderUsernameField}
+          render={UsernameField}
         />
 
         <FormField
           control={form.control}
           name="password"
-          render={renderPasswordField}
+          render={PasswordField}
         />
 
         <Button

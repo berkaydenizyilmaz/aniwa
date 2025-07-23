@@ -58,8 +58,8 @@ export const GenreForm = memo(function GenreForm({ onSuccess, onCancel, onClose 
     }
   }, [isLoading, form, onSuccess, onClose]);
 
-  // Form field render fonksiyonu - useCallback ile optimize edildi
-  const renderNameField = useCallback(({ field }: { field: ControllerRenderProps<CreateGenreInput, 'name'> }) => (
+  // Form field component
+  const NameField = ({ field }: { field: ControllerRenderProps<CreateGenreInput, 'name'> }) => (
     <FormItem>
       <FormControl>
         <Input
@@ -71,22 +71,20 @@ export const GenreForm = memo(function GenreForm({ onSuccess, onCancel, onClose 
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
-  // Cancel button render fonksiyonu - useCallback ile optimize edildi
-  const renderCancelButton = useCallback(() => (
-    onCancel && (
-      <Button
-        type="button"
-        variant="outline"
-        onClick={onCancel}
-        disabled={isLoading}
-        className="hover:bg-muted/80 transition-all duration-200"
-      >
-        İptal
-      </Button>
-    )
-  ), [onCancel, isLoading]);
+  // Cancel button
+  const cancelButton = onCancel && (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onCancel}
+      disabled={isLoading}
+      className="hover:bg-muted/80 transition-all duration-200"
+    >
+      İptal
+    </Button>
+  );
 
   return (
     <Form {...form}>
@@ -94,11 +92,11 @@ export const GenreForm = memo(function GenreForm({ onSuccess, onCancel, onClose 
         <FormField
           control={form.control}
           name="name"
-          render={renderNameField}
+          render={NameField}
         />
 
         <div className="flex items-center justify-end space-x-2">
-          {renderCancelButton()}
+          {cancelButton}
           <Button
             type="submit"
             loading={isLoading}

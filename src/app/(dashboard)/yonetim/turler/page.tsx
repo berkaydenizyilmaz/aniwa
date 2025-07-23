@@ -3,7 +3,7 @@ import { GenreTable } from './_components/genre-table';
 
 const GenresPage = memo(function GenresPage() {
   // Page header render fonksiyonu - useCallback ile optimize edildi
-  const renderPageHeader = () => (
+  const pageHeader = (
     <div>
       <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Tür Yönetimi</h1>
       <p className="text-muted-foreground">
@@ -15,7 +15,7 @@ const GenresPage = memo(function GenresPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      {renderPageHeader()}
+      {pageHeader}
 
       {/* Genre Table */}
       <GenreTable />

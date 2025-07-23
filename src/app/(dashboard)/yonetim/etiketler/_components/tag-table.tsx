@@ -122,20 +122,20 @@ export const TagTable = memo(function TagTable() {
     });
   }, [editForm]);
 
-  // Loading skeleton render fonksiyonu - useCallback ile optimize edildi
-  const renderLoadingSkeleton = useCallback(() => (
+  // Loading skeleton
+  const loadingSkeleton = (
     <LoadingSkeleton itemCount={5} showSearch={true} showActionButton={true} />
-  ), []);
+  );
 
-  // Empty state render fonksiyonu - useCallback ile optimize edildi
-  const renderEmptyState = useCallback(() => (
+  // Empty state
+  const emptyState = (
     <div className="text-center py-8 text-muted-foreground">
       {searchTerm ? 'Arama sonucu bulunamadı.' : 'Henüz etiket eklenmemiş.'}
     </div>
-  ), [searchTerm]);
+  );
 
-  // Tag item render fonksiyonu - useCallback ile optimize edildi
-  const renderTagItem = useCallback((tag: Tag) => (
+  // Tag item component
+  const TagItem = ({ tag }: { tag: Tag }) => (
     <div
       key={tag.id}
       className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-border/20 rounded-lg hover:bg-muted/30 transition-all duration-200 gap-3 bg-card/80 backdrop-blur-sm"
@@ -307,11 +307,11 @@ export const TagTable = memo(function TagTable() {
         />
       </div>
     </div>
-  ), [handleEdit, handleDelete, openEditDialog, isUpdating, editForm]);
+  );
 
   // Loading skeleton
   if (isLoading) {
-    return renderLoadingSkeleton();
+    return loadingSkeleton;
   }
 
   return (
@@ -344,9 +344,11 @@ export const TagTable = memo(function TagTable() {
       <CardContent>
         <div className="space-y-2">
           {filteredTags().length === 0 ? (
-            renderEmptyState()
+            emptyState
           ) : (
-            filteredTags().map(renderTagItem)
+            filteredTags().map((tag) => (
+              <TagItem key={tag.id} tag={tag} />
+            ))
           )}
         </div>
       </CardContent>

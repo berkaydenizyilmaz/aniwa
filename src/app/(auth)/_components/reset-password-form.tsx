@@ -52,8 +52,8 @@ export const ResetPasswordForm = memo(function ResetPasswordForm({ token }: Rese
     }
   }, [isLoading, router]);
 
-  // Form field render fonksiyonları - useCallback ile optimize edildi
-  const renderPasswordField = useCallback(({ field }: { field: ControllerRenderProps<ResetPasswordInput, 'password'> }) => (
+  // Form field components
+  const PasswordField = ({ field }: { field: ControllerRenderProps<ResetPasswordInput, 'password'> }) => (
     <FormItem className="space-y-1.5">
       <FormControl>
         <Input
@@ -65,9 +65,9 @@ export const ResetPasswordForm = memo(function ResetPasswordForm({ token }: Rese
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
-  const renderConfirmPasswordField = useCallback(({ field }: { field: ControllerRenderProps<ResetPasswordInput, 'confirmPassword'> }) => (
+  const ConfirmPasswordField = ({ field }: { field: ControllerRenderProps<ResetPasswordInput, 'confirmPassword'> }) => (
     <FormItem className="space-y-1.5">
       <FormControl>
         <Input
@@ -79,12 +79,12 @@ export const ResetPasswordForm = memo(function ResetPasswordForm({ token }: Rese
       </FormControl>
       <FormMessage />
     </FormItem>
-  ), [isLoading]);
+  );
 
-  // Error state handler - useCallback ile optimize edildi
-  const handleRequestNewLink = useCallback(() => {
+  // Error state handler
+  const handleRequestNewLink = () => {
     router.push(ROUTES.PAGES.AUTH.FORGOT_PASSWORD);
-  }, [router]);
+  };
 
   // Token yoksa uyarı göster
   if (!token) {
@@ -110,13 +110,13 @@ export const ResetPasswordForm = memo(function ResetPasswordForm({ token }: Rese
         <FormField
           control={form.control}
           name="password"
-          render={renderPasswordField}
+          render={PasswordField}
         />
 
         <FormField
           control={form.control}
           name="confirmPassword"
-          render={renderConfirmPasswordField}
+          render={ConfirmPasswordField}
         />
 
         <Button

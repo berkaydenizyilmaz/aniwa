@@ -112,20 +112,20 @@ export const GenreTable = memo(function GenreTable() {
     editForm.reset({ name: genre.name });
   }, [editForm]);
 
-  // Loading skeleton render fonksiyonu - useCallback ile optimize edildi
-  const renderLoadingSkeleton = useCallback(() => (
+  // Loading skeleton
+  const loadingSkeleton = (
     <LoadingSkeleton itemCount={5} showSearch={true} showActionButton={true} />
-  ), []);
+  );
 
-  // Empty state render fonksiyonu - useCallback ile optimize edildi
-  const renderEmptyState = useCallback(() => (
+  // Empty state
+  const emptyState = (
     <div className="text-center py-8 text-muted-foreground">
       {searchTerm ? 'Arama sonucu bulunamadı.' : 'Henüz tür eklenmemiş.'}
     </div>
-  ), [searchTerm]);
+  );
 
-  // Genre item render fonksiyonu - useCallback ile optimize edildi
-  const renderGenreItem = useCallback((genre: Genre) => (
+  // Genre item component
+  const GenreItem = ({ genre }: { genre: Genre }) => (
     <div
       key={genre.id}
       className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-border/20 rounded-lg hover:bg-muted/30 transition-all duration-200 gap-3 bg-card/80 backdrop-blur-sm"
@@ -211,7 +211,7 @@ export const GenreTable = memo(function GenreTable() {
 
   // Loading skeleton
   if (isLoading) {
-    return renderLoadingSkeleton();
+    return loadingSkeleton;
   }
 
   return (
@@ -244,9 +244,11 @@ export const GenreTable = memo(function GenreTable() {
       <CardContent>
         <div className="space-y-2">
           {filteredGenres().length === 0 ? (
-            renderEmptyState()
+            emptyState
           ) : (
-            filteredGenres().map(renderGenreItem)
+            filteredGenres().map((genre) => (
+              <GenreItem key={genre.id} genre={genre} />
+            ))
           )}
         </div>
       </CardContent>

@@ -23,8 +23,8 @@ const AdminLayout = memo(function AdminLayout({ children }: AdminLayoutProps) {
     setSidebarOpen(false);
   }, []);
 
-  // Mobile hamburger button render fonksiyonu - useCallback ile optimize edildi
-  const renderMobileButton = useCallback(() => (
+  // Mobile hamburger button
+  const mobileButton = (
     <div className="md:hidden fixed top-4 right-4 z-50">
       <Button 
         variant="ghost" 
@@ -35,7 +35,7 @@ const AdminLayout = memo(function AdminLayout({ children }: AdminLayoutProps) {
         <Menu className="h-5 w-5 text-foreground" />
       </Button>
     </div>
-  ), [handleSidebarToggle]);
+  );
 
   return (
     <div className="h-screen flex overflow-hidden">
@@ -52,7 +52,7 @@ const AdminLayout = memo(function AdminLayout({ children }: AdminLayoutProps) {
       
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Hamburger Button */}
-        {renderMobileButton()}
+        {mobileButton}
         
         <main className="flex-1 overflow-auto p-4 md:p-6">
           {children}

@@ -2,8 +2,8 @@ import { memo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const AdminDashboardPage = memo(function AdminDashboardPage() {
-  // Page header render fonksiyonu - useCallback ile optimize edildi
-  const renderPageHeader = () => (
+  // Page header
+  const pageHeader = (
     <div>
       <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
       <p className="text-muted-foreground">
@@ -12,8 +12,8 @@ const AdminDashboardPage = memo(function AdminDashboardPage() {
     </div>
   );
 
-  // Welcome card render fonksiyonu - useCallback ile optimize edildi
-  const renderWelcomeCard = () => (
+  // Welcome card
+  const welcomeCard = (
     <Card className="bg-card/80 backdrop-blur-sm border border-border/20 shadow-lg">
       <CardHeader>
         <CardTitle className="text-foreground">Hoş Geldiniz!</CardTitle>
@@ -32,10 +32,10 @@ const AdminDashboardPage = memo(function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      {renderPageHeader()}
+      {pageHeader}
 
       {/* Welcome Card */}
-      {renderWelcomeCard()}
+      {welcomeCard}
     </div>
   );
 });

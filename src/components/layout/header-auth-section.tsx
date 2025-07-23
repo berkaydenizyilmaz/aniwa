@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession, signOut } from 'next-auth/react';
-import { useState, useCallback, memo } from 'react';
+import { useState, memo } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -22,43 +22,39 @@ export const HeaderAuthSection = memo(function HeaderAuthSection() {
   const [isOpen, setIsOpen] = useState(false);
 
   // Çıkış yapma işlemi
-  const handleSignOut = useCallback(() => {
+  const handleSignOut = () => {
     signOut({ callbackUrl: ROUTES.PAGES.HOME });
-  }, []);
+  };
 
-  // Dropdown içeriği - useCallback ile optimize edildi
-  const renderDropdownContent = useCallback(() => {
-    if (!session) return null;
-    
-    return (
-      <>
-        <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200">
-          <Link href={ROUTES.PAGES.PROFILE}>
-            <User className="mr-2 h-4 w-4" />
-            <span>Profil</span>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200">
-          <Link href={ROUTES.PAGES.NOTIFICATIONS}>
-            <Bell className="mr-2 h-4 w-4" />
-            <span>Bildirimler</span>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200">
-          <Link href={ROUTES.PAGES.SETTINGS}>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Ayarlar</span>
-          </Link>
-        </DropdownMenuItem>
+  // Dropdown content
+  const dropdownContent = session && (
+    <>
+      <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200">
+        <Link href={ROUTES.PAGES.PROFILE}>
+          <User className="mr-2 h-4 w-4" />
+          <span>Profil</span>
+        </Link>
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200">
+        <Link href={ROUTES.PAGES.NOTIFICATIONS}>
+          <Bell className="mr-2 h-4 w-4" />
+          <span>Bildirimler</span>
+        </Link>
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200">
+        <Link href={ROUTES.PAGES.SETTINGS}>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Ayarlar</span>
+        </Link>
+      </DropdownMenuItem>
 
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut} className="text-foreground hover:text-red-500 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-500 transition-all duration-200 group">
-          <LogOut className="mr-2 h-4 w-4 group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200" />
-          <span className="group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200">Çıkış Yap</span>
-        </DropdownMenuItem>
-      </>
-    );
-  }, [session, handleSignOut]);
+      <DropdownMenuSeparator />
+      <DropdownMenuItem onClick={handleSignOut} className="text-foreground hover:text-red-500 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-500 transition-all duration-200 group">
+        <LogOut className="mr-2 h-4 w-4 group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200" />
+        <span className="group-hover:text-red-500 group-focus:text-red-500 transition-colors duration-200">Çıkış Yap</span>
+      </DropdownMenuItem>
+    </>
+  );
 
   // Loading durumu
   if (status === 'loading') {
@@ -113,7 +109,7 @@ export const HeaderAuthSection = memo(function HeaderAuthSection() {
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="center" side="bottom" className="w-64 bg-card/80 backdrop-blur-md border-border/20 mt-4 shadow-xl">
-          {renderDropdownContent()}
+          {dropdownContent}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

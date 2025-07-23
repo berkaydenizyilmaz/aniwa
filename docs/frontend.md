@@ -78,7 +78,7 @@ Next.js App Router'ın ana gücü olan bu ayrımı bilinçli kullanıyoruz:
 
     Fonksiyonel Komponentler: Tüm React bileşenleri fonksiyonel olarak yazılır.
 
-    Hooks Kullanımı: useEffect, useState, useCallback, useMemo gibi hook'lar bilinçli ve gerektiği yerde kullanılır. Performans optimizasyonları için useCallback ve useMemo tercih edilebilir.
+    Hooks Kullanımı: useEffect, useState, useCallback, useMemo gibi hook'lar bilinçli ve gerektiği yerde kullanılır. useCallback sadece gerçekten gerekli olan yerlerde (form submit, API call, async handler) kullanılır, over-optimization'dan kaçınılır.
 
     Modüler İçe Aktarımlar: Sadece ihtiyaç duyulan fonksiyonlar veya bileşenler içe aktarılır, tüm kütüphane değil.
 
@@ -139,7 +139,9 @@ Next.js App Router'ın ana gücü olan bu ayrımı bilinçli kullanıyoruz:
 8. Performans ve Okunabilirlik Optimizasyonları
 
     React.memo: Tüm component'lerde kullanılır
-    useCallback: Event handler'lar ve render fonksiyonları optimize edilir
+    useCallback: Sadece gerçekten gerekli olan yerlerde kullanılır
+        ✅ Mantıklı Kullanım: Form submit handler'ları, API call fonksiyonları, async event handler'lar
+        ❌ Gereksiz Kullanım: Basit state setter'lar, render fonksiyonları, statik JSX
     Function Separation: Karmaşık render logic'i ayrı function'lara bölünür
     Error Handling: Try-catch + console.error + double submission prevention
     Loading State: isLoading ile form field'ları disabled edilir
@@ -147,7 +149,7 @@ Next.js App Router'ın ana gücü olan bu ayrımı bilinçli kullanıyoruz:
     TypeScript: any tipi yasak, proper type definitions kullanılır
     Component Structure: Import → Hooks → Handlers → Render → Return
 
-Bu optimizasyonlar proje genelinde tutarlı şekilde uygulanır.
+Bu optimizasyonlar proje genelinde tutarlı şekilde uygulanır ve over-optimization'dan kaçınılır.
 
 9. Tasarım Sistemi ve UI/UX Standartları
 

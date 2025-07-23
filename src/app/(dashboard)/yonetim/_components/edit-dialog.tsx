@@ -40,10 +40,10 @@ export const EditDialog = memo(function EditDialog<T = Record<string, unknown>>(
   const [isOpen, setIsOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Dialog close handler - useCallback ile optimize edildi
-  const handleClose = useCallback(() => {
+  // Dialog close handler
+  const handleClose = () => {
     setIsOpen(false);
-  }, []);
+  };
 
   // Form submit handler - useCallback ile optimize edildi
   const handleSubmit = useCallback(async (data: T) => {
@@ -60,8 +60,8 @@ export const EditDialog = memo(function EditDialog<T = Record<string, unknown>>(
     }
   }, [onEdit, isUpdating]);
 
-  // Default trigger render fonksiyonu - useCallback ile optimize edildi
-  const renderDefaultTrigger = useCallback(() => (
+  // Default trigger
+  const defaultTrigger = (
     <Button 
       variant={variant} 
       size={size} 
@@ -70,19 +70,17 @@ export const EditDialog = memo(function EditDialog<T = Record<string, unknown>>(
     >
       <Edit className="h-4 w-4" />
     </Button>
-  ), [variant, size, isLoading]);
+  );
 
-  // Children render fonksiyonu - useCallback ile optimize edildi
-  const renderChildren = useCallback(() => {
-    return typeof children === 'function' 
-      ? children({ onClose: handleClose, onSubmit: handleSubmit, isUpdating }) 
-      : children;
-  }, [children, handleClose, handleSubmit, isUpdating]);
+  // Children
+  const childrenContent = typeof children === 'function' 
+    ? children({ onClose: handleClose, onSubmit: handleSubmit, isUpdating }) 
+    : children;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {trigger || renderDefaultTrigger()}
+        {trigger || defaultTrigger}
       </DialogTrigger>
       <DialogContent className="bg-card/90 backdrop-blur-md border border-border/20 shadow-xl">
         <DialogHeader>
@@ -92,7 +90,7 @@ export const EditDialog = memo(function EditDialog<T = Record<string, unknown>>(
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          {renderChildren()}
+          {childrenContent}
         </div>
       </DialogContent>
     </Dialog>

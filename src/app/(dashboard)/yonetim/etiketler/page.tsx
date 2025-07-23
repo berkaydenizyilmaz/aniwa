@@ -2,8 +2,8 @@ import { memo } from 'react';
 import { TagTable } from './_components/tag-table';
 
 const TagsPage = memo(function TagsPage() {
-  // Page header render fonksiyonu - useCallback ile optimize edildi
-  const renderPageHeader = () => (
+  // Page header
+  const pageHeader = (
     <div>
       <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Etiket Yönetimi</h1>
       <p className="text-muted-foreground">
@@ -15,7 +15,7 @@ const TagsPage = memo(function TagsPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      {renderPageHeader()}
+      {pageHeader}
 
       {/* Tag Table */}
       <TagTable />
