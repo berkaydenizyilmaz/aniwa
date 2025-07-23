@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
@@ -36,12 +37,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <QueryProvider>
-            <main className="relative min-h-screen pb-20 md:pb-0">
-              {children}
-            </main>
-            <Toaster />
-          </QueryProvider>
+          <AuthSessionProvider>
+            <QueryProvider>
+              <main className="relative min-h-screen pb-20 md:pb-0">
+                {children}
+              </main>
+              <Toaster />
+            </QueryProvider>
+          </AuthSessionProvider>
         </ThemeProvider>
       </body>
     </html>
