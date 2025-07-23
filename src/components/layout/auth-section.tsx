@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Skeleton } from '@/components/ui/skeleton'
 import { User, Settings, LogOut, Bell } from 'lucide-react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
@@ -26,7 +27,7 @@ export function AuthSection() {
   if (status === 'loading') {
     return (
       <div className="flex items-center space-x-2">
-        <div className="h-8 w-16 bg-muted animate-pulse rounded" />
+        <Skeleton className="h-10 w-10 rounded-full" />
       </div>
     )
   }
