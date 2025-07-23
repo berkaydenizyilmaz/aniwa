@@ -106,11 +106,11 @@ Next.js App Router'ın ana gücü olan bu ayrımı bilinçli kullanıyoruz:
 
     Form Yönetimi ve Validasyon:
 
-        React Hook Form ve Zod: Form verilerini yönetmek ve validasyon yapmak için birlikte kullanılır.
+    React Hook Form ve Zod: Form verilerini yönetmek ve validasyon yapmak için birlikte kullanılır.
 
-            Zod: Form şemalarını tanımlar ve güçlü, tip güvenli validasyon kuralları sağlar.
+        Zod: Form şemalarını tanımlar ve güçlü, tip güvenli validasyon kuralları sağlar.
 
-            React Hook Form: Form durumunu performanslı bir şekilde yönetir, Zod ile entegre olur (zodResolver).
+        React Hook Form: Form durumunu performanslı bir şekilde yönetir, Zod ile entegre olur (zodResolver).
 
             Gönderim: Form gönderimleri Server Actions aracılığıyla yapılır. Client Component'teki formdan gelen veri, Server Action içinde doğrulanıp (Zod ile) direkt business katmanına iletilir.
 

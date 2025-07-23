@@ -7,4 +7,4 @@ import { RegisterInput } from '@/lib/schemas/auth.schema';
 export type RegisterResponse = Pick<User, 'id' | 'username' | 'email'>;
 
 // Auth API istek tipleri
-export type RegisterRequest = RegisterInput; 
+export type RegisterRequest = RegisterInput;
