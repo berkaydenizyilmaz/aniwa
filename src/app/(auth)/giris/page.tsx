@@ -1,5 +1,37 @@
+import Link from 'next/link';
+import { AuthCard } from "@/components/modules/auth/auth-card";
 import { LoginForm } from "@/components/modules/auth/login-form";
+import { ROUTES } from '@/lib/constants/routes.constants';
 
 export default function LoginPage() {
-  return <LoginForm />;
+  const loginLinks = (
+    <>
+      <Link
+        href={ROUTES.PAGES.AUTH.FORGOT_PASSWORD}
+        className="text-sm text-muted-foreground hover:text-primary transition-colors"
+      >
+        Şifremi unuttum
+      </Link>
+      
+      <div className="text-sm text-muted-foreground">
+        Hesabınız yok mu?{' '}
+        <Link
+          href={ROUTES.PAGES.AUTH.REGISTER}
+          className="text-primary hover:underline"
+        >
+          Kayıt ol
+        </Link>
+      </div>
+    </>
+  );
+
+  return (
+    <AuthCard
+      title="Giriş Yap"
+      description="Hesabınıza giriş yapın"
+      links={loginLinks}
+    >
+      <LoginForm />
+    </AuthCard>
+  );
 } 

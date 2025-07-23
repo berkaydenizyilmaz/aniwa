@@ -5,8 +5,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { AuthCard } from '@/components/modules/auth/auth-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -68,70 +66,46 @@ export function LoginForm() {
   };
 
   return (
-    <AuthCard
-      title="Giriş Yap"
-      description="Hesabınıza giriş yapın"
-    >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Kullanıcı Adı */}
-        <div className="space-y-2">
-          <Label htmlFor="username">Kullanıcı Adı</Label>
-          <Input
-            id="username"
-            type="text"
-            placeholder="Kullanıcı adınızı girin"
-            {...register('username')}
-            disabled={isLoading}
-          />
-          {errors.username && (
-            <p className="text-sm text-destructive">{errors.username.message}</p>
-          )}
-        </div>
-
-        {/* Şifre */}
-        <div className="space-y-2">
-          <Label htmlFor="password">Şifre</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Şifrenizi girin"
-            {...register('password')}
-            disabled={isLoading}
-          />
-          {errors.password && (
-            <p className="text-sm text-destructive">{errors.password.message}</p>
-          )}
-        </div>
-
-        {/* Giriş Butonu */}
-        <Button
-          type="submit"
-          className="w-full"
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* Kullanıcı Adı */}
+      <div className="space-y-2">
+        <Label htmlFor="username">Kullanıcı Adı</Label>
+        <Input
+          id="username"
+          type="text"
+          placeholder="Kullanıcı adınızı girin"
+          {...register('username')}
           disabled={isLoading}
-        >
-          {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
-        </Button>
+        />
+        {errors.username && (
+          <p className="text-sm text-destructive">{errors.username.message}</p>
+        )}
+      </div>
 
-        {/* Linkler */}
-        <div className="text-center space-y-2">
-          <Link
-            href={ROUTES.PAGES.AUTH.FORGOT_PASSWORD}
-            className="text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            Şifremi unuttum
-          </Link>
-          
-          <div className="text-sm text-muted-foreground">
-            Hesabınız yok mu?{' '}
-            <Link
-              href={ROUTES.PAGES.AUTH.REGISTER}
-              className="text-primary hover:underline"
-            >
-              Kayıt ol
-            </Link>
-          </div>
-        </div>
-      </form>
-    </AuthCard>
+      {/* Şifre */}
+      <div className="space-y-2">
+        <Label htmlFor="password">Şifre</Label>
+        <Input
+          id="password"
+          type="password"
+          placeholder="Şifrenizi girin"
+          {...register('password')}
+          disabled={isLoading}
+        />
+        {errors.password && (
+          <p className="text-sm text-destructive">{errors.password.message}</p>
+        )}
+      </div>
+
+      {/* Giriş Butonu */}
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={isLoading}
+      >
+        {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+      </Button>
+
+    </form>
   );
 } 
