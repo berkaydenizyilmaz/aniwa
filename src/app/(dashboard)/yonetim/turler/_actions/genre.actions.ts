@@ -2,12 +2,33 @@
 
 import { createGenreSchema, type CreateGenreInput } from '@/lib/schemas/genre.schema';
 import { updateGenreSchema, type UpdateGenreInput } from '@/lib/schemas/genre.schema';
-import { createGenre as createGenreBusiness, updateGenre as updateGenreBusiness, deleteGenre as deleteGenreBusiness } from '@/lib/services/business/genre.business';
+import { createGenre as createGenreBusiness, updateGenre as updateGenreBusiness, deleteGenre as deleteGenreBusiness, getAllGenres as getAllGenresBusiness } from '@/lib/services/business/genre.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
 import { ROUTES } from '@/lib/constants/routes.constants';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
+
+export async function getGenres(): Promise<ServerActionResponse> {
+  try {
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+    if (!session?.user) {
+      throw new Error('Oturum bulunamadı');
+    }
+
+    // Business logic'i kullan
+    const result = await getAllGenresBusiness();
+
+    return {
+      success: true,
+      data: result.data
+    };
+
+  } catch (error) {
+    return handleServerActionError(error);
+  }
+}
 
 export async function createGenre(data: CreateGenreInput): Promise<ServerActionResponse> {
   try {

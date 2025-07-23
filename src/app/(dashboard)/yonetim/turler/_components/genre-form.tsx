@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { ControllerRenderProps, useForm } from 'react-hook-form';
+import { useState, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toastError, toastSuccess } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
@@ -28,8 +28,8 @@ export function GenreForm({ onSuccess, onCancel, onClose }: GenreFormProps) {
   });
 
   // Form submit handler
-  const onSubmit = async (data: CreateGenreInput) => {
-    if (isLoading) return; // Prevent double submission
+  const onSubmit = useCallback(async (data: CreateGenreInput) => {
+    if (isLoading) return;
     
     setIsLoading(true);
 
@@ -37,18 +37,16 @@ export function GenreForm({ onSuccess, onCancel, onClose }: GenreFormProps) {
       const result = await createGenre(data);
 
       if (!result.success) {
-        // Field errors varsa form'a set et
         if (result.fieldErrors) {
           setFormFieldErrors<CreateGenreInput>(result.fieldErrors, form.setError);
         } else {
-          // Genel hata mesajı
           toastError('Hata', result.error);
         }
       } else {
         toastSuccess('Başarılı', 'Tür başarıyla oluşturuldu!');
         form.reset();
         onSuccess?.();
-        onClose?.(); // Dialog'u kapat
+        onClose?.();
       }
     } catch (error) {
       console.error('Create genre error:', error);
@@ -56,35 +54,7 @@ export function GenreForm({ onSuccess, onCancel, onClose }: GenreFormProps) {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Form field component
-  const NameField = ({ field }: { field: ControllerRenderProps<CreateGenreInput, 'name'> }) => (
-    <FormItem>
-      <FormControl>
-        <Input
-          placeholder="Tür Adı"
-          disabled={isLoading}
-          {...field}
-          className="bg-card/80 backdrop-blur-sm"
-        />
-      </FormControl>
-      <FormMessage />
-    </FormItem>
-  );
-
-  // Cancel button
-  const cancelButton = onCancel && (
-    <Button
-      type="button"
-      variant="outline"
-      onClick={onCancel}
-      disabled={isLoading}
-      className="hover:bg-muted/80 transition-all duration-200"
-    >
-      İptal
-    </Button>
-  );
+  }, [isLoading, form, onSuccess, onClose]);
 
   return (
     <Form {...form}>
@@ -92,11 +62,33 @@ export function GenreForm({ onSuccess, onCancel, onClose }: GenreFormProps) {
         <FormField
           control={form.control}
           name="name"
-          render={NameField}
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="Tür adı"
+                  disabled={isLoading}
+                  className="bg-card/80 backdrop-blur-sm"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
 
         <div className="flex items-center justify-end space-x-2">
-          {cancelButton}
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isLoading}
+              className="hover:bg-muted/80 transition-all duration-200"
+            >
+              İptal
+            </Button>
+          )}
           <Button
             type="submit"
             loading={isLoading}
