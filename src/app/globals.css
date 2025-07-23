@@ -77,7 +77,7 @@
   /* Durum renkleri */
   --success: #86efac;
   --warning: #fde68a;
-  --destructive: #fca5a5;
+  --destructive: #ff9999;
   --destructive-foreground: #ffffff;
   --info: #a5f3fc;
   
@@ -127,7 +127,7 @@
   
   --success: #6ee7b7;
   --warning: #fcd34d;
-  --destructive: #f87171;
+  --destructive: #ff8a8a;
   --destructive-foreground: #ffffff;
   --info: #67e8f9;
   
