@@ -81,11 +81,11 @@ export function AdminSidebar() {
         hidden md:flex flex-col h-full
         glass-card border-r
         transition-all duration-300 ease-in-out
-        ${isCollapsed ? 'w-16' : 'w-64'}
+        ${isCollapsed ? 'w-24' : 'w-64'}
       `}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b">
+          <div className={`flex items-center border-b ${isCollapsed ? 'justify-center p-2' : 'justify-between p-4'}`}>
             {!isCollapsed && (
               <Link href={ROUTES.PAGES.ADMIN.DASHBOARD} className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center">
@@ -110,7 +110,7 @@ export function AdminSidebar() {
           </div>
 
           {/* Navigation */}
-          <nav className={`flex-1 space-y-2 ${isCollapsed ? 'px-1 py-2' : 'p-4'}`}>
+          <nav className={`flex-1 space-y-2 ${isCollapsed ? 'py-2' : 'p-4'}`}>
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -140,13 +140,13 @@ export function AdminSidebar() {
           </nav>
 
           {/* Bottom Section */}
-          <div className={`border-t space-y-2 ${isCollapsed ? 'px-1 py-2' : 'p-4'}`}>
+          <div className={`border-t space-y-2 ${isCollapsed ? 'py-2' : 'p-4'}`}>
             {/* Ana Sayfaya Dön */}
             <Link
               href={ROUTES.PAGES.HOME}
               className={`
                 flex items-center rounded-lg
-                text-muted-foreground hover:text-foreground hover:bg-muted/50
+                text-muted-foreground hover:text-foreground hover:bg-accent/50
                 transition-colors duration-200
                 ${isCollapsed ? 'justify-center p-2' : 'space-x-3 px-3 py-2'}
               `}
@@ -154,12 +154,19 @@ export function AdminSidebar() {
             >
               <Home className="h-5 w-5 flex-shrink-0" />
               {!isCollapsed && (
-                <span className="font-medium">Ana Sayfa</span>
+                <span className="text-sm font-medium">Ana Sayfa</span>
               )}
             </Link>
 
             {/* Auth Section */}
-            <AdminAuthSection isSidebarOpen={!isCollapsed} />
+            <div className={`
+              flex items-center rounded-lg
+              text-muted-foreground hover:text-foreground hover:bg-accent/50
+              transition-colors duration-200
+              ${isCollapsed ? 'justify-center p-2' : 'space-x-3 px-3 py-2'}
+            `}>
+              <AdminAuthSection isSidebarOpen={!isCollapsed} />
+            </div>
           </div>
         </div>
       </aside>
@@ -167,7 +174,7 @@ export function AdminSidebar() {
       {/* Mobile Sidebar */}
       <aside className={`
         fixed inset-y-0 left-0 z-50 w-64
-        glass-card border-r
+        bg-background/90 backdrop-blur-md border-r
         transition-transform duration-300 ease-in-out
         md:hidden
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -226,7 +233,7 @@ export function AdminSidebar() {
               onClick={() => setIsMobileOpen(false)}
               className={`
                 flex items-center space-x-3 px-3 py-2 rounded-lg
-                text-muted-foreground hover:text-foreground hover:bg-muted/50
+                text-muted-foreground hover:text-foreground hover:bg-accent/50
                 transition-colors duration-200
               `}
             >
@@ -235,20 +242,28 @@ export function AdminSidebar() {
             </Link>
 
             {/* Auth Section */}
-            <AdminAuthSection isSidebarOpen={true} />
+            <div className={`
+              flex items-center space-x-3 px-3 py-2 rounded-lg
+              text-muted-foreground hover:text-foreground hover:bg-accent/50
+              transition-colors duration-200
+            `}>
+              <AdminAuthSection isSidebarOpen={true} />
+            </div>
           </div>
         </div>
       </aside>
 
       {/* Mobile Toggle Button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={toggleMobile}
-        className="fixed top-4 left-4 z-50 md:hidden glass-card"
-      >
-        <Menu className="h-4 w-4" />
-      </Button>
+      {!isMobileOpen && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleMobile}
+          className="fixed top-4 left-4 z-50 md:hidden glass-card"
+        >
+          <Menu className="h-4 w-4" />
+        </Button>
+      )}
     </>
   );
 } 

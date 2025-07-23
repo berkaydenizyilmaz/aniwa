@@ -30,39 +30,39 @@ export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="cursor-pointer flex items-center space-x-2">
-          <Avatar className="h-8 w-8">
+        <div className="cursor-pointer flex items-center space-x-2 w-full">
+          <Avatar className="h-5 w-5 flex-shrink-0">
             <AvatarImage src={session.user?.image || ''} alt={session.user?.username || ''} />
             <AvatarFallback className="bg-muted text-xs">
               {session.user?.username?.charAt(0).toUpperCase() || 'A'}
             </AvatarFallback>
           </Avatar>
           {isSidebarOpen && (
-            <span className="text-sm font-medium">{session.user.username}</span>
+            <span className="font-medium">{session.user.username}</span>
           )}
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="glass-card w-48" align="center" forceMount>
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <DropdownMenuItem key={item.label} asChild>
-              <Link href={item.href} className="group">
-                <Icon className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
-                <span>{item.label}</span>
-              </Link>
-            </DropdownMenuItem>
-          );
-        })}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem 
-          className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive group"
-          onClick={handleSignOut}
-        >
-          <LogOut className="mr-2 h-4 w-4 group-hover:text-destructive" />
-          <span>Çıkış Yap</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
+              <DropdownMenuContent className="glass-card w-48" align="center" forceMount>
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <DropdownMenuItem key={item.label} asChild className="cursor-pointer">
+                <Link href={item.href} className="group">
+                  <Icon className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
+                  <span>{item.label}</span>
+                </Link>
+              </DropdownMenuItem>
+            );
+          })}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem 
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive group cursor-pointer"
+            onClick={handleSignOut}
+          >
+            <LogOut className="mr-2 h-4 w-4 group-hover:text-destructive" />
+            <span>Çıkış Yap</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
     </DropdownMenu>
   );
 } 
