@@ -8,7 +8,7 @@ export default function LoginPage() {
     <>
       <Link
         href={ROUTES.PAGES.AUTH.FORGOT_PASSWORD}
-        className="text-sm text-muted-foreground hover:text-primary transition-colors"
+        className="text-sm text-primary hover:underline transition-colors"
       >
         Şifremi unuttum
       </Link>
