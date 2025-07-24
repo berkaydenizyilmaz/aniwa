@@ -53,7 +53,7 @@ export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
-              <DropdownMenuItem key={item.label} asChild className="cursor-pointer">
+              <DropdownMenuItem key={item.label} asChild>
                 <Link href={item.href} className="group">
                   <Icon className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
                   <span>{item.label}</span>
@@ -70,7 +70,7 @@ export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
             .map((item) => {
               const Icon = item.icon;
               return (
-                <DropdownMenuItem key={item.label} asChild className="cursor-pointer">
+                <DropdownMenuItem key={item.label} asChild>
                   <Link href={item.href} className="group">
                     <Icon className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
                     <span>{item.label}</span>
@@ -80,7 +80,7 @@ export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
             })}
           <DropdownMenuSeparator />
           <DropdownMenuItem 
-            className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive group cursor-pointer"
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive group"
             onClick={handleSignOut}
           >
             <LogOut className="mr-2 h-4 w-4 group-hover:text-destructive" />
