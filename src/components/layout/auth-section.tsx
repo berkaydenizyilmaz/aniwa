@@ -10,22 +10,17 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { User, Settings, LogOut, Bell, Shield, Edit, Crown } from 'lucide-react'
+import { User, Settings, LogOut, Bell } from 'lucide-react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { ROUTES } from '@/lib/constants/routes.constants'
+import { ADMIN_MENU_ITEMS } from '@/lib/constants/menu.constants'
 import { USER } from '@/lib/constants/user.constants'
 
 const menuItems = [
   { icon: User, label: 'Profil', href: ROUTES.PAGES.PROFILE },
   { icon: Bell, label: 'Bildirimler', href: ROUTES.PAGES.NOTIFICATIONS },
   { icon: Settings, label: 'Ayarlar', href: ROUTES.PAGES.SETTINGS },
-]
-
-const adminMenuItems = [
-  { icon: Crown, label: 'Admin Paneli', href: ROUTES.PAGES.ADMIN.DASHBOARD, role: USER.ROLES.ADMIN },
-  { icon: Edit, label: 'Editör Paneli', href: ROUTES.PAGES.EDITOR.DASHBOARD, role: USER.ROLES.EDITOR },
-  { icon: Shield, label: 'Moderasyon Paneli', href: ROUTES.PAGES.MODERATOR.DASHBOARD, role: USER.ROLES.MODERATOR },
 ]
 
 export function AuthSection() {
@@ -82,10 +77,10 @@ export function AuthSection() {
             )
           })}
           <DropdownMenuSeparator />
-          {adminMenuItems
+          {ADMIN_MENU_ITEMS
             .filter((item) => 
-              session.user.roles.includes(USER.ROLES.ADMIN) || 
-              session.user.roles.includes(item.role)
+              session.user.roles.includes(item.role) || 
+              session.user.roles.includes(USER.ROLES.ADMIN)
             )
             .map((item) => {
               const Icon = item.icon
