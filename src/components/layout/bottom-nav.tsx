@@ -18,7 +18,7 @@ export function BottomNav() {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t flex">
-      {navItems.map((item, index) => {
+      {navItems.map((item) => {
         const Icon = item.icon
         const isActive = pathname === item.href
         
