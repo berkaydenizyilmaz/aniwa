@@ -29,7 +29,7 @@ export function ForgotPasswordForm() {
 
   const onSubmit = async (data: ForgotPasswordInput) => {
     if (isLoading(LOADING_KEYS.AUTH.FORGOT_PASSWORD)) return; // Prevent double submission
-
+    
     setLoadingStore(LOADING_KEYS.AUTH.FORGOT_PASSWORD, true);
 
     try {

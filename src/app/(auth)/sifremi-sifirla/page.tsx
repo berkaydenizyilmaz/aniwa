@@ -24,7 +24,7 @@ export default function ResetPasswordPage() {
       links={resetPasswordLinks}
     >
       <Suspense fallback={<div>Yükleniyor...</div>}>
-        <ResetPasswordForm />
+      <ResetPasswordForm />
       </Suspense>
     </AuthCard>
   );

@@ -34,7 +34,7 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterInput) => {
     if (isLoading(LOADING_KEYS.AUTH.REGISTER)) return; // Prevent double submission
-
+    
     setLoadingStore(LOADING_KEYS.AUTH.REGISTER, true);
 
     try {
@@ -48,7 +48,7 @@ export function RegisterForm() {
 
       // Başarılı kayıt - giriş sayfasına yönlendir
       toast.success('Hesabınız oluşturuldu! Giriş yapabilirsiniz.');
-
+      
       router.push(ROUTES.PAGES.AUTH.LOGIN);
 
     } catch (error) {
@@ -121,14 +121,14 @@ export function RegisterForm() {
         )}
       </div>
 
-      {/* Kayıt Butonu */}
-      <Button
-        type="submit"
-        className="w-full"
+        {/* Kayıt Butonu */}
+        <Button
+          type="submit"
+          className="w-full"
         disabled={isLoading(LOADING_KEYS.AUTH.REGISTER)}
-      >
-        Kayıt Ol
-      </Button>
+        >
+          Kayıt Ol
+        </Button>
 
     </form>
   );

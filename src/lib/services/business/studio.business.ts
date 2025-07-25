@@ -30,7 +30,7 @@ import {
 } from '@/lib/types/api/studio.api';
 
 // Studio oluşturma
-export async function createStudio(
+export async function createStudioBusiness(
   data: CreateStudioRequest,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<CreateStudioResponse>> {
@@ -89,12 +89,27 @@ export async function createStudio(
 }
 
 // Studio getirme (ID ile)
-export async function getStudioById(id: string): Promise<ApiResponse<GetStudioResponse>> {
+export async function getStudioBusiness(
+  id: string,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<GetStudioResponse>> {
   try {
     const studio = await findStudioById(id);
     if (!studio) {
       throw new NotFoundError('Studio bulunamadı');
     }
+
+    // Başarılı getirme logu
+    await logger.info(
+      EVENTS.ADMIN.STUDIO_RETRIEVED,
+      'Studio başarıyla getirildi',
+      { 
+        studioId: studio.id, 
+        name: studio.name,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
+    );
 
     return {
       success: true,
@@ -117,7 +132,10 @@ export async function getStudioById(id: string): Promise<ApiResponse<GetStudioRe
 }
 
 // Tüm studio'ları getirme (filtrelemeli)
-export async function getAllStudios(filters?: GetStudiosRequest): Promise<ApiResponse<GetStudiosResponse>> {
+export async function getStudiosBusiness(
+  adminUser: { id: string; username: string },
+  filters?: GetStudiosRequest
+): Promise<ApiResponse<GetStudiosResponse>> {
   try {
     const page = filters?.page || 1;
     const limit = filters?.limit || 50;
@@ -140,6 +158,18 @@ export async function getAllStudios(filters?: GetStudiosRequest): Promise<ApiRes
     const total = studios.length;
     const paginatedStudios = studios.slice(skip, skip + limit);
     const totalPages = Math.ceil(total / limit);
+
+    // Başarılı getirme logu
+    await logger.info(
+      EVENTS.ADMIN.STUDIOS_RETRIEVED,
+      'Studios başarıyla getirildi',
+      { 
+        total: studios.length,
+        filtered: paginatedStudios.length,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
+    );
 
     return {
       success: true,
@@ -168,7 +198,7 @@ export async function getAllStudios(filters?: GetStudiosRequest): Promise<ApiRes
 }
 
 // Studio güncelleme
-export async function updateStudio(
+export async function updateStudioBusiness(
   id: string, 
   data: UpdateStudioRequest,
   adminUser: { id: string; username: string }
@@ -233,7 +263,7 @@ export async function updateStudio(
 }
 
 // Studio silme
-export async function deleteStudio(
+export async function deleteStudioBusiness(
   id: string,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<void>> {
