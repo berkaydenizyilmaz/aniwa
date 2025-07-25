@@ -3,11 +3,7 @@
 import Link from 'next/link'
 import { AuthSection } from './auth-section'
 import { ROUTES } from '@/lib/constants/routes.constants'
-
-const navigationItems = [
-  { label: 'Anime', href: ROUTES.PAGES.ANIME },
-  { label: 'Listeler', href: ROUTES.PAGES.LISTS },
-]
+import { HEADER_NAVIGATION_ITEMS } from '@/lib/constants/menu.constants'
 
 export function Header() {
   return (
@@ -23,7 +19,7 @@ export function Header() {
 
         {/* Navigation */}
         <nav className="flex items-center space-x-6">
-          {navigationItems.map((item) => (
+          {HEADER_NAVIGATION_ITEMS.map((item) => (
             <Link 
               key={item.label}
               href={item.href} 

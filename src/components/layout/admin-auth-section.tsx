@@ -3,10 +3,10 @@
 import { useSession, signOut } from 'next-auth/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { User, Settings, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes.constants';
-import { ADMIN_MENU_ITEMS } from '@/lib/constants/menu.constants';
+import { ADMIN_MENU_ITEMS, AUTH_MENU_ITEMS } from '@/lib/constants/menu.constants';
 import { USER } from '@/lib/constants/user.constants';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
@@ -14,13 +14,6 @@ import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 interface AdminAuthSectionProps {
   isSidebarOpen: boolean;
 }
-
-const menuItems = [
-  { icon: User, label: 'Profil', href: ROUTES.PAGES.PROFILE },
-  { icon: Settings, label: 'Ayarlar', href: ROUTES.PAGES.SETTINGS },
-];
-
-
 
 export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
   const { data: session } = useSession();
@@ -60,7 +53,7 @@ export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
         </div>
       </DropdownMenuTrigger>
               <DropdownMenuContent className="glass-card w-48" align="center" forceMount>
-          {menuItems.map((item) => {
+          {AUTH_MENU_ITEMS.map((item) => {
             const Icon = item.icon;
             return (
               <DropdownMenuItem key={item.label} asChild>

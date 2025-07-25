@@ -2,23 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Play, List } from 'lucide-react'
-import { ROUTES } from '@/lib/constants/routes.constants'
 import { cn } from '@/lib/utils'
 import { MobileAuthSection } from './mobile-auth-section'
-
-const navItems = [
-  { icon: Home, label: 'Ana Sayfa', href: ROUTES.PAGES.HOME },
-  { icon: Play, label: 'Anime', href: ROUTES.PAGES.ANIME },
-  { icon: List, label: 'Listeler', href: ROUTES.PAGES.LISTS },
-]
+import { BOTTOM_NAVIGATION_ITEMS } from '@/lib/constants/menu.constants'
 
 export function BottomNav() {
   const pathname = usePathname()
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t flex">
-      {navItems.map((item) => {
+      {BOTTOM_NAVIGATION_ITEMS.map((item) => {
         const Icon = item.icon
         const isActive = pathname === item.href
         

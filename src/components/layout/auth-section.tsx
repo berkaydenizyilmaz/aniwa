@@ -10,20 +10,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { User, Settings, LogOut, Bell } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { ROUTES } from '@/lib/constants/routes.constants'
-import { ADMIN_MENU_ITEMS } from '@/lib/constants/menu.constants'
+import { ADMIN_MENU_ITEMS, AUTH_MENU_ITEMS } from '@/lib/constants/menu.constants'
 import { USER } from '@/lib/constants/user.constants'
 import { useLoadingStore } from '@/lib/stores/loading.store'
 import { LOADING_KEYS } from '@/lib/constants/loading.constants'
-
-const menuItems = [
-  { icon: User, label: 'Profil', href: ROUTES.PAGES.PROFILE },
-  { icon: Bell, label: 'Bildirimler', href: ROUTES.PAGES.NOTIFICATIONS },
-  { icon: Settings, label: 'Ayarlar', href: ROUTES.PAGES.SETTINGS },
-]
 
 export function AuthSection() {
   const { data: session, status } = useSession()
@@ -78,7 +72,7 @@ export function AuthSection() {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="glass-card w-48" align="center" forceMount>
-          {menuItems.map((item) => {
+          {AUTH_MENU_ITEMS.map((item) => {
             const Icon = item.icon
             return (
               <DropdownMenuItem key={item.label} asChild>

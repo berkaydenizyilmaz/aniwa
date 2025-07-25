@@ -6,52 +6,14 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { AdminAuthSection } from './admin-auth-section';
 import { ROUTES } from '@/lib/constants/routes.constants';
+import { ADMIN_NAVIGATION_ITEMS } from '@/lib/constants/menu.constants';
 import { 
-  LayoutDashboard, 
-  Film, 
-  Tag, 
-  Building2, 
-  Users, 
-  Tv, 
   Home,
   Menu,
   X,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-
-const navigationItems = [
-  { 
-    label: 'Dashboard', 
-    href: ROUTES.PAGES.ADMIN.DASHBOARD, 
-    icon: LayoutDashboard 
-  },
-  { 
-    label: 'Anime', 
-    href: '/yonetim/anime', 
-    icon: Film 
-  },
-  { 
-    label: 'Türler', 
-    href: '/yonetim/turler', 
-    icon: Tag 
-  },
-  { 
-    label: 'Stüdyolar', 
-    href: '/yonetim/studios', 
-    icon: Building2 
-  },
-  { 
-    label: 'Kullanıcılar', 
-    href: '/yonetim/users', 
-    icon: Users 
-  },
-  { 
-    label: 'Platformlar', 
-    href: '/yonetim/platforms', 
-    icon: Tv 
-  },
-];
 
 export function AdminSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -111,7 +73,7 @@ export function AdminSidebar() {
 
           {/* Navigation */}
           <nav className={`flex-1 space-y-2 ${isCollapsed ? 'py-2' : 'p-4'}`}>
-            {navigationItems.map((item) => {
+            {ADMIN_NAVIGATION_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
               
@@ -200,7 +162,7 @@ export function AdminSidebar() {
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2">
-            {navigationItems.map((item) => {
+            {ADMIN_NAVIGATION_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
               
