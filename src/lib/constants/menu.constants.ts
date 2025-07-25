@@ -1,6 +1,6 @@
 // Menu sabitleri
 
-import { Crown, Edit, Shield, LayoutDashboard, Tag, Home, Play, List, User, Bell, Settings } from 'lucide-react';
+import { Crown, Edit, Shield, LayoutDashboard, Tag, Home, Play, List, User, Bell, Settings, Building2 } from 'lucide-react';
 import { ROUTES } from './routes.constants';
 import { USER } from './user.constants';
  
@@ -25,6 +25,11 @@ export const ADMIN_NAVIGATION_ITEMS = [
     label: 'Etiketler',
     href: ROUTES.PAGES.ADMIN.TAGS,
     icon: Tag
+  },
+  {
+    label: 'Stüdyolar',
+    href: ROUTES.PAGES.ADMIN.STUDIOS,
+    icon: Building2
   },
 ] as const;
 

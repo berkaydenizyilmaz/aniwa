@@ -13,6 +13,8 @@ export const LOADING_KEYS = {
     UPDATE_TAG: 'update-tag-form',
     CREATE_GENRE: 'create-genre-form',
     UPDATE_GENRE: 'update-genre-form',
+    CREATE_STUDIO: 'create-studio-form',
+    UPDATE_STUDIO: 'update-studio-form',
   },
   
   // Auth loading'leri
@@ -28,8 +30,10 @@ export const LOADING_KEYS = {
   ACTIONS: {
     DELETE_TAG: 'delete-tag',
     DELETE_GENRE: 'delete-genre',
+    DELETE_STUDIO: 'delete-studio',
     SEARCH_TAGS: 'search-tags',
     SEARCH_GENRES: 'search-genres',
+    SEARCH_STUDIOS: 'search-studios',
   },
 } as const;
 

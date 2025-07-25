@@ -112,7 +112,7 @@ export const ROUTES = {
         '/yonetim',           // Yönetim ana sayfa
         '/yonetim/turler',    // Genre yönetimi
         '/yonetim/etiketler', // Tag yönetimi
-        '/yonetim/studiolar', // Studio yönetimi
+        '/yonetim/studyolar', // Studio yönetimi
       ],
       API: [
         '/api/admin',         // Admin ana API
