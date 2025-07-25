@@ -23,4 +23,13 @@ export const MASTER_DATA = {
   
   // Prisma enum'ları
   TAG_CATEGORY: TagCategory,
+  
+  // Tag kategori etiketleri
+  TAG_CATEGORY_LABELS: {
+    DEMOGRAPHICS: 'Hedef Kitle',
+    THEMES: 'Ana Temalar',
+    CONTENT: 'İçerik Niteliği',
+    SETTING: 'Ortam',
+    ELEMENTS: 'Spesifik Öğeler',
+  } as const,
 } as const; 

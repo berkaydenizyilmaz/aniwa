@@ -24,6 +24,7 @@ import { createTagAction, updateTagAction } from '@/lib/actions/tag.action';
 import { createTagSchema, updateTagSchema, type CreateTagInput, type UpdateTagInput } from '@/lib/schemas/tag.schema';
 import { toast } from 'sonner';
 import { Tag, TagCategory } from '@prisma/client';
+import { MASTER_DATA } from '@/lib/constants/masterData.constants';
 
 interface TagFormDialogProps {
   open: boolean;
@@ -162,11 +163,11 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
                 <SelectValue placeholder="Kategori seçin" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="DEMOGRAPHICS">Hedef Kitle</SelectItem>
-                <SelectItem value="THEMES">Ana Temalar</SelectItem>
-                <SelectItem value="CONTENT">İçerik Niteliği</SelectItem>
-                <SelectItem value="SETTING">Ortam</SelectItem>
-                <SelectItem value="ELEMENTS">Spesifik Öğeler</SelectItem>
+                {Object.entries(MASTER_DATA.TAG_CATEGORY).map(([, value]) => (
+                  <SelectItem key={value} value={value}>
+                    {MASTER_DATA.TAG_CATEGORY_LABELS[value as TagCategory]}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {errors.category && (
@@ -213,6 +214,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
             </Button>
             <Button
               type="submit"
+              disabled={isLoading}
               loading={isLoading}
             >
               {isEdit ? 'Güncelle' : 'Oluştur'}
