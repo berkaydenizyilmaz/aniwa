@@ -9,9 +9,10 @@ import { useDebounce } from '@/lib/hooks/use-debounce';
 interface TagFiltersProps {
   onSearch?: (search: string) => void;
   onAddNew?: () => void;
+  loading?: boolean;
 }
 
-export function TagFilters({ onSearch, onAddNew }: TagFiltersProps) {
+export function TagFilters({ onSearch, onAddNew, loading = false }: TagFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
@@ -39,7 +40,7 @@ export function TagFilters({ onSearch, onAddNew }: TagFiltersProps) {
         </div>
 
         {/* Yeni Etiket Ekle */}
-        <Button onClick={onAddNew} className="flex items-center gap-2">
+        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={loading}>
           <Plus className="h-4 w-4" />
           Yeni Etiket Ekle
         </Button>

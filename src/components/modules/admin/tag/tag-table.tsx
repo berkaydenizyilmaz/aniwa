@@ -29,9 +29,10 @@ import {
 interface TagTableProps {
   onEdit?: (tag: Tag) => void;
   searchTerm?: string;
+  onLoadingChange?: (loading: boolean) => void;
 }
 
-export function TagTable({ onEdit, searchTerm = '' }: TagTableProps) {
+export function TagTable({ onEdit, searchTerm = '', onLoadingChange }: TagTableProps) {
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -42,6 +43,7 @@ export function TagTable({ onEdit, searchTerm = '' }: TagTableProps) {
   useEffect(() => {
     const fetchTags = async () => {
       try {
+        onLoadingChange?.(true);
         const result = await getTagsAction();
 
         if (!result.success) {
@@ -56,11 +58,12 @@ export function TagTable({ onEdit, searchTerm = '' }: TagTableProps) {
         toast.error('Etiketler yüklenirken bir hata oluştu');
       } finally {
         setLoading(false);
+        onLoadingChange?.(false);
       }
     };
 
     fetchTags();
-  }, []);
+  }, [onLoadingChange]);
 
   // Arama filtreleme
   const filteredTags = tags.filter(tag =>

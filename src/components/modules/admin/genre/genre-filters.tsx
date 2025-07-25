@@ -9,9 +9,10 @@ import { useDebounce } from '@/lib/hooks/use-debounce';
 interface GenreFiltersProps {
   onSearch?: (search: string) => void;
   onAddNew?: () => void;
+  loading?: boolean;
 }
 
-export function GenreFilters({ onSearch, onAddNew }: GenreFiltersProps) {
+export function GenreFilters({ onSearch, onAddNew, loading = false }: GenreFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
@@ -39,7 +40,7 @@ export function GenreFilters({ onSearch, onAddNew }: GenreFiltersProps) {
         </div>
 
         {/* Yeni Tür Ekle */}
-        <Button onClick={onAddNew} className="flex items-center gap-2">
+        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={loading}>
           <Plus className="h-4 w-4" />
           Yeni Tür Ekle
         </Button>
