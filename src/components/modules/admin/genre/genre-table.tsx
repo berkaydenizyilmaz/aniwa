@@ -28,9 +28,10 @@ import {
 
 interface GenreTableProps {
   onEdit?: (genre: Genre) => void;
+  searchTerm?: string;
 }
 
-export function GenreTable({ onEdit }: GenreTableProps) {
+export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -60,6 +61,12 @@ export function GenreTable({ onEdit }: GenreTableProps) {
 
     fetchGenres();
   }, []);
+
+  // Arama filtreleme
+  const filteredGenres = genres.filter(genre =>
+    genre.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    genre.slug.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleEdit = (genre: Genre) => {
     onEdit?.(genre);
@@ -152,7 +159,7 @@ export function GenreTable({ onEdit }: GenreTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {genres.map((genre) => (
+            {filteredGenres.map((genre) => (
               <TableRow key={genre.id}>
                 <TableCell>{genre.name}</TableCell>
                 <TableCell className="text-muted-foreground">{genre.slug}</TableCell>
@@ -184,9 +191,9 @@ export function GenreTable({ onEdit }: GenreTableProps) {
           </TableBody>
         </Table>
 
-        {genres.length === 0 && (
+        {filteredGenres.length === 0 && (
           <div className="p-8 text-center text-muted-foreground">
-            Henüz tür bulunmuyor.
+            {searchTerm ? 'Arama kriterlerine uygun tür bulunamadı.' : 'Henüz tür bulunmuyor.'}
           </div>
         )}
       </div>

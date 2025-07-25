@@ -10,6 +10,7 @@ export default function GenresPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleAddNew = () => {
     setSelectedGenre(null);
@@ -25,6 +26,10 @@ export default function GenresPage() {
     setRefreshKey(prev => prev + 1);
   };
 
+  const handleSearch = (search: string) => {
+    setSearchTerm(search);
+  };
+
   return (
     <div className="space-y-6">
       {/* Başlık */}
@@ -36,12 +41,13 @@ export default function GenresPage() {
       </div>
 
       {/* Filtreler */}
-      <GenreFilters onAddNew={handleAddNew} />
+      <GenreFilters onSearch={handleSearch} onAddNew={handleAddNew} />
 
       {/* Tablo */}
       <GenreTable 
         key={refreshKey}
-        onEdit={handleEdit} 
+        onEdit={handleEdit}
+        searchTerm={searchTerm}
       />
 
       {/* Form Dialog */}
