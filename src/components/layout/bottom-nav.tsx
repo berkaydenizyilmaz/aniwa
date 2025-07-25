@@ -23,28 +23,20 @@ export function BottomNav() {
         const isActive = pathname === item.href
         
         return (
-          <>
-            <Link
-              key={item.label}
-              href={item.href}
-              className={cn(
-                "flex items-center justify-center flex-1 py-2 transition-colors",
-                isActive 
-                  ? "text-primary bg-primary/10" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-              )}
-            >
-              <Icon className="h-5 w-5" />
-            </Link>
-            {index < navItems.length - 1 && (
-              <div className="w-px bg-border" />
+          <Link
+            key={item.label}
+            href={item.href}
+            className={cn(
+              "flex items-center justify-center flex-1 py-2 transition-colors",
+              isActive 
+                ? "text-primary bg-primary/10" 
+                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
             )}
-          </>
+          >
+            <Icon className="h-5 w-5" />
+          </Link>
         )
       })}
-      
-      {/* Çizgi */}
-      <div className="w-px bg-border" />
       
       {/* Mobil Auth Section */}
       <div className="flex items-center justify-center flex-1 py-2">
