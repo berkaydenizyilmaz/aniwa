@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Plus } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface GenreFiltersProps {
   onSearch?: (search: string) => void;
@@ -17,12 +16,6 @@ export function GenreFilters({ onSearch, onAddNew }: GenreFiltersProps) {
   const handleSearch = (value: string) => {
     setSearchTerm(value);
     onSearch?.(value);
-  };
-
-  const handleAddNew = () => {
-    // TODO: Dialog açılacak
-    toast.info('Yeni tür ekleme özelliği yakında eklenecek');
-    onAddNew?.();
   };
 
   return (
@@ -40,7 +33,7 @@ export function GenreFilters({ onSearch, onAddNew }: GenreFiltersProps) {
         </div>
 
         {/* Yeni Tür Ekle */}
-        <Button onClick={handleAddNew} className="flex items-center gap-2">
+        <Button onClick={onAddNew} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Yeni Tür Ekle
         </Button>
