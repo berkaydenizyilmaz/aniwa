@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { AuthCard } from "@/components/modules/auth/auth-card";
 import { ResetPasswordForm } from "@/components/modules/auth/reset-password-form";
 import { ROUTES } from '@/lib/constants/routes.constants';
@@ -22,7 +23,9 @@ export default function ResetPasswordPage() {
       description="Yeni şifrenizi belirleyin"
       links={resetPasswordLinks}
     >
-      <ResetPasswordForm />
+      <Suspense fallback={<div>Yükleniyor...</div>}>
+        <ResetPasswordForm />
+      </Suspense>
     </AuthCard>
   );
 } 

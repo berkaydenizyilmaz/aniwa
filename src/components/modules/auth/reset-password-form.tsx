@@ -93,7 +93,7 @@ export function ResetPasswordForm() {
           type="password"
           placeholder="Yeni şifrenizi girin"
           {...register('password')}
-          disabled={isLoading}
+          disabled={isLoading(LOADING_KEYS.AUTH.RESET_PASSWORD)}
         />
         {errors.password && (
           <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -108,7 +108,7 @@ export function ResetPasswordForm() {
           type="password"
           placeholder="Şifrenizi tekrar girin"
           {...register('confirmPassword')}
-          disabled={isLoading}
+          disabled={isLoading(LOADING_KEYS.AUTH.RESET_PASSWORD)}
         />
         {errors.confirmPassword && (
           <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
@@ -119,7 +119,7 @@ export function ResetPasswordForm() {
       <Button
         type="submit"
         className="w-full"
-        disabled={isLoading}
+        disabled={isLoading(LOADING_KEYS.AUTH.RESET_PASSWORD)}
       >
         Şifreyi Sıfırla
       </Button>

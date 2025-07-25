@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -69,7 +69,7 @@ export function RegisterForm() {
           type="text"
           placeholder="Kullanıcı adınızı girin"
           {...register('username')}
-          disabled={isLoading}
+          disabled={isLoading(LOADING_KEYS.AUTH.REGISTER)}
         />
         {errors.username && (
           <p className="text-sm text-destructive">{errors.username.message}</p>
@@ -84,7 +84,7 @@ export function RegisterForm() {
           type="email"
           placeholder="E-posta adresinizi girin"
           {...register('email')}
-          disabled={isLoading}
+          disabled={isLoading(LOADING_KEYS.AUTH.REGISTER)}
         />
         {errors.email && (
           <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -99,7 +99,7 @@ export function RegisterForm() {
           type="password"
           placeholder="Şifrenizi girin"
           {...register('password')}
-          disabled={isLoading}
+          disabled={isLoading(LOADING_KEYS.AUTH.REGISTER)}
         />
         {errors.password && (
           <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -114,7 +114,7 @@ export function RegisterForm() {
           type="password"
           placeholder="Şifrenizi tekrar girin"
           {...register('confirmPassword')}
-          disabled={isLoading}
+          disabled={isLoading(LOADING_KEYS.AUTH.REGISTER)}
         />
         {errors.confirmPassword && (
           <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
@@ -125,7 +125,7 @@ export function RegisterForm() {
       <Button
         type="submit"
         className="w-full"
-        disabled={isLoading}
+        disabled={isLoading(LOADING_KEYS.AUTH.REGISTER)}
       >
         Kayıt Ol
       </Button>
