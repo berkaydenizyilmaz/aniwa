@@ -15,6 +15,15 @@ export const LOADING_KEYS = {
     UPDATE_GENRE: 'update-genre-form',
   },
   
+  // Auth loading'leri
+  AUTH: {
+    LOGIN: 'auth-login',
+    REGISTER: 'auth-register',
+    FORGOT_PASSWORD: 'auth-forgot-password',
+    RESET_PASSWORD: 'auth-reset-password',
+    SIGNOUT: 'auth-signout',
+  },
+  
   // İşlem loading'leri
   ACTIONS: {
     DELETE_TAG: 'delete-tag',
@@ -28,4 +37,5 @@ export const LOADING_KEYS = {
 export type LoadingKey = 
   | typeof LOADING_KEYS.PAGES[keyof typeof LOADING_KEYS.PAGES]
   | typeof LOADING_KEYS.FORMS[keyof typeof LOADING_KEYS.FORMS]
+  | typeof LOADING_KEYS.AUTH[keyof typeof LOADING_KEYS.AUTH]
   | typeof LOADING_KEYS.ACTIONS[keyof typeof LOADING_KEYS.ACTIONS]; 

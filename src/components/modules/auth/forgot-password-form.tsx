@@ -10,9 +10,11 @@ import { Label } from '@/components/ui/label';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '@/lib/schemas/auth.schema';
 import { forgotPassword } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
+import { useLoadingStore } from '@/lib/stores/loading.store';
+import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
 export function ForgotPasswordForm() {
-  const [isLoading, setIsLoading] = useState(false);
+  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   const {
     register,
@@ -26,9 +28,9 @@ export function ForgotPasswordForm() {
   });
 
   const onSubmit = async (data: ForgotPasswordInput) => {
-    if (isLoading) return; // Prevent double submission
+    if (isLoading(LOADING_KEYS.AUTH.FORGOT_PASSWORD)) return; // Prevent double submission
 
-    setIsLoading(true);
+    setLoadingStore(LOADING_KEYS.AUTH.FORGOT_PASSWORD, true);
 
     try {
       // Server Action ile şifre sıfırlama isteği
@@ -46,7 +48,7 @@ export function ForgotPasswordForm() {
       console.error('Forgot password error:', error);
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
-      setIsLoading(false);
+      setLoadingStore(LOADING_KEYS.AUTH.FORGOT_PASSWORD, false);
     }
   };
 
@@ -60,7 +62,7 @@ export function ForgotPasswordForm() {
           type="email"
           placeholder="E-posta adresinizi girin"
           {...register('email')}
-          disabled={isLoading}
+          disabled={isLoading(LOADING_KEYS.AUTH.FORGOT_PASSWORD)}
         />
         {errors.email && (
           <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -71,7 +73,7 @@ export function ForgotPasswordForm() {
       <Button
         type="submit"
         className="w-full"
-        disabled={isLoading}
+        disabled={isLoading(LOADING_KEYS.AUTH.FORGOT_PASSWORD)}
       >
         Gönder
       </Button>

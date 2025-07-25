@@ -11,10 +11,12 @@ import { registerSchema, type RegisterInput } from '@/lib/schemas/auth.schema';
 import { registerUser } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
 import { ROUTES } from '@/lib/constants/routes.constants';
+import { useLoadingStore } from '@/lib/stores/loading.store';
+import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
 export function RegisterForm() {
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   const {
     register,
@@ -31,9 +33,9 @@ export function RegisterForm() {
   });
 
   const onSubmit = async (data: RegisterInput) => {
-    if (isLoading) return; // Prevent double submission
+    if (isLoading(LOADING_KEYS.AUTH.REGISTER)) return; // Prevent double submission
 
-    setIsLoading(true);
+    setLoadingStore(LOADING_KEYS.AUTH.REGISTER, true);
 
     try {
       // Server Action ile kayıt
@@ -53,7 +55,7 @@ export function RegisterForm() {
       console.error('Register error:', error);
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
-      setIsLoading(false);
+      setLoadingStore(LOADING_KEYS.AUTH.REGISTER, false);
     }
   };
 
