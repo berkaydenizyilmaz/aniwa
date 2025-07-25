@@ -55,12 +55,12 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
 
   const onSubmit = async (data: CreateGenreInput | UpdateGenreInput) => {
     if (isLoading) return; // Prevent double submission
-    
+
     setIsLoading(true);
 
     try {
       let result;
-      
+
       if (isEdit && genre) {
         // Güncelleme
         result = await updateGenreAction(genre.id, data);
@@ -76,7 +76,7 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
 
       // Başarılı
       toast.success(`Tür başarıyla ${isEdit ? 'güncellendi' : 'oluşturuldu'}!`);
-      
+
       // Dialog'u kapat ve callback çağır
       onOpenChange(false);
       onSuccess?.();
@@ -97,7 +97,7 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
             {isEdit ? 'Tür Düzenle' : 'Yeni Tür Ekle'}
           </DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Tür Adı */}
           <div className="space-y-2">
@@ -126,7 +126,7 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
             </Button>
             <Button
               type="submit"
-              loading={isLoading}
+              disabled={isLoading}
             >
               {isEdit ? 'Güncelle' : 'Oluştur'}
             </Button>

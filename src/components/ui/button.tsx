@@ -42,24 +42,19 @@ function Button({
   variant,
   size,
   asChild = false,
-  loading = false,
   children,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
-    loading?: boolean
   }) {
   const Comp = asChild ? Slot : "button"
 
   return (
     <Comp
       data-slot="button"
-      className={cn(
-        buttonVariants({ variant, size, className }),
-        loading && "opacity-60 pointer-events-none cursor-not-allowed"
-      )}
-      disabled={loading || props.disabled}
+      className={cn(buttonVariants({ variant, size, className }))}
+      disabled={props.disabled}
       {...props}
     >
       {children}

@@ -27,7 +27,7 @@ export function ForgotPasswordForm() {
 
   const onSubmit = async (data: ForgotPasswordInput) => {
     if (isLoading) return; // Prevent double submission
-    
+
     setIsLoading(true);
 
     try {
@@ -71,7 +71,7 @@ export function ForgotPasswordForm() {
       <Button
         type="submit"
         className="w-full"
-        loading={isLoading}
+        disabled={isLoading}
       >
         Gönder
       </Button>

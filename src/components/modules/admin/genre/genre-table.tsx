@@ -194,7 +194,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
             <AlertDialogCancel disabled={isDeleting}>İptal</AlertDialogCancel>
             <Button
               onClick={handleDeleteConfirm}
-              loading={isDeleting}
+              disabled={isDeleting}
               variant="destructive"
             >
               Sil

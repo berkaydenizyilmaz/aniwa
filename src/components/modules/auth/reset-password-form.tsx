@@ -45,7 +45,7 @@ export function ResetPasswordForm() {
 
   const onSubmit = async (data: ResetPasswordInput) => {
     if (isLoading) return; // Prevent double submission
-    
+
     setIsLoading(true);
 
     try {
@@ -65,7 +65,7 @@ export function ResetPasswordForm() {
 
       // Başarılı şifre sıfırlama
       toast.success('Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.');
-      
+
       router.push(ROUTES.PAGES.AUTH.LOGIN);
 
     } catch (error) {
@@ -117,7 +117,7 @@ export function ResetPasswordForm() {
       <Button
         type="submit"
         className="w-full"
-        loading={isLoading}
+        disabled={isLoading}
       >
         Şifreyi Sıfırla
       </Button>

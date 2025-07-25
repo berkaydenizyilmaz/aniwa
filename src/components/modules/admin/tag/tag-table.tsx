@@ -199,7 +199,7 @@ export function TagTable({ onEdit, searchTerm = '' }: TagTableProps) {
             <AlertDialogCancel disabled={isDeleting}>İptal</AlertDialogCancel>
             <Button
               onClick={handleDeleteConfirm}
-              loading={isDeleting}
+              disabled={isDeleting}
               variant="destructive"
             >
               Sil

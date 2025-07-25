@@ -215,7 +215,6 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
             <Button
               type="submit"
               disabled={isLoading}
-              loading={isLoading}
             >
               {isEdit ? 'Güncelle' : 'Oluştur'}
             </Button>

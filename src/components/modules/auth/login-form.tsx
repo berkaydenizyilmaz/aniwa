@@ -95,7 +95,7 @@ export function LoginForm() {
         <Button
           type="submit"
           className="w-full"
-          loading={isLoading}
+          disabled={isLoading}
         >
           Giriş Yap
         </Button>
