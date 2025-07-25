@@ -5,6 +5,7 @@ export const LOADING_KEYS = {
     GENRES: 'genres-page',
     STUDIOS: 'studios-page',
     USERS: 'users-page',
+    LOGS: 'logs-page',
   },
   
   // Form loading'leri

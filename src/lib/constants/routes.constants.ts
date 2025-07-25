@@ -25,6 +25,7 @@ export const ROUTES = {
       GENRES: '/yonetim/turler',
       TAGS: '/yonetim/etiketler',
       STUDIOS: '/yonetim/studyolar',
+      LOGS: '/yonetim/loglar',
     },
     
     // Moderator sayfaları
@@ -113,6 +114,7 @@ export const ROUTES = {
         '/yonetim/turler',    // Genre yönetimi
         '/yonetim/etiketler', // Tag yönetimi
         '/yonetim/studyolar', // Studio yönetimi
+        '/yonetim/loglar',    // Log yönetimi
       ],
       API: [
         '/api/admin',         // Admin ana API
