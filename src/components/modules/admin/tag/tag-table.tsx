@@ -119,7 +119,6 @@ export function TagTable({ onEdit, searchTerm = '' }: TagTableProps) {
               <Skeleton className="h-4 flex-1" />
               <Skeleton className="h-4 flex-1" />
               <Skeleton className="h-4 flex-1" />
-              <Skeleton className="h-4 flex-1" />
               <div className="flex gap-2">
                 <Skeleton className="h-8 w-8" />
                 <Skeleton className="h-8 w-8" />
@@ -137,11 +136,10 @@ export function TagTable({ onEdit, searchTerm = '' }: TagTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-1/5">İsim</TableHead>
-              <TableHead className="w-1/5">Slug</TableHead>
-              <TableHead className="w-1/5">Kategori</TableHead>
-              <TableHead className="w-1/5">Oluşturulma Tarihi</TableHead>
-              <TableHead className="w-1/5">İşlemler</TableHead>
+              <TableHead className="w-1/4">İsim</TableHead>
+              <TableHead className="w-1/4">Slug</TableHead>
+              <TableHead className="w-1/4">Kategori</TableHead>
+              <TableHead className="w-1/4">İşlemler</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -151,9 +149,6 @@ export function TagTable({ onEdit, searchTerm = '' }: TagTableProps) {
                 <TableCell className="text-muted-foreground">{tag.slug}</TableCell>
                 <TableCell className="text-muted-foreground">
                   {tag.category || '-'}
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {new Date(tag.createdAt).toLocaleDateString('tr-TR')}
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
