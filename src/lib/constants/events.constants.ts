@@ -42,6 +42,8 @@ export const EVENTS = {
     GENRE_UPDATED: 'admin_genre_updated',
     GENRE_DELETED: 'admin_genre_deleted',
     TAG_CREATED: 'admin_tag_created',
+    TAG_RETRIEVED: 'admin_tag_retrieved',
+    TAGS_RETRIEVED: 'admin_tags_retrieved',
     TAG_UPDATED: 'admin_tag_updated',
     TAG_DELETED: 'admin_tag_deleted',
     STUDIO_CREATED: 'admin_studio_created',

@@ -92,12 +92,27 @@ export async function createTagBusiness(
 }
 
 // Tag getirme (ID ile)
-export async function getTagBusiness(id: string): Promise<ApiResponse<GetTagResponse>> {
+export async function getTagBusiness(
+  id: string,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<GetTagResponse>> {
   try {
     const tag = await findTagById(id);
     if (!tag) {
       throw new NotFoundError('Tag bulunamadı');
     }
+
+    // Başarılı getirme logu
+    await logger.info(
+      EVENTS.ADMIN.TAG_RETRIEVED,
+      'Tag detayı görüntülendi',
+      { 
+        tagId: tag.id, 
+        name: tag.name,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
+    );
 
     return {
       success: true,
@@ -121,8 +136,8 @@ export async function getTagBusiness(id: string): Promise<ApiResponse<GetTagResp
 
 // Tüm tag'leri getirme (filtrelemeli)
 export async function getTagsBusiness(
-  filters?: GetTagsRequest,
-  user?: { id: string; userSettings?: { displayAdultContent: boolean } }
+  adminUser: { id: string; username: string },
+  filters?: GetTagsRequest
 ): Promise<ApiResponse<GetTagsResponse>> {
   try {
     const page = filters?.page || 1;
@@ -143,10 +158,8 @@ export async function getTagsBusiness(
       tags = tags.filter(tag => tag.category === filters.category);
     }
 
-    // Yetişkin içerik kontrolü - kullanıcı ayarı yoksa adult tag'leri gizle
-    if (user && !user.userSettings?.displayAdultContent) {
-      tags = tags.filter(tag => !tag.isAdult);
-    } else if (filters?.isAdult !== undefined) {
+    // Yetişkin içerik kontrolü - admin için tüm tag'leri göster
+    if (filters?.isAdult !== undefined) {
       tags = tags.filter(tag => tag.isAdult === filters.isAdult);
     }
 
@@ -157,6 +170,20 @@ export async function getTagsBusiness(
     const total = tags.length;
     const paginatedTags = tags.slice(skip, skip + limit);
     const totalPages = Math.ceil(total / limit);
+
+    // Başarılı listeleme logu
+    await logger.info(
+      EVENTS.ADMIN.TAGS_RETRIEVED,
+      'Tag listesi görüntülendi',
+      { 
+        total,
+        page,
+        limit,
+        totalPages,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
+    );
 
     return {
       success: true,
