@@ -8,6 +8,9 @@ import { handleApiError } from '@/lib/utils/api-error-handler';
 // Tüm tag'leri listele (GET)
 export async function GET(request: NextRequest) {
   try {
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+
     // Query parametrelerini al
     const { searchParams } = new URL(request.url);
     const filters = {
@@ -22,8 +25,12 @@ export async function GET(request: NextRequest) {
     // Input validasyonu
     const validatedFilters = tagFiltersSchema.parse(filters);
 
-    // Business logic
-    const result = await getTagsBusiness(validatedFilters);
+    // Business logic 
+    const result = await getTagsBusiness({
+      ...validatedFilters,
+      id: session!.user.id,
+      username: session!.user.username
+    });
 
     // Başarılı yanıt
     return NextResponse.json(result);

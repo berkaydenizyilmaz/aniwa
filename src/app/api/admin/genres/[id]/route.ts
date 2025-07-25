@@ -13,8 +13,14 @@ export async function GET(
   try {
     const { id } = await params;
 
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+
     // Business logic
-    const result = await getGenreBusiness(id);
+    const result = await getGenreBusiness(id, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
 
     // Başarılı yanıt
     return NextResponse.json(result);

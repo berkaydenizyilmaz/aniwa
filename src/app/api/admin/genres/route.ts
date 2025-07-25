@@ -8,6 +8,9 @@ import { handleApiError } from '@/lib/utils/api-error-handler';
 // Tüm genre'leri listele (GET)
 export async function GET(request: NextRequest) {
   try {
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+
     // Query parametrelerini al
     const { searchParams } = new URL(request.url);
     const filters = {
@@ -20,7 +23,11 @@ export async function GET(request: NextRequest) {
     const validatedFilters = genreFiltersSchema.parse(filters);
 
     // Business logic
-    const result = await getGenresBusiness(validatedFilters);
+    const result = await getGenresBusiness({
+      ...validatedFilters,
+      id: session!.user.id,
+      username: session!.user.username
+    });
 
     // Başarılı yanıt
     return NextResponse.json(result);
