@@ -11,7 +11,8 @@ import {
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
 import { ROUTES } from '@/lib/constants/routes.constants';
-import { auth } from '@/lib/auth/auth';
+import { getServerSession } from 'next-auth';
+import { authConfig } from '@/lib/auth/auth.config';
 
 // Genre oluşturma
 export async function createGenreAction(data: CreateGenreInput): Promise<ServerActionResponse> {
@@ -20,7 +21,7 @@ export async function createGenreAction(data: CreateGenreInput): Promise<ServerA
     const validatedData = createGenreSchema.parse(data);
 
     // Session'dan user bilgisini al
-    const session = await auth();
+    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await createGenreBusiness(validatedData, {
@@ -48,7 +49,7 @@ export async function getGenresAction(filters?: GenreFilters): Promise<ServerAct
     const validatedFilters = filters ? genreFiltersSchema.parse(filters) : undefined;
 
     // Session'dan user bilgisini al
-    const session = await auth();
+    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await getGenresBusiness({
@@ -70,7 +71,7 @@ export async function getGenresAction(filters?: GenreFilters): Promise<ServerAct
 export async function getGenreAction(id: string): Promise<ServerActionResponse> {
   try {
     // Session'dan user bilgisini al
-    const session = await auth();
+    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await getGenreBusiness(id, {
@@ -95,7 +96,7 @@ export async function updateGenreAction(id: string, data: UpdateGenreInput): Pro
     const validatedData = updateGenreSchema.parse(data);
 
     // Session'dan user bilgisini al
-    const session = await auth();
+    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await updateGenreBusiness(id, validatedData, {
@@ -120,7 +121,7 @@ export async function updateGenreAction(id: string, data: UpdateGenreInput): Pro
 export async function deleteGenreAction(id: string): Promise<ServerActionResponse> {
   try {
     // Session'dan user bilgisini al
-    const session = await auth();
+    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     await deleteGenreBusiness(id, {
