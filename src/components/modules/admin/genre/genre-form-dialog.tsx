@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { createGenreAction, updateGenreAction } from '@/lib/actions/genre.action';
-import { createGenreSchema, type CreateGenreInput } from '@/lib/schemas/genre.schema';
+import { createGenreSchema, updateGenreSchema, type CreateGenreInput, type UpdateGenreInput } from '@/lib/schemas/genre.schema';
 import { toast } from 'sonner';
 import { Genre } from '@prisma/client';
 
@@ -34,7 +34,7 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
     reset,
     formState: { errors }
   } = useForm<CreateGenreInput>({
-    resolver: zodResolver(createGenreSchema),
+    resolver: zodResolver(isEdit ? updateGenreSchema : createGenreSchema),
     defaultValues: {
       name: '',
     },
@@ -53,7 +53,7 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
     }
   }, [genre, reset]);
 
-  const onSubmit = async (data: CreateGenreInput) => {
+  const onSubmit = async (data: CreateGenreInput | UpdateGenreInput) => {
     if (isLoading) return; // Prevent double submission
     
     setIsLoading(true);

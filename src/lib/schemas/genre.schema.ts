@@ -10,7 +10,7 @@ export const createGenreSchema = z.object({
 
 // Genre güncelleme şeması
 export const updateGenreSchema = z.object({
-  name: z.string().min(MASTER_DATA.NAME.MIN_LENGTH, 'Tür adı gerekli').max(MASTER_DATA.NAME.MAX_LENGTH, 'Tür adı çok uzun').optional(),
+  name: z.string().min(MASTER_DATA.NAME.MIN_LENGTH, 'Tür adı gerekli').max(MASTER_DATA.NAME.MAX_LENGTH, 'Tür adı çok uzun'),
 });
 
 // Genre filtreleme şeması
