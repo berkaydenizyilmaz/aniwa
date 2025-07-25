@@ -66,7 +66,8 @@ export async function registerUser(data: RegisterRequest): Promise<ApiResponse<R
     await logger.info(
       EVENTS.AUTH.USER_REGISTERED,
       'Kullanıcı başarıyla kayıt oldu',
-      { userId: result.id, username: result.username, email: result.email }
+      { username: result.username, email: result.email },
+      result.id
     );
 
     return {
@@ -133,7 +134,8 @@ export async function forgotPassword(email: string): Promise<ApiResponse<void>> 
       await logger.error(
         EVENTS.SYSTEM.EMAIL_SEND_FAILED,
         'Şifre sıfırlama emaili gönderilemedi',
-        { email, userId: user.id }
+        { email },
+        user.id
       );
       throw new BusinessError('Email gönderilemedi');
     }

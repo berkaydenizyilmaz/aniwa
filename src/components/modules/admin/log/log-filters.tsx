@@ -45,8 +45,6 @@ export function LogFilters({ onSearch, onRefresh }: LogFiltersProps) {
         {/* Refresh Butonu */}
         <Button 
           onClick={onRefresh} 
-          variant="outline" 
-          size="sm"
           disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}
           className="flex items-center gap-2"
         >
