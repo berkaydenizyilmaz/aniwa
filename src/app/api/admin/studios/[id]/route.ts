@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { updateStudioSchema } from '@/lib/schemas/studio.schema';
-import { getStudioById, updateStudio, deleteStudio } from '@/lib/services/business/studio.business';
+import { getStudioBusiness, updateStudioBusiness, deleteStudioBusiness } from '@/lib/services/business/studio.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tek studio detayı (GET)
@@ -13,8 +13,14 @@ export async function GET(
   try {
     const { id } = await params;
 
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+
     // Business logic
-    const result = await getStudioById(id);
+    const result = await getStudioBusiness(id, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -40,7 +46,7 @@ export async function PUT(
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await updateStudio(id, validatedData, {
+    const result = await updateStudioBusiness(id, validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });
@@ -65,7 +71,7 @@ export async function DELETE(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await deleteStudio(id, {
+    const result = await deleteStudioBusiness(id, {
       id: session!.user.id,
       username: session!.user.username
     });

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { createStudioSchema, studioFiltersSchema } from '@/lib/schemas/studio.schema';
-import { createStudio, getAllStudios } from '@/lib/services/business/studio.business';
+import { createStudioBusiness, getStudiosBusiness } from '@/lib/services/business/studio.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tüm studio'ları listele (GET)
@@ -20,8 +20,14 @@ export async function GET(request: NextRequest) {
     // Input validasyonu
     const validatedFilters = studioFiltersSchema.parse(filters);
 
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+
     // Business logic
-    const result = await getAllStudios(validatedFilters);
+    const result = await getStudiosBusiness({
+      id: session!.user.id,
+      username: session!.user.username
+    }, validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -43,7 +49,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await createStudio(validatedData, {
+    const result = await createStudioBusiness(validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });
