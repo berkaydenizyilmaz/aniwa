@@ -88,7 +88,10 @@ export async function createGenreBusiness(
 }
 
 // Genre getirme (ID ile)
-export async function getGenreBusiness(id: string): Promise<ApiResponse<GetGenreResponse>> {
+export async function getGenreBusiness(
+  id: string,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<GetGenreResponse>> {
   try {
     const genre = await findGenreById(id);
     if (!genre) {
@@ -102,7 +105,9 @@ export async function getGenreBusiness(id: string): Promise<ApiResponse<GetGenre
       { 
         genreId: genre.id, 
         name: genre.name, 
-        slug: genre.slug
+        slug: genre.slug,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
       }
     );
 
@@ -127,7 +132,10 @@ export async function getGenreBusiness(id: string): Promise<ApiResponse<GetGenre
 }
 
 // Tüm genre'leri getirme (filtrelemeli)
-export async function getGenresBusiness(filters?: GetGenresRequest): Promise<ApiResponse<GetGenresResponse>> {
+export async function getGenresBusiness(
+  adminUser: { id: string; username: string },
+  filters?: GetGenresRequest
+): Promise<ApiResponse<GetGenresResponse>> {
   try {
     const page = filters?.page || 1;
     const limit = filters?.limit || 50;
@@ -159,7 +167,9 @@ export async function getGenresBusiness(filters?: GetGenresRequest): Promise<Api
         page,
         limit,
         totalPages,
-        search: filters?.search || null
+        search: filters?.search || null,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
       }
     );
     
