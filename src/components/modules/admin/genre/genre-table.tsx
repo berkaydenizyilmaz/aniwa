@@ -111,37 +111,19 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
   if (loading) {
     return (
       <div className="glass-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-1/4">İsim</TableHead>
-              <TableHead className="w-1/4">Slug</TableHead>
-              <TableHead className="w-1/4">Oluşturulma Tarihi</TableHead>
-              <TableHead className="w-1/4">İşlemler</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {[...Array(5)].map((_, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <Skeleton className="h-4 w-24" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-20" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-20" />
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Skeleton className="h-8 w-8" />
-                    <Skeleton className="h-8 w-8" />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="p-4">
+          {[...Array(5)].map((_, index) => (
+            <div key={index} className="flex items-center gap-4 py-3 border-b border-border/50 last:border-b-0">
+              <Skeleton className="h-4 flex-1" />
+              <Skeleton className="h-4 flex-1" />
+              <Skeleton className="h-4 flex-1" />
+              <div className="flex gap-2">
+                <Skeleton className="h-8 w-8" />
+                <Skeleton className="h-8 w-8" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
