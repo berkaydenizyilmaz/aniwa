@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { GenreFilters } from "@/components/modules/genre/genre-filters";
-import { GenreTable } from "@/components/modules/genre/genre-table";
-import { GenreFormDialog } from "@/components/modules/genre/genre-form-dialog";
+import { GenreFilters } from "@/components/modules/admin/genre/genre-filters";
+import { GenreTable } from "@/components/modules/admin/genre/genre-table";
+import { GenreFormDialog } from "@/components/modules/admin/genre/genre-form-dialog";
 import { Genre } from '@prisma/client';
 
 export default function GenresPage() {
