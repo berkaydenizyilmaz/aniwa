@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,8 @@ import { createTagSchema, updateTagSchema, type CreateTagInput, type UpdateTagIn
 import { toast } from 'sonner';
 import { Tag, TagCategory } from '@prisma/client';
 import { MASTER_DATA } from '@/lib/constants/masterData.constants';
+import { useLoadingStore } from '@/lib/stores/loading.store';
+import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
 interface TagFormDialogProps {
   open: boolean;
@@ -34,8 +36,8 @@ interface TagFormDialogProps {
 }
 
 export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDialogProps) {
-  const [isLoading, setIsLoading] = useState(false);
   const isEdit = !!tag;
+  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   const {
     register,
@@ -76,9 +78,9 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
   }, [tag, reset]);
 
   const onSubmit = async (data: CreateTagInput | UpdateTagInput) => {
-    if (isLoading) return; // Prevent double submission
+    if (isLoading(LOADING_KEYS.FORMS.CREATE_TAG)) return; // Prevent double submission
     
-    setIsLoading(true);
+    setLoadingStore(LOADING_KEYS.FORMS.CREATE_TAG, true);
 
     try {
       let result;
@@ -107,7 +109,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
       console.error('Tag form error:', error);
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
-      setIsLoading(false);
+      setLoadingStore(LOADING_KEYS.FORMS.CREATE_TAG, false);
     }
   };
 
@@ -129,7 +131,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
               type="text"
               placeholder="Etiket adını girin"
               {...register('name')}
-              disabled={isLoading}
+              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
             />
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -143,7 +145,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
               id="description"
               placeholder="Etiket açıklaması (isteğe bağlı)"
               {...register('description')}
-              disabled={isLoading}
+              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
               rows={3}
             />
             {errors.description && (
@@ -157,7 +159,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
             <Select
               onValueChange={(value: string) => setValue('category', value as TagCategory)}
               defaultValue={tag?.category || undefined}
-              disabled={isLoading}
+              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Kategori seçin" />
@@ -184,7 +186,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
                   type="checkbox"
                   id="isAdult"
                   {...register('isAdult')}
-                  disabled={isLoading}
+                  disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
                   className="rounded border-gray-300"
                 />
                 <Label htmlFor="isAdult" className="text-sm">Yetişkin İçerik</Label>
@@ -194,7 +196,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
                   type="checkbox"
                   id="isSpoiler"
                   {...register('isSpoiler')}
-                  disabled={isLoading}
+                  disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
                   className="rounded border-gray-300"
                 />
                 <Label htmlFor="isSpoiler" className="text-sm">Spoiler İçerir</Label>
@@ -208,13 +210,13 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
             >
               İptal
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
             >
               {isEdit ? 'Güncelle' : 'Oluştur'}
             </Button>

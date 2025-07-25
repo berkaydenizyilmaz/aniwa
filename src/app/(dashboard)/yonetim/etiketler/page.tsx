@@ -11,7 +11,6 @@ export default function TagsPage() {
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleAddNew = () => {
     setSelectedTag(null);
@@ -42,14 +41,13 @@ export default function TagsPage() {
       </div>
 
       {/* Filtreler */}
-      <TagFilters onSearch={handleSearch} onAddNew={handleAddNew} loading={loading} />
+      <TagFilters onSearch={handleSearch} onAddNew={handleAddNew} />
 
       {/* Tablo */}
       <TagTable 
         key={refreshKey}
         onEdit={handleEdit}
         searchTerm={searchTerm}
-        onLoadingChange={setLoading}
       />
 
       {/* Form Dialog */}

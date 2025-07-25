@@ -5,16 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Plus } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
+import { useLoadingStore } from '@/lib/stores/loading.store';
+import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
 interface GenreFiltersProps {
   onSearch?: (search: string) => void;
   onAddNew?: () => void;
-  loading?: boolean;
 }
 
-export function GenreFilters({ onSearch, onAddNew, loading = false }: GenreFiltersProps) {
+export function GenreFilters({ onSearch, onAddNew }: GenreFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const { isLoading } = useLoadingStore();
 
   // Debounced search term değiştiğinde onSearch'ü çağır
   useEffect(() => {
@@ -40,7 +42,7 @@ export function GenreFilters({ onSearch, onAddNew, loading = false }: GenreFilte
         </div>
 
         {/* Yeni Tür Ekle */}
-        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={loading}>
+        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={isLoading(LOADING_KEYS.PAGES.GENRES) || isLoading(LOADING_KEYS.FORMS.CREATE_GENRE)}>
           <Plus className="h-4 w-4" />
           Yeni Tür Ekle
         </Button>

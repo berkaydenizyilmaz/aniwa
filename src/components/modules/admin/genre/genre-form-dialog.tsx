@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';  
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,8 @@ import { createGenreAction, updateGenreAction } from '@/lib/actions/genre.action
 import { createGenreSchema, updateGenreSchema, type CreateGenreInput, type UpdateGenreInput } from '@/lib/schemas/genre.schema';
 import { toast } from 'sonner';
 import { Genre } from '@prisma/client';
+import { useLoadingStore } from '@/lib/stores/loading.store';
+import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
 interface GenreFormDialogProps {
   open: boolean;
@@ -25,8 +27,8 @@ interface GenreFormDialogProps {
 }
 
 export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreFormDialogProps) {
-  const [isLoading, setIsLoading] = useState(false);
   const isEdit = !!genre;
+  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   const {
     register,
@@ -54,9 +56,9 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
   }, [genre, reset]);
 
   const onSubmit = async (data: CreateGenreInput | UpdateGenreInput) => {
-    if (isLoading) return; // Prevent double submission
+    if (isLoading(LOADING_KEYS.FORMS.CREATE_GENRE)) return; // Prevent double submission
 
-    setIsLoading(true);
+    setLoadingStore(LOADING_KEYS.FORMS.CREATE_GENRE, true);
 
     try {
       let result;
@@ -85,7 +87,7 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
       console.error('Genre form error:', error);
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
-      setIsLoading(false);
+      setLoadingStore(LOADING_KEYS.FORMS.CREATE_GENRE, false);
     }
   };
 
@@ -107,7 +109,7 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
               type="text"
               placeholder="Tür adını girin"
               {...register('name')}
-              disabled={isLoading}
+              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_GENRE)}
             />
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -120,13 +122,13 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_GENRE)}
             >
               İptal
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_GENRE)}
             >
               {isEdit ? 'Güncelle' : 'Oluştur'}
             </Button>

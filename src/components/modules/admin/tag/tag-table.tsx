@@ -25,25 +25,25 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useLoadingStore } from '@/lib/stores/loading.store';
+import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
 interface TagTableProps {
   onEdit?: (tag: Tag) => void;
   searchTerm?: string;
-  onLoadingChange?: (loading: boolean) => void;
 }
 
-export function TagTable({ onEdit, searchTerm = '', onLoadingChange }: TagTableProps) {
+export function TagTable({ onEdit, searchTerm = '' }: TagTableProps) {
   const [tags, setTags] = useState<Tag[]>([]);
-  const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   // Tag'leri getir
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        onLoadingChange?.(true);
+        setLoadingStore(LOADING_KEYS.PAGES.TAGS, true);
         const result = await getTagsAction();
 
         if (!result.success) {
@@ -57,13 +57,12 @@ export function TagTable({ onEdit, searchTerm = '', onLoadingChange }: TagTableP
         console.error('Fetch tags error:', error);
         toast.error('Etiketler yüklenirken bir hata oluştu');
       } finally {
-        setLoading(false);
-        onLoadingChange?.(false);
+        setLoadingStore(LOADING_KEYS.PAGES.TAGS, false);
       }
     };
 
     fetchTags();
-  }, [onLoadingChange]);
+  }, [setLoadingStore]);
 
   // Arama filtreleme
   const filteredTags = tags.filter(tag =>
@@ -81,9 +80,9 @@ export function TagTable({ onEdit, searchTerm = '', onLoadingChange }: TagTableP
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedTag || isDeleting) return;
+    if (!selectedTag || isLoading(LOADING_KEYS.ACTIONS.DELETE_TAG)) return;
 
-    setIsDeleting(true);
+    setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_TAG, true);
 
     try {
       const result = await deleteTagAction(selectedTag.id);
@@ -107,11 +106,11 @@ export function TagTable({ onEdit, searchTerm = '', onLoadingChange }: TagTableP
       console.error('Delete tag error:', error);
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
-      setIsDeleting(false);
+      setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_TAG, false);
     }
   };
 
-  if (loading) {
+  if (isLoading(LOADING_KEYS.PAGES.TAGS)) {
     return (
       <div className="glass-card">
         <div className="p-4">
@@ -199,10 +198,10 @@ export function TagTable({ onEdit, searchTerm = '', onLoadingChange }: TagTableP
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>İptal</AlertDialogCancel>
+            <AlertDialogCancel disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_TAG)}>İptal</AlertDialogCancel>
             <Button
               onClick={handleDeleteConfirm}
-              disabled={isDeleting}
+              disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_TAG)}
               variant="destructive"
             >
               Sil

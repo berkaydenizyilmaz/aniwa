@@ -25,6 +25,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useLoadingStore } from '@/lib/stores/loading.store';
+import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
 interface GenreTableProps {
   onEdit?: (genre: Genre) => void;
@@ -33,15 +35,15 @@ interface GenreTableProps {
 
 export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
   const [genres, setGenres] = useState<Genre[]>([]);
-  const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   // Genre'leri getir
   useEffect(() => {
     const fetchGenres = async () => {
       try {
+        setLoadingStore(LOADING_KEYS.PAGES.GENRES, true);
         const result = await getGenresAction();
 
         if (!result.success) {
@@ -55,12 +57,12 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
         console.error('Fetch genres error:', error);
         toast.error('Türler yüklenirken bir hata oluştu');
       } finally {
-        setLoading(false);
+        setLoadingStore(LOADING_KEYS.PAGES.GENRES, false);
       }
     };
 
     fetchGenres();
-  }, []);
+  }, [setLoadingStore]);
 
   // Arama filtreleme
   const filteredGenres = genres.filter(genre =>
@@ -78,9 +80,9 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedGenre || isDeleting) return;
+    if (!selectedGenre || isLoading(LOADING_KEYS.ACTIONS.DELETE_GENRE)) return;
 
-    setIsDeleting(true);
+    setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_GENRE, true);
 
     try {
       const result = await deleteGenreAction(selectedGenre.id);
@@ -104,11 +106,11 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
       console.error('Delete genre error:', error);
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
-      setIsDeleting(false);
+      setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_GENRE, false);
     }
   };
 
-  if (loading) {
+  if (isLoading(LOADING_KEYS.PAGES.GENRES)) {
     return (
       <div className="glass-card">
         <div className="p-4">
@@ -191,10 +193,10 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>İptal</AlertDialogCancel>
+            <AlertDialogCancel disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_GENRE)}>İptal</AlertDialogCancel>
             <Button
               onClick={handleDeleteConfirm}
-              disabled={isDeleting}
+              disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_GENRE)}
               variant="destructive"
             >
               Sil
