@@ -118,7 +118,6 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
             <div key={index} className="flex items-center gap-4 py-3 border-b border-border/50 last:border-b-0">
               <Skeleton className="h-4 flex-1" />
               <Skeleton className="h-4 flex-1" />
-              <Skeleton className="h-4 flex-1" />
               <div className="flex gap-2">
                 <Skeleton className="h-8 w-8" />
                 <Skeleton className="h-8 w-8" />
@@ -136,10 +135,9 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-1/4">İsim</TableHead>
-              <TableHead className="w-1/4">Slug</TableHead>
-              <TableHead className="w-1/4">Oluşturulma Tarihi</TableHead>
-              <TableHead className="w-1/4">İşlemler</TableHead>
+              <TableHead className="w-1/3">İsim</TableHead>
+              <TableHead className="w-1/3">Slug</TableHead>
+              <TableHead className="w-1/3">İşlemler</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -147,9 +145,6 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
               <TableRow key={genre.id}>
                 <TableCell>{genre.name}</TableCell>
                 <TableCell className="text-muted-foreground">{genre.slug}</TableCell>
-                <TableCell className="text-muted-foreground">
-                  {new Date(genre.createdAt).toLocaleDateString('tr-TR')}
-                </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
