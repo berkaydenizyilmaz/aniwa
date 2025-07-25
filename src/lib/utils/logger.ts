@@ -1,6 +1,6 @@
 // Logger utility - Console ve Database logging
 import { LogLevel } from '@prisma/client';
-import { createLog } from '@/lib/services/db/log.db';
+import { createLogSchema } from '@/lib/schemas/log.schema';
 
 // Console renkleri
 const CONSOLE_COLORS = {
@@ -38,13 +38,18 @@ class Logger {
     userId?: string
   ): Promise<void> {
     try {
-      await createLog({
+      // Schema validation
+      const logData = createLogSchema.parse({
         level,
         event,
         message,
-        metadata: metadata ? JSON.parse(JSON.stringify(metadata)) : null,
-        user: userId ? { connect: { id: userId } } : undefined
+        metadata: metadata ? JSON.parse(JSON.stringify(metadata)) : undefined,
+        userId
       });
+
+      // Business layer üzerinden log oluştur
+      const { createLogBusiness } = await import('@/lib/services/business/log.business');
+      await createLogBusiness(logData);
     } catch (error) {
       // Database'e kaydedilemezse sadece console'a yaz
       console.error('Failed to save log to database:', error);
