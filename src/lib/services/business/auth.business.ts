@@ -7,9 +7,9 @@ import {
   UnauthorizedError,
   DatabaseError
 } from '@/lib/errors';
-import { createUser, findUserByUsername, findUserByEmail, findUserBySlug, updateUser } from '@/lib/services/db/user.db';
-import { createUserSettings } from '@/lib/services/db/userProfileSettings.db';
-import { createVerificationToken, findVerificationTokenByToken, deleteVerificationTokenByToken } from '@/lib/services/db/verificationToken.db';
+import { createUserDB, findUserByUsernameDB, findUserByEmailDB, findUserBySlugDB, updateUserDB } from '@/lib/services/db/user.db';
+import { createUserSettingsDB } from '@/lib/services/db/userProfileSettings.db';
+import { createVerificationTokenDB, findVerificationTokenByTokenDB, deleteVerificationTokenByTokenDB } from '@/lib/services/db/verificationToken.db';
 import { prisma } from '@/lib/prisma';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { sendPasswordResetEmail } from '@/lib/utils/email.utils';
@@ -24,20 +24,20 @@ import crypto from 'crypto';
 export async function registerUserBusiness(data: RegisterRequest): Promise<ApiResponse<RegisterResponse>> {
   try {
     // Username benzersizlik kontrolü
-    const existingUser = await findUserByUsername(data.username);
+    const existingUser = await findUserByUsernameDB(data.username);
     if (existingUser) {
       throw new ConflictError('Bu kullanıcı adı zaten kullanımda');
     }
 
     // Email benzersizlik kontrolü
-    const existingEmail = await findUserByEmail(data.email);
+    const existingEmail = await findUserByEmailDB(data.email);
     if (existingEmail) {
       throw new ConflictError('Bu e-posta adresi zaten kullanımda');
     }
 
     // Slug benzersizlik kontrolü
     const slug = createSlug(data.username);
-    const existingSlug = await findUserBySlug(slug);
+    const existingSlug = await findUserBySlugDB(slug);
     if (existingSlug) {
       throw new ConflictError('Bu kullanıcı adı zaten kullanımda');
     }
@@ -48,7 +48,7 @@ export async function registerUserBusiness(data: RegisterRequest): Promise<ApiRe
     // Transaction ile kullanıcı ve ayarları oluştur
     const result = await prisma.$transaction(async (tx) => {
       // Kullanıcı oluştur
-      const user = await createUser({
+      const user = await createUserDB({
         username: data.username,
         email: data.email,
         passwordHash,
@@ -56,7 +56,7 @@ export async function registerUserBusiness(data: RegisterRequest): Promise<ApiRe
       }, tx);
 
       // Varsayılan kullanıcı ayarlarını oluştur
-      await createUserSettings({
+      await createUserSettingsDB({
         user: { connect: { id: user.id } },
       }, tx);
 
@@ -100,7 +100,7 @@ export async function registerUserBusiness(data: RegisterRequest): Promise<ApiRe
 export async function forgotPasswordBusiness(email: string): Promise<ApiResponse<void>> {
   try {
     // Kullanıcıyı bul
-    const user = await findUserByEmail(email);
+    const user = await findUserByEmailDB(email);
     if (!user) {
       // Güvenlik için kullanıcı bulunamasa da başarılı döndür
       return { success: true };
@@ -110,7 +110,7 @@ export async function forgotPasswordBusiness(email: string): Promise<ApiResponse
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 saat
 
-    await createVerificationToken({
+    await createVerificationTokenDB({
       token,
       email,
       type: 'password-reset',
@@ -150,7 +150,7 @@ export async function forgotPasswordBusiness(email: string): Promise<ApiResponse
 export async function resetPasswordBusiness(token: string, newPassword: string): Promise<ApiResponse<void>> {
   try {
     // Token'ı bul ve kontrol et
-    const verificationToken = await findVerificationTokenByToken(token);
+    const verificationToken = await findVerificationTokenByTokenDB(token);
     if (!verificationToken || verificationToken.type !== 'password-reset') {
       throw new UnauthorizedError('Geçersiz veya süresi dolmuş token');
     }
@@ -160,7 +160,7 @@ export async function resetPasswordBusiness(token: string, newPassword: string):
     }
 
     // Kullanıcıyı bul
-    const user = await findUserByEmail(verificationToken.email);
+    const user = await findUserByEmailDB(verificationToken.email);
     if (!user) {
       throw new UnauthorizedError('Kullanıcı bulunamadı');
     }
@@ -170,8 +170,8 @@ export async function resetPasswordBusiness(token: string, newPassword: string):
 
     // Şifreyi güncelle ve token'ı sil
     await prisma.$transaction(async (tx) => {
-      await updateUser({ id: user.id }, { passwordHash }, tx);
-      await deleteVerificationTokenByToken(token);
+      await updateUserDB({ id: user.id }, { passwordHash }, tx);
+      await deleteVerificationTokenByTokenDB(token);
     });
 
     // Başarılı sıfırlama logu

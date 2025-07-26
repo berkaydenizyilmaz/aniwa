@@ -7,13 +7,13 @@ import {
   DatabaseError
 } from '@/lib/errors';
 import { 
-  createGenre as createGenreDB, 
-  findGenreById, 
-  findGenreByName, 
-  findGenreBySlug, 
-  findAllGenres, 
-  updateGenre as updateGenreDB, 
-  deleteGenre as deleteGenreDB, 
+  createGenreDB, 
+  findGenreByIdDB, 
+  findGenreByNameDB, 
+  findGenreBySlugDB, 
+  findAllGenresDB, 
+  updateGenreDB, 
+  deleteGenreDB, 
 } from '@/lib/services/db/genre.db';
 import { Prisma } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
@@ -37,14 +37,14 @@ export async function createGenreBusiness(
 ): Promise<ApiResponse<CreateGenreResponse>> {
   try {
     // Name benzersizlik kontrolü
-    const existingGenre = await findGenreByName(data.name);
+    const existingGenre = await findGenreByNameDB(data.name);
     if (existingGenre) {
       throw new ConflictError('Bu tür adı zaten kullanımda');
     }
 
     // Slug oluştur ve benzersizlik kontrolü
     const slug = createSlug(data.name);
-    const existingSlug = await findGenreBySlug(slug);
+    const existingSlug = await findGenreBySlugDB(slug);
     if (existingSlug) {
       throw new ConflictError('Bu tür adı zaten kullanımda');
     }
@@ -95,7 +95,7 @@ export async function getGenreBusiness(
   userId: string
 ): Promise<ApiResponse<GetGenreResponse>> {
   try {
-    const genre = await findGenreById(id);
+    const genre = await findGenreByIdDB(id);
     if (!genre) {
       throw new NotFoundError('Genre bulunamadı');
     }
@@ -145,7 +145,7 @@ export async function getGenresBusiness(
     const skip = (page - 1) * limit;
 
     // Genre'leri getir
-    const genres = await findAllGenres();
+    const genres = await findAllGenresDB();
     
     // Filtreleme (basit implementasyon)
     let filteredGenres = genres;
@@ -207,14 +207,14 @@ export async function updateGenreBusiness(
 ): Promise<ApiResponse<UpdateGenreResponse>> {
   try {
     // Genre mevcut mu kontrolü
-    const existingGenre = await findGenreById(id);
+    const existingGenre = await findGenreByIdDB(id);
     if (!existingGenre) {
       throw new NotFoundError('Genre bulunamadı');
     }
 
     // Name güncelleniyorsa benzersizlik kontrolü
     if (data.name && data.name !== existingGenre.name) {
-      const nameExists = await findGenreByName(data.name);
+      const nameExists = await findGenreByNameDB(data.name);
       if (nameExists) {
         throw new ConflictError('Bu tür adı zaten kullanımda');
       }
@@ -226,7 +226,7 @@ export async function updateGenreBusiness(
       const newSlug = createSlug(data.name);
       // Slug değişiyorsa benzersizlik kontrolü
       if (newSlug !== existingGenre.slug) {
-        const slugExists = await findGenreBySlug(newSlug);
+        const slugExists = await findGenreBySlugDB(newSlug);
         if (slugExists) {
           throw new ConflictError('Bu tür adı zaten kullanımda');
         }
@@ -281,7 +281,7 @@ export async function deleteGenreBusiness(
 ): Promise<ApiResponse<void>> {
   try {
     // Genre mevcut mu kontrolü
-    const existingGenre = await findGenreById(id);
+    const existingGenre = await findGenreByIdDB(id);
     if (!existingGenre) {
       throw new NotFoundError('Genre bulunamadı');
     }

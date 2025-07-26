@@ -2,16 +2,16 @@
 
 import { BusinessError, NotFoundError, ConflictError, DatabaseError } from '@/lib/errors';
 import {
-  createStreamingPlatform as createStreamingPlatformDB,
-  findStreamingPlatformById,
-  findStreamingPlatformByName,
-  findAllStreamingPlatforms,
-  countStreamingPlatforms,
-  updateStreamingPlatform as updateStreamingPlatformDB,
-  deleteStreamingPlatform as deleteStreamingPlatformDB,
-  findAllStreamingLinks,
-  countStreamingLinks,
-  createStreamingLink as createStreamingLinkDB,
+  createStreamingPlatformDB,
+  findStreamingPlatformByIdDB,
+  findStreamingPlatformByNameDB,
+  findAllStreamingPlatformsDB,
+  countStreamingPlatformsDB,
+  updateStreamingPlatformDB,
+  deleteStreamingPlatformDB,
+  findAllStreamingLinksDB,
+  countStreamingLinksDB,
+  createStreamingLinkDB,
 } from '@/lib/services/db/streaming.db';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
@@ -43,7 +43,7 @@ export async function createStreamingPlatformBusiness(
 ): Promise<ApiResponse<CreateStreamingPlatformResponse>> {
   try {
     // Name benzersizlik kontrolü
-    const existingPlatform = await findStreamingPlatformByName(data.name);
+    const existingPlatform = await findStreamingPlatformByNameDB(data.name);
     if (existingPlatform) {
       throw new ConflictError('Bu platform adı zaten kullanımda');
     }
@@ -96,7 +96,7 @@ export async function getStreamingPlatformBusiness(
   userId: string
 ): Promise<ApiResponse<GetStreamingPlatformResponse>> {
   try {
-    const platform = await findStreamingPlatformById(id);
+    const platform = await findStreamingPlatformByIdDB(id);
 
     if (!platform) {
       throw new NotFoundError('Streaming platform bulunamadı');
@@ -150,8 +150,8 @@ export async function getStreamingPlatformsBusiness(
 
     // Platformları getir
     const [platforms, total] = await Promise.all([
-      findAllStreamingPlatforms({}, skip, limit, { createdAt: 'desc' }),
-      countStreamingPlatforms({}),
+      findAllStreamingPlatformsDB({}, skip, limit, { createdAt: 'desc' }),
+      countStreamingPlatformsDB({}),
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -208,14 +208,14 @@ export async function updateStreamingPlatformBusiness(
 ): Promise<ApiResponse<UpdateStreamingPlatformResponse>> {
   try {
     // Platform mevcut mu kontrolü
-    const existingPlatform = await findStreamingPlatformById(id);
+    const existingPlatform = await findStreamingPlatformByIdDB(id);
     if (!existingPlatform) {
       throw new NotFoundError('Streaming platform bulunamadı');
     }
 
     // Name güncelleniyorsa benzersizlik kontrolü
     if (data.name && data.name !== existingPlatform.name) {
-      const nameExists = await findStreamingPlatformByName(data.name);
+      const nameExists = await findStreamingPlatformByNameDB(data.name);
       if (nameExists) {
         throw new ConflictError('Bu platform adı zaten kullanımda');
       }
@@ -274,7 +274,7 @@ export async function deleteStreamingPlatformBusiness(
 ): Promise<ApiResponse<{ message: string }>> {
   try {
     // Platform mevcut mu kontrolü
-    const existingPlatform = await findStreamingPlatformById(id);
+    const existingPlatform = await findStreamingPlatformByIdDB(id);
     if (!existingPlatform) {
       throw new NotFoundError('Streaming platform bulunamadı');
     }
@@ -513,8 +513,8 @@ export async function getAllStreamingLinks(
 
     // Linkleri getir
     const [links, total] = await Promise.all([
-      findAllStreamingLinks({}, skip, limit, { createdAt: 'desc' }),
-      countStreamingLinks({}),
+      findAllStreamingLinksDB({}, skip, limit, { createdAt: 'desc' }),
+      countStreamingLinksDB({}),
     ]);
 
     const totalPages = Math.ceil(total / limit);

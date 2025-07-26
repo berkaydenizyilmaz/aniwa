@@ -7,13 +7,13 @@ import {
   DatabaseError
 } from '@/lib/errors';
 import { 
-  createStudio as createStudioDB, 
-  findStudioById, 
-  findStudioByName, 
-  findStudioBySlug, 
-  findAllStudios, 
-  updateStudio as updateStudioDB, 
-  deleteStudio as deleteStudioDB
+  createStudioDB, 
+  findStudioByIdDB, 
+  findStudioByNameDB, 
+  findStudioBySlugDB, 
+  findAllStudiosDB, 
+  updateStudioDB, 
+  deleteStudioDB
 } from '@/lib/services/db/studio.db';
 import { Prisma } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
@@ -37,14 +37,14 @@ export async function createStudioBusiness(
 ): Promise<ApiResponse<CreateStudioResponse>> {
   try {
     // Name benzersizlik kontrolü
-    const existingStudio = await findStudioByName(data.name);
+    const existingStudio = await findStudioByNameDB(data.name);
     if (existingStudio) {
       throw new ConflictError('Bu stüdyo adı zaten kullanımda');
     }
 
     // Slug oluştur ve benzersizlik kontrolü
     const slug = createSlug(data.name);
-    const existingSlug = await findStudioBySlug(slug);
+    const existingSlug = await findStudioBySlugDB(slug);
     if (existingSlug) {
       throw new ConflictError('Bu stüdyo adı zaten kullanımda');
     }
@@ -97,7 +97,7 @@ export async function getStudioBusiness(
   userId: string
 ): Promise<ApiResponse<GetStudioResponse>> {
   try {
-    const studio = await findStudioById(id);
+    const studio = await findStudioByIdDB(id);
     if (!studio) {
       throw new NotFoundError('Stüdyo bulunamadı');
     }
@@ -146,7 +146,7 @@ export async function getStudiosBusiness(
     const skip = (page - 1) * limit;
 
     // Stüdyoları getir
-    let studios = await findAllStudios();
+    let studios = await findAllStudiosDB();
     
     // Filtreleme
     if (filters?.search) {
@@ -212,14 +212,14 @@ export async function updateStudioBusiness(
 ): Promise<ApiResponse<UpdateStudioResponse>> {
   try {
     // Stüdyo mevcut mu kontrolü
-    const existingStudio = await findStudioById(id);
+    const existingStudio = await findStudioByIdDB(id);
     if (!existingStudio) {
       throw new NotFoundError('Stüdyo bulunamadı');
     }
 
     // Name güncelleniyorsa benzersizlik kontrolü
     if (data.name && data.name !== existingStudio.name) {
-      const nameExists = await findStudioByName(data.name);
+      const nameExists = await findStudioByNameDB(data.name);
       if (nameExists) {
         throw new ConflictError('Bu stüdyo adı zaten kullanımda');
       }
@@ -231,7 +231,7 @@ export async function updateStudioBusiness(
       const newSlug = createSlug(data.name);
       // Slug değişiyorsa benzersizlik kontrolü
       if (newSlug !== existingStudio.slug) {
-        const slugExists = await findStudioBySlug(newSlug);
+        const slugExists = await findStudioBySlugDB(newSlug);
         if (slugExists) {
           throw new ConflictError('Bu stüdyo adı zaten kullanımda');
         }
@@ -288,7 +288,7 @@ export async function deleteStudioBusiness(
 ): Promise<ApiResponse<void>> {
   try {
     // Stüdyo mevcut mu kontrolü
-    const existingStudio = await findStudioById(id);
+    const existingStudio = await findStudioByIdDB(id);
     if (!existingStudio) {
       throw new NotFoundError('Stüdyo bulunamadı');
     }

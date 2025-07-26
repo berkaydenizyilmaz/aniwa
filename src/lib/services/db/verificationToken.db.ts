@@ -5,7 +5,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Token oluştur
-export async function createVerificationToken(
+export async function createVerificationTokenDB(
   data: Prisma.VerificationTokenCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<VerificationToken> {
@@ -19,7 +19,7 @@ export async function createVerificationToken(
 }
 
 // Token'ı token string ile bul
-export async function findVerificationTokenByToken(
+export async function findVerificationTokenByTokenDB(
   token: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<VerificationToken | null> {
@@ -33,7 +33,7 @@ export async function findVerificationTokenByToken(
 }
 
 // Token string ile sil
-export async function deleteVerificationTokenByToken(
+export async function deleteVerificationTokenByTokenDB(
   token: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<VerificationToken | null> {
@@ -47,7 +47,7 @@ export async function deleteVerificationTokenByToken(
 }
 
 // Email ve tip ile token sil
-export async function deleteVerificationTokenByEmailAndType(
+export async function deleteVerificationTokenByEmailAndTypeDB(
   email: string, 
   type: string,
   client: PrismaClientOrTransaction = prisma

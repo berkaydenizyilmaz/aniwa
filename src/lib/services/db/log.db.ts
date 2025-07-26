@@ -5,7 +5,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Log oluştur
-export async function createLog(
+export async function createLogDB(
   data: Prisma.LogCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Log> {
@@ -19,7 +19,7 @@ export async function createLog(
 }
 
 // Log'u ID ile bul
-export async function findLogById(
+export async function findLogByIdDB(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Log | null> {
@@ -32,8 +32,42 @@ export async function findLogById(
   }
 }
 
+// Tüm log'ları getir (filtrelemeli)
+export async function findAllLogsDB(
+  where?: Prisma.LogWhereInput,
+  skip?: number,
+  take?: number,
+  orderBy?: Prisma.LogOrderByWithRelationInput,
+  include?: Prisma.LogInclude,
+  client: PrismaClientOrTransaction = prisma
+): Promise<Log[]> {
+  try {
+    return client.log.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Log\'ları listeleme', { where, skip, take, orderBy });
+  }
+}
+
+// Log sayısını getir
+export async function countLogsDB(
+  where?: Prisma.LogWhereInput,
+  client: PrismaClientOrTransaction = prisma
+): Promise<number> {
+  try {
+    return client.log.count({ where });
+  } catch (error) {
+    handleDatabaseError(error, 'Log sayma', { where });
+  }
+}
+
 // Log sil
-export async function deleteLog(
+export async function deleteLogDB(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Log | null> {

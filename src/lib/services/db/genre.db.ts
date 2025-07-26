@@ -8,7 +8,7 @@ import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 // Genre CRUD operasyonları
 
 // Yeni genre oluşturur
-export async function createGenre(
+export async function createGenreDB(
     data: Prisma.GenreCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre> {
@@ -22,7 +22,7 @@ export async function createGenre(
 }
 
 // ID ile genre bulur
-export async function findGenreById(
+export async function findGenreByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre | null> {
@@ -36,7 +36,7 @@ export async function findGenreById(
 }
 
 // Slug ile genre bulur
-export async function findGenreBySlug(
+export async function findGenreBySlugDB(
     slug: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre | null> {
@@ -50,7 +50,7 @@ export async function findGenreBySlug(
 }
 
 // Name ile genre bulur
-export async function findGenreByName(
+export async function findGenreByNameDB(
     name: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre | null> {
@@ -64,7 +64,7 @@ export async function findGenreByName(
 }
 
 // Tüm genre'leri listeler
-export async function findAllGenres(
+export async function findAllGenresDB(
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre[]> {
     try {
@@ -77,7 +77,7 @@ export async function findAllGenres(
 }
 
 // Genre bilgilerini günceller
-export async function updateGenre(
+export async function updateGenreDB(
     where: Prisma.GenreWhereUniqueInput,
     data: Prisma.GenreUpdateInput,
     client: PrismaClientOrTransaction = prisma
@@ -93,7 +93,7 @@ export async function updateGenre(
 }
 
 // Genre'yi siler
-export async function deleteGenre(
+export async function deleteGenreDB(
     where: Prisma.GenreWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre> {
@@ -105,7 +105,7 @@ export async function deleteGenre(
 }
 
 // Genre sayısını döner
-export async function countGenres(
+export async function countGenresDB(
     where?: Prisma.GenreWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

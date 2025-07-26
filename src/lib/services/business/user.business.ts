@@ -7,13 +7,13 @@ import {
   DatabaseError
 } from '@/lib/errors';
 import { 
-  findUserById, 
-  findUserByUsername,
-  findUserByEmail,
-  updateUser as updateUserDB,
-  deleteUser as deleteUserDB,
-  countUsers,
-  findAllUsers
+  findUserByIdDB, 
+  findUserByUsernameDB,
+  findUserByEmailDB,
+  updateUserDB,
+  deleteUserDB,
+  countUsersDB,
+  findAllUsersDB
 } from '@/lib/services/db/user.db';
 import { Prisma, UserRole } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
@@ -58,8 +58,8 @@ export async function getUsersBusiness(
 
     // Kullanıcıları getir
     const [users, total] = await Promise.all([
-      findAllUsers(where, skip, limit, { createdAt: 'desc' }),
-      countUsers(where)
+      findAllUsersDB(where, skip, limit, { createdAt: 'desc' }),
+      countUsersDB(where)
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -111,7 +111,7 @@ export async function getUserBusiness(
   userId: string
 ): Promise<ApiResponse<GetUserResponse>> {
   try {
-    const user = await findUserById(id);
+    const user = await findUserByIdDB(id);
     if (!user) {
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
@@ -157,14 +157,14 @@ export async function updateUserBusiness(
 ): Promise<ApiResponse<UpdateUserResponse>> {
   try {
     // Kullanıcı mevcut mu kontrolü
-    const existingUser = await findUserById(id);
+    const existingUser = await findUserByIdDB(id);
     if (!existingUser) {
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
 
     // Username güncelleniyorsa benzersizlik kontrolü
     if (data.username && data.username !== existingUser.username) {
-      const usernameExists = await findUserByUsername(data.username);
+      const usernameExists = await findUserByUsernameDB(data.username);
       if (usernameExists) {
         throw new ConflictError('Bu kullanıcı adı zaten kullanımda');
       }
@@ -172,7 +172,7 @@ export async function updateUserBusiness(
 
     // Email güncelleniyorsa benzersizlik kontrolü
     if (data.email && data.email !== existingUser.email) {
-      const emailExists = await findUserByEmail(data.email);
+      const emailExists = await findUserByEmailDB(data.email);
       if (emailExists) {
         throw new ConflictError('Bu e-posta adresi zaten kullanımda');
       }
@@ -232,7 +232,7 @@ export async function banUserBusiness(
 ): Promise<ApiResponse<UpdateUserResponse>> {
   try {
     // Kullanıcı mevcut mu kontrolü
-    const existingUser = await findUserById(id);
+    const existingUser = await findUserByIdDB(id);
     if (!existingUser) {
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
@@ -284,7 +284,7 @@ export async function unbanUserBusiness(
 ): Promise<ApiResponse<UpdateUserResponse>> {
   try {
     // Kullanıcı mevcut mu kontrolü
-    const existingUser = await findUserById(id);
+    const existingUser = await findUserByIdDB(id);
     if (!existingUser) {
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
@@ -336,7 +336,7 @@ export async function deleteUserBusiness(
 ): Promise<ApiResponse<void>> {
   try {
     // Kullanıcı mevcut mu kontrolü
-    const existingUser = await findUserById(id);
+    const existingUser = await findUserByIdDB(id);
     if (!existingUser) {
       throw new NotFoundError('Kullanıcı bulunamadı');
     }

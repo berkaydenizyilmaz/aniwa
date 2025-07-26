@@ -8,7 +8,7 @@ import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 // Studio CRUD operasyonları
 
 // Yeni studio oluşturur
-export async function createStudio(
+export async function createStudioDB(
     data: Prisma.StudioCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Studio> {
@@ -22,7 +22,7 @@ export async function createStudio(
 }
 
 // ID ile studio bulur
-export async function findStudioById(
+export async function findStudioByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Studio | null> {
@@ -36,7 +36,7 @@ export async function findStudioById(
 }
 
 // Slug ile studio bulur
-export async function findStudioBySlug(
+export async function findStudioBySlugDB(
     slug: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Studio | null> {
@@ -50,7 +50,7 @@ export async function findStudioBySlug(
 }
 
 // Name ile studio bulur
-export async function findStudioByName(
+export async function findStudioByNameDB(
     name: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Studio | null> {
@@ -64,7 +64,7 @@ export async function findStudioByName(
 }
 
 // Animasyon stüdyolarını bulur
-export async function findAnimationStudios(
+export async function findAnimationStudiosDB(
     client: PrismaClientOrTransaction = prisma
 ): Promise<Studio[]> {
     try {
@@ -78,7 +78,7 @@ export async function findAnimationStudios(
 }
 
 // Prodüksiyon şirketlerini bulur
-export async function findProductionStudios(
+export async function findProductionStudiosDB(
     client: PrismaClientOrTransaction = prisma
 ): Promise<Studio[]> {
     try {
@@ -92,7 +92,7 @@ export async function findProductionStudios(
 }
 
 // Tüm stüdyoları listeler
-export async function findAllStudios(
+export async function findAllStudiosDB(
     client: PrismaClientOrTransaction = prisma
 ): Promise<Studio[]> {
     try {
@@ -105,7 +105,7 @@ export async function findAllStudios(
 }
 
 // Studio bilgilerini günceller
-export async function updateStudio(
+export async function updateStudioDB(
     where: Prisma.StudioWhereUniqueInput,
     data: Prisma.StudioUpdateInput,
     client: PrismaClientOrTransaction = prisma
@@ -121,7 +121,7 @@ export async function updateStudio(
 }
 
 // Studio'yu siler
-export async function deleteStudio(
+export async function deleteStudioDB(
     where: Prisma.StudioWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Studio> {
@@ -133,7 +133,7 @@ export async function deleteStudio(
 }
 
 // Studio sayısını döner
-export async function countStudios(
+export async function countStudiosDB(
     where?: Prisma.StudioWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

@@ -6,9 +6,11 @@ import {
   DatabaseError
 } from '@/lib/errors';
 import { 
-  findLogById
+  findLogByIdDB,
+  findAllLogsDB,
+  countLogsDB,
+  createLogDB
 } from '@/lib/services/db/log.db';
-import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
 import { ApiResponse } from '@/lib/types/api';
@@ -24,14 +26,12 @@ export async function createLogBusiness(
   data: CreateLogRequest,
 ): Promise<void> {
   try {
-    await prisma.log.create({
-      data: {
-        level: data.level,
-        event: data.event,
-        message: data.message,
-        metadata: data.metadata ? JSON.parse(JSON.stringify(data.metadata)) : null,
-        user: data.userId ? { connect: { id: data.userId } } : undefined
-      }
+    await createLogDB({
+      level: data.level,
+      event: data.event,
+      message: data.message,
+      metadata: data.metadata ? JSON.parse(JSON.stringify(data.metadata)) : null,
+      user: data.userId ? { connect: { id: data.userId } } : undefined
     });
   } catch (error) {
     console.error('Failed to create log:', error);
@@ -44,7 +44,7 @@ export async function getLogBusiness(
   userId: string
 ): Promise<ApiResponse<GetLogResponse>> {
   try {
-    const log = await findLogById(id);
+    const log = await findLogByIdDB(id);
     if (!log) {
       throw new NotFoundError('Log bulunamadı');
     }
@@ -124,12 +124,12 @@ export async function getLogsBusiness(
 
     // Log'ları getir
     const [logs, total] = await Promise.all([
-      prisma.log.findMany({
+      findAllLogsDB(
         where,
         skip,
-        take: limit,
-        orderBy: { id: 'desc' },
-        include: {
+        limit,
+        { id: 'desc' },
+        {
           user: {
             select: {
               id: true,
@@ -139,8 +139,8 @@ export async function getLogsBusiness(
             }
           }
         }
-      }),
-      prisma.log.count({ where })
+      ),
+      countLogsDB(where)
     ]);
 
     const totalPages = Math.ceil(total / limit);

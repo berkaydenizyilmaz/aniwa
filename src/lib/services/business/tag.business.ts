@@ -7,13 +7,13 @@ import {
   DatabaseError
 } from '@/lib/errors';
 import { 
-  createTag as createTagDB, 
-  findTagById, 
-  findTagByName, 
-  findTagBySlug, 
-  findAllTags, 
-  updateTag as updateTagDB, 
-  deleteTag as deleteTagDB
+  createTagDB, 
+  findTagByIdDB, 
+  findTagByNameDB, 
+  findTagBySlugDB, 
+  findAllTagsDB, 
+  updateTagDB, 
+  deleteTagDB
 } from '@/lib/services/db/tag.db';
 import { Prisma } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
@@ -37,14 +37,14 @@ export async function createTagBusiness(
 ): Promise<ApiResponse<CreateTagResponse>> {
   try {
     // Name benzersizlik kontrolü
-    const existingTag = await findTagByName(data.name);
+    const existingTag = await findTagByNameDB(data.name);
     if (existingTag) {
       throw new ConflictError('Bu etiket adı zaten kullanımda');
     }
 
     // Slug oluştur ve benzersizlik kontrolü
     const slug = createSlug(data.name);
-    const existingSlug = await findTagBySlug(slug);
+    const existingSlug = await findTagBySlugDB(slug);
     if (existingSlug) {
       throw new ConflictError('Bu etiket adı zaten kullanımda');
     }
@@ -99,7 +99,7 @@ export async function getTagBusiness(
   userId: string
 ): Promise<ApiResponse<GetTagResponse>> {
   try {
-    const tag = await findTagById(id);
+    const tag = await findTagByIdDB(id);
     if (!tag) {
       throw new NotFoundError('Tag bulunamadı');
     }
@@ -148,7 +148,7 @@ export async function getTagsBusiness(
     const skip = (page - 1) * limit;
 
     // Tag'leri getir
-    let tags = await findAllTags();
+    let tags = await findAllTagsDB();
     
     // Filtreleme
     if (filters?.search) {
@@ -223,14 +223,14 @@ export async function updateTagBusiness(
 ): Promise<ApiResponse<UpdateTagResponse>> {
   try {
     // Tag mevcut mu kontrolü
-    const existingTag = await findTagById(id);
+    const existingTag = await findTagByIdDB(id);
     if (!existingTag) {
       throw new NotFoundError('Tag bulunamadı');
     }
 
     // Name güncelleniyorsa benzersizlik kontrolü
     if (data.name && data.name !== existingTag.name) {
-      const nameExists = await findTagByName(data.name);
+      const nameExists = await findTagByNameDB(data.name);
       if (nameExists) {
         throw new ConflictError('Bu etiket adı zaten kullanımda');
       }
@@ -242,7 +242,7 @@ export async function updateTagBusiness(
       const newSlug = createSlug(data.name);
       // Slug değişiyorsa benzersizlik kontrolü
       if (newSlug !== existingTag.slug) {
-        const slugExists = await findTagBySlug(newSlug);
+        const slugExists = await findTagBySlugDB(newSlug);
         if (slugExists) {
           throw new ConflictError('Bu etiket adı zaten kullanımda');
         }
@@ -301,7 +301,7 @@ export async function deleteTagBusiness(
 ): Promise<ApiResponse<void>> {
   try {
     // Tag mevcut mu kontrolü
-    const existingTag = await findTagById(id);
+    const existingTag = await findTagByIdDB(id);
     if (!existingTag) {
       throw new NotFoundError('Tag bulunamadı');
     }

@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Kullanıcı ayarları oluşturur
-export async function createUserSettings(
+export async function createUserSettingsDB(
     data: Prisma.UserProfileSettingsCreateInput,
     client: PrismaClientOrTransaction = prisma
 ) {
@@ -20,7 +20,7 @@ export async function createUserSettings(
 }
 
 // Kullanıcı ayarlarını günceller
-export async function updateUserSettings(
+export async function updateUserSettingsDB(
     where: Prisma.UserProfileSettingsWhereUniqueInput,
     data: Prisma.UserProfileSettingsUpdateInput,
     client: PrismaClientOrTransaction = prisma
@@ -36,7 +36,7 @@ export async function updateUserSettings(
 }
 
 // Kullanıcı ayarlarını bulur
-export async function findUserSettings(
+export async function findUserSettingsDB(
     userId: string,
     client: PrismaClientOrTransaction = prisma
 ) {

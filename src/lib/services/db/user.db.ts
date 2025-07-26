@@ -9,7 +9,7 @@ import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 // User CRUD operasyonları
 
 // Yeni kullanıcı oluşturur
-export async function createUser(
+export async function createUserDB(
     data: Prisma.UserCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserWithSettings> {
@@ -26,7 +26,7 @@ export async function createUser(
 }
 
 // ID ile kullanıcı bulur
-export async function findUserById(
+export async function findUserByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserWithSettings | null> {
@@ -43,7 +43,7 @@ export async function findUserById(
 }
 
 // E-posta ile kullanıcı bulur
-export async function findUserByEmail(
+export async function findUserByEmailDB(
     email: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserWithSettings | null> {
@@ -60,7 +60,7 @@ export async function findUserByEmail(
 }
 
 // Kullanıcı adı ile kullanıcı bulur
-export async function findUserByUsername(
+export async function findUserByUsernameDB(
     username: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserWithSettings | null> {
@@ -77,7 +77,7 @@ export async function findUserByUsername(
 }
 
 // Slug ile kullanıcı bulur
-export async function findUserBySlug(
+export async function findUserBySlugDB(
     slug: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserWithSettings | null> {
@@ -94,7 +94,7 @@ export async function findUserBySlug(
 }
 
 // Tüm kullanıcıları getirir (filtrelemeli)
-export async function findAllUsers(
+export async function findAllUsersDB(
     where?: Prisma.UserWhereInput,
     skip?: number,
     take?: number,
@@ -114,7 +114,7 @@ export async function findAllUsers(
 }
 
 // Kullanıcı bilgilerini günceller
-export async function updateUser(
+export async function updateUserDB(
     where: Prisma.UserWhereUniqueInput,
     data: Prisma.UserUpdateInput,
     client: PrismaClientOrTransaction = prisma
@@ -130,7 +130,7 @@ export async function updateUser(
 }
 
 // Kullanıcıyı siler
-export async function deleteUser(
+export async function deleteUserDB(
     where: Prisma.UserWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ) {
@@ -142,7 +142,7 @@ export async function deleteUser(
 }
 
 // Kullanıcı sayısını döner
-export async function countUsers(
+export async function countUsersDB(
     where?: Prisma.UserWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

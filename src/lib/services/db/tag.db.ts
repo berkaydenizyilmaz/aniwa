@@ -8,7 +8,7 @@ import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 // Tag CRUD operasyonları
 
 // Yeni tag oluşturur
-export async function createTag(
+export async function createTagDB(
     data: Prisma.TagCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Tag> {
@@ -22,7 +22,7 @@ export async function createTag(
 }
 
 // ID ile tag bulur
-export async function findTagById(
+export async function findTagByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Tag | null> {
@@ -36,7 +36,7 @@ export async function findTagById(
 }
 
 // Slug ile tag bulur
-export async function findTagBySlug(
+export async function findTagBySlugDB(
     slug: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Tag | null> {
@@ -50,7 +50,7 @@ export async function findTagBySlug(
 }
 
 // Name ile tag bulur
-export async function findTagByName(
+export async function findTagByNameDB(
     name: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Tag | null> {
@@ -64,7 +64,7 @@ export async function findTagByName(
 }
 
 // Kategoriye göre tag'leri bulur
-export async function findTagsByCategory(
+export async function findTagsByCategoryDB(
     category: TagCategory,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Tag[]> {
@@ -79,7 +79,7 @@ export async function findTagsByCategory(
 }
 
 // Yetişkin içerik tag'lerini bulur
-export async function findAdultTags(
+export async function findAdultTagsDB(
     client: PrismaClientOrTransaction = prisma
 ): Promise<Tag[]> {
     try {
@@ -93,7 +93,7 @@ export async function findAdultTags(
 }
 
 // Spoiler tag'lerini bulur
-export async function findSpoilerTags(
+export async function findSpoilerTagsDB(
     client: PrismaClientOrTransaction = prisma
 ): Promise<Tag[]> {
     try {
@@ -107,7 +107,7 @@ export async function findSpoilerTags(
 }
 
 // Tüm tag'leri listeler
-export async function findAllTags(
+export async function findAllTagsDB(
     client: PrismaClientOrTransaction = prisma
 ): Promise<Tag[]> {
     try {
@@ -120,7 +120,7 @@ export async function findAllTags(
 }
 
 // Tag bilgilerini günceller
-export async function updateTag(
+export async function updateTagDB(
     where: Prisma.TagWhereUniqueInput,
     data: Prisma.TagUpdateInput,
     client: PrismaClientOrTransaction = prisma
@@ -136,7 +136,7 @@ export async function updateTag(
 }
 
 // Tag'i siler
-export async function deleteTag(
+export async function deleteTagDB(
     where: Prisma.TagWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Tag> {
@@ -148,7 +148,7 @@ export async function deleteTag(
 }
 
 // Tag sayısını döner
-export async function countTags(
+export async function countTagsDB(
     where?: Prisma.TagWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
