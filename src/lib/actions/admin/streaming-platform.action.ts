@@ -35,7 +35,10 @@ export async function createStreamingPlatformAction(data: CreateStreamingPlatfor
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'createStreamingPlatformAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -57,7 +60,10 @@ export async function getStreamingPlatformsAction(filters?: StreamingPlatformFil
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getStreamingPlatformsAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -76,7 +82,10 @@ export async function getStreamingPlatformAction(id: string): Promise<ServerActi
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getStreamingPlatformAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -101,7 +110,10 @@ export async function updateStreamingPlatformAction(id: string, data: UpdateStre
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'updateStreamingPlatformAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -123,6 +135,9 @@ export async function deleteStreamingPlatformAction(id: string): Promise<ServerA
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'deleteStreamingPlatformAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 } 

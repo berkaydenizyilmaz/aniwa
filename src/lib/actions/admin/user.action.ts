@@ -33,7 +33,10 @@ export async function getUsersAction(filters?: UserFilters): Promise<ServerActio
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getUsersAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -52,7 +55,10 @@ export async function getUserAction(id: string): Promise<ServerActionResponse> {
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getUserAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -77,7 +83,10 @@ export async function updateUserAction(id: string, data: UpdateUserInput): Promi
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'updateUserAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -99,7 +108,10 @@ export async function banUserAction(id: string): Promise<ServerActionResponse> {
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'banUserAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -121,7 +133,10 @@ export async function unbanUserAction(id: string): Promise<ServerActionResponse>
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'unbanUserAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -143,6 +158,9 @@ export async function deleteUserAction(id: string): Promise<ServerActionResponse
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'deleteUserAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 } 

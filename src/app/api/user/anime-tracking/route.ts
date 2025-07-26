@@ -28,6 +28,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
 
   } catch (error) {
-    return handleApiError(error);
+    return handleApiError(error, {
+      endpoint: request.url,
+      method: 'GET',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 } 

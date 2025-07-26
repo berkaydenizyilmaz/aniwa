@@ -35,7 +35,10 @@ export async function createTagAction(data: CreateTagInput): Promise<ServerActio
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'createTagAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -57,7 +60,10 @@ export async function getTagsAction(filters?: TagFilters): Promise<ServerActionR
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getTagsAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -76,7 +82,10 @@ export async function getTagAction(id: string): Promise<ServerActionResponse> {
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getTagAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -101,7 +110,10 @@ export async function updateTagAction(id: string, data: UpdateTagInput): Promise
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'updateTagAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -123,6 +135,9 @@ export async function deleteTagAction(id: string): Promise<ServerActionResponse>
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'deleteTagAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 } 

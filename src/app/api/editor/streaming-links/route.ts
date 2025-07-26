@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { streamingLinkFiltersSchema } from '@/lib/schemas/streaming.schema';
 import { getAllStreamingLinks } from '@/lib/services/business/streaming.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
+import { authConfig } from '@/lib/auth/auth.config';
+import { getServerSession } from 'next-auth';
 
 // Tüm streaming linkleri listele (GET) - Editör erişimi
 export async function GET(request: NextRequest) {
@@ -27,6 +29,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
 
   } catch (error) {
-    return handleApiError(error);
+    return handleApiError(error, {
+      endpoint: request.url,
+      method: 'GET',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 } 

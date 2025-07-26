@@ -29,7 +29,9 @@ export async function registerUser(data: RegisterInput): Promise<ServerActionRes
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'registerUser'
+    });
   }
 }
 
@@ -47,7 +49,9 @@ export async function forgotPassword(data: ForgotPasswordInput): Promise<ServerA
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'forgotPassword'
+    });
   }
 }
 
@@ -65,6 +69,8 @@ export async function resetPassword(data: ResetPasswordInput): Promise<ServerAct
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'resetPassword'
+    });
   }
 }

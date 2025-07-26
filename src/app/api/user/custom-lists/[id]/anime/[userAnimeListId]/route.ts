@@ -22,6 +22,10 @@ export async function POST(
     return NextResponse.json(result);
     
   } catch (error) {
-    return handleApiError(error);
+    return handleApiError(error, {
+      endpoint: request.url,
+      method: 'DELETE',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 } 

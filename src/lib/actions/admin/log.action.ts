@@ -27,7 +27,10 @@ export async function getLogsAction(filters?: LogFilters): Promise<ServerActionR
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getLogsAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -46,6 +49,9 @@ export async function getLogAction(id: string): Promise<ServerActionResponse> {
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getLogAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 } 

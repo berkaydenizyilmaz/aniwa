@@ -33,7 +33,11 @@ export async function GET(
     return NextResponse.json(result);
 
   } catch (error) {
-    return handleApiError(error);
+    return handleApiError(error, {
+      endpoint: request.url,
+      method: 'GET',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -59,7 +63,11 @@ export async function PUT(
     return NextResponse.json(result);
     
   } catch (error) {
-    return handleApiError(error);
+    return handleApiError(error, {
+      endpoint: request.url,
+      method: 'PUT',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -81,6 +89,10 @@ export async function DELETE(
     return NextResponse.json(result);
     
   } catch (error) {
-    return handleApiError(error);
+    return handleApiError(error, {
+      endpoint: request.url,
+      method: 'DELETE',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 } 

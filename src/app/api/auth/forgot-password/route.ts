@@ -17,6 +17,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result, { status: 200 });
     
   } catch (error) {
-    return handleApiError(error);
+    return handleApiError(error, {
+      endpoint: request.url,
+      method: 'POST',
+      userId: undefined // Forgot password'da henüz user yok
+    });
   }
 } 

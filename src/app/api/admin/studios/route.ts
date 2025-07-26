@@ -30,7 +30,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
 
   } catch (error) {
-    return handleApiError(error);
+    return handleApiError(error, {
+      endpoint: request.url,
+      method: 'GET',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -52,6 +56,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result, { status: 201 });
     
   } catch (error) {
-    return handleApiError(error);
+    return handleApiError(error, {
+      endpoint: request.url,
+      method: 'POST',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 } 

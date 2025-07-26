@@ -35,7 +35,10 @@ export async function createStudioAction(data: CreateStudioInput): Promise<Serve
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'createStudioAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -57,7 +60,10 @@ export async function getStudiosAction(filters?: StudioFilters): Promise<ServerA
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getStudiosAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -76,7 +82,10 @@ export async function getStudioAction(id: string): Promise<ServerActionResponse>
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getStudioAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -101,7 +110,10 @@ export async function updateStudioAction(id: string, data: UpdateStudioInput): P
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'updateStudioAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -123,6 +135,9 @@ export async function deleteStudioAction(id: string): Promise<ServerActionRespon
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'deleteStudioAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 } 
