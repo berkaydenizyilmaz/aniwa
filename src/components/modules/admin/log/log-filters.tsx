@@ -3,18 +3,31 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, RefreshCw } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Search, RefreshCw, Filter, Calendar } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
 interface LogFiltersProps {
   onSearch?: (search: string) => void;
+  onLevelChange?: (level: string) => void;
+  onStartDateChange?: (date: string) => void;
+  onEndDateChange?: (date: string) => void;
   onRefresh?: () => void;
 }
 
-export function LogFilters({ onSearch, onRefresh }: LogFiltersProps) {
+export function LogFilters({ onSearch, onLevelChange, onStartDateChange, onEndDateChange, onRefresh }: LogFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedLevel, setSelectedLevel] = useState<string>('all');
+  const [selectedStartDate, setSelectedStartDate] = useState<string>('');
+  const [selectedEndDate, setSelectedEndDate] = useState<string>('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { isLoading } = useLoadingStore();
 
@@ -25,6 +38,21 @@ export function LogFilters({ onSearch, onRefresh }: LogFiltersProps) {
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
+  };
+
+  const handleLevelChange = (level: string) => {
+    setSelectedLevel(level);
+    onLevelChange?.(level === 'all' ? '' : level);
+  };
+
+  const handleStartDateChange = (date: string) => {
+    setSelectedStartDate(date);
+    onStartDateChange?.(date);
+  };
+
+  const handleEndDateChange = (date: string) => {
+    setSelectedEndDate(date);
+    onEndDateChange?.(date);
   };
 
   return (
@@ -38,6 +66,44 @@ export function LogFilters({ onSearch, onRefresh }: LogFiltersProps) {
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-10"
+            disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}
+          />
+        </div>
+
+        {/* Seviye Filtresi */}
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <Select value={selectedLevel} onValueChange={handleLevelChange} disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Tüm Seviyeler" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tüm Seviyeler</SelectItem>
+              <SelectItem value="info">Bilgi</SelectItem>
+              <SelectItem value="warn">Uyarı</SelectItem>
+              <SelectItem value="error">Hata</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Tarih Aralığı Filtresi */}
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-muted-foreground" />
+          <Input
+            type="date"
+            value={selectedStartDate}
+            onChange={(e) => handleStartDateChange(e.target.value)}
+            className="w-[130px]"
+            placeholder="Başlangıç"
+            disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}
+          />
+          <span className="text-muted-foreground">-</span>
+          <Input
+            type="date"
+            value={selectedEndDate}
+            onChange={(e) => handleEndDateChange(e.target.value)}
+            className="w-[130px]"
+            placeholder="Bitiş"
             disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}
           />
         </div>

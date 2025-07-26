@@ -27,9 +27,12 @@ import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
 interface LogTableProps {
   searchTerm?: string;
+  selectedLevel?: string;
+  selectedStartDate?: string;
+  selectedEndDate?: string;
 }
 
-export function LogTable({ searchTerm = '' }: LogTableProps) {
+export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStartDate = '', selectedEndDate = '' }: LogTableProps) {
   const [logs, setLogs] = useState<(Log & { user?: { id: string; username: string; email: string } | null })[]>([]);
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<(Log & { user?: { id: string; username: string; email: string } | null }) | null>(null);
@@ -60,12 +63,21 @@ export function LogTable({ searchTerm = '' }: LogTableProps) {
     fetchLogs();
   }, [setLoadingStore]);
 
-  // Arama filtreleme
-  const filteredLogs = logs.filter(log =>
-    log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    log.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    log.level.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Arama ve filtreleme
+  const filteredLogs = logs.filter(log => {
+    const matchesSearch = log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      log.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      log.level.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesLevel = selectedLevel === 'all' || log.level.toLowerCase() === selectedLevel.toLowerCase();
+
+    const logDate = new Date(log.timestamp).toISOString().split('T')[0];
+    const matchesStartDate = !selectedStartDate || logDate >= selectedStartDate;
+    const matchesEndDate = !selectedEndDate || logDate <= selectedEndDate;
+    const matchesDate = matchesStartDate && matchesEndDate;
+
+    return matchesSearch && matchesLevel && matchesDate;
+  });
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString('tr-TR');
