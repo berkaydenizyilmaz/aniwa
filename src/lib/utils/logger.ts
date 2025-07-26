@@ -61,10 +61,8 @@ class Logger {
     const formattedMessage = this.formatMessage(LogLevel.INFO, message, metadata);
     console.log(formattedMessage);
     
-    // Önemli info logları DB'ye kaydet
-    if (event.startsWith('user_') || event.startsWith('system_')) {
-      await this.saveToDatabase(LogLevel.INFO, event, message, metadata, userId);
-    }
+    // Tüm info logları DB'ye kaydet
+    await this.saveToDatabase(LogLevel.INFO, event, message, metadata, userId);
   }
 
   // Warning log
