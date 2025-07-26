@@ -1,109 +1,12 @@
-// Streaming modelleri için CRUD operasyonları
+// StreamingLink modeli için CRUD operasyonları
 
-import { Prisma, StreamingPlatform, StreamingLink } from '@prisma/client';
+import { Prisma, StreamingLink } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
-// Streaming Platform CRUD İşlemleri
-
-// Streaming platform oluşturma
-export async function createStreamingPlatformDB(
-  data: Prisma.StreamingPlatformCreateInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingPlatform> {
-  try {
-    return await client.streamingPlatform.create({ data });
-  } catch (error) {
-    handleDatabaseError(error, 'Streaming platform oluşturma', { data });
-  }
-}
-
-// Streaming platform getirme (ID ile)
-export async function findStreamingPlatformByIdDB(
-  id: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingPlatform | null> {
-  try {
-    return await client.streamingPlatform.findUnique({ where: { id } });
-  } catch (error) {
-    handleDatabaseError(error, 'Streaming platform ID ile bulma', { id });
-  }
-}
-
-// Streaming platform getirme (name ile)
-export async function findStreamingPlatformByNameDB(
-  name: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingPlatform | null> {
-  try {
-    return await client.streamingPlatform.findFirst({ where: { name } });
-  } catch (error) {
-    handleDatabaseError(error, 'Streaming platform name ile bulma', { name });
-  }
-}
-
-// Tüm streaming platformları getirme (filtrelemeli)
-export async function findAllStreamingPlatformsDB(
-  where?: Prisma.StreamingPlatformWhereInput,
-  skip?: number,
-  take?: number,
-  orderBy?: Prisma.StreamingPlatformOrderByWithRelationInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingPlatform[]> {
-  try {
-    return await client.streamingPlatform.findMany({
-      where,
-      skip,
-      take,
-      orderBy,
-    });
-  } catch (error) {
-    handleDatabaseError(error, 'Tüm streaming platformları listeleme', { where, skip, take, orderBy });
-  }
-}
-
-// Streaming platform güncelleme
-export async function updateStreamingPlatformDB(
-  where: Prisma.StreamingPlatformWhereUniqueInput,
-  data: Prisma.StreamingPlatformUpdateInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingPlatform> {
-  try {
-    return await client.streamingPlatform.update({ where, data });
-  } catch (error) {
-    handleDatabaseError(error, 'Streaming platform güncelleme', { where, data });
-  }
-}
-
-// Streaming platform silme
-export async function deleteStreamingPlatformDB(
-  where: Prisma.StreamingPlatformWhereUniqueInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingPlatform> {
-  try {
-    return await client.streamingPlatform.delete({ where });
-  } catch (error) {
-    handleDatabaseError(error, 'Streaming platform silme', { where });
-  }
-}
-
-// Streaming platform sayısı
-export async function countStreamingPlatformsDB(
-  where?: Prisma.StreamingPlatformWhereInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<number> {
-  try {
-    return await client.streamingPlatform.count({ where });
-  } catch (error) {
-    handleDatabaseError(error, 'Streaming platform sayma', { where });
-  }
-}
-
-// Streaming Link CRUD İşlemleri
-
 // Streaming link oluşturma
-export async function createStreamingLinkDB(
+export async function createStreamingLink(
   data: Prisma.StreamingLinkCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink> {
@@ -115,7 +18,7 @@ export async function createStreamingLinkDB(
 }
 
 // Streaming link getirme (ID ile)
-export async function findStreamingLinkByIdDB(
+export async function findStreamingLinkById(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink | null> {
@@ -127,7 +30,7 @@ export async function findStreamingLinkByIdDB(
 }
 
 // Streaming link getirme (URL ile)
-export async function findStreamingLinkByUrlDB(
+export async function findStreamingLinkByUrl(
   url: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink | null> {
@@ -139,7 +42,7 @@ export async function findStreamingLinkByUrlDB(
 }
 
 // Anime serisi ID'sine göre streaming link'leri getirme
-export async function findStreamingLinksByAnimeSeriesIdDB(
+export async function findStreamingLinksByAnimeSeriesId(
   animeSeriesId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink[]> {
@@ -153,7 +56,7 @@ export async function findStreamingLinksByAnimeSeriesIdDB(
 }
 
 // Media part ID'sine göre streaming link'leri getirme
-export async function findStreamingLinksByMediaPartIdDB(
+export async function findStreamingLinksByMediaPartId(
   animeMediaPartId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink[]> {
@@ -167,7 +70,7 @@ export async function findStreamingLinksByMediaPartIdDB(
 }
 
 // Episode ID'sine göre streaming link'leri getirme
-export async function findStreamingLinksByEpisodeIdDB(
+export async function findStreamingLinksByEpisodeId(
   episodeId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink[]> {
@@ -181,7 +84,7 @@ export async function findStreamingLinksByEpisodeIdDB(
 }
 
 // Platform ID'sine göre streaming link'leri getirme
-export async function findStreamingLinksByPlatformIdDB(
+export async function findStreamingLinksByPlatformId(
   platformId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink[]> {
@@ -195,7 +98,7 @@ export async function findStreamingLinksByPlatformIdDB(
 }
 
 // Tüm streaming link'leri getirme (filtrelemeli)
-export async function findAllStreamingLinksDB(
+export async function findAllStreamingLinks(
   where?: Prisma.StreamingLinkWhereInput,
   skip?: number,
   take?: number,
@@ -215,7 +118,7 @@ export async function findAllStreamingLinksDB(
 }
 
 // Streaming link güncelleme
-export async function updateStreamingLinkDB(
+export async function updateStreamingLink(
   where: Prisma.StreamingLinkWhereUniqueInput,
   data: Prisma.StreamingLinkUpdateInput,
   client: PrismaClientOrTransaction = prisma
@@ -228,7 +131,7 @@ export async function updateStreamingLinkDB(
 }
 
 // Streaming link silme
-export async function deleteStreamingLinkDB(
+export async function deleteStreamingLink(
   where: Prisma.StreamingLinkWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink> {
@@ -240,7 +143,7 @@ export async function deleteStreamingLinkDB(
 }
 
 // Streaming link sayısı
-export async function countStreamingLinksDB(
+export async function countStreamingLinks(
   where?: Prisma.StreamingLinkWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
