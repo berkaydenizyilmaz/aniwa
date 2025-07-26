@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Log } from '@prisma/client';
+import { Log, LogLevel } from '@prisma/client';
 import { getLogsAction } from '@/lib/actions/log.action';
 import { toast } from 'sonner';
 import { GetLogsResponse } from '@/lib/types/api/log.api';
+import { type LogFilters } from '@/lib/schemas/log.schema';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
@@ -43,7 +44,26 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
     const fetchLogs = async () => {
       try {
         setLoadingStore(LOADING_KEYS.PAGES.LOGS, true);
-        const result = await getLogsAction();
+        
+        // Filtreleri hazırla
+        const filters: LogFilters = {
+          page: 1,
+          limit: 50
+        };
+        if (selectedLevel !== 'all') {
+          filters.level = selectedLevel as LogLevel;
+        }
+        if (selectedStartDate) {
+          filters.startDate = selectedStartDate;
+        }
+        if (selectedEndDate) {
+          filters.endDate = selectedEndDate;
+        }
+        if (searchTerm) {
+          filters.search = searchTerm;
+        }
+        
+        const result = await getLogsAction(filters);
 
         if (!result.success) {
           toast.error(result.error || 'Loglar yüklenirken bir hata oluştu');
@@ -61,23 +81,10 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
     };
 
     fetchLogs();
-  }, [setLoadingStore]);
+  }, [setLoadingStore, searchTerm, selectedLevel, selectedStartDate, selectedEndDate]);
 
-  // Arama ve filtreleme
-  const filteredLogs = logs.filter(log => {
-    const matchesSearch = log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.level.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesLevel = selectedLevel === 'all' || log.level.toLowerCase() === selectedLevel.toLowerCase();
-
-    const logDate = new Date(log.timestamp).toISOString().split('T')[0];
-    const matchesStartDate = !selectedStartDate || logDate >= selectedStartDate;
-    const matchesEndDate = !selectedEndDate || logDate <= selectedEndDate;
-    const matchesDate = matchesStartDate && matchesEndDate;
-
-    return matchesSearch && matchesLevel && matchesDate;
-  });
+    // Server-side filtreleme kullanıldığı için client-side filtreleme gerekmez
+  const filteredLogs = logs;
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString('tr-TR');

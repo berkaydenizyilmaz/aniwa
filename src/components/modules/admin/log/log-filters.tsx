@@ -14,6 +14,7 @@ import { Search, RefreshCw, Filter, Calendar } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { LogLevel } from '@prisma/client';
 
 interface LogFiltersProps {
   onSearch?: (search: string) => void;
@@ -79,9 +80,11 @@ export function LogFilters({ onSearch, onLevelChange, onStartDateChange, onEndDa
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tüm Seviyeler</SelectItem>
-              <SelectItem value="info">Bilgi</SelectItem>
-              <SelectItem value="warn">Uyarı</SelectItem>
-              <SelectItem value="error">Hata</SelectItem>
+              {Object.values(LogLevel).map((level) => (
+                <SelectItem key={level} value={level}>
+                  {level}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
