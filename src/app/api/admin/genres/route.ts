@@ -23,11 +23,7 @@ export async function GET(request: NextRequest) {
     const validatedFilters = genreFiltersSchema.parse(filters);
 
     // Business logic
-    const result = await getGenresBusiness({
-      ...validatedFilters,
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await getGenresBusiness(session!.user.id, validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -49,10 +45,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await createGenreBusiness(validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await createGenreBusiness(validatedData, session!.user.id);
     
     // Başarılı yanıt
     return NextResponse.json(result, { status: 201 });

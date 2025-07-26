@@ -38,12 +38,6 @@ export async function createComment(
   user: { id: string; username: string }
 ): Promise<ApiResponse<CreateCommentResponse>> {
   try {
-    // Yetişkin içerik kontrolü (ileride user settings'den kontrol edilecek)
-    // Şimdilik basit kontrol
-    if (data.content.length < 1) {
-      throw new BusinessError('Yorum içeriği boş olamaz');
-    }
-
     // Transaction ile güvenli işlem
     const result = await prisma.$transaction(async (tx) => {
       return await createCommentDB({
@@ -230,11 +224,6 @@ export async function updateComment(
     }
     if (existingComment.userId !== userId) {
       throw new NotFoundError('Yorum bulunamadı');
-    }
-
-    // İçerik kontrolü
-    if (data.content.length < 1) {
-      throw new BusinessError('Yorum içeriği boş olamaz');
     }
 
     // Transaction ile güvenli işlem
