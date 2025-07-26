@@ -2,16 +2,18 @@
 
 import { BusinessError, ConflictError, NotFoundError, DatabaseError } from '@/lib/errors';
 import {
-  createCustomList as createCustomListDB,
-  findCustomListById,
-  findCustomListByUserAndName,
-  findCustomListsByUserId,
-  updateCustomList as updateCustomListDB,
-  deleteCustomList as deleteCustomListDB,
-  createCustomListItem as createCustomListItemDB,
-  findCustomListItemByListAndAnime,
-  deleteCustomListItem as deleteCustomListItemDB,
+  createCustomListDB,
+  findCustomListByIdDB,
+  findCustomListByUserAndNameDB,
+  findCustomListsByUserIdDB,
+  updateCustomListDB,
+  deleteCustomListDB,
 } from '@/lib/services/db/customList.db';
+import {
+  createCustomListItemDB,
+  findCustomListItemByListAndAnimeDB,
+  deleteCustomListItemDB,
+} from '@/lib/services/db/customListItem.db';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
@@ -36,7 +38,7 @@ export async function createCustomListBusiness(
 ): Promise<ApiResponse<CreateCustomListResponse>> {
   try {
     // İsim benzersizlik kontrolü (aynı kullanıcı için)
-    const existingList = await findCustomListByUserAndName(userId, data.name);
+    const existingList = await findCustomListByUserAndNameDB(userId, data.name);
     if (existingList) {
       throw new ConflictError('Bu isimde bir liste zaten mevcut');
     }
@@ -98,7 +100,7 @@ export async function getUserCustomListsBusiness(
     const limit = filters?.limit || 50;
 
     // Kullanıcının listelerini getir
-    const lists = await findCustomListsByUserId(userId);
+    const lists = await findCustomListsByUserIdDB(userId);
     const total = await prisma.customList.count({ where: { userId } });
     const totalPages = Math.ceil(total / limit);
 
@@ -156,7 +158,7 @@ export async function updateCustomListBusiness(
 ): Promise<ApiResponse<UpdateCustomListResponse>> {
   try {
     // Liste mevcut mu ve kullanıcıya ait mi kontrolü
-    const existingList = await findCustomListById(listId);
+    const existingList = await findCustomListByIdDB(listId);
     if (!existingList) {
       throw new NotFoundError('Liste bulunamadı');
     }
@@ -167,7 +169,7 @@ export async function updateCustomListBusiness(
 
     // İsim güncelleniyorsa benzersizlik kontrolü
     if (data.name && data.name !== existingList.name) {
-      const nameExists = await findCustomListByUserAndName(userId, data.name);
+      const nameExists = await findCustomListByUserAndNameDB(userId, data.name);
       if (nameExists) {
         throw new ConflictError('Bu isimde bir liste zaten mevcut');
       }
@@ -232,7 +234,7 @@ export async function deleteCustomListBusiness(
 ): Promise<ApiResponse<DeleteCustomListResponse>> {
   try {
     // Liste mevcut mu ve kullanıcıya ait mi kontrolü
-    const existingList = await findCustomListById(listId);
+    const existingList = await findCustomListByIdDB(listId);
     if (!existingList) {
       throw new NotFoundError('Liste bulunamadı');
     }
@@ -290,7 +292,7 @@ export async function toggleAnimeInListBusiness(
 ): Promise<ApiResponse<AddCustomListItemResponse>> {
   try {
     // Liste mevcut mu ve kullanıcıya ait mi kontrolü
-    const existingList = await findCustomListById(listId);
+    const existingList = await findCustomListByIdDB(listId);
     if (!existingList) {
       throw new NotFoundError('Liste bulunamadı');
     }
@@ -308,7 +310,7 @@ export async function toggleAnimeInListBusiness(
     }
 
     // Mevcut item kontrolü
-    const existingItem = await findCustomListItemByListAndAnime(listId, userAnimeListId);
+    const existingItem = await findCustomListItemByListAndAnimeDB(listId, userAnimeListId);
 
     let result;
     if (existingItem) {
@@ -362,7 +364,7 @@ export async function getListItemsBusiness(
     const limit = filters?.limit || 50;
 
     // Liste mevcut mu kontrolü
-    const existingList = await findCustomListById(listId);
+    const existingList = await findCustomListByIdDB(listId);
     if (!existingList) {
       throw new NotFoundError('Liste bulunamadı');
     }

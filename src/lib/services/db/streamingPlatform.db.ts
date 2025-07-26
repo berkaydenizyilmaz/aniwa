@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Streaming platform oluşturma
-export async function createStreamingPlatform(
+export async function createStreamingPlatformDB(
   data: Prisma.StreamingPlatformCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingPlatform> {
@@ -18,7 +18,7 @@ export async function createStreamingPlatform(
 }
 
 // Streaming platform getirme (ID ile)
-export async function findStreamingPlatformById(
+export async function findStreamingPlatformByIdDB(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingPlatform | null> {
@@ -30,7 +30,7 @@ export async function findStreamingPlatformById(
 }
 
 // Streaming platform getirme (name ile)
-export async function findStreamingPlatformByName(
+export async function findStreamingPlatformByNameDB(
   name: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingPlatform | null> {
@@ -42,7 +42,7 @@ export async function findStreamingPlatformByName(
 }
 
 // Tüm streaming platformları getirme (filtrelemeli)
-export async function findAllStreamingPlatforms(
+export async function findAllStreamingPlatformsDB(
   where?: Prisma.StreamingPlatformWhereInput,
   skip?: number,
   take?: number,
@@ -62,7 +62,7 @@ export async function findAllStreamingPlatforms(
 }
 
 // Streaming platform güncelleme
-export async function updateStreamingPlatform(
+export async function updateStreamingPlatformDB(
   where: Prisma.StreamingPlatformWhereUniqueInput,
   data: Prisma.StreamingPlatformUpdateInput,
   client: PrismaClientOrTransaction = prisma
@@ -75,7 +75,7 @@ export async function updateStreamingPlatform(
 }
 
 // Streaming platform silme
-export async function deleteStreamingPlatform(
+export async function deleteStreamingPlatformDB(
   where: Prisma.StreamingPlatformWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingPlatform> {
@@ -87,7 +87,7 @@ export async function deleteStreamingPlatform(
 }
 
 // Streaming platform sayısı
-export async function countStreamingPlatforms(
+export async function countStreamingPlatformsDB(
   where?: Prisma.StreamingPlatformWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

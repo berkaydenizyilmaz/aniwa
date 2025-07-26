@@ -1,6 +1,6 @@
 'use server';
 
-import { createStreamingPlatformSchema, updateStreamingPlatformSchema, streamingPlatformFiltersSchema, type CreateStreamingPlatformInput, type UpdateStreamingPlatformInput, type StreamingPlatformFilters } from '@/lib/schemas/streaming.schema';
+import { createStreamingPlatformSchema, updateStreamingPlatformSchema, streamingPlatformFiltersSchema, type CreateStreamingPlatformInput, type UpdateStreamingPlatformInput, type StreamingPlatformFilters } from '@/lib/schemas/streamingPlatform.schema';
 import { 
   createStreamingPlatformBusiness, 
   getStreamingPlatformsBusiness, 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { streamingLinkFiltersSchema } from '@/lib/schemas/streaming.schema';
-import { getAllStreamingLinks } from '@/lib/services/business/streaming.business';
+import { streamingLinkFiltersSchema } from '@/lib/schemas/streamingLink.schema';
+import { getAllStreamingLinksBusiness } from '@/lib/services/business/streamingLink.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 import { authConfig } from '@/lib/auth/auth.config';
 import { getServerSession } from 'next-auth';
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const validatedFilters = streamingLinkFiltersSchema.parse(filters);
 
     // Business logic
-    const result = await getAllStreamingLinks(validatedFilters);
+    const result = await getAllStreamingLinksBusiness(validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);

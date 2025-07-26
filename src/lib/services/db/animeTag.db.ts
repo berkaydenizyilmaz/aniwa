@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Anime-Tag ilişkisi oluşturma
-export async function createAnimeTag(
+export async function createAnimeTagDB(
   animeSeriesId: string,
   tagId: string,
   client: PrismaClientOrTransaction = prisma
@@ -22,7 +22,7 @@ export async function createAnimeTag(
 }
 
 // Anime-Tag ilişkisi getirme (ID ile)
-export async function findAnimeTagById(
+export async function findAnimeTagByIdDB(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeTagGetPayload<{ include: { tag: true } }> | null> {
@@ -37,7 +37,7 @@ export async function findAnimeTagById(
 }
 
 // Anime serisi için tag'leri getirme
-export async function findAnimeTagsBySeriesId(
+export async function findAnimeTagsBySeriesIdDB(
   animeSeriesId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeTagGetPayload<{ include: { tag: true } }>[]> {
@@ -53,7 +53,7 @@ export async function findAnimeTagsBySeriesId(
 }
 
 // Tag için anime'leri getirme
-export async function findAnimeTagsByTagId(
+export async function findAnimeTagsByTagIdDB(
   tagId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeTagGetPayload<{ include: { animeSeries: true } }>[]> {
@@ -69,7 +69,7 @@ export async function findAnimeTagsByTagId(
 }
 
 // Toplu Anime-Tag ilişkileri oluşturma
-export async function createAnimeTags(
+export async function createAnimeTagsDB(
   animeSeriesId: string,
   tagIds: string[],
   client: PrismaClientOrTransaction = prisma
@@ -84,7 +84,7 @@ export async function createAnimeTags(
 }
 
 // Anime-Tag ilişkisi silme
-export async function deleteAnimeTag(
+export async function deleteAnimeTagDB(
   where: Prisma.AnimeTagWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeTagGetPayload<{ include: { tag: true } }>> {
@@ -99,7 +99,7 @@ export async function deleteAnimeTag(
 }
 
 // Anime serisi için tüm tag ilişkilerini silme
-export async function deleteAnimeTagsBySeriesId(
+export async function deleteAnimeTagsBySeriesIdDB(
   animeSeriesId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.BatchPayload> {
@@ -113,7 +113,7 @@ export async function deleteAnimeTagsBySeriesId(
 }
 
 // Anime-Tag ilişkisi sayısı
-export async function countAnimeTags(
+export async function countAnimeTagsDB(
   where?: Prisma.AnimeTagWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Yeni özel liste öğesi oluşturur
-export async function createCustomListItem(
+export async function createCustomListItemDB(
     data: Prisma.CustomListItemCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CustomListItem> {
@@ -20,7 +20,7 @@ export async function createCustomListItem(
 }
 
 // ID ile özel liste öğesi bulur
-export async function findCustomListItemById(
+export async function findCustomListItemByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CustomListItem | null> {
@@ -65,7 +65,7 @@ export async function findCustomListItemById(
 }
 
 // Liste ve anime ile özel liste öğesi bulur
-export async function findCustomListItemByListAndAnime(
+export async function findCustomListItemByListAndAnimeDB(
     customListId: string,
     userAnimeListId: string,
     client: PrismaClientOrTransaction = prisma
@@ -84,8 +84,8 @@ export async function findCustomListItemByListAndAnime(
     }
 }
 
-// Özel liste öğesi bilgilerini günceller
-export async function updateCustomListItem(
+// Özel liste öğesi günceller
+export async function updateCustomListItemDB(
     where: Prisma.CustomListItemWhereUniqueInput,
     data: Prisma.CustomListItemUpdateInput,
     client: PrismaClientOrTransaction = prisma
@@ -100,25 +100,29 @@ export async function updateCustomListItem(
     }
 }
 
-// Özel liste öğesini siler
-export async function deleteCustomListItem(
+// Özel liste öğesi siler
+export async function deleteCustomListItemDB(
     where: Prisma.CustomListItemWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CustomListItem> {
     try {
-        return await client.customListItem.delete({ where });
+        return await client.customListItem.delete({
+            where,
+        });
     } catch (error) {
         handleDatabaseError(error, 'Özel liste öğesi silme', { where });
     }
 }
 
 // Özel liste öğesi sayısını döner
-export async function countCustomListItems(
+export async function countCustomListItemsDB(
     where?: Prisma.CustomListItemWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
     try {
-        return await client.customListItem.count({ where });
+        return await client.customListItem.count({
+            where,
+        });
     } catch (error) {
         handleDatabaseError(error, 'Özel liste öğesi sayma', { where });
     }

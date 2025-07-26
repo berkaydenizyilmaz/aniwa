@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Episode oluşturma
-export async function createEpisode(
+export async function createEpisodeDB(
   data: Prisma.EpisodeCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode> {
@@ -18,7 +18,7 @@ export async function createEpisode(
 }
 
 // Episode getirme (ID ile)
-export async function findEpisodeById(
+export async function findEpisodeByIdDB(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode | null> {
@@ -30,7 +30,7 @@ export async function findEpisodeById(
 }
 
 // Episode getirme (medya parçası ve bölüm numarası ile)
-export async function findEpisodeByNumber(
+export async function findEpisodeByNumberDB(
   mediaPartId: string,
   episodeNumber: number,
   client: PrismaClientOrTransaction = prisma
@@ -57,7 +57,7 @@ export async function findEpisodeByNumber(
 }
 
 // Medya parçası için bölümleri getirme
-export async function findEpisodesByMediaPartId(
+export async function findEpisodesByMediaPartIdDB(
   mediaPartId: string,
   orderBy?: Prisma.EpisodeOrderByWithRelationInput,
   client: PrismaClientOrTransaction = prisma
@@ -80,7 +80,7 @@ export async function findEpisodesByMediaPartId(
 }
 
 // Tüm episode'ları listeleme
-export async function findAllEpisodes(
+export async function findAllEpisodesDB(
   where?: Prisma.EpisodeWhereInput,
   skip?: number,
   take?: number,
@@ -107,7 +107,7 @@ export async function findAllEpisodes(
 }
 
 // Episode güncelleme
-export async function updateEpisode(
+export async function updateEpisodeDB(
   where: Prisma.EpisodeWhereUniqueInput,
   data: Prisma.EpisodeUpdateInput,
   client: PrismaClientOrTransaction = prisma
@@ -120,7 +120,7 @@ export async function updateEpisode(
 }
 
 // Episode silme
-export async function deleteEpisode(
+export async function deleteEpisodeDB(
   where: Prisma.EpisodeWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode> {
@@ -132,7 +132,7 @@ export async function deleteEpisode(
 }
 
 // Episode sayısı
-export async function countEpisodes(
+export async function countEpisodesDB(
   where?: Prisma.EpisodeWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

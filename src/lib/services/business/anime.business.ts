@@ -2,16 +2,26 @@
 
 import { BusinessError, NotFoundError, UnauthorizedError, DatabaseError } from "@/lib/errors";
 import {
-  createAnimeSeries as createAnimeSeriesDB,
-  findAnimeSeriesByIdWithDetails,
-  findAllAnimeSeriesWithDetails,
-  countAnimeSeries,
-  createAnimeMediaPart as createAnimeMediaPartDB,
-  createEpisode as createEpisodeDB,
-  createAnimeGenres,
-  createAnimeTags,
-  createAnimeStudios,
+  createAnimeSeriesDB,
+  findAnimeSeriesByIdDB,
+  findAllAnimeSeriesDB,
+  countAnimeSeriesDB,
 } from "@/lib/services/db/anime.db";
+import {
+  createAnimeMediaPartDB,
+} from "@/lib/services/db/mediaPart.db";
+import {
+  createEpisodeDB,
+} from "@/lib/services/db/episode.db";
+import {
+  createAnimeGenresDB,
+} from "@/lib/services/db/animeGenre.db";
+import {
+  createAnimeTagsDB,
+} from "@/lib/services/db/animeTag.db";
+import {
+  createAnimeStudiosDB,
+} from "@/lib/services/db/animeStudio.db";
 import { Prisma, AnimeType, AnimeStatus, Season, Source } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/utils/logger";
@@ -58,24 +68,23 @@ export async function createAnimeSeriesBusiness(
           trailer: data.trailer,
           isMultiPart:
             data.mediaParts && data.mediaParts.length > 1,
-          relatedAnimeIds: data.relatedAnimeIds || [],
         },
         tx
       );
 
       // Genre ilişkilerini oluştur
       if (data.genreIds && data.genreIds.length > 0) {
-        await createAnimeGenres(animeSeries.id, data.genreIds, tx);
+        await createAnimeGenresDB(animeSeries.id, data.genreIds, tx);
       }
 
       // Tag ilişkilerini oluştur
       if (data.tagIds && data.tagIds.length > 0) {
-        await createAnimeTags(animeSeries.id, data.tagIds, tx);
+        await createAnimeTagsDB(animeSeries.id, data.tagIds, tx);
       }
 
       // Studio ilişkilerini oluştur
       if (data.studioIds && data.studioIds.length > 0) {
-        await createAnimeStudios(animeSeries.id, data.studioIds, tx);
+        await createAnimeStudiosDB(animeSeries.id, data.studioIds, tx);
       }
 
       // Medya parçalarını oluştur
@@ -130,7 +139,7 @@ export async function createAnimeSeriesBusiness(
     });
 
     // Detaylı anime serisi bilgilerini getir
-    const animeWithDetails = await findAnimeSeriesByIdWithDetails(result.id);
+    const animeWithDetails = await findAnimeSeriesByIdDB(result.id);
 
     // Başarılı oluşturma logu
     await logger.info(
@@ -148,14 +157,16 @@ export async function createAnimeSeriesBusiness(
     // API response tipine uygun dönüşüm
     const responseData: GetAnimeSeriesDetailsResponse = {
       ...animeWithDetails!,
-      genres: animeWithDetails!.animeGenres.map(ag => ag.genre),
-      tags: animeWithDetails!.animeTags.map(at => at.tag),
-      studios: animeWithDetails!.animeStudios.map(as => as.studio),
-      mediaParts: animeWithDetails!.mediaParts.map(mp => ({
+      genres: animeWithDetails!.animeGenres?.map(ag => ag.genre) || [],
+      tags: animeWithDetails!.animeTags?.map(at => at.tag) || [],
+      studios: animeWithDetails!.animeStudios?.map(as => as.studio) || [],
+      mediaParts: animeWithDetails!.mediaParts?.map(mp => ({
         ...mp,
         partsEpisodes: mp.partsEpisodes
-      })),
-      comments: animeWithDetails!.comments
+      })) || [],
+      comments: animeWithDetails!.comments || [],
+      sourceRelations: [],
+      targetRelations: []
     };
 
     return {
@@ -189,7 +200,7 @@ export async function getAnimeDetailsByIdBusiness(
   user?: { id: string; userSettings?: { displayAdultContent: boolean } }
 ): Promise<ApiResponse<GetAnimeSeriesDetailsResponse>> {
   try {
-    const anime = await findAnimeSeriesByIdWithDetails(id);
+    const anime = await findAnimeSeriesByIdDB(id);
     if (!anime) {
       throw new NotFoundError('Anime serisi bulunamadı');
     }
@@ -284,8 +295,8 @@ export async function getAllAnimeSeriesBusiness(
 
     // Anime serilerini getir
     const [animeSeries, total] = await Promise.all([
-      findAllAnimeSeriesWithDetails(where, skip, limit, { createdAt: 'desc' }),
-      countAnimeSeries(where),
+      findAllAnimeSeriesDB(where, skip, limit, { createdAt: 'desc' }),
+      countAnimeSeriesDB(where),
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -337,7 +348,7 @@ export async function updateAnimeSeriesBusiness(
 ): Promise<ApiResponse<GetAnimeSeriesDetailsResponse>> {
   try {
     // Anime serisi mevcut mu kontrolü
-    const existingAnime = await findAnimeSeriesByIdWithDetails(id);
+    const existingAnime = await findAnimeSeriesByIdDB(id);
     if (!existingAnime) {
       throw new NotFoundError('Anime serisi bulunamadı');
     }
@@ -378,7 +389,7 @@ export async function updateAnimeSeriesBusiness(
       if (data.genreIds) {
         await tx.animeGenre.deleteMany({ where: { animeSeriesId: id } });
         if (data.genreIds.length > 0) {
-          await createAnimeGenres(id, data.genreIds, tx);
+          await createAnimeGenresDB(id, data.genreIds, tx);
         }
       }
 
@@ -386,7 +397,7 @@ export async function updateAnimeSeriesBusiness(
       if (data.tagIds) {
         await tx.animeTag.deleteMany({ where: { animeSeriesId: id } });
         if (data.tagIds.length > 0) {
-          await createAnimeTags(id, data.tagIds, tx);
+          await createAnimeTagsDB(id, data.tagIds, tx);
         }
       }
 
@@ -394,7 +405,7 @@ export async function updateAnimeSeriesBusiness(
       if (data.studioIds) {
         await tx.animeStudio.deleteMany({ where: { animeSeriesId: id } });
         if (data.studioIds.length > 0) {
-          await createAnimeStudios(id, data.studioIds, tx);
+          await createAnimeStudiosDB(id, data.studioIds, tx);
         }
       }
 
@@ -402,7 +413,7 @@ export async function updateAnimeSeriesBusiness(
     });
 
     // Güncellenmiş anime serisi detaylarını getir
-    const updatedAnimeWithDetails = await findAnimeSeriesByIdWithDetails(id);
+    const updatedAnimeWithDetails = await findAnimeSeriesByIdDB(id);
 
     // Başarılı güncelleme logu
     await logger.info(
@@ -462,7 +473,7 @@ export async function deleteAnimeSeriesBusiness(
 ): Promise<ApiResponse<{ message: string }>> {
   try {
     // Anime serisi mevcut mu kontrolü
-    const existingAnime = await findAnimeSeriesByIdWithDetails(id);
+    const existingAnime = await findAnimeSeriesByIdDB(id);
     if (!existingAnime) {
       throw new NotFoundError('Anime serisi bulunamadı');
     }
@@ -512,7 +523,7 @@ export async function getAnimeSeriesByIdBusiness(
   userId: string
 ): Promise<ApiResponse<GetAnimeSeriesDetailsResponse>> {
   try {
-    const anime = await findAnimeSeriesByIdWithDetails(id);
+    const anime = await findAnimeSeriesByIdDB(id);
     if (!anime) {
       throw new NotFoundError('Anime serisi bulunamadı');
     }

@@ -8,7 +8,7 @@ import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 // Anime Serisi CRUD İşlemleri
 
 // Anime serisi oluşturma
-export async function createAnimeSeries(
+export async function createAnimeSeriesDB(
   data: Prisma.AnimeSeriesCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries> {
@@ -20,7 +20,7 @@ export async function createAnimeSeries(
 }
 
 // Anime serisi getirme (ID ile)
-export async function findAnimeSeriesById(
+export async function findAnimeSeriesByIdDB(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries | null> {
@@ -32,7 +32,7 @@ export async function findAnimeSeriesById(
 }
 
 // Anime serisi getirme (Anilist ID ile)
-export async function findAnimeSeriesByAnilistId(
+export async function findAnimeSeriesByAnilistIdDB(
   anilistId: number,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries | null> {
@@ -44,7 +44,7 @@ export async function findAnimeSeriesByAnilistId(
 }
 
 // Anime serisi getirme (MAL ID ile)
-export async function findAnimeSeriesByMalId(
+export async function findAnimeSeriesByMalIdDB(
   idMal: number,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries | null> {
@@ -56,7 +56,7 @@ export async function findAnimeSeriesByMalId(
 }
 
 // Anime serisi getirme (Aniwa Public ID ile)
-export async function findAnimeSeriesByPublicId(
+export async function findAnimeSeriesByPublicIdDB(
   aniwaPublicId: number,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries | null> {
@@ -68,7 +68,7 @@ export async function findAnimeSeriesByPublicId(
 }
 
 // Tüm anime serilerini getirme (filtrelemeli)
-export async function findAllAnimeSeries(
+export async function findAllAnimeSeriesDB(
   where?: Prisma.AnimeSeriesWhereInput,
   skip?: number,
   take?: number,
@@ -88,7 +88,7 @@ export async function findAllAnimeSeries(
 }
 
 // Anime serisi güncelleme
-export async function updateAnimeSeries(
+export async function updateAnimeSeriesDB(
   where: Prisma.AnimeSeriesWhereUniqueInput,
   data: Prisma.AnimeSeriesUpdateInput,
   client: PrismaClientOrTransaction = prisma
@@ -101,7 +101,7 @@ export async function updateAnimeSeries(
 }
 
 // Anime serisi silme
-export async function deleteAnimeSeries(
+export async function deleteAnimeSeriesDB(
   where: Prisma.AnimeSeriesWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries> {
@@ -113,7 +113,7 @@ export async function deleteAnimeSeries(
 }
 
 // Anime serisi sayısı
-export async function countAnimeSeries(
+export async function countAnimeSeriesDB(
   where?: Prisma.AnimeSeriesWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

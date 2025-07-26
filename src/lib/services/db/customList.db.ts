@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Yeni özel liste oluşturur
-export async function createCustomList(
+export async function createCustomListDB(
     data: Prisma.CustomListCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CustomList> {
@@ -20,7 +20,7 @@ export async function createCustomList(
 }
 
 // ID ile özel liste bulur
-export async function findCustomListById(
+export async function findCustomListByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CustomList | null> {
@@ -66,7 +66,7 @@ export async function findCustomListById(
 }
 
 // Kullanıcı ve isim ile özel liste bulur
-export async function findCustomListByUserAndName(
+export async function findCustomListByUserAndNameDB(
     userId: string,
     name: string,
     client: PrismaClientOrTransaction = prisma
@@ -86,7 +86,7 @@ export async function findCustomListByUserAndName(
 }
 
 // Kullanıcının özel listelerini getirir
-export async function findCustomListsByUserId(
+export async function findCustomListsByUserIdDB(
     userId: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CustomList[]> {
@@ -118,15 +118,15 @@ export async function findCustomListsByUserId(
                     orderBy: { order: 'asc' },
                 },
             },
-            orderBy: { updatedAt: 'desc' },
+            orderBy: { createdAt: 'desc' },
         });
     } catch (error) {
         handleDatabaseError(error, 'Kullanıcının özel listelerini bulma', { userId });
     }
 }
 
-// Tüm özel listeleri getirir (filtrelemeli)
-export async function findAllCustomLists(
+// Tüm özel listeleri listeler (filtrelemeli)
+export async function findAllCustomListsDB(
     where?: Prisma.CustomListWhereInput,
     skip?: number,
     take?: number,
@@ -177,8 +177,8 @@ export async function findAllCustomLists(
     }
 }
 
-// Özel liste bilgilerini günceller
-export async function updateCustomList(
+// Özel liste günceller
+export async function updateCustomListDB(
     where: Prisma.CustomListWhereUniqueInput,
     data: Prisma.CustomListUpdateInput,
     client: PrismaClientOrTransaction = prisma
@@ -193,25 +193,29 @@ export async function updateCustomList(
     }
 }
 
-// Özel listeyi siler
-export async function deleteCustomList(
+// Özel liste siler
+export async function deleteCustomListDB(
     where: Prisma.CustomListWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CustomList> {
     try {
-        return await client.customList.delete({ where });
+        return await client.customList.delete({
+            where,
+        });
     } catch (error) {
         handleDatabaseError(error, 'Özel liste silme', { where });
     }
 }
 
 // Özel liste sayısını döner
-export async function countCustomLists(
+export async function countCustomListsDB(
     where?: Prisma.CustomListWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
     try {
-        return await client.customList.count({ where });
+        return await client.customList.count({
+            where,
+        });
     } catch (error) {
         handleDatabaseError(error, 'Özel liste sayma', { where });
     }

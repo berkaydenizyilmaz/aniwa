@@ -1,29 +1,12 @@
-// Streaming validasyon şemaları
+// StreamingLink validasyon şemaları
 
 import { z } from 'zod';
 import { STREAMING } from '@/lib/constants/streaming.constants';
 
-// Streaming platform oluşturma şeması
-export const createStreamingPlatformSchema = z.object({
-  name: z.string().min(STREAMING.PLATFORM.NAME.MIN_LENGTH, 'Platform adı gerekli').max(STREAMING.PLATFORM.NAME.MAX_LENGTH, 'Platform adı çok uzun'),
-  baseUrl: z.string().url('Geçerli bir URL girin').max(STREAMING.PLATFORM.BASE_URL.MAX_LENGTH, 'URL çok uzun'),
-});
-
-// Streaming platform güncelleme şeması
-export const updateStreamingPlatformSchema = createStreamingPlatformSchema.partial();
-
-// Streaming platform filtreleme şeması
-export const streamingPlatformFiltersSchema = z.object({
-  search: z.string().optional(),
-  page: z.number().min(STREAMING.PAGINATION.MIN_PAGE).default(STREAMING.PAGINATION.MIN_PAGE),
-  limit: z.number().min(STREAMING.PAGINATION.MIN_PAGE).max(STREAMING.PAGINATION.MAX_LIMIT).default(STREAMING.PAGINATION.DEFAULT_LIMIT),
-});
-
-// Streaming link oluşturma şeması
+// Link oluşturma şeması
 export const createStreamingLinkSchema = z.object({
   platformId: z.string().min(1, 'Platform ID gerekli'),
   url: z.string().url('Geçerli bir URL girin').max(STREAMING.LINK.URL.MAX_LENGTH, 'URL çok uzun'),
-  // Polymorphic ilişki - sadece biri dolu olacak
   animeSeriesId: z.string().optional(),
   animeMediaPartId: z.string().optional(),
   episodeId: z.string().optional(),
@@ -38,10 +21,16 @@ export const createStreamingLinkSchema = z.object({
   }
 );
 
-// Streaming link güncelleme şeması
-export const updateStreamingLinkSchema = createStreamingLinkSchema.partial();
+// Link güncelleme şeması
+export const updateStreamingLinkSchema = z.object({
+  platformId: z.string().min(1, 'Platform ID gerekli').optional(),
+  url: z.string().url('Geçerli bir URL girin').max(STREAMING.LINK.URL.MAX_LENGTH, 'URL çok uzun').optional(),
+  animeSeriesId: z.string().optional(),
+  animeMediaPartId: z.string().optional(),
+  episodeId: z.string().optional(),
+});
 
-// Streaming link filtreleme şeması
+// Link filtreleme şeması
 export const streamingLinkFiltersSchema = z.object({
   platformId: z.string().optional(),
   animeSeriesId: z.string().optional(),
@@ -51,7 +40,7 @@ export const streamingLinkFiltersSchema = z.object({
   limit: z.number().min(STREAMING.PAGINATION.MIN_PAGE).max(STREAMING.PAGINATION.MAX_LIMIT).default(STREAMING.PAGINATION.DEFAULT_LIMIT),
 });
 
-// Streaming link toplu güncelleme şeması
+// Toplu link güncelleme şeması
 export const updateStreamingLinksSchema = z.object({
   links: z.array(z.object({
     platformId: z.string().min(1, 'Platform ID gerekli'),
@@ -60,10 +49,6 @@ export const updateStreamingLinksSchema = z.object({
 });
 
 // Tip türetmeleri
-export type CreateStreamingPlatformInput = z.infer<typeof createStreamingPlatformSchema>;
-export type UpdateStreamingPlatformInput = z.infer<typeof updateStreamingPlatformSchema>;
-export type StreamingPlatformFilters = z.infer<typeof streamingPlatformFiltersSchema>;
-
 export type CreateStreamingLinkInput = z.infer<typeof createStreamingLinkSchema>;
 export type UpdateStreamingLinkInput = z.infer<typeof updateStreamingLinkSchema>;
 export type StreamingLinkFilters = z.infer<typeof streamingLinkFiltersSchema>; 

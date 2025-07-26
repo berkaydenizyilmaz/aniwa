@@ -2,18 +2,20 @@
 
 import { BusinessError, NotFoundError, DatabaseError } from '@/lib/errors';
 import {
-  createComment as createCommentDB,
-  findCommentById,
-  findCommentsByUserId,
-  findCommentsByAnimeSeriesId,
-  findCommentsByAnimeMediaPartId,
-  updateComment as updateCommentDB,
-  deleteComment as deleteCommentDB,
-  countComments,
-  createCommentLike as createCommentLikeDB,
-  findCommentLikeByUserAndComment,
-  deleteCommentLike as deleteCommentLikeDB,
+  createCommentDB,
+  findCommentByIdDB,
+  findCommentsByUserIdDB,
+  findCommentsByAnimeSeriesIdDB,
+  findCommentsByAnimeMediaPartIdDB,
+  updateCommentDB,
+  deleteCommentDB,
+  countCommentsDB,
 } from '@/lib/services/db/comment.db';
+import {
+  createCommentLikeDB,
+  findCommentLikeByUserAndCommentDB,
+  deleteCommentLikeDB,
+} from '@/lib/services/db/commentLike.db';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
@@ -98,8 +100,8 @@ export async function getUserComments(
     const skip = (page - 1) * limit;
 
     // Kullanıcının yorumlarını getir
-    const comments = await findCommentsByUserId(userId, skip, limit);
-    const total = await countComments({ userId });
+    const comments = await findCommentsByUserIdDB(userId, skip, limit);
+    const total = await countCommentsDB({ userId });
     const totalPages = Math.ceil(total / limit);
 
     // Başarılı işlem logu
@@ -158,8 +160,8 @@ export async function getAnimeSeriesComments(
     const skip = (page - 1) * limit;
 
     // Anime serisi yorumlarını getir
-    const comments = await findCommentsByAnimeSeriesId(animeSeriesId, skip, limit);
-    const total = await countComments({ animeSeriesId });
+    const comments = await findCommentsByAnimeSeriesIdDB(animeSeriesId, skip, limit);
+    const total = await countCommentsDB({ animeSeriesId });
     const totalPages = Math.ceil(total / limit);
 
     return {
@@ -204,8 +206,8 @@ export async function getAnimeMediaPartComments(
     const skip = (page - 1) * limit;
 
     // Anime medya parçası yorumlarını getir
-    const comments = await findCommentsByAnimeMediaPartId(animeMediaPartId, skip, limit);
-    const total = await countComments({ animeMediaPartId });
+    const comments = await findCommentsByAnimeMediaPartIdDB(animeMediaPartId, skip, limit);
+    const total = await countCommentsDB({ animeMediaPartId });
     const totalPages = Math.ceil(total / limit);
 
     return {
@@ -247,7 +249,7 @@ export async function updateComment(
 ): Promise<ApiResponse<UpdateCommentResponse>> {
   try {
     // Yorum mevcut mu ve kullanıcıya ait mi kontrolü
-    const existingComment = await findCommentById(commentId);
+    const existingComment = await findCommentByIdDB(commentId);
     if (!existingComment) {
       throw new NotFoundError('Yorum bulunamadı');
     }
@@ -305,7 +307,7 @@ export async function deleteComment(
 ): Promise<ApiResponse<DeleteCommentResponse>> {
   try {
     // Yorum mevcut mu ve kullanıcıya ait mi kontrolü
-    const existingComment = await findCommentById(commentId);
+    const existingComment = await findCommentByIdDB(commentId);
     if (!existingComment) {
       throw new NotFoundError('Yorum bulunamadı');
     }
@@ -361,13 +363,13 @@ export async function toggleCommentLike(
 ): Promise<ApiResponse<ToggleCommentLikeResponse>> {
   try {
     // Yorum mevcut mu kontrolü
-    const existingComment = await findCommentById(data.commentId);
+    const existingComment = await findCommentByIdDB(data.commentId);
     if (!existingComment) {
       throw new NotFoundError('Yorum bulunamadı');
     }
 
     // Mevcut beğeni kontrolü
-    const existingLike = await findCommentLikeByUserAndComment(userId, data.commentId);
+    const existingLike = await findCommentLikeByUserAndCommentDB(userId, data.commentId);
 
     let result;
     if (existingLike) {

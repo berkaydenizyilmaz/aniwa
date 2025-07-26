@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Anime medya parçası oluşturma
-export async function createAnimeMediaPart(
+export async function createAnimeMediaPartDB(
   data: Prisma.AnimeMediaPartCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeMediaPart> {
@@ -18,7 +18,7 @@ export async function createAnimeMediaPart(
 }
 
 // Anime medya parçası getirme (ID ile)
-export async function findAnimeMediaPartById(
+export async function findAnimeMediaPartByIdDB(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeMediaPart | null> {
@@ -30,7 +30,7 @@ export async function findAnimeMediaPartById(
 }
 
 // Anime medya parçası getirme (Anilist ID ile)
-export async function findAnimeMediaPartByAnilistId(
+export async function findAnimeMediaPartByAnilistIdDB(
   anilistId: number,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeMediaPart | null> {
@@ -42,7 +42,7 @@ export async function findAnimeMediaPartByAnilistId(
 }
 
 // Anime serisi için medya parçalarını getirme
-export async function findAnimeMediaPartsBySeriesId(
+export async function findAnimeMediaPartsBySeriesIdDB(
   seriesId: string,
   orderBy?: Prisma.AnimeMediaPartOrderByWithRelationInput,
   client: PrismaClientOrTransaction = prisma
@@ -61,7 +61,7 @@ export async function findAnimeMediaPartsBySeriesId(
 }
 
 // Tüm anime medya parçalarını getirme (filtrelemeli)
-export async function findAllAnimeMediaParts(
+export async function findAllAnimeMediaPartsDB(
   where?: Prisma.AnimeMediaPartWhereInput,
   skip?: number,
   take?: number,
@@ -85,7 +85,7 @@ export async function findAllAnimeMediaParts(
 }
 
 // Anime medya parçası güncelleme
-export async function updateAnimeMediaPart(
+export async function updateAnimeMediaPartDB(
   where: Prisma.AnimeMediaPartWhereUniqueInput,
   data: Prisma.AnimeMediaPartUpdateInput,
   client: PrismaClientOrTransaction = prisma
@@ -98,7 +98,7 @@ export async function updateAnimeMediaPart(
 }
 
 // Anime medya parçası silme
-export async function deleteAnimeMediaPart(
+export async function deleteAnimeMediaPartDB(
   where: Prisma.AnimeMediaPartWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeMediaPart> {
@@ -110,7 +110,7 @@ export async function deleteAnimeMediaPart(
 }
 
 // Anime medya parçası sayısı
-export async function countAnimeMediaParts(
+export async function countAnimeMediaPartsDB(
   where?: Prisma.AnimeMediaPartWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

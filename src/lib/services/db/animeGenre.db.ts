@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Anime-Genre ilişkisi oluşturma
-export async function createAnimeGenre(
+export async function createAnimeGenreDB(
   animeSeriesId: string,
   genreId: string,
   client: PrismaClientOrTransaction = prisma
@@ -22,7 +22,7 @@ export async function createAnimeGenre(
 }
 
 // Anime-Genre ilişkisi getirme (ID ile)
-export async function findAnimeGenreById(
+export async function findAnimeGenreByIdDB(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeGenreGetPayload<{ include: { genre: true } }> | null> {
@@ -37,7 +37,7 @@ export async function findAnimeGenreById(
 }
 
 // Anime serisi için genre'leri getirme
-export async function findAnimeGenresBySeriesId(
+export async function findAnimeGenresBySeriesIdDB(
   animeSeriesId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeGenreGetPayload<{ include: { genre: true } }>[]> {
@@ -53,7 +53,7 @@ export async function findAnimeGenresBySeriesId(
 }
 
 // Genre için anime'leri getirme
-export async function findAnimeGenresByGenreId(
+export async function findAnimeGenresByGenreIdDB(
   genreId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeGenreGetPayload<{ include: { animeSeries: true } }>[]> {
@@ -69,7 +69,7 @@ export async function findAnimeGenresByGenreId(
 }
 
 // Toplu Anime-Genre ilişkileri oluşturma
-export async function createAnimeGenres(
+export async function createAnimeGenresDB(
   animeSeriesId: string,
   genreIds: string[],
   client: PrismaClientOrTransaction = prisma
@@ -84,7 +84,7 @@ export async function createAnimeGenres(
 }
 
 // Anime-Genre ilişkisi silme
-export async function deleteAnimeGenre(
+export async function deleteAnimeGenreDB(
   where: Prisma.AnimeGenreWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeGenreGetPayload<{ include: { genre: true } }>> {
@@ -99,7 +99,7 @@ export async function deleteAnimeGenre(
 }
 
 // Anime serisi için tüm genre ilişkilerini silme
-export async function deleteAnimeGenresBySeriesId(
+export async function deleteAnimeGenresBySeriesIdDB(
   animeSeriesId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.BatchPayload> {
@@ -113,7 +113,7 @@ export async function deleteAnimeGenresBySeriesId(
 }
 
 // Anime-Genre ilişkisi sayısı
-export async function countAnimeGenres(
+export async function countAnimeGenresDB(
   where?: Prisma.AnimeGenreWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

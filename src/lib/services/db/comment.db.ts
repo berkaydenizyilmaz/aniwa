@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Yeni yorum oluşturur
-export async function createComment(
+export async function createCommentDB(
     data: Prisma.CommentCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Comment> {
@@ -20,7 +20,7 @@ export async function createComment(
 }
 
 // ID ile yorum bulur
-export async function findCommentById(
+export async function findCommentByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Comment | null> {
@@ -54,7 +54,7 @@ export async function findCommentById(
 }
 
 // Kullanıcının yorumlarını listeler
-export async function findCommentsByUserId(
+export async function findCommentsByUserIdDB(
     userId: string,
     skip?: number,
     take?: number,
@@ -93,7 +93,7 @@ export async function findCommentsByUserId(
 }
 
 // Anime serisi için yorumları listeler
-export async function findCommentsByAnimeSeriesId(
+export async function findCommentsByAnimeSeriesIdDB(
     animeSeriesId: string,
     skip?: number,
     take?: number,
@@ -127,12 +127,12 @@ export async function findCommentsByAnimeSeriesId(
             },
         });
     } catch (error) {
-        handleDatabaseError(error, 'Anime serisi için yorumları bulma', { animeSeriesId, skip, take });
+        handleDatabaseError(error, 'Anime serisi yorumlarını bulma', { animeSeriesId, skip, take });
     }
 }
 
 // Anime medya parçası için yorumları listeler
-export async function findCommentsByAnimeMediaPartId(
+export async function findCommentsByAnimeMediaPartIdDB(
     animeMediaPartId: string,
     skip?: number,
     take?: number,
@@ -166,12 +166,12 @@ export async function findCommentsByAnimeMediaPartId(
             },
         });
     } catch (error) {
-        handleDatabaseError(error, 'Anime medya parçası için yorumları bulma', { animeMediaPartId, skip, take });
+        handleDatabaseError(error, 'Anime medya parçası yorumlarını bulma', { animeMediaPartId, skip, take });
     }
 }
 
 // Tüm yorumları listeler (filtrelemeli)
-export async function findAllComments(
+export async function findAllCommentsDB(
     where?: Prisma.CommentWhereInput,
     skip?: number,
     take?: number,
@@ -210,8 +210,8 @@ export async function findAllComments(
     }
 }
 
-// Yorum bilgilerini günceller
-export async function updateComment(
+// Yorum günceller
+export async function updateCommentDB(
     where: Prisma.CommentWhereUniqueInput,
     data: Prisma.CommentUpdateInput,
     client: PrismaClientOrTransaction = prisma
@@ -226,25 +226,29 @@ export async function updateComment(
     }
 }
 
-// Yorumu siler
-export async function deleteComment(
+// Yorum siler
+export async function deleteCommentDB(
     where: Prisma.CommentWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Comment> {
     try {
-        return await client.comment.delete({ where });
+        return await client.comment.delete({
+            where,
+        });
     } catch (error) {
         handleDatabaseError(error, 'Yorum silme', { where });
     }
 }
 
 // Yorum sayısını döner
-export async function countComments(
+export async function countCommentsDB(
     where?: Prisma.CommentWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
     try {
-        return await client.comment.count({ where });
+        return await client.comment.count({
+            where,
+        });
     } catch (error) {
         handleDatabaseError(error, 'Yorum sayma', { where });
     }

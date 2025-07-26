@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Yorum beğenisi oluşturur
-export async function createCommentLike(
+export async function createCommentLikeDB(
     data: Prisma.CommentLikeCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CommentLike> {
@@ -20,7 +20,7 @@ export async function createCommentLike(
 }
 
 // Kullanıcının yorum beğenisini bulur
-export async function findCommentLikeByUserAndComment(
+export async function findCommentLikeByUserAndCommentDB(
     userId: string,
     commentId: string,
     client: PrismaClientOrTransaction = prisma
@@ -40,7 +40,7 @@ export async function findCommentLikeByUserAndComment(
 }
 
 // Yorumun beğenilerini listeler
-export async function findCommentLikesByCommentId(
+export async function findCommentLikesByCommentIdDB(
     commentId: string,
     skip?: number,
     take?: number,
@@ -68,7 +68,7 @@ export async function findCommentLikesByCommentId(
 }
 
 // Kullanıcının beğenilerini listeler
-export async function findCommentLikesByUserId(
+export async function findCommentLikesByUserIdDB(
     userId: string,
     skip?: number,
     take?: number,
@@ -107,25 +107,69 @@ export async function findCommentLikesByUserId(
     }
 }
 
+// Tüm yorum beğenilerini listeler (filtrelemeli)
+export async function findAllCommentLikesDB(
+    where?: Prisma.CommentLikeWhereInput,
+    skip?: number,
+    take?: number,
+    orderBy?: Prisma.CommentLikeOrderByWithRelationInput,
+    client: PrismaClientOrTransaction = prisma
+): Promise<CommentLike[]> {
+    try {
+        return await client.commentLike.findMany({
+            where,
+            skip,
+            take,
+            orderBy,
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                    },
+                },
+                comment: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                profilePicture: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Tüm yorum beğenilerini listeleme', { where, skip, take, orderBy });
+    }
+}
+
 // Yorum beğenisini siler
-export async function deleteCommentLike(
+export async function deleteCommentLikeDB(
     where: Prisma.CommentLikeWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CommentLike> {
     try {
-        return await client.commentLike.delete({ where });
+        return await client.commentLike.delete({
+            where,
+        });
     } catch (error) {
         handleDatabaseError(error, 'Yorum beğenisi silme', { where });
     }
 }
 
 // Yorum beğeni sayısını döner
-export async function countCommentLikes(
+export async function countCommentLikesDB(
     where?: Prisma.CommentLikeWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
     try {
-        return await client.commentLike.count({ where });
+        return await client.commentLike.count({
+            where,
+        });
     } catch (error) {
         handleDatabaseError(error, 'Yorum beğeni sayma', { where });
     }

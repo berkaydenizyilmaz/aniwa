@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Streaming link oluşturma
-export async function createStreamingLink(
+export async function createStreamingLinkDB(
   data: Prisma.StreamingLinkCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink> {
@@ -18,7 +18,7 @@ export async function createStreamingLink(
 }
 
 // Streaming link getirme (ID ile)
-export async function findStreamingLinkById(
+export async function findStreamingLinkByIdDB(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink | null> {
@@ -30,7 +30,7 @@ export async function findStreamingLinkById(
 }
 
 // Streaming link getirme (URL ile)
-export async function findStreamingLinkByUrl(
+export async function findStreamingLinkByUrlDB(
   url: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink | null> {
@@ -42,7 +42,7 @@ export async function findStreamingLinkByUrl(
 }
 
 // Anime serisi ID'sine göre streaming link'leri getirme
-export async function findStreamingLinksByAnimeSeriesId(
+export async function findStreamingLinksByAnimeSeriesIdDB(
   animeSeriesId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink[]> {
@@ -56,7 +56,7 @@ export async function findStreamingLinksByAnimeSeriesId(
 }
 
 // Media part ID'sine göre streaming link'leri getirme
-export async function findStreamingLinksByMediaPartId(
+export async function findStreamingLinksByMediaPartIdDB(
   animeMediaPartId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink[]> {
@@ -70,7 +70,7 @@ export async function findStreamingLinksByMediaPartId(
 }
 
 // Episode ID'sine göre streaming link'leri getirme
-export async function findStreamingLinksByEpisodeId(
+export async function findStreamingLinksByEpisodeIdDB(
   episodeId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink[]> {
@@ -84,7 +84,7 @@ export async function findStreamingLinksByEpisodeId(
 }
 
 // Platform ID'sine göre streaming link'leri getirme
-export async function findStreamingLinksByPlatformId(
+export async function findStreamingLinksByPlatformIdDB(
   platformId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink[]> {
@@ -98,7 +98,7 @@ export async function findStreamingLinksByPlatformId(
 }
 
 // Tüm streaming link'leri getirme (filtrelemeli)
-export async function findAllStreamingLinks(
+export async function findAllStreamingLinksDB(
   where?: Prisma.StreamingLinkWhereInput,
   skip?: number,
   take?: number,
@@ -118,7 +118,7 @@ export async function findAllStreamingLinks(
 }
 
 // Streaming link güncelleme
-export async function updateStreamingLink(
+export async function updateStreamingLinkDB(
   where: Prisma.StreamingLinkWhereUniqueInput,
   data: Prisma.StreamingLinkUpdateInput,
   client: PrismaClientOrTransaction = prisma
@@ -131,7 +131,7 @@ export async function updateStreamingLink(
 }
 
 // Streaming link silme
-export async function deleteStreamingLink(
+export async function deleteStreamingLinkDB(
   where: Prisma.StreamingLinkWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink> {
@@ -143,7 +143,7 @@ export async function deleteStreamingLink(
 }
 
 // Streaming link sayısı
-export async function countStreamingLinks(
+export async function countStreamingLinksDB(
   where?: Prisma.StreamingLinkWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

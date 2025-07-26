@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Anime-Studio ilişkisi oluşturma
-export async function createAnimeStudio(
+export async function createAnimeStudioDB(
   animeSeriesId: string,
   studioId: string,
   client: PrismaClientOrTransaction = prisma
@@ -22,7 +22,7 @@ export async function createAnimeStudio(
 }
 
 // Anime-Studio ilişkisi getirme (ID ile)
-export async function findAnimeStudioById(
+export async function findAnimeStudioByIdDB(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeStudioGetPayload<{ include: { studio: true } }> | null> {
@@ -37,7 +37,7 @@ export async function findAnimeStudioById(
 }
 
 // Anime serisi için studio'ları getirme
-export async function findAnimeStudiosBySeriesId(
+export async function findAnimeStudiosBySeriesIdDB(
   animeSeriesId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeStudioGetPayload<{ include: { studio: true } }>[]> {
@@ -53,7 +53,7 @@ export async function findAnimeStudiosBySeriesId(
 }
 
 // Studio için anime'leri getirme
-export async function findAnimeStudiosByStudioId(
+export async function findAnimeStudiosByStudioIdDB(
   studioId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeStudioGetPayload<{ include: { animeSeries: true } }>[]> {
@@ -69,7 +69,7 @@ export async function findAnimeStudiosByStudioId(
 }
 
 // Toplu Anime-Studio ilişkileri oluşturma
-export async function createAnimeStudios(
+export async function createAnimeStudiosDB(
   animeSeriesId: string,
   studioIds: string[],
   client: PrismaClientOrTransaction = prisma
@@ -84,7 +84,7 @@ export async function createAnimeStudios(
 }
 
 // Anime-Studio ilişkisi silme
-export async function deleteAnimeStudio(
+export async function deleteAnimeStudioDB(
   where: Prisma.AnimeStudioWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeStudioGetPayload<{ include: { studio: true } }>> {
@@ -99,7 +99,7 @@ export async function deleteAnimeStudio(
 }
 
 // Anime serisi için tüm studio ilişkilerini silme
-export async function deleteAnimeStudiosBySeriesId(
+export async function deleteAnimeStudiosBySeriesIdDB(
   animeSeriesId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.BatchPayload> {
@@ -113,7 +113,7 @@ export async function deleteAnimeStudiosBySeriesId(
 }
 
 // Anime-Studio ilişkisi sayısı
-export async function countAnimeStudios(
+export async function countAnimeStudiosDB(
   where?: Prisma.AnimeStudioWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

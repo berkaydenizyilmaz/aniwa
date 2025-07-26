@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { updateStreamingPlatformSchema } from '@/lib/schemas/streaming.schema';
+import { updateStreamingPlatformSchema } from '@/lib/schemas/streamingPlatform.schema';
 import { getStreamingPlatformBusiness, updateStreamingPlatformBusiness, deleteStreamingPlatformBusiness } from '@/lib/services/business/streaming.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 

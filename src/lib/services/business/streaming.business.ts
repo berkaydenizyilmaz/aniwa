@@ -9,12 +9,8 @@ import {
   countStreamingPlatformsDB,
   updateStreamingPlatformDB,
   deleteStreamingPlatformDB,
-  findAllStreamingLinksDB,
-  countStreamingLinksDB,
-  createStreamingLinkDB,
-} from '@/lib/services/db/streaming.db';
+} from '@/lib/services/db/streamingPlatform.db';
 import { Prisma } from '@prisma/client';
-import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
 import { ApiResponse } from '@/lib/types/api';
@@ -22,19 +18,11 @@ import {
   CreateStreamingPlatformRequest,
   UpdateStreamingPlatformRequest,
   GetStreamingPlatformsRequest,
-  GetStreamingLinksRequest,
-  UpdateStreamingLinksRequest,
   CreateStreamingPlatformResponse,
   GetStreamingPlatformResponse,
   GetAllStreamingPlatformsResponse,
   UpdateStreamingPlatformResponse,
-  GetAllStreamingLinksResponse,
-  UpdateStreamingLinksResponse,
-} from '@/lib/types/api/streaming.api';
-
-// =============================================================================
-// STREAMING PLATFORM BUSINESS LOGIC
-// =============================================================================
+} from '@/lib/types/api/streamingPlatform.api';
 
 // Streaming platform oluşturma
 export async function createStreamingPlatformBusiness(
@@ -96,9 +84,9 @@ export async function getStreamingPlatformBusiness(
   userId: string
 ): Promise<ApiResponse<GetStreamingPlatformResponse>> {
   try {
-    const platform = await findStreamingPlatformByIdDB(id);
+    const streamingPlatform = await findStreamingPlatformByIdDB(id);
 
-    if (!platform) {
+    if (!streamingPlatform) {
       throw new NotFoundError('Streaming platform bulunamadı');
     }
 
@@ -107,15 +95,15 @@ export async function getStreamingPlatformBusiness(
       EVENTS.ADMIN.STREAMING_PLATFORM_RETRIEVED,
       'Streaming platform detayı görüntülendi',
       {
-        platformId: platform.id,
-        name: platform.name
+        platformId: streamingPlatform.id,
+        name: streamingPlatform.name
       },
       userId
     );
 
     return {
       success: true,
-      data: platform,
+      data: streamingPlatform,
     };
   } catch (error) {
     if (error instanceof DatabaseError) {
@@ -227,15 +215,15 @@ export async function updateStreamingPlatformBusiness(
     if (data.baseUrl !== undefined) updateData.baseUrl = data.baseUrl;
 
     // Platform güncelle
-    const result = await updateStreamingPlatformDB({ id }, updateData);
+    const updatedPlatform = await updateStreamingPlatformDB({ id }, updateData);
 
     // Başarılı güncelleme logu
     await logger.info(
       EVENTS.ADMIN.STREAMING_PLATFORM_UPDATED,
       'Streaming platform başarıyla güncellendi',
       {
-        platformId: result.id,
-        name: result.name,
+        platformId: updatedPlatform.id,
+        name: updatedPlatform.name,
         oldName: existingPlatform.name
       },
       userId
@@ -243,7 +231,7 @@ export async function updateStreamingPlatformBusiness(
 
     return {
       success: true,
-      data: result,
+      data: updatedPlatform,
     };
   } catch (error) {
     if (error instanceof DatabaseError) {
@@ -315,236 +303,5 @@ export async function deleteStreamingPlatformBusiness(
     );
 
     throw new BusinessError('Streaming platform silme başarısız');
-  }
-}
-
-// =============================================================================
-// STREAMING LINKS BUSINESS LOGIC
-// =============================================================================
-
-// Anime serisi streaming linklerini güncelleme
-export async function updateAnimeStreamingLinks(
-  animeSeriesId: string,
-  data: UpdateStreamingLinksRequest,
-  userId: string
-): Promise<ApiResponse<UpdateStreamingLinksResponse>> {
-  try {
-    // Mevcut linkleri sil
-    await prisma.streamingLink.deleteMany({
-      where: { animeSeriesId },
-    });
-
-    // Yeni linkleri oluştur
-    const createdLinks = [];
-    for (const linkData of data.links) {
-      const link = await createStreamingLinkDB({
-        url: linkData.url,
-        animeSeries: { connect: { id: animeSeriesId } },
-        platform: { connect: { id: linkData.platformId } },
-      });
-      createdLinks.push(link);
-    }
-
-    // Başarılı güncelleme logu
-    await logger.info(
-      EVENTS.EDITOR.STREAMING_LINKS_UPDATED,
-      'Anime serisi streaming linkleri güncellendi',
-      {
-        animeSeriesId,
-        linkCount: createdLinks.length
-      },
-      userId
-    );
-
-    return {
-      success: true,
-      data: { message: 'Streaming linkleri başarıyla güncellendi', updatedCount: createdLinks.length },
-    };
-  } catch (error) {
-    if (error instanceof DatabaseError) {
-      // DB hatası zaten loglanmış, direkt fırlat
-      throw error;
-    }
-
-    // Beklenmedik hata logu
-    await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
-      'Anime serisi streaming linkleri güncelleme sırasında beklenmedik hata',
-      {
-        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-        animeSeriesId,
-        data
-      },
-      userId
-    );
-
-    throw new BusinessError('Anime serisi streaming linkleri güncelleme başarısız');
-  }
-}
-
-// Medya parçası streaming linklerini güncelleme
-export async function updateMediaPartStreamingLinks(
-  mediaPartId: string,
-  data: UpdateStreamingLinksRequest,
-  userId: string
-): Promise<ApiResponse<UpdateStreamingLinksResponse>> {
-  try {
-    // Mevcut linkleri sil
-    await prisma.streamingLink.deleteMany({
-      where: { animeMediaPartId: mediaPartId },
-    });
-
-    // Yeni linkleri oluştur
-    const createdLinks = [];
-    for (const linkData of data.links) {
-      const link = await createStreamingLinkDB({
-        url: linkData.url,
-        animeMediaPart: { connect: { id: mediaPartId } },
-        platform: { connect: { id: linkData.platformId } },
-      });
-      createdLinks.push(link);
-    }
-
-    // Başarılı güncelleme logu
-    await logger.info(
-      EVENTS.EDITOR.STREAMING_LINKS_UPDATED,
-      'Medya parçası streaming linkleri güncellendi',
-      {
-        mediaPartId,
-        linkCount: createdLinks.length
-      },
-      userId
-    );
-
-    return {
-      success: true,
-      data: { message: 'Streaming linkleri başarıyla güncellendi', updatedCount: createdLinks.length },
-    };
-  } catch (error) {
-    if (error instanceof DatabaseError) {
-      // DB hatası zaten loglanmış, direkt fırlat
-      throw error;
-    }
-
-    // Beklenmedik hata logu
-    await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
-      'Medya parçası streaming linkleri güncelleme sırasında beklenmedik hata',
-      {
-        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-        mediaPartId,
-        data
-      },
-      userId
-    );
-
-    throw new BusinessError('Medya parçası streaming linkleri güncelleme başarısız');
-  }
-}
-
-// Episode streaming linklerini güncelleme
-export async function updateEpisodeStreamingLinks(
-  episodeId: string,
-  data: UpdateStreamingLinksRequest,
-  userId: string
-): Promise<ApiResponse<UpdateStreamingLinksResponse>> {
-  try {
-    // Mevcut linkleri sil
-    await prisma.streamingLink.deleteMany({
-      where: { episodeId },
-    });
-
-    // Yeni linkleri oluştur
-    const createdLinks = [];
-    for (const linkData of data.links) {
-      const link = await createStreamingLinkDB({
-        url: linkData.url,
-        episode: { connect: { id: episodeId } },
-        platform: { connect: { id: linkData.platformId } },
-      });
-      createdLinks.push(link);
-    }
-
-    // Başarılı güncelleme logu
-    await logger.info(
-      EVENTS.EDITOR.STREAMING_LINKS_UPDATED,
-      'Episode streaming linkleri güncellendi',
-      {
-        episodeId,
-        linkCount: createdLinks.length
-      },
-      userId
-    );
-
-    return {
-      success: true,
-      data: { message: 'Streaming linkleri başarıyla güncellendi', updatedCount: createdLinks.length },
-    };
-  } catch (error) {
-    if (error instanceof DatabaseError) {
-      // DB hatası zaten loglanmış, direkt fırlat
-      throw error;
-    }
-
-    // Beklenmedik hata logu
-    await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
-      'Episode streaming linkleri güncelleme sırasında beklenmedik hata',
-      {
-        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-        episodeId,
-        data
-      },
-      userId
-    );
-
-    throw new BusinessError('Episode streaming linkleri güncelleme başarısız');
-  }
-}
-
-// Tüm streaming linklerini getirme
-export async function getAllStreamingLinks(
-  filters?: GetStreamingLinksRequest
-): Promise<ApiResponse<GetAllStreamingLinksResponse>> {
-  try {
-    const page = filters?.page || 1;
-    const limit = filters?.limit || 50;
-    const skip = (page - 1) * limit;
-
-    // Linkleri getir
-    const [links, total] = await Promise.all([
-      findAllStreamingLinksDB({}, skip, limit, { createdAt: 'desc' }),
-      countStreamingLinksDB({}),
-    ]);
-
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      success: true,
-      data: {
-        links,
-        total,
-        page,
-        limit,
-        totalPages,
-      },
-    };
-  } catch (error) {
-    if (error instanceof DatabaseError) {
-      // DB hatası zaten loglanmış, direkt fırlat
-      throw error;
-    }
-
-    // Beklenmedik hata logu
-    await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
-      'Streaming linkleri listeleme sırasında beklenmedik hata',
-      {
-        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-        filters
-      }
-    );
-
-    throw new BusinessError('Streaming linkleri listeleme başarısız');
   }
 } 
