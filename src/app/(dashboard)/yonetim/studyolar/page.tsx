@@ -11,6 +11,7 @@ export default function StudiosPage() {
   const [selectedStudio, setSelectedStudio] = useState<Studio | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStudioType, setSelectedStudioType] = useState<boolean | null>(null);
 
   const handleAddNew = () => {
     setSelectedStudio(null);
@@ -30,6 +31,10 @@ export default function StudiosPage() {
     setSearchTerm(search);
   };
 
+  const handleStudioTypeChange = (isAnimationStudio: boolean | null) => {
+    setSelectedStudioType(isAnimationStudio);
+  };
+
   return (
     <div className="space-y-6">
       {/* Başlık */}
@@ -41,13 +46,14 @@ export default function StudiosPage() {
       </div>
 
       {/* Filtreler */}
-      <StudioFilters onSearch={handleSearch} onAddNew={handleAddNew} />
+      <StudioFilters onSearch={handleSearch} onStudioTypeChange={handleStudioTypeChange} onAddNew={handleAddNew} />
 
       {/* Tablo */}
       <StudioTable 
         key={refreshKey}
         onEdit={handleEdit}
         searchTerm={searchTerm}
+        selectedStudioType={selectedStudioType}
       />
 
       {/* Form Dialog */}

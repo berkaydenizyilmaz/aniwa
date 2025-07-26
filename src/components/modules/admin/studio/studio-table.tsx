@@ -31,9 +31,10 @@ import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 interface StudioTableProps {
   onEdit?: (studio: Studio) => void;
   searchTerm?: string;
+  selectedStudioType?: boolean | null;
 }
 
-export function StudioTable({ onEdit, searchTerm = '' }: StudioTableProps) {
+export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null }: StudioTableProps) {
   const [studios, setStudios] = useState<Studio[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedStudio, setSelectedStudio] = useState<Studio | null>(null);
@@ -64,11 +65,15 @@ export function StudioTable({ onEdit, searchTerm = '' }: StudioTableProps) {
     fetchStudios();
   }, [setLoadingStore]);
 
-  // Arama filtreleme
-  const filteredStudios = studios.filter(studio =>
-    studio.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    studio.slug.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Arama ve stüdyo türü filtreleme
+  const filteredStudios = studios.filter(studio => {
+    const matchesSearch = studio.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         studio.slug.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStudioType = selectedStudioType === null || studio.isAnimationStudio === selectedStudioType;
+    
+    return matchesSearch && matchesStudioType;
+  });
 
   const handleEdit = (studio: Studio) => {
     onEdit?.(studio);

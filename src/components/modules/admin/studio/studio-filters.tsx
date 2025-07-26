@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { Search, Plus } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useLoadingStore } from '@/lib/stores/loading.store';
@@ -10,11 +12,13 @@ import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
 interface StudioFiltersProps {
   onSearch?: (search: string) => void;
+  onStudioTypeChange?: (isAnimationStudio: boolean | null) => void;
   onAddNew?: () => void;
 }
 
-export function StudioFilters({ onSearch, onAddNew }: StudioFiltersProps) {
+export function StudioFilters({ onSearch, onStudioTypeChange, onAddNew }: StudioFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStudioType, setSelectedStudioType] = useState<boolean | null>(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { isLoading } = useLoadingStore();
 
@@ -25,6 +29,11 @@ export function StudioFilters({ onSearch, onAddNew }: StudioFiltersProps) {
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
+  };
+
+  const handleStudioTypeChange = (isAnimationStudio: boolean | null) => {
+    setSelectedStudioType(isAnimationStudio);
+    onStudioTypeChange?.(isAnimationStudio);
   };
 
   return (
@@ -39,6 +48,21 @@ export function StudioFilters({ onSearch, onAddNew }: StudioFiltersProps) {
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-10"
           />
+        </div>
+
+        {/* Stüdyo Türü Filtresi */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="animation-studio-filter"
+              checked={selectedStudioType === true}
+              onCheckedChange={(checked) => handleStudioTypeChange(checked ? true : null)}
+              disabled={isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+            />
+            <Label htmlFor="animation-studio-filter" className="flex items-center gap-1 text-sm">
+              Animasyon Stüdyosu
+            </Label>
+          </div>
         </div>
 
         {/* Yeni Stüdyo Ekle */}
