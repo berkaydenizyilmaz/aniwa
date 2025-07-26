@@ -127,6 +127,18 @@ enum MediaListStatus {
   REPEATING        // Tekrar izleniyor
 }
 
+// Anime İlişki Tipleri
+enum RelationType {
+  SIDE_STORY    // Yan hikaye
+  SPIN_OFF      // Spin-off
+  SPECIAL       // Özel bölüm
+  REMAKE        // Yeniden yapım
+  SEQUEL        // Devamı
+  PREQUEL       // Öncesi
+  SUMMARY       // Özet
+  PARALLEL      // Paralel hikaye
+}
+
 // =============================================================================
 // DOĞRULAMA VE GÜVENLİK MODELLERİ
 // =============================================================================
@@ -326,6 +338,23 @@ model CommentLike {
   @@unique([userId, commentId])
 }
 
+// Anime İlişki Modeli
+model AnimeRelation {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  sourceAnimeId   String       @db.ObjectId
+  targetAnimeId   String       @db.ObjectId
+  relationType    RelationType
+  description     String?      // "Ana hikaye", "Yan hikaye" vs.
+  
+  sourceAnime     AnimeSeries  @relation("SourceRelations", fields: [sourceAnimeId], references: [id], onDelete: Cascade)
+  targetAnime     AnimeSeries  @relation("TargetRelations", fields: [targetAnimeId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([sourceAnimeId, targetAnimeId, relationType])
+}
+
 // Ana Anime Serisi Modeli
 model AnimeSeries {
   id                String            @id @default(auto()) @map("_id") @db.ObjectId
@@ -373,12 +402,12 @@ model AnimeSeries {
   favouritedBy      FavouriteAnimeSeries[]
   trackedByUsers    UserAnimeTracking[] @relation("AnimeTrackedByUsers")
 
-  // Self-referencing relations için explicit junction table gerekli
-  // Şimdilik basit array olarak bırakıyorum
-  relatedAnimeIds   String[]          @db.ObjectId // İlgili anime ID'leri
-
-  // Çok Parçalı Kontrol
+    // Çok Parçalı Kontrol
   isMultiPart       Boolean           @default(false) // Çok sezonlu mu?
+
+  // İlişkiler
+  sourceRelations   AnimeRelation[]   @relation("SourceRelations")
+  targetRelations   AnimeRelation[]   @relation("TargetRelations")
 
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt

@@ -59,7 +59,7 @@ export const createAnimeSeriesSchema = z.object({
   bannerImage: z.string().url('Geçerli bir URL girin').optional(),
   description: z.string().optional(),
   trailer: z.string().url('Geçerli bir URL girin').optional(),
-  relatedAnimeIds: z.array(z.string()).optional(),
+  isMultiPart: z.boolean().default(false),
   genreIds: z.array(z.string()).optional(),
   tagIds: z.array(z.string()).optional(),
   studioIds: z.array(z.string()).optional(),
