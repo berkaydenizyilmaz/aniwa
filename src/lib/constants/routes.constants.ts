@@ -26,6 +26,7 @@ export const ROUTES = {
       TAGS: '/yonetim/etiketler',
       STUDIOS: '/yonetim/studyolar',
       LOGS: '/yonetim/loglar',
+      USERS: '/yonetim/kullanicilar',
     },
     
     // Moderator sayfaları
@@ -115,6 +116,7 @@ export const ROUTES = {
         '/yonetim/etiketler', // Tag yönetimi
         '/yonetim/studyolar', // Studio yönetimi
         '/yonetim/loglar',    // Log yönetimi
+        '/yonetim/kullanicilar', // Kullanıcı yönetimi
       ],
       API: [
         '/api/admin',         // Admin ana API
@@ -123,6 +125,7 @@ export const ROUTES = {
         '/api/admin/studios', // Studio yönetimi
         '/api/admin/anime',   // Anime yönetimi
         '/api/admin/streaming-platforms', // Streaming platform yönetimi
+        '/api/admin/users',   // Kullanıcı yönetimi
       ],
     },
     
