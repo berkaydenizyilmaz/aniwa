@@ -32,6 +32,11 @@ export const ADMIN_NAVIGATION_ITEMS = [
     icon: Building2
   },
   {
+    label: 'Kullanıcılar',
+    href: ROUTES.PAGES.ADMIN.USERS,
+    icon: User
+  },
+  {
     label: 'Loglar',
     href: ROUTES.PAGES.ADMIN.LOGS,
     icon: FileText

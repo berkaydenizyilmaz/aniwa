@@ -16,6 +16,8 @@ export const LOADING_KEYS = {
     UPDATE_GENRE: 'update-genre-form',
     CREATE_STUDIO: 'create-studio-form',
     UPDATE_STUDIO: 'update-studio-form',
+    CREATE_USER: 'create-user-form',
+    UPDATE_USER: 'update-user-form',
   },
   
   // Auth loading'leri
@@ -32,6 +34,9 @@ export const LOADING_KEYS = {
     DELETE_TAG: 'delete-tag',
     DELETE_GENRE: 'delete-genre',
     DELETE_STUDIO: 'delete-studio',
+    DELETE_USER: 'delete-user',
+    BAN_USER: 'ban-user',
+    UNBAN_USER: 'unban-user',
     SEARCH_TAGS: 'search-tags',
     SEARCH_GENRES: 'search-genres',
     SEARCH_STUDIOS: 'search-studios',

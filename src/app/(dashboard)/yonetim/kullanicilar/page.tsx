@@ -1,0 +1,62 @@
+'use client';
+
+import { useState } from 'react';
+import { UserFilters } from "@/components/modules/admin/user/user-filters";
+import { UserTable } from "@/components/modules/admin/user/user-table";
+import { UserFormDialog } from "@/components/modules/admin/user/user-form-dialog";
+import { User } from '@prisma/client';
+
+export default function UsersPage() {
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleAddNew = () => {
+    setSelectedUser(null);
+    setFormDialogOpen(true);
+  };
+
+  const handleEdit = (user: User) => {
+    setSelectedUser(user);
+    setFormDialogOpen(true);
+  };
+
+  const handleSuccess = () => {
+    setRefreshKey(prev => prev + 1);
+  };
+
+  const handleSearch = (search: string) => {
+    setSearchTerm(search);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Başlık */}
+      <div>
+        <h1 className="text-3xl font-bold">Kullanıcılar</h1>
+        <p className="text-muted-foreground">
+          Kullanıcıları yönetin
+        </p>
+      </div>
+
+      {/* Filtreler */}
+      <UserFilters onSearch={handleSearch} onAddNew={handleAddNew} />
+
+      {/* Tablo */}
+      <UserTable 
+        key={refreshKey}
+        onEdit={handleEdit}
+        searchTerm={searchTerm}
+      />
+
+      {/* Form Dialog */}
+      <UserFormDialog
+        open={formDialogOpen}
+        onOpenChange={setFormDialogOpen}
+        user={selectedUser}
+        onSuccess={handleSuccess}
+      />
+    </div>
+  );
+} 
