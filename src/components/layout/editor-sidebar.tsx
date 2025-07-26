@@ -57,7 +57,7 @@ export function EditorSidebar() {
             <div className={`flex items-center border-b ${isCollapsed ? 'justify-center p-2' : 'justify-between p-4'}`}>
               {!isCollapsed && (
                 <Link href={ROUTES.PAGES.EDITOR.DASHBOARD} className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold text-base">E</span>
                   </div>
                   <span className="font-bold text-xl">Editör</span>
@@ -91,7 +91,7 @@ export function EditorSidebar() {
                       transition-colors duration-200
                       ${isCollapsed ? 'justify-center p-2' : 'space-x-3 px-3 py-2'}
                       ${isActive 
-                        ? 'bg-blue-500 text-white' 
+                        ? 'bg-primary text-primary-foreground' 
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                       }
                     `}
@@ -172,7 +172,7 @@ export function EditorSidebar() {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
               <Link href={ROUTES.PAGES.EDITOR.DASHBOARD} className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-base">E</span>
                 </div>
                 <span className="font-bold text-xl">Editör</span>
@@ -202,7 +202,7 @@ export function EditorSidebar() {
                       flex items-center space-x-3 px-3 py-2 rounded-lg
                       transition-colors duration-200
                       ${isActive 
-                        ? 'bg-blue-500 text-white' 
+                        ? 'bg-primary text-primary-foreground' 
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                       }
                     `}
