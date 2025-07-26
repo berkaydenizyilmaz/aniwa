@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Filter, Shield } from 'lucide-react';
+import { Search, Plus, Filter } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
@@ -94,8 +94,7 @@ export function UserFilters({ onSearch, onRoleChange, onBannedChange, onAddNew }
             disabled={isLoading(LOADING_KEYS.PAGES.USERS)}
           />
           <Label htmlFor="banned-filter" className="flex items-center gap-1 text-sm">
-            <Shield className="h-3 w-3 text-muted-foreground" />
-            Sadece Banlı Kullanıcılar
+            Banlı Kullanıcılar
           </Label>
         </div>
 
