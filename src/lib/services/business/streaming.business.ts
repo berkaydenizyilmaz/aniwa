@@ -20,7 +20,7 @@ import {
   GetStreamingPlatformsRequest,
   CreateStreamingPlatformResponse,
   GetStreamingPlatformResponse,
-  GetAllStreamingPlatformsResponse,
+  GetStreamingPlatformsResponse,
   UpdateStreamingPlatformResponse,
 } from '@/lib/types/api/streamingPlatform.api';
 
@@ -130,7 +130,7 @@ export async function getStreamingPlatformBusiness(
 export async function getStreamingPlatformsBusiness(
   userId: string,
   filters?: GetStreamingPlatformsRequest
-): Promise<ApiResponse<GetAllStreamingPlatformsResponse>> {
+): Promise<ApiResponse<GetStreamingPlatformsResponse>> {
   try {
     const page = filters?.page || 1;
     const limit = filters?.limit || 50;
