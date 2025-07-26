@@ -32,7 +32,7 @@ import {
 // Genre oluşturma
 export async function createGenreBusiness(
   data: CreateGenreRequest,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<CreateGenreResponse>> {
   try {
     // Name benzersizlik kontrolü
@@ -61,10 +61,9 @@ export async function createGenreBusiness(
       { 
         genreId: result.id, 
         name: result.name, 
-        slug: result.slug,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        slug: result.slug
+      },
+      userId
     );
 
     return {
@@ -80,7 +79,8 @@ export async function createGenreBusiness(
     await logger.error(
       EVENTS.SYSTEM.API_ERROR,
       'Genre oluşturma sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', name: data.name }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', name: data.name },
+      userId
     );
     
     throw new BusinessError('Genre oluşturma başarısız');
@@ -90,7 +90,7 @@ export async function createGenreBusiness(
 // Genre getirme (ID ile)
 export async function getGenreBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<GetGenreResponse>> {
   try {
     const genre = await findGenreById(id);
@@ -105,10 +105,9 @@ export async function getGenreBusiness(
       { 
         genreId: genre.id, 
         name: genre.name, 
-        slug: genre.slug,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        slug: genre.slug
+      },
+      userId
     );
 
     return {
@@ -124,7 +123,8 @@ export async function getGenreBusiness(
     await logger.error(
       EVENTS.SYSTEM.API_ERROR,
       'Genre getirme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id },
+      userId
     );
     
     throw new BusinessError('Genre getirme başarısız');
@@ -133,7 +133,7 @@ export async function getGenreBusiness(
 
 // Tüm genre'leri getirme (filtrelemeli)
 export async function getGenresBusiness(
-  adminUser: { id: string; username: string },
+  userId: string,
   filters?: GetGenresRequest
 ): Promise<ApiResponse<GetGenresResponse>> {
   try {
@@ -147,32 +147,27 @@ export async function getGenresBusiness(
     // Filtreleme (basit implementasyon)
     let filteredGenres = genres;
     if (filters?.search) {
-      filteredGenres = genres.filter(genre => 
+      filteredGenres = filteredGenres.filter(genre => 
         genre.name.toLowerCase().includes(filters.search!.toLowerCase())
       );
     }
-    
+
+    // Sayfalama
     const total = filteredGenres.length;
-
     const paginatedGenres = filteredGenres.slice(skip, skip + limit);
-
     const totalPages = Math.ceil(total / limit);
-    
+
     // Başarılı listeleme logu
     await logger.info(
       EVENTS.ADMIN.GENRES_RETRIEVED,
-      'Genre listesi başarıyla getirildi',
+      'Genre\'ler listelendi',
       { 
-        total,
-        page,
-        limit,
-        totalPages,
-        search: filters?.search || null,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        filters,
+        total
+      },
+      userId
     );
-    
+
     return {
       success: true,
       data: {
@@ -192,7 +187,8 @@ export async function getGenresBusiness(
     await logger.error(
       EVENTS.SYSTEM.API_ERROR,
       'Genre listeleme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
+      userId
     );
     
     throw new BusinessError('Genre listeleme başarısız');
@@ -203,7 +199,7 @@ export async function getGenresBusiness(
 export async function updateGenreBusiness(
   id: string, 
   data: UpdateGenreRequest,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<UpdateGenreResponse>> {
   try {
     // Genre mevcut mu kontrolü
@@ -237,10 +233,9 @@ export async function updateGenreBusiness(
       { 
         genreId: result.id, 
         name: result.name, 
-        slug: result.slug,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        slug: result.slug
+      },
+      userId
     );
 
     return {
@@ -256,7 +251,8 @@ export async function updateGenreBusiness(
     await logger.error(
       EVENTS.SYSTEM.API_ERROR,
       'Genre güncelleme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id, data }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id, data },
+      userId
     );
     
     throw new BusinessError('Genre güncelleme başarısız');
@@ -266,7 +262,7 @@ export async function updateGenreBusiness(
 // Genre silme
 export async function deleteGenreBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<void>> {
   try {
     // Genre mevcut mu kontrolü
@@ -283,16 +279,14 @@ export async function deleteGenreBusiness(
       EVENTS.ADMIN.GENRE_DELETED,
       'Genre başarıyla silindi',
       { 
-        genreId: id, 
-        name: existingGenre.name,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        genreId: existingGenre.id, 
+        name: existingGenre.name, 
+        slug: existingGenre.slug
+      },
+      userId
     );
 
-    return {
-      success: true
-    };
+    return { success: true };
   } catch (error) {
     if (error instanceof BusinessError) {
       throw error;
@@ -302,7 +296,8 @@ export async function deleteGenreBusiness(
     await logger.error(
       EVENTS.SYSTEM.API_ERROR,
       'Genre silme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id },
+      userId
     );
     
     throw new BusinessError('Genre silme başarısız');

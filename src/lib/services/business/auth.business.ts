@@ -94,17 +94,6 @@ export async function registerUser(data: RegisterRequest): Promise<ApiResponse<R
   }
 }
 
-// Kullanıcı çıkışı (NextAuth ile entegre)
-export async function logoutUser(): Promise<ApiResponse<void>> {
-  try {
-    return {
-      success: true
-    };
-  } catch {
-    throw new BusinessError('Çıkış başarısız');
-  }
-}
-
 // Şifre sıfırlama isteği
 export async function forgotPassword(email: string): Promise<ApiResponse<void>> {
   try {
@@ -139,6 +128,14 @@ export async function forgotPassword(email: string): Promise<ApiResponse<void>> 
       );
       throw new BusinessError('Email gönderilemedi');
     }
+
+    // Başarılı şifre sıfırlama isteği logu
+    await logger.info(
+      EVENTS.AUTH.PASSWORD_RESET_REQUESTED,
+      'Şifre sıfırlama isteği gönderildi',
+      { email },
+      user.id
+    );
 
     return { success: true };
   } catch (error) {
@@ -191,6 +188,14 @@ export async function resetPassword(token: string, newPassword: string): Promise
       // Token'ı sil
       await deleteVerificationTokenByToken(token, tx);
     });
+
+    // Başarılı şifre sıfırlama logu
+    await logger.info(
+      EVENTS.AUTH.PASSWORD_RESET_COMPLETED,
+      'Şifre başarıyla sıfırlandı',
+      { email: user.email },
+      user.id
+    );
 
     return { success: true };
   } catch (error) {

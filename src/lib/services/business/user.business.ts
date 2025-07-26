@@ -68,11 +68,11 @@ export async function getUsersBusiness(
       EVENTS.ADMIN.USERS_RETRIEVED,
       'Kullanıcılar listelendi',
       { 
-        adminId: adminUser.id,
         adminUsername: adminUser.username,
         filters,
         total
-      }
+      },
+      adminUser.id
     );
 
     return {
@@ -94,7 +94,8 @@ export async function getUsersBusiness(
     await logger.error(
       EVENTS.SYSTEM.API_ERROR,
       'Kullanıcı listeleme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
+      adminUser.id
     );
     
     throw new BusinessError('Kullanıcı listeleme başarısız');
@@ -119,9 +120,9 @@ export async function getUserBusiness(
       { 
         userId: user.id,
         username: user.username,
-        adminId: adminUser.id,
         adminUsername: adminUser.username
-      }
+      },
+      adminUser.id
     );
 
     return {
@@ -137,7 +138,8 @@ export async function getUserBusiness(
     await logger.error(
       EVENTS.SYSTEM.API_ERROR,
       'Kullanıcı getirme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id },
+      adminUser.id
     );
     
     throw new BusinessError('Kullanıcı getirme başarısız');
