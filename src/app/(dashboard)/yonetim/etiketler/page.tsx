@@ -12,6 +12,8 @@ export default function TagsPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedAdult, setSelectedAdult] = useState<boolean | null>(null);
+  const [selectedSpoiler, setSelectedSpoiler] = useState<boolean | null>(null);
 
   const handleAddNew = () => {
     setSelectedTag(null);
@@ -35,6 +37,14 @@ export default function TagsPage() {
     setSelectedCategory(category);
   };
 
+  const handleAdultChange = (isAdult: boolean | null) => {
+    setSelectedAdult(isAdult);
+  };
+
+  const handleSpoilerChange = (isSpoiler: boolean | null) => {
+    setSelectedSpoiler(isSpoiler);
+  };
+
   return (
     <div className="space-y-6">
       {/* Başlık */}
@@ -46,7 +56,13 @@ export default function TagsPage() {
       </div>
 
       {/* Filtreler */}
-      <TagFilters onSearch={handleSearch} onCategoryChange={handleCategoryChange} onAddNew={handleAddNew} />
+      <TagFilters 
+        onSearch={handleSearch} 
+        onCategoryChange={handleCategoryChange} 
+        onAdultChange={handleAdultChange}
+        onSpoilerChange={handleSpoilerChange}
+        onAddNew={handleAddNew} 
+      />
 
       {/* Tablo */}
       <TagTable 
@@ -54,6 +70,8 @@ export default function TagsPage() {
         onEdit={handleEdit}
         searchTerm={searchTerm}
         selectedCategory={selectedCategory}
+        selectedAdult={selectedAdult}
+        selectedSpoiler={selectedSpoiler}
       />
 
       {/* Form Dialog */}

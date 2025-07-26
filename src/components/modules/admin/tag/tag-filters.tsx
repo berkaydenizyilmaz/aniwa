@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, Filter } from 'lucide-react';
+import { Search, Plus, Filter, Eye, Shield } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
@@ -12,12 +12,16 @@ import { MASTER_DATA } from '@/lib/constants/masterData.constants';
 interface TagFiltersProps {
   onSearch?: (search: string) => void;
   onCategoryChange?: (category: string) => void;
+  onAdultChange?: (isAdult: boolean | null) => void;
+  onSpoilerChange?: (isSpoiler: boolean | null) => void;
   onAddNew?: () => void;
 }
 
-export function TagFilters({ onSearch, onCategoryChange, onAddNew }: TagFiltersProps) {
+export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoilerChange, onAddNew }: TagFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedAdult, setSelectedAdult] = useState<boolean | null>(null);
+  const [selectedSpoiler, setSelectedSpoiler] = useState<boolean | null>(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { isLoading } = useLoadingStore();
 
@@ -33,6 +37,16 @@ export function TagFilters({ onSearch, onCategoryChange, onAddNew }: TagFiltersP
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
     onCategoryChange?.(category);
+  };
+
+  const handleAdultChange = (isAdult: boolean | null) => {
+    setSelectedAdult(isAdult);
+    onAdultChange?.(isAdult);
+  };
+
+  const handleSpoilerChange = (isSpoiler: boolean | null) => {
+    setSelectedSpoiler(isSpoiler);
+    onSpoilerChange?.(isSpoiler);
   };
 
   return (
@@ -64,6 +78,36 @@ export function TagFilters({ onSearch, onCategoryChange, onAddNew }: TagFiltersP
                 {label}
               </option>
             ))}
+          </select>
+        </div>
+
+        {/* Adult Filtresi */}
+        <div className="flex items-center gap-2">
+          <Shield className="h-4 w-4 text-muted-foreground" />
+          <select
+            value={selectedAdult === null ? '' : selectedAdult.toString()}
+            onChange={(e) => handleAdultChange(e.target.value === '' ? null : e.target.value === 'true')}
+            className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
+          >
+            <option value="">Tüm İçerikler</option>
+            <option value="false">Yetişkin Değil</option>
+            <option value="true">Yetişkin İçerik</option>
+          </select>
+        </div>
+
+        {/* Spoiler Filtresi */}
+        <div className="flex items-center gap-2">
+          <Eye className="h-4 w-4 text-muted-foreground" />
+          <select
+            value={selectedSpoiler === null ? '' : selectedSpoiler.toString()}
+            onChange={(e) => handleSpoilerChange(e.target.value === '' ? null : e.target.value === 'true')}
+            className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
+          >
+            <option value="">Tüm İçerikler</option>
+            <option value="false">Spoiler Değil</option>
+            <option value="true">Spoiler İçerik</option>
           </select>
         </div>
 

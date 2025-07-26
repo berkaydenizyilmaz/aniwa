@@ -32,9 +32,11 @@ interface TagTableProps {
   onEdit?: (tag: Tag) => void;
   searchTerm?: string;
   selectedCategory?: string;
+  selectedAdult?: boolean | null;
+  selectedSpoiler?: boolean | null;
 }
 
-export function TagTable({ onEdit, searchTerm = '', selectedCategory = '' }: TagTableProps) {
+export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selectedAdult = null, selectedSpoiler = null }: TagTableProps) {
   const [tags, setTags] = useState<Tag[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
@@ -65,14 +67,16 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '' }: Tag
     fetchTags();
   }, [setLoadingStore]);
 
-  // Arama ve kategori filtreleme
+    // Arama ve filtreleme
   const filteredTags = tags.filter(tag => {
     const matchesSearch = tag.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tag.slug.toLowerCase().includes(searchTerm.toLowerCase());
-
+                         tag.slug.toLowerCase().includes(searchTerm.toLowerCase());
+    
     const matchesCategory = !selectedCategory || tag.category === selectedCategory;
-
-    return matchesSearch && matchesCategory;
+    const matchesAdult = selectedAdult === null || tag.isAdult === selectedAdult;
+    const matchesSpoiler = selectedSpoiler === null || tag.isSpoiler === selectedSpoiler;
+    
+    return matchesSearch && matchesCategory && matchesAdult && matchesSpoiler;
   });
 
   const handleEdit = (tag: Tag) => {
