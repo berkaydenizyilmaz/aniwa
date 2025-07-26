@@ -12,13 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { updateUserAction } from '@/lib/actions/user.action';
 import { updateUserSchema, type UpdateUserInput } from '@/lib/schemas/user.schema';
 import { toast } from 'sonner';
@@ -146,21 +139,38 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               name="roles"
               control={control}
               render={({ field }) => (
-                <Select
-                  value={field.value?.[0] || ''}
-                  onValueChange={(value) => field.onChange([value as UserRole])}
-                  disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_USER)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Rol seçin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={UserRole.USER}>Kullanıcı</SelectItem>
-                    <SelectItem value={UserRole.MODERATOR}>Moderatör</SelectItem>
-                    <SelectItem value={UserRole.EDITOR}>Editör</SelectItem>
-                    <SelectItem value={UserRole.ADMIN}>Admin</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="grid grid-cols-2 gap-3 p-3 bg-muted/50 rounded-lg border">
+                  {Object.values(UserRole).map((role) => {
+                    const isSelected = field.value?.includes(role) || false;
+                    return (
+                      <div key={role} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`role-${role}`}
+                          checked={isSelected}
+                          onChange={(e) => {
+                            const currentRoles = field.value || [];
+                            if (e.target.checked) {
+                              field.onChange([...currentRoles, role]);
+                            } else {
+                              field.onChange(currentRoles.filter(r => r !== role));
+                            }
+                          }}
+                          disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_USER)}
+                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <Label 
+                          htmlFor={`role-${role}`} 
+                          className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
+                            isSelected ? 'text-primary' : 'text-muted-foreground'
+                          }`}
+                        >
+                          {role}
+                        </Label>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             />
             {errors.roles && (
@@ -208,10 +218,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               type="submit"
               disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_USER)}
             >
-              {isLoading(LOADING_KEYS.FORMS.UPDATE_USER) 
-                ? 'Güncelleniyor...'
-                : 'Güncelle'
-              }
+              Güncelle
             </Button>
           </div>
         </form>

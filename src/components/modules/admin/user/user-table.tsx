@@ -291,7 +291,7 @@ export function UserTable({ onEdit, searchTerm = '' }: UserTableProps) {
               onClick={handleDeleteConfirm}
               disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_USER)}
             >
-              {isLoading(LOADING_KEYS.ACTIONS.DELETE_USER) ? 'Siliniyor...' : 'Sil'}
+              Sil
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

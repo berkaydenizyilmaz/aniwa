@@ -157,10 +157,7 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
               type="submit"
               disabled={isLoading(LOADING_KEYS.FORMS.CREATE_STUDIO)}
             >
-              {isLoading(LOADING_KEYS.FORMS.CREATE_STUDIO) 
-                ? (isEdit ? 'Güncelleniyor...' : 'Oluşturuluyor...')
-                : (isEdit ? 'Güncelle' : 'Oluştur')
-              }
+              {isEdit ? 'Güncelle' : 'Oluştur'}
             </Button>
           </div>
         </form>
