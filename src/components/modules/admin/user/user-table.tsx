@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { type UserFilters } from '@/lib/schemas/user.schema';
 
 interface UserTableProps {
   onEdit?: (user: User) => void;
@@ -39,18 +40,21 @@ export function UserTable({ onEdit, searchTerm = '' }: UserTableProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
-  // Kullanıcıları getir
+  // Kullanıcıları getir (server-side filtreleme)
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         setLoadingStore(LOADING_KEYS.PAGES.USERS, true);
-        const result = await getUsersAction();
-
+        const filters: UserFilters = {
+          page: 1,
+          limit: 100,
+        };
+        if (searchTerm) filters.search = searchTerm;
+        const result = await getUsersAction(filters);
         if (!result.success) {
           toast.error(result.error || 'Kullanıcılar yüklenirken bir hata oluştu');
           return;
         }
-
         const data = result.data as GetUsersResponse;
         setUsers(data.users);
       } catch (error) {
@@ -60,15 +64,10 @@ export function UserTable({ onEdit, searchTerm = '' }: UserTableProps) {
         setLoadingStore(LOADING_KEYS.PAGES.USERS, false);
       }
     };
-
     fetchUsers();
-  }, [setLoadingStore]);
+  }, [setLoadingStore, searchTerm]);
 
-  // Arama filtreleme
-  const filteredUsers = users.filter(user =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Client-side filtreleme kaldırıldı, direkt users kullanılıyor
 
   const handleEdit = (user: User) => {
     onEdit?.(user);
@@ -206,7 +205,7 @@ export function UserTable({ onEdit, searchTerm = '' }: UserTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.map((user) => (
+            {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>{user.username}</TableCell>
                 <TableCell className="text-muted-foreground">{user.email}</TableCell>
@@ -268,7 +267,7 @@ export function UserTable({ onEdit, searchTerm = '' }: UserTableProps) {
           </TableBody>
         </Table>
 
-        {filteredUsers.length === 0 && (
+        {users.length === 0 && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun kullanıcı bulunamadı.' : 'Henüz kullanıcı bulunmuyor.'}
           </div>
