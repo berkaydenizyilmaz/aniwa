@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -29,7 +29,6 @@ interface StreamingPlatformFormDialogProps {
 }
 
 export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSuccess }: StreamingPlatformFormDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   const isEditing = !!platform;
@@ -66,7 +65,6 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
   const onSubmit = async (data: CreateStreamingPlatformInput | UpdateStreamingPlatformInput) => {
     if (isLoading(loadingKey)) return;
 
-    setIsSubmitting(true);
     setLoadingStore(loadingKey, true);
 
     try {
@@ -92,7 +90,6 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
       console.error('Form submission error:', error);
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
-      setIsSubmitting(false);
       setLoadingStore(loadingKey, false);
     }
   };
@@ -151,7 +148,7 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
               type="submit"
               disabled={isLoading(loadingKey)}
             >
-              {isSubmitting ? 'Kaydediliyor...' : (isEditing ? 'Güncelle' : 'Oluştur')}
+              {isEditing ? 'Güncelle' : 'Oluştur'}
             </Button>
           </DialogFooter>
         </form>
