@@ -49,10 +49,7 @@ export async function getTagsAction(filters?: TagFilters): Promise<ServerActionR
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getTagsBusiness({
-      id: session!.user.id,
-      username: session!.user.username
-    }, validatedFilters);
+    const result = await getTagsBusiness(session!.user.id, validatedFilters);
 
     return {
       success: true,
@@ -71,10 +68,7 @@ export async function getTagAction(id: string): Promise<ServerActionResponse> {
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getTagBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await getTagBusiness(id, session!.user.id);
 
     return {
       success: true,
@@ -96,10 +90,7 @@ export async function updateTagAction(id: string, data: UpdateTagInput): Promise
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await updateTagBusiness(id, validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await updateTagBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.TAGS);
@@ -121,10 +112,7 @@ export async function deleteTagAction(id: string): Promise<ServerActionResponse>
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await deleteTagBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await deleteTagBusiness(id, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.TAGS);
