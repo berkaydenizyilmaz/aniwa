@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -124,15 +125,13 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
               control={control}
               render={({ field }) => (
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id="isAnimationStudio"
                     checked={field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
+                    onCheckedChange={(checked) => field.onChange(checked === true)}
                     disabled={isLoading(LOADING_KEYS.FORMS.CREATE_STUDIO)}
-                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <Label htmlFor="isAnimationStudio" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  <Label htmlFor="isAnimationStudio" className="text-sm">
                     Animasyon Stüdyosu
                   </Label>
                 </div>

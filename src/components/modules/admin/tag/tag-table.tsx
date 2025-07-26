@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { MASTER_DATA } from '@/lib/constants/masterData.constants';
 
 interface TagTableProps {
   onEdit?: (tag: Tag) => void;
@@ -157,7 +158,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
                 <TableCell>{tag.name}</TableCell>
                 <TableCell className="text-muted-foreground">{tag.slug}</TableCell>
                 <TableCell className="text-muted-foreground">
-                  {tag.category || '-'}
+                  {tag.category ? MASTER_DATA.TAG_CATEGORY_LABELS[tag.category] || tag.category : '-'}
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">

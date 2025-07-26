@@ -11,7 +11,7 @@ export default function TagsPage() {
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedAdult, setSelectedAdult] = useState<boolean | null>(null);
   const [selectedSpoiler, setSelectedSpoiler] = useState<boolean | null>(null);
 

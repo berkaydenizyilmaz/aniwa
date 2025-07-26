@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -44,6 +45,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors }
   } = useForm<CreateTagInput | UpdateTagInput>({
     resolver: zodResolver(isEdit ? updateTagSchema : createTagSchema),
@@ -182,22 +184,20 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
             <Label>Özel Durumlar</Label>
             <div className="flex gap-4">
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="isAdult"
-                  {...register('isAdult')}
+                  checked={watch('isAdult')}
+                  onCheckedChange={(checked) => setValue('isAdult', checked === true)}
                   disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
-                  className="rounded border-gray-300"
                 />
                 <Label htmlFor="isAdult" className="text-sm">Yetişkin İçerik</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="isSpoiler"
-                  {...register('isSpoiler')}
+                  checked={watch('isSpoiler')}
+                  onCheckedChange={(checked) => setValue('isSpoiler', checked === true)}
                   disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
-                  className="rounded border-gray-300"
                 />
                 <Label htmlFor="isSpoiler" className="text-sm">Spoiler İçerir</Label>
               </div>

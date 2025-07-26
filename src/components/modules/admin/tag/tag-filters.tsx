@@ -3,6 +3,15 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Search, Plus, Filter, Eye, Shield } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useLoadingStore } from '@/lib/stores/loading.store';
@@ -19,7 +28,7 @@ interface TagFiltersProps {
 
 export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoilerChange, onAddNew }: TagFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedAdult, setSelectedAdult] = useState<boolean | null>(null);
   const [selectedSpoiler, setSelectedSpoiler] = useState<boolean | null>(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -36,7 +45,7 @@ export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoile
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    onCategoryChange?.(category);
+    onCategoryChange?.(category === 'all' ? '' : category);
   };
 
   const handleAdultChange = (isAdult: boolean | null) => {
@@ -66,49 +75,50 @@ export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoile
         {/* Kategori Filtresi */}
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <select
-            value={selectedCategory}
-            onChange={(e) => handleCategoryChange(e.target.value)}
-            className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
-          >
-            <option value="">Tüm Kategoriler</option>
-            {Object.entries(MASTER_DATA.TAG_CATEGORY_LABELS).map(([key, label]) => (
-              <option key={key} value={key}>
-                {label}
-              </option>
-            ))}
-          </select>
+          <Select value={selectedCategory} onValueChange={handleCategoryChange} disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Tüm Kategoriler" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tüm Kategoriler</SelectItem>
+              {Object.entries(MASTER_DATA.TAG_CATEGORY_LABELS).map(([key, label]) => (
+                <SelectItem key={key} value={key}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Adult Filtresi */}
-        <div className="flex items-center gap-2">
-          <Shield className="h-4 w-4 text-muted-foreground" />
-          <select
-            value={selectedAdult === null ? '' : selectedAdult.toString()}
-            onChange={(e) => handleAdultChange(e.target.value === '' ? null : e.target.value === 'true')}
-            className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
-          >
-            <option value="">Tüm İçerikler</option>
-            <option value="false">Yetişkin Değil</option>
-            <option value="true">Yetişkin İçerik</option>
-          </select>
-        </div>
+        {/* Adult ve Spoiler Filtreleri */}
+        <div className="flex items-center gap-4">
+          {/* Adult Filtresi */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="adult-filter"
+              checked={selectedAdult === true}
+              onCheckedChange={(checked) => handleAdultChange(checked ? true : null)}
+              disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
+            />
+            <Label htmlFor="adult-filter" className="flex items-center gap-1 text-sm">
+              <Shield className="h-3 w-3 text-muted-foreground" />
+              Yetişkin İçerik
+            </Label>
+          </div>
 
-        {/* Spoiler Filtresi */}
-        <div className="flex items-center gap-2">
-          <Eye className="h-4 w-4 text-muted-foreground" />
-          <select
-            value={selectedSpoiler === null ? '' : selectedSpoiler.toString()}
-            onChange={(e) => handleSpoilerChange(e.target.value === '' ? null : e.target.value === 'true')}
-            className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
-          >
-            <option value="">Tüm İçerikler</option>
-            <option value="false">Spoiler Değil</option>
-            <option value="true">Spoiler İçerik</option>
-          </select>
+          {/* Spoiler Filtresi */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="spoiler-filter"
+              checked={selectedSpoiler === true}
+              onCheckedChange={(checked) => handleSpoilerChange(checked ? true : null)}
+              disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
+            />
+            <Label htmlFor="spoiler-filter" className="flex items-center gap-1 text-sm">
+              <Eye className="h-3 w-3 text-muted-foreground" />
+              Spoiler İçerik
+            </Label>
+          </div>
         </div>
 
         {/* Yeni Etiket Ekle */}

@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -144,20 +145,18 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
                     const isSelected = field.value?.includes(role) || false;
                     return (
                       <div key={role} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           id={`role-${role}`}
                           checked={isSelected}
-                          onChange={(e) => {
+                          onCheckedChange={(checked) => {
                             const currentRoles = field.value || [];
-                            if (e.target.checked) {
+                            if (checked === true) {
                               field.onChange([...currentRoles, role]);
                             } else {
                               field.onChange(currentRoles.filter(r => r !== role));
                             }
                           }}
                           disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_USER)}
-                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                         />
                         <Label 
                           htmlFor={`role-${role}`} 
@@ -185,15 +184,13 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               control={control}
               render={({ field }) => (
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id="isBanned"
                     checked={field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
+                    onCheckedChange={(checked) => field.onChange(checked === true)}
                     disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_USER)}
-                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <Label htmlFor="isBanned" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  <Label htmlFor="isBanned" className="text-sm">
                     Yasaklı
                   </Label>
                 </div>
