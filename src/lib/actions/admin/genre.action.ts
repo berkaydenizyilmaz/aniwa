@@ -35,7 +35,10 @@ export async function createGenreAction(data: CreateGenreInput): Promise<ServerA
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'createGenreAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -57,7 +60,10 @@ export async function getGenresAction(filters?: GenreFilters): Promise<ServerAct
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getGenresAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -76,7 +82,10 @@ export async function getGenreAction(id: string): Promise<ServerActionResponse> 
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'getGenreAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -101,7 +110,10 @@ export async function updateGenreAction(id: string, data: UpdateGenreInput): Pro
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'updateGenreAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 }
 
@@ -123,6 +135,9 @@ export async function deleteGenreAction(id: string): Promise<ServerActionRespons
     };
 
   } catch (error) {
-    return handleServerActionError(error);
+    return handleServerActionError(error, {
+      actionName: 'deleteGenreAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
   }
 } 

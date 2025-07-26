@@ -146,9 +146,6 @@ export async function findStreamingLinksByAnimeSeriesIdDB(
   try {
     return await client.streamingLink.findMany({
       where: { animeSeriesId },
-      include: {
-        streamingPlatform: true,
-      },
     });
   } catch (error) {
     handleDatabaseError(error, 'Anime serisi streaming link\'lerini bulma', { animeSeriesId });
@@ -163,9 +160,6 @@ export async function findStreamingLinksByMediaPartIdDB(
   try {
     return await client.streamingLink.findMany({
       where: { animeMediaPartId },
-      include: {
-        streamingPlatform: true,
-      },
     });
   } catch (error) {
     handleDatabaseError(error, 'Media part streaming link\'lerini bulma', { animeMediaPartId });
@@ -180,9 +174,6 @@ export async function findStreamingLinksByEpisodeIdDB(
   try {
     return await client.streamingLink.findMany({
       where: { episodeId },
-      include: {
-        streamingPlatform: true,
-      },
     });
   } catch (error) {
     handleDatabaseError(error, 'Episode streaming link\'lerini bulma', { episodeId });
@@ -196,12 +187,7 @@ export async function findStreamingLinksByPlatformIdDB(
 ): Promise<StreamingLink[]> {
   try {
     return await client.streamingLink.findMany({
-      where: { streamingPlatformId: platformId },
-      include: {
-        animeSeries: true,
-        animeMediaPart: true,
-        episode: true,
-      },
+      where: { platformId },
     });
   } catch (error) {
     handleDatabaseError(error, 'Platform streaming link\'lerini bulma', { platformId });
@@ -222,12 +208,6 @@ export async function findAllStreamingLinksDB(
       skip,
       take,
       orderBy,
-      include: {
-        streamingPlatform: true,
-        animeSeries: true,
-        animeMediaPart: true,
-        episode: true,
-      },
     });
   } catch (error) {
     handleDatabaseError(error, 'Tüm streaming link\'leri listeleme', { where, skip, take, orderBy });

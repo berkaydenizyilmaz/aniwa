@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
-import { BusinessError } from '@/lib/errors';
+import { BusinessError, DatabaseError } from '@/lib/errors';
 import { ERROR_CODES } from '@/lib/constants/error.constants';
+import { logger } from '@/lib/utils/logger';
+import { EVENTS } from '@/lib/constants/events.constants';
 
 // HTTP status kodlarını belirle
 function getHttpStatus(errorCode: string): number {
@@ -41,9 +43,10 @@ function formatZodErrors(zodError: ZodError) {
 }
 
 // API error handler
-export function handleApiError(error: unknown) {
+export function handleApiError(error: unknown, context?: { endpoint?: string; method?: string; userId?: string }) {
   // Zod validasyon hatası
   if (error instanceof ZodError) {
+    // Validation hatası loglanmaz (client hatası)
     return NextResponse.json({
       success: false,
       error: 'Geçersiz veri formatı',
@@ -51,7 +54,7 @@ export function handleApiError(error: unknown) {
     }, { status: 400 });
   }
   
-  // Business error
+  // Business error - zaten loglanmış
   if (error instanceof BusinessError) {
     const status = getHttpStatus(error.code);
     
@@ -61,8 +64,29 @@ export function handleApiError(error: unknown) {
       errorCode: error.code
     }, { status });
   }
+
+  // Database error - zaten loglanmış
+  if (error instanceof DatabaseError) {
+    return NextResponse.json({
+      success: false,
+      error: 'Veritabanı hatası'
+    }, { status: 500 });
+  }
   
-  // Beklenmedik hata
+  // Beklenmedik hata - logla
+  logger.error(
+    EVENTS.SYSTEM.API_ERROR,
+    'API seviyesinde beklenmedik hata',
+    {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      stack: error instanceof Error ? error.stack : undefined,
+      endpoint: context?.endpoint,
+      method: context?.method,
+      userId: context?.userId
+    },
+    context?.userId
+  );
+
   console.error('API Error:', error);
   return NextResponse.json({
     success: false,

@@ -1,5 +1,7 @@
 import { ZodError } from 'zod';
-import { BusinessError } from '@/lib/errors';
+import { BusinessError, DatabaseError } from '@/lib/errors';
+import { logger } from '@/lib/utils/logger';
+import { EVENTS } from '@/lib/constants/events.constants';
 
 // Server Action error response type
 export type ServerActionErrorResponse = {
@@ -35,8 +37,11 @@ export function setFormFieldErrors<T extends Record<string, unknown>>(
 }
 
 // Server Action error handler
-export function handleServerActionError(error: unknown): ServerActionErrorResponse {
-  // Business error'ları yakala
+export function handleServerActionError(
+  error: unknown, 
+  context?: { actionName?: string; userId?: string }
+): ServerActionErrorResponse {
+  // Business error - zaten loglanmış
   if (error instanceof BusinessError) {
     return {
       success: false,
@@ -44,7 +49,15 @@ export function handleServerActionError(error: unknown): ServerActionErrorRespon
     };
   }
 
-  // Zod validation hatası
+  // Database error - zaten loglanmış
+  if (error instanceof DatabaseError) {
+    return {
+      success: false,
+      error: 'Veritabanı hatası'
+    };
+  }
+
+  // Zod validation hatası - loglanmaz (client hatası)
   if (error instanceof ZodError) {
     return {
       success: false,
@@ -53,7 +66,19 @@ export function handleServerActionError(error: unknown): ServerActionErrorRespon
     };
   }
 
-  // Beklenmedik hata
+  // Beklenmedik hata - logla
+  logger.error(
+    EVENTS.SYSTEM.ACTION_ERROR,
+    'Server Action seviyesinde beklenmedik hata',
+    {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      stack: error instanceof Error ? error.stack : undefined,
+      actionName: context?.actionName,
+      userId: context?.userId
+    },
+    context?.userId
+  );
+
   console.error('Server Action Error:', error);
   return {
     success: false,
