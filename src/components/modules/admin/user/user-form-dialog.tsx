@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { updateUserAction } from '@/lib/actions/user.action';
+import { updateUserAction } from '@/lib/actions/admin/user.action';
 import { updateUserSchema, type UpdateUserInput } from '@/lib/schemas/user.schema';
 import { toast } from 'sonner';
 import { User, UserRole } from '@prisma/client';

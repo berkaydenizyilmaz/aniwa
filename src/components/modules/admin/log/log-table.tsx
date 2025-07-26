@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Log, LogLevel } from '@prisma/client';
-import { getLogsAction } from '@/lib/actions/log.action';
+import { getLogsAction } from '@/lib/actions/admin/log.action';
 import { toast } from 'sonner';
 import { GetLogsResponse } from '@/lib/types/api/log.api';
 import { type LogFilters } from '@/lib/schemas/log.schema';

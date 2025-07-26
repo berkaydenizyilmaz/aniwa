@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { StreamingPlatform } from '@prisma/client';
-import { getStreamingPlatformsAction, deleteStreamingPlatformAction } from '@/lib/actions/streaming-platform.action';
+import { getStreamingPlatformsAction, deleteStreamingPlatformAction } from '@/lib/actions/admin/streaming-platform.action';
 import { toast } from 'sonner';
 import { GetStreamingPlatformsResponse } from '@/lib/types/api/streaming-platform.api';
 import { Skeleton } from '@/components/ui/skeleton';

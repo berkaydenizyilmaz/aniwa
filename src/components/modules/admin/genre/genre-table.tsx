@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Genre } from '@prisma/client';
-import { getGenresAction, deleteGenreAction } from '@/lib/actions/genre.action';
+import { getGenresAction, deleteGenreAction } from '@/lib/actions/admin/genre.action';
 import { toast } from 'sonner';
 import { GetGenresResponse } from '@/lib/types/api/genre.api';
 import { Skeleton } from '@/components/ui/skeleton';

@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import { createStudioAction, updateStudioAction } from '@/lib/actions/studio.action';
+import { createStudioAction, updateStudioAction } from '@/lib/actions/admin/studio.action';
 import { createStudioSchema, updateStudioSchema, type CreateStudioInput, type UpdateStudioInput } from '@/lib/schemas/studio.schema';
 import { toast } from 'sonner';
 import { Studio } from '@prisma/client';

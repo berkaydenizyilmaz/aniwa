@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Studio } from '@prisma/client';
-import { getStudiosAction, deleteStudioAction } from '@/lib/actions/studio.action';
+import { getStudiosAction, deleteStudioAction } from '@/lib/actions/admin/studio.action';
 import { toast } from 'sonner';
 import { GetStudiosResponse } from '@/lib/types/api/studio.api';
 import { Skeleton } from '@/components/ui/skeleton';

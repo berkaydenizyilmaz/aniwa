@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { createGenreAction, updateGenreAction } from '@/lib/actions/genre.action';
+import { createGenreAction, updateGenreAction } from '@/lib/actions/admin/genre.action';
 import { createGenreSchema, updateGenreSchema, type CreateGenreInput, type UpdateGenreInput } from '@/lib/schemas/genre.schema';
 import { toast } from 'sonner';
 import { Genre } from '@prisma/client';

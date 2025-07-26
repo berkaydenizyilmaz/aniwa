@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { createTagAction, updateTagAction } from '@/lib/actions/tag.action';
+import { createTagAction, updateTagAction } from '@/lib/actions/admin/tag.action';
 import { createTagSchema, updateTagSchema, type CreateTagInput, type UpdateTagInput } from '@/lib/schemas/tag.schema';
 import { toast } from 'sonner';
 import { Tag, TagCategory } from '@prisma/client';

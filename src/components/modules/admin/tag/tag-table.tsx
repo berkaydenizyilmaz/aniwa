@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Tag, TagCategory } from '@prisma/client';
-import { getTagsAction, deleteTagAction } from '@/lib/actions/tag.action';
+import { getTagsAction, deleteTagAction } from '@/lib/actions/admin/tag.action';
 import { toast } from 'sonner';
 import { GetTagsResponse } from '@/lib/types/api/tag.api';
 import { Skeleton } from '@/components/ui/skeleton';
