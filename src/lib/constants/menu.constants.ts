@@ -1,6 +1,6 @@
 // Menu sabitleri
 
-import { Crown, Edit, Shield, LayoutDashboard, Tag, Home, Play, List, User, Bell, Settings, Building2, FileText } from 'lucide-react';
+import { Crown, Edit, Shield, LayoutDashboard, Tag, Home, Play, List, User, Bell, Settings, Building2, FileText, Tv } from 'lucide-react';
 import { ROUTES } from './routes.constants';
 import { USER } from './user.constants';
  
@@ -35,6 +35,11 @@ export const ADMIN_NAVIGATION_ITEMS = [
     label: 'Kullanıcılar',
     href: ROUTES.PAGES.ADMIN.USERS,
     icon: User
+  },
+  {
+    label: 'Yayın Platformları',
+    href: ROUTES.PAGES.ADMIN.STREAMING_PLATFORMS,
+    icon: Tv
   },
   {
     label: 'Loglar',
