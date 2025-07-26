@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Plus, Filter, Eye, Shield } from 'lucide-react';
+import { Search, Plus, Filter } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
@@ -101,7 +101,6 @@ export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoile
               disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
             />
             <Label htmlFor="adult-filter" className="flex items-center gap-1 text-sm">
-              <Shield className="h-3 w-3 text-muted-foreground" />
               Yetişkin İçerik
             </Label>
           </div>
@@ -115,7 +114,6 @@ export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoile
               disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
             />
             <Label htmlFor="spoiler-filter" className="flex items-center gap-1 text-sm">
-              <Eye className="h-3 w-3 text-muted-foreground" />
               Spoiler İçerik
             </Label>
           </div>

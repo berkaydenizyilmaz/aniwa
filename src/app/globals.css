@@ -166,6 +166,21 @@
   }
 }
 
+/* Form elementleri için belirgin border'lar */
+@layer components {
+  .form-input {
+    @apply border-2 border-border/60 focus:border-primary/80 transition-colors;
+  }
+  
+  .form-checkbox {
+    @apply border-2 border-border/60 focus:border-primary/80 transition-colors;
+  }
+  
+  .form-select {
+    @apply border-2 border-border/60 focus:border-primary/80 transition-colors;
+  }
+}
+
 /* Glassmorphism Utility Classes */
 .glass {
   backdrop-filter: blur(12px);

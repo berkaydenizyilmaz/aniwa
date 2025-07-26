@@ -58,4 +58,4 @@ export const AUTH_MENU_ITEMS = [
   { icon: User, label: 'Profil', href: ROUTES.PAGES.PROFILE },
   { icon: Bell, label: 'Bildirimler', href: ROUTES.PAGES.NOTIFICATIONS },
   { icon: Settings, label: 'Ayarlar', href: ROUTES.PAGES.SETTINGS },
-] as const;
+] as const; 
