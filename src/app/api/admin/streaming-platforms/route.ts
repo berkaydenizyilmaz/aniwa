@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { createStreamingPlatformSchema, streamingPlatformFiltersSchema } from '@/lib/schemas/streaming.schema';
-import { createStreamingPlatform, getAllStreamingPlatforms } from '@/lib/services/business/streaming.business';
+import { createStreamingPlatformBusiness, getStreamingPlatformsBusiness } from '@/lib/services/business/streaming.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tüm streaming platformları listele (GET)
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authConfig);
+
     // Query parametrelerini al
     const { searchParams } = new URL(request.url);
     const filters = {
@@ -20,7 +22,10 @@ export async function GET(request: NextRequest) {
     const validatedFilters = streamingPlatformFiltersSchema.parse(filters);
 
     // Business logic
-    const result = await getAllStreamingPlatforms(validatedFilters);
+    const result = await getStreamingPlatformsBusiness({
+      id: session!.user.id,
+      username: session!.user.username
+    }, validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -42,7 +47,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await createStreamingPlatform(validatedData, {
+    const result = await createStreamingPlatformBusiness(validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });

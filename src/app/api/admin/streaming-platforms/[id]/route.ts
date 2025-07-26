@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { updateStreamingPlatformSchema } from '@/lib/schemas/streaming.schema';
-import { getStreamingPlatformById, updateStreamingPlatform, deleteStreamingPlatform } from '@/lib/services/business/streaming.business';
+import { getStreamingPlatformBusiness, updateStreamingPlatformBusiness, deleteStreamingPlatformBusiness } from '@/lib/services/business/streaming.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tek streaming platform detayı (GET)
@@ -12,9 +12,13 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await getStreamingPlatformById(id);
+    const result = await getStreamingPlatformBusiness(id, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -40,7 +44,7 @@ export async function PUT(
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await updateStreamingPlatform(id, validatedData, {
+    const result = await updateStreamingPlatformBusiness(id, validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });
@@ -65,7 +69,7 @@ export async function DELETE(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await deleteStreamingPlatform(id, {
+    const result = await deleteStreamingPlatformBusiness(id, {
       id: session!.user.id,
       username: session!.user.username
     });
