@@ -24,10 +24,7 @@ export async function createTagAction(data: CreateTagInput): Promise<ServerActio
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await createTagBusiness(validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await createTagBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.TAGS);

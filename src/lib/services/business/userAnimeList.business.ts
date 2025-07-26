@@ -1,6 +1,6 @@
 // UserAnimeList iş mantığı katmanı
 
-import { BusinessError } from '@/lib/errors';
+import { BusinessError, DatabaseError } from '@/lib/errors';
 import {
   createUserAnimeList as createUserAnimeListDB,
   findUserAnimeListByUserAndAnime,
@@ -23,8 +23,7 @@ import {
 // Anime'yi listeye ekle/çıkar (Toggle)
 export async function toggleAnimeInListBusiness(
   userId: string,
-  data: AddAnimeToListRequest,
-  user: { id: string; username: string }
+  data: AddAnimeToListRequest
 ): Promise<ApiResponse<AddAnimeToListResponse | RemoveAnimeFromListResponse>> {
   try {
     // Anime zaten listede mi kontrolü
@@ -38,6 +37,18 @@ export async function toggleAnimeInListBusiness(
           tx
         );
       });
+
+      // Başarılı işlem logu
+      await logger.info(
+        EVENTS.USER.ANIME_REMOVED_FROM_LIST,
+        'Anime listeden çıkarıldı',
+        {
+          userId,
+          animeSeriesId: data.animeSeriesId,
+          action: 'removed',
+        },
+        userId
+      );
 
       return {
         success: true,
@@ -57,26 +68,40 @@ export async function toggleAnimeInListBusiness(
         }, tx);
       });
 
+      // Başarılı işlem logu
+      await logger.info(
+        EVENTS.USER.ANIME_ADDED_TO_LIST,
+        'Anime listeye eklendi',
+        {
+          userId,
+          animeSeriesId: data.animeSeriesId,
+          status: data.status || 'PLANNING',
+          action: 'added',
+        },
+        userId
+      );
+
       return {
         success: true,
         data: result,
       };
     }
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Anime listeye ekleme/çıkarma sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         animeSeriesId: data.animeSeriesId,
-        username: user.username,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Anime listeye ekleme/çıkarma başarısız');
@@ -102,6 +127,20 @@ export async function getUserAnimeListsBusiness(
     // Sayfalama
     const paginatedLists = userAnimeLists.slice(skip, skip + limit);
 
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.ANIME_LIST_RETRIEVED,
+      'Kullanıcı anime listesi görüntülendi',
+      {
+        userId,
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+      userId
+    );
+
     return {
       success: true,
       data: {
@@ -113,54 +152,69 @@ export async function getUserAnimeListsBusiness(
       },
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı anime listesi getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         filters,
-      }
+      },
+      userId
     );
 
-    throw new BusinessError('Anime listesi getirme başarısız');
+    throw new BusinessError('Kullanıcı anime listesi getirme başarısız');
   }
 }
 
-// Belirli anime'nin liste durumunu getirme
+// Belirli bir anime'nin kullanıcı listesindeki durumunu getirme
 export async function getUserAnimeListByAnimeBusiness(
   userId: string,
   animeSeriesId: string
 ): Promise<ApiResponse<GetUserAnimeListByAnimeResponse>> {
   try {
-    // Anime'nin liste durumunu getir
     const userAnimeList = await findUserAnimeListByUserAndAnime(userId, animeSeriesId);
+
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.ANIME_LIST_STATUS_CHECKED,
+      'Anime liste durumu kontrol edildi',
+      {
+        userId,
+        animeSeriesId,
+        hasInList: !!userAnimeList,
+      },
+      userId
+    );
 
     return {
       success: true,
-      data: userAnimeList,
+      data: userAnimeList || null,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Anime liste durumu getirme sırasında beklenmedik hata',
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Kullanıcı anime listesi durumu getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         animeSeriesId,
-      }
+      },
+      userId
     );
 
-    throw new BusinessError('Anime liste durumu getirme başarısız');
+    throw new BusinessError('Kullanıcı anime listesi durumu getirme başarısız');
   }
 } 

@@ -2,7 +2,8 @@
 
 import { 
   BusinessError, 
-  NotFoundError
+  NotFoundError,
+  DatabaseError
 } from '@/lib/errors';
 import { 
   findLogById
@@ -40,7 +41,7 @@ export async function createLogBusiness(
 // Log getirme (ID ile)
 export async function getLogBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<GetLogResponse>> {
   try {
     const log = await findLogById(id);
@@ -51,14 +52,13 @@ export async function getLogBusiness(
     // Başarılı getirme logu
     await logger.info(
       EVENTS.ADMIN.LOG_RETRIEVED,
-      'Log başarıyla getirildi',
+      'Log detayı görüntülendi',
       { 
         logId: log.id, 
         event: log.event,
-        level: log.level,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        level: log.level
+      },
+      userId
     );
 
     return {
@@ -66,15 +66,17 @@ export async function getLogBusiness(
       data: log
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Log getirme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', logId: id }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', logId: id },
+      userId
     );
     
     throw new BusinessError('Log getirme başarısız');
@@ -83,7 +85,7 @@ export async function getLogBusiness(
 
 // Tüm log'ları getirme (filtrelemeli)
 export async function getLogsBusiness(
-  adminUser: { id: string; username: string },
+  userId: string,
   filters?: GetLogsRequest
 ): Promise<ApiResponse<GetLogsResponse>> {
   try {
@@ -110,44 +112,50 @@ export async function getLogsBusiness(
     }
     
     if (filters?.startDate && filters?.endDate) {
-      where.timestamp = {
+      where.createdAt = {
         gte: new Date(filters.startDate),
         lte: new Date(filters.endDate)
       };
+    } else if (filters?.startDate) {
+      where.createdAt = { gte: new Date(filters.startDate) };
+    } else if (filters?.endDate) {
+      where.createdAt = { lte: new Date(filters.endDate) };
     }
 
     // Log'ları getir
     const [logs, total] = await Promise.all([
       prisma.log.findMany({
         where,
+        skip,
+        take: limit,
+        orderBy: { id: 'desc' },
         include: {
           user: {
             select: {
               id: true,
               username: true,
-              email: true
+              email: true,
+              profilePicture: true
             }
           }
-        },
-        orderBy: { timestamp: 'desc' },
-        skip,
-        take: limit
+        }
       }),
       prisma.log.count({ where })
     ]);
-    
+
     const totalPages = Math.ceil(total / limit);
 
-    // Başarılı getirme logu
+    // Başarılı listeleme logu
     await logger.info(
       EVENTS.ADMIN.LOGS_RETRIEVED,
-      'Loglar başarıyla getirildi',
+      'Log listesi görüntülendi',
       { 
-        total: logs.length,
-        filtered: total,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        total,
+        page,
+        limit,
+        totalPages
+      },
+      userId
     );
 
     return {
@@ -161,15 +169,17 @@ export async function getLogsBusiness(
       }
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Log listeleme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
+      userId
     );
     
     throw new BusinessError('Log listeleme başarısız');

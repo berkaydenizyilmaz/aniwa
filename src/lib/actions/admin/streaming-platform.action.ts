@@ -24,10 +24,7 @@ export async function createStreamingPlatformAction(data: CreateStreamingPlatfor
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await createStreamingPlatformBusiness(validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await createStreamingPlatformBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.STREAMING_PLATFORMS);
@@ -52,10 +49,7 @@ export async function getStreamingPlatformsAction(filters?: StreamingPlatformFil
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getStreamingPlatformsBusiness({
-      id: session!.user.id,
-      username: session!.user.username
-    }, validatedFilters);
+    const result = await getStreamingPlatformsBusiness(session!.user.id, validatedFilters);
 
     return {
       success: true,
@@ -74,10 +68,7 @@ export async function getStreamingPlatformAction(id: string): Promise<ServerActi
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getStreamingPlatformBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await getStreamingPlatformBusiness(id, session!.user.id);
 
     return {
       success: true,
@@ -99,10 +90,7 @@ export async function updateStreamingPlatformAction(id: string, data: UpdateStre
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await updateStreamingPlatformBusiness(id, validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await updateStreamingPlatformBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.STREAMING_PLATFORMS);
@@ -124,10 +112,7 @@ export async function deleteStreamingPlatformAction(id: string): Promise<ServerA
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await deleteStreamingPlatformBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await deleteStreamingPlatformBusiness(id, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.STREAMING_PLATFORMS);

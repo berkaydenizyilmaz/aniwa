@@ -24,10 +24,7 @@ export async function createStudioAction(data: CreateStudioInput): Promise<Serve
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await createStudioBusiness(validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await createStudioBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.STUDIOS);
@@ -52,10 +49,7 @@ export async function getStudiosAction(filters?: StudioFilters): Promise<ServerA
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getStudiosBusiness({
-      id: session!.user.id,
-      username: session!.user.username
-    }, validatedFilters);
+    const result = await getStudiosBusiness(session!.user.id, validatedFilters);
 
     return {
       success: true,
@@ -74,10 +68,7 @@ export async function getStudioAction(id: string): Promise<ServerActionResponse>
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getStudioBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await getStudioBusiness(id, session!.user.id);
 
     return {
       success: true,
@@ -99,10 +90,7 @@ export async function updateStudioAction(id: string, data: UpdateStudioInput): P
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await updateStudioBusiness(id, validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await updateStudioBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.STUDIOS);
@@ -124,10 +112,7 @@ export async function deleteStudioAction(id: string): Promise<ServerActionRespon
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    await deleteStudioBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    await deleteStudioBusiness(id, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.STUDIOS);

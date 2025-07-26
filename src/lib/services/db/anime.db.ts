@@ -272,7 +272,7 @@ export async function findAllAnimeMediaParts(
       take,
       orderBy,
       include: {
-        animeSeries: { select: { id: true, title: true, englishTitle: true } },
+        series: { select: { id: true, title: true, englishTitle: true } },
         partsEpisodes: { orderBy: { episodeNumber: 'asc' } },
       },
     });
@@ -359,15 +359,15 @@ export async function findEpisodeByNumber(
         },
       },
       include: {
-        animeMediaPart: {
+        mediaPart: {
           include: {
-            animeSeries: { select: { id: true, title: true, englishTitle: true } },
+            series: { select: { id: true, title: true, englishTitle: true } },
           },
         },
       },
     });
   } catch (error) {
-    handleDatabaseError(error, 'Episode numarası ile bulma', { mediaPartId, episodeNumber });
+    handleDatabaseError(error, 'Episode numara ile bulma', { mediaPartId, episodeNumber });
   }
 }
 
@@ -380,21 +380,21 @@ export async function findEpisodesByMediaPartId(
   try {
     return await client.episode.findMany({
       where: { mediaPartId },
-      orderBy,
+      orderBy: orderBy || { episodeNumber: 'asc' },
       include: {
-        animeMediaPart: {
+        mediaPart: {
           include: {
-            animeSeries: { select: { id: true, title: true, englishTitle: true } },
+            series: { select: { id: true, title: true, englishTitle: true } },
           },
         },
       },
     });
   } catch (error) {
-    handleDatabaseError(error, 'Medya parçası için bölümleri bulma', { mediaPartId, orderBy });
+    handleDatabaseError(error, 'Episode medya parçası ID ile bulma', { mediaPartId, orderBy });
   }
 }
 
-// Tüm bölümleri getirme (filtrelemeli)
+// Tüm episode'ları listeleme
 export async function findAllEpisodes(
   where?: Prisma.EpisodeWhereInput,
   skip?: number,
@@ -409,15 +409,15 @@ export async function findAllEpisodes(
       take,
       orderBy,
       include: {
-        animeMediaPart: {
+        mediaPart: {
           include: {
-            animeSeries: { select: { id: true, title: true, englishTitle: true } },
+            series: { select: { id: true, title: true, englishTitle: true } },
           },
         },
       },
     });
   } catch (error) {
-    handleDatabaseError(error, 'Tüm bölümleri listeleme', { where, skip, take, orderBy });
+    handleDatabaseError(error, 'Tüm episode\'ları listeleme', { where, skip, take, orderBy });
   }
 }
 

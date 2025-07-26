@@ -1,6 +1,6 @@
 // CustomList iş mantığı katmanı
 
-import { BusinessError, ConflictError, NotFoundError } from '@/lib/errors';
+import { BusinessError, ConflictError, NotFoundError, DatabaseError } from '@/lib/errors';
 import {
   createCustomList as createCustomListDB,
   findCustomListById,
@@ -31,8 +31,7 @@ import {
 // Özel liste oluşturma
 export async function createCustomListBusiness(
   userId: string,
-  data: CreateCustomListRequest,
-  user: { id: string; username: string }
+  data: CreateCustomListRequest
 ): Promise<ApiResponse<CreateCustomListResponse>> {
   try {
     // İsim benzersizlik kontrolü (aynı kullanıcı için)
@@ -57,10 +56,9 @@ export async function createCustomListBusiness(
       'Özel liste başarıyla oluşturuldu',
       {
         listId: result.id,
-        name: result.name,
-        userId: user.id,
-        username: user.username,
-      }
+        name: result.name
+      },
+      userId
     );
 
     return {
@@ -68,20 +66,21 @@ export async function createCustomListBusiness(
       data: result,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Özel liste oluşturma sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
-        name: data.name,
-        username: user.username,
-      }
+        name: data.name
+      },
+      userId
     );
 
     throw new BusinessError('Özel liste oluşturma başarısız');
@@ -98,19 +97,29 @@ export async function getUserCustomListsBusiness(
     const limit = filters?.limit || 50;
     const skip = (page - 1) * limit;
 
-    // Kullanıcının özel listelerini getir
-    const customLists = await findCustomListsByUserId(userId);
-
-    const total = customLists.length;
+    // Kullanıcının listelerini getir
+    const lists = await findCustomListsByUserId(userId);
+    const total = await prisma.customList.count({ where: { userId } });
     const totalPages = Math.ceil(total / limit);
 
-    // Sayfalama
-    const paginatedLists = customLists.slice(skip, skip + limit);
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.CUSTOM_LISTS_RETRIEVED,
+      'Kullanıcı özel listeleri görüntülendi',
+      {
+        userId,
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+      userId
+    );
 
     return {
       success: true,
       data: {
-        customLists: paginatedLists,
+        customLists: lists,
         total,
         page,
         limit,
@@ -118,22 +127,24 @@ export async function getUserCustomListsBusiness(
       },
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı özel listeleri getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         filters,
-      }
+      },
+      userId
     );
 
-    throw new BusinessError('Özel listeler getirme başarısız');
+    throw new BusinessError('Kullanıcı özel listeleri getirme başarısız');
   }
 }
 
@@ -141,8 +152,7 @@ export async function getUserCustomListsBusiness(
 export async function updateCustomListBusiness(
   listId: string,
   userId: string,
-  data: UpdateCustomListRequest,
-  user: { id: string; username: string }
+  data: UpdateCustomListRequest
 ): Promise<ApiResponse<UpdateCustomListResponse>> {
   try {
     // Liste mevcut mu ve kullanıcıya ait mi kontrolü
@@ -150,8 +160,9 @@ export async function updateCustomListBusiness(
     if (!existingList) {
       throw new NotFoundError('Liste bulunamadı');
     }
+
     if (existingList.userId !== userId) {
-      throw new NotFoundError('Liste bulunamadı');
+      throw new BusinessError('Bu listeyi düzenleme yetkiniz yok');
     }
 
     // İsim güncelleniyorsa benzersizlik kontrolü
@@ -182,9 +193,9 @@ export async function updateCustomListBusiness(
       {
         listId: result.id,
         name: result.name,
-        userId: user.id,
-        username: user.username,
-      }
+        oldName: existingList.name
+      },
+      userId
     );
 
     return {
@@ -192,20 +203,22 @@ export async function updateCustomListBusiness(
       data: result,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Özel liste güncelleme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         listId,
         userId,
-        username: user.username,
-      }
+        data,
+      },
+      userId
     );
 
     throw new BusinessError('Özel liste güncelleme başarısız');
@@ -215,8 +228,7 @@ export async function updateCustomListBusiness(
 // Özel liste silme
 export async function deleteCustomListBusiness(
   listId: string,
-  userId: string,
-  user: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<DeleteCustomListResponse>> {
   try {
     // Liste mevcut mu ve kullanıcıya ait mi kontrolü
@@ -224,8 +236,9 @@ export async function deleteCustomListBusiness(
     if (!existingList) {
       throw new NotFoundError('Liste bulunamadı');
     }
+
     if (existingList.userId !== userId) {
-      throw new NotFoundError('Liste bulunamadı');
+      throw new BusinessError('Bu listeyi silme yetkiniz yok');
     }
 
     // Transaction ile güvenli işlem
@@ -239,43 +252,41 @@ export async function deleteCustomListBusiness(
       'Özel liste başarıyla silindi',
       {
         listId,
-        name: existingList.name,
-        userId: user.id,
-        username: user.username,
-      }
+        name: existingList.name
+      },
+      userId
     );
 
     return {
       success: true,
-      data: undefined,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Özel liste silme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         listId,
         userId,
-        username: user.username,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Özel liste silme başarısız');
   }
 }
 
-// Listeye anime ekleme/çıkarma (toggle)
+// Anime'yi listeye ekle/çıkar
 export async function toggleAnimeInListBusiness(
   listId: string,
   userAnimeListId: string,
-  userId: string,
-  user: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<AddCustomListItemResponse>> {
   try {
     // Liste mevcut mu ve kullanıcıya ait mi kontrolü
@@ -283,117 +294,127 @@ export async function toggleAnimeInListBusiness(
     if (!existingList) {
       throw new NotFoundError('Liste bulunamadı');
     }
+
     if (existingList.userId !== userId) {
-      throw new NotFoundError('Liste bulunamadı');
+      throw new BusinessError('Bu listeyi düzenleme yetkiniz yok');
     }
 
-    // Mevcut liste öğesi durumunu kontrol et
+    // UserAnimeList mevcut mu kontrolü
+    const userAnimeList = await prisma.userAnimeList.findUnique({
+      where: { id: userAnimeListId },
+    });
+    if (!userAnimeList) {
+      throw new NotFoundError('Anime listesi bulunamadı');
+    }
+
+    // Mevcut item kontrolü
     const existingItem = await findCustomListItemByListAndAnime(listId, userAnimeListId);
 
-    // Transaction ile güvenli işlem
-    const result = await prisma.$transaction(async (tx) => {
-      if (existingItem) {
-        // Liste öğesi varsa çıkar
-        const deletedItem = await deleteCustomListItemDB(
-          { customListId_userAnimeListId: { customListId: listId, userAnimeListId } },
-          tx
-        );
-
-        return deletedItem;
-      } else {
-        // Liste öğesi yoksa ekle
-        // Son sıra numarasını bul
-        const lastOrder = await tx.customListItem.findFirst({
-          where: { customListId: listId },
-          orderBy: { order: 'desc' },
-          select: { order: true },
-        });
-
-        const newOrder = (lastOrder?.order || 0) + 1;
-
-        const newItem = await createCustomListItemDB({
-          customList: { connect: { id: listId } },
-          userAnimeList: { connect: { id: userAnimeListId } },
-          order: newOrder,
-        }, tx);
-
-        return newItem;
-      }
-    });
+    let result;
+    if (existingItem) {
+      // Item'ı kaldır
+      await deleteCustomListItemDB({ id: existingItem.id });
+      result = undefined;
+    } else {
+      // Item ekle
+      const newItem = await createCustomListItemDB({
+        customList: { connect: { id: listId } },
+        userAnimeList: { connect: { id: userAnimeListId } },
+      });
+      result = { id: newItem.id, createdAt: newItem.createdAt, updatedAt: newItem.updatedAt, order: newItem.order, userAnimeListId: newItem.userAnimeListId, customListId: newItem.customListId };
+    }
 
     return {
       success: true,
       data: result,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Liste anime toggle sırasında beklenmedik hata',
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Anime listeye ekleme/çıkarma sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         listId,
         userAnimeListId,
         userId,
-        username: user.username,
-      }
+      },
+      userId
     );
 
-    throw new BusinessError('Liste anime işlemi başarısız');
+    throw new BusinessError('Anime listeye ekleme/çıkarma başarısız');
   }
 }
 
-// Liste içeriğini getirme
+// Liste itemlarını getirme
 export async function getListItemsBusiness(
   listId: string,
   userId: string,
   filters?: GetUserCustomListsRequest
 ): Promise<ApiResponse<GetUserCustomListsResponse>> {
   try {
-    // Liste mevcut mu ve kullanıcıya ait mi kontrolü
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 50;
+    const skip = (page - 1) * limit;
+
+    // Liste mevcut mu kontrolü
     const existingList = await findCustomListById(listId);
     if (!existingList) {
       throw new NotFoundError('Liste bulunamadı');
     }
-    if (existingList.userId !== userId) {
-      throw new NotFoundError('Liste bulunamadı');
-    }
 
-    const page = filters?.page || 1;
-    const limit = filters?.limit || 50;
+    // Liste itemlarını getir
+    const items = await prisma.customListItem.findMany({
+      where: { customListId: listId },
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        userAnimeList: {
+          include: {
+            animeSeries: true,
+          },
+        },
+      },
+    });
 
-    // Liste zaten include ile geldiği için direkt döndür
+    const total = await prisma.customListItem.count({ where: { customListId: listId } });
+    const totalPages = Math.ceil(total / limit);
+
     return {
       success: true,
       data: {
-        customLists: [existingList], // Tek liste olarak döndür
-        total: 1,
+        customListItems: items,
+        total,
         page,
         limit,
-        totalPages: 1,
+        totalPages,
       },
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Liste içeriği getirme sırasında beklenmedik hata',
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Liste itemları getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         listId,
         userId,
         filters,
-      }
+      },
+      userId
     );
 
-    throw new BusinessError('Liste içeriği getirme başarısız');
+    throw new BusinessError('Liste itemları getirme başarısız');
   }
 } 

@@ -53,10 +53,7 @@ export async function PUT(
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await updateCustomListBusiness(id, session!.user.id, validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await updateCustomListBusiness(id, session!.user.id, validatedData);
     
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -78,10 +75,7 @@ export async function DELETE(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await deleteCustomListBusiness(id, session!.user.id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await deleteCustomListBusiness(id, session!.user.id);
     
     // Başarılı yanıt
     return NextResponse.json(result);

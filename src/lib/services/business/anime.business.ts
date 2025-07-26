@@ -1,6 +1,6 @@
 // Anime iş mantığı katmanı
 
-import { BusinessError, NotFoundError, UnauthorizedError } from "@/lib/errors";
+import { BusinessError, NotFoundError, UnauthorizedError, DatabaseError } from "@/lib/errors";
 import {
   createAnimeSeries as createAnimeSeriesDB,
   findAnimeSeriesByIdWithDetails,
@@ -27,7 +27,7 @@ import {
 // Anime serisi oluşturma (transaction ile)
 export async function createAnimeSeriesBusiness(
   data: CreateAnimeSeriesRequest,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<GetAnimeSeriesDetailsResponse>> {
   try {
     // Transaction ile tüm işlemleri yap
@@ -102,10 +102,7 @@ export async function createAnimeSeriesBusiness(
           );
 
           // Bölümleri oluştur
-          if (
-            mediaPartData.episodeList &&
-            mediaPartData.episodeList.length > 0
-          ) {
+          if (mediaPartData.episodeList && mediaPartData.episodeList.length > 0) {
             for (const episodeData of mediaPartData.episodeList) {
               await createEpisodeDB(
                 {
@@ -114,10 +111,10 @@ export async function createAnimeSeriesBusiness(
                   title: episodeData.title,
                   englishTitle: episodeData.englishTitle,
                   japaneseTitle: episodeData.japaneseTitle,
+                  duration: episodeData.duration,
+                  airDate: episodeData.airDate,
                   description: episodeData.description,
                   thumbnailImage: episodeData.thumbnailImage,
-                  airDate: episodeData.airDate,
-                  duration: episodeData.duration,
                   isFiller: episodeData.isFiller,
                   fillerNotes: episodeData.fillerNotes,
                   averageScore: episodeData.averageScore,
@@ -132,100 +129,110 @@ export async function createAnimeSeriesBusiness(
       return animeSeries;
     });
 
+    // Detaylı anime serisi bilgilerini getir
+    const animeWithDetails = await findAnimeSeriesByIdWithDetails(result.id);
+
     // Başarılı oluşturma logu
     await logger.info(
       EVENTS.ADMIN.ANIME_SERIES_CREATED,
-      "Anime serisi başarıyla oluşturuldu",
+      'Anime serisi başarıyla oluşturuldu',
       {
         animeSeriesId: result.id,
         title: result.title,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username,
-      }
+        type: result.type,
+        status: result.status
+      },
+      userId
     );
+
+    // API response tipine uygun dönüşüm
+    const responseData: GetAnimeSeriesDetailsResponse = {
+      ...animeWithDetails!,
+      genres: animeWithDetails!.animeGenres.map(ag => ag.genre),
+      tags: animeWithDetails!.animeTags.map(at => at.tag),
+      studios: animeWithDetails!.animeStudios.map(as => as.studio),
+      mediaParts: animeWithDetails!.mediaParts.map(mp => ({
+        ...mp,
+        partsEpisodes: mp.partsEpisodes
+      })),
+      comments: animeWithDetails!.comments
+    };
 
     return {
       success: true,
-      data: result as GetAnimeSeriesDetailsResponse,
+      data: responseData,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      "Anime serisi oluşturma sırasında beklenmedik hata",
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Anime serisi oluşturma sırasında beklenmedik hata',
       {
-        error: error instanceof Error ? error.message : "Bilinmeyen hata",
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         title: data.title,
-        adminId: adminUser.id,
-      }
+      },
+      userId
     );
 
-    throw new BusinessError("Anime serisi oluşturma başarısız");
+    throw new BusinessError('Anime serisi oluşturma başarısız');
   }
 }
 
-// Anime serisi detaylarını getirme
+// Anime serisi detaylarını getirme (kullanıcı için)
 export async function getAnimeDetailsByIdBusiness(
   id: string,
   user?: { id: string; userSettings?: { displayAdultContent: boolean } }
 ): Promise<ApiResponse<GetAnimeSeriesDetailsResponse>> {
   try {
-    // Anime serisini tüm ilişkileriyle getir
-    const animeSeries = await findAnimeSeriesByIdWithDetails(id);
-
-    if (!animeSeries) {
-      throw new NotFoundError("Anime serisi bulunamadı");
+    const anime = await findAnimeSeriesByIdWithDetails(id);
+    if (!anime) {
+      throw new NotFoundError('Anime serisi bulunamadı');
     }
 
     // Yetişkin içerik kontrolü
-    if (
-      animeSeries.isAdult &&
-      user &&
-      !user.userSettings?.displayAdultContent
-    ) {
-      throw new UnauthorizedError(
-        "Bu içeriği görüntülemek için yetişkin içerik ayarını etkinleştirmeniz gerekir"
-      );
+    if (anime.isAdult && (!user?.userSettings?.displayAdultContent)) {
+      throw new UnauthorizedError('Bu içeriği görüntüleme yetkiniz yok');
     }
 
-    // Frontend için veriyi dönüştür
-    const transformedData: GetAnimeSeriesDetailsResponse = {
-      ...animeSeries,
-      genres: animeSeries.animeGenres?.map((ag) => ag.genre) || [],
-      tags: animeSeries.animeTags?.map((at) => at.tag) || [],
-      studios: animeSeries.animeStudios?.map((as) => as.studio) || [],
-      mediaParts:
-        animeSeries.mediaParts?.map((part) => ({
-          ...part,
-          partsEpisodes: part.partsEpisodes || [],
-        })) || [],
-      comments: animeSeries.comments || [],
+    // API response tipine uygun dönüşüm
+    const responseData: GetAnimeSeriesDetailsResponse = {
+      ...anime,
+      genres: anime.animeGenres.map(ag => ag.genre),
+      tags: anime.animeTags.map(at => at.tag),
+      studios: anime.animeStudios.map(as => as.studio),
+      mediaParts: anime.mediaParts.map(mp => ({
+        ...mp,
+        partsEpisodes: mp.partsEpisodes
+      })),
+      comments: anime.comments
     };
 
     return {
       success: true,
-      data: transformedData,
+      data: responseData,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      "Anime serisi detay getirme sırasında beklenmedik hata",
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Anime serisi detayları getirme sırasında beklenmedik hata',
       {
-        error: error instanceof Error ? error.message : "Bilinmeyen hata",
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         animeSeriesId: id,
       }
     );
 
-    throw new BusinessError("Anime serisi detay getirme başarısız");
+    throw new BusinessError('Anime serisi detayları getirme başarısız');
   }
 }
 
@@ -244,10 +251,9 @@ export async function getAllAnimeSeriesBusiness(
 
     if (filters?.search) {
       where.OR = [
-        { title: { contains: filters.search, mode: "insensitive" } },
-        { englishTitle: { contains: filters.search, mode: "insensitive" } },
-        { japaneseTitle: { contains: filters.search, mode: "insensitive" } },
-        { synonyms: { has: filters.search } },
+        { title: { contains: filters.search, mode: 'insensitive' } },
+        { englishTitle: { contains: filters.search, mode: 'insensitive' } },
+        { japaneseTitle: { contains: filters.search, mode: 'insensitive' } },
       ];
     }
 
@@ -272,63 +278,54 @@ export async function getAllAnimeSeriesBusiness(
     }
 
     // Yetişkin içerik kontrolü
-    if (user && !user.userSettings?.displayAdultContent) {
+    if (!user?.userSettings?.displayAdultContent) {
       where.isAdult = false;
     }
 
-    // Sıralama
-    const orderBy: Prisma.AnimeSeriesOrderByWithRelationInput = {};
-    if (filters?.sortBy) {
-      const sortField =
-        filters.sortBy as keyof Prisma.AnimeSeriesOrderByWithRelationInput;
-      orderBy[sortField] = filters.sortOrder || "desc";
-    } else {
-      orderBy.createdAt = "desc";
-    }
-
-    // Anime serilerini getir (temel bilgilerle)
+    // Anime serilerini getir
     const [animeSeries, total] = await Promise.all([
-      findAllAnimeSeriesWithDetails(where, skip, limit, orderBy),
+      findAllAnimeSeriesWithDetails(where, skip, limit, { createdAt: 'desc' }),
       countAnimeSeries(where),
     ]);
 
-    // Frontend için veriyi dönüştür
-    const transformedAnimeSeries = animeSeries.map((anime) => ({
-      ...anime,
-      genres: anime.animeGenres?.map((ag) => ag.genre) || [],
-      tags: anime.animeTags?.map((at) => at.tag) || [],
-      studios: anime.animeStudios?.map((as) => as.studio) || [],
-      mediaParts: anime.mediaParts || [],
-    }));
-
     const totalPages = Math.ceil(total / limit);
+
+    // API response tipine uygun dönüşüm
+    const responseData: GetAllAnimeSeriesResponse = {
+      animeSeries: animeSeries.map(anime => ({
+        ...anime,
+        genres: anime.animeGenres.map(ag => ag.genre),
+        tags: anime.animeTags.map(at => at.tag),
+        studios: anime.animeStudios.map(as => as.studio),
+        mediaParts: anime.mediaParts
+      })),
+      total,
+      page,
+      limit,
+      totalPages,
+    };
 
     return {
       success: true,
-      data: {
-        animeSeries: transformedAnimeSeries,
-        total,
-        page,
-        limit,
-        totalPages,
-      },
+      data: responseData,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      "Anime serisi listeleme sırasında beklenmedik hata",
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Anime serileri listeleme sırasında beklenmedik hata',
       {
-        error: error instanceof Error ? error.message : "Bilinmeyen hata",
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         filters,
       }
     );
 
-    throw new BusinessError("Anime serisi listeleme başarısız");
+    throw new BusinessError('Anime serileri listeleme başarısız');
   }
 }
 
@@ -336,90 +333,66 @@ export async function getAllAnimeSeriesBusiness(
 export async function updateAnimeSeriesBusiness(
   id: string,
   data: Partial<CreateAnimeSeriesRequest>,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<GetAnimeSeriesDetailsResponse>> {
   try {
-    // Anime serisinin var olup olmadığını kontrol et
+    // Anime serisi mevcut mu kontrolü
     const existingAnime = await findAnimeSeriesByIdWithDetails(id);
     if (!existingAnime) {
       throw new NotFoundError('Anime serisi bulunamadı');
     }
 
-    // Transaction ile güncelleme işlemi
+    // Transaction ile güncelleme
     const result = await prisma.$transaction(async (tx) => {
-      // Temel bilgileri güncelle
-      const updateData: Prisma.AnimeSeriesUpdateInput = {};
-      
-      if (data.title !== undefined) updateData.title = data.title;
-      if (data.englishTitle !== undefined) updateData.englishTitle = data.englishTitle;
-      if (data.japaneseTitle !== undefined) updateData.japaneseTitle = data.japaneseTitle;
-      if (data.synonyms !== undefined) updateData.synonyms = data.synonyms;
-      if (data.type !== undefined) updateData.type = data.type as AnimeType;
-      if (data.status !== undefined) updateData.status = data.status as AnimeStatus;
-      if (data.episodes !== undefined) updateData.episodes = data.episodes;
-      if (data.duration !== undefined) updateData.duration = data.duration;
-      if (data.isAdult !== undefined) updateData.isAdult = data.isAdult;
-      if (data.season !== undefined) updateData.season = data.season as Season;
-      if (data.seasonYear !== undefined) updateData.seasonYear = data.seasonYear;
-      if (data.source !== undefined) updateData.source = data.source as Source;
-      if (data.countryOfOrigin !== undefined) updateData.countryOfOrigin = data.countryOfOrigin;
-      if (data.anilistAverageScore !== undefined) updateData.anilistAverageScore = data.anilistAverageScore;
-      if (data.anilistPopularity !== undefined) updateData.anilistPopularity = data.anilistPopularity;
-      if (data.averageScore !== undefined) updateData.averageScore = data.averageScore;
-      if (data.popularity !== undefined) updateData.popularity = data.popularity;
-      if (data.coverImage !== undefined) updateData.coverImage = data.coverImage;
-      if (data.bannerImage !== undefined) updateData.bannerImage = data.bannerImage;
-      if (data.description !== undefined) updateData.description = data.description;
-      if (data.trailer !== undefined) updateData.trailer = data.trailer;
-      if (data.relatedAnimeIds !== undefined) updateData.relatedAnimeIds = data.relatedAnimeIds;
-      if (data.mediaParts !== undefined) updateData.isMultiPart = data.mediaParts && data.mediaParts.length > 1;
-
-      // Anime serisini güncelle
-      const updatedAnime = await prisma.animeSeries.update({
+      // Anime serisi güncelle
+      const updatedAnime = await tx.animeSeries.update({
         where: { id },
-        data: updateData,
-        include: {
-          animeGenres: { include: { genre: true } },
-          animeTags: { include: { tag: true } },
-          animeStudios: { include: { studio: true } },
-          mediaParts: { 
-            include: { partsEpisodes: { orderBy: { episodeNumber: 'asc' } } },
-            orderBy: { displayOrder: 'asc' }
-          },
-          streamingLinks: true,
-          comments: { 
-            include: { user: { select: { id: true, username: true, profilePicture: true } } },
-            orderBy: { createdAt: 'desc' },
-            take: 10
-          }
-        }
+        data: {
+          title: data.title,
+          englishTitle: data.englishTitle,
+          japaneseTitle: data.japaneseTitle,
+          synonyms: data.synonyms,
+          type: data.type as AnimeType,
+          status: data.status as AnimeStatus,
+          episodes: data.episodes,
+          duration: data.duration,
+          isAdult: data.isAdult,
+          season: data.season as Season,
+          seasonYear: data.seasonYear,
+          source: data.source as Source,
+          countryOfOrigin: data.countryOfOrigin,
+          anilistAverageScore: data.anilistAverageScore,
+          anilistPopularity: data.anilistPopularity,
+          averageScore: data.averageScore,
+          popularity: data.popularity,
+          coverImage: data.coverImage,
+          bannerImage: data.bannerImage,
+          description: data.description,
+          trailer: data.trailer,
+          isMultiPart: data.mediaParts && data.mediaParts.length > 1,
+          relatedAnimeIds: data.relatedAnimeIds,
+        },
       });
 
       // Genre ilişkilerini güncelle
-      if (data.genreIds !== undefined) {
-        // Mevcut ilişkileri sil
-        await prisma.animeGenre.deleteMany({ where: { animeSeriesId: id } });
-        // Yeni ilişkileri oluştur
+      if (data.genreIds) {
+        await tx.animeGenre.deleteMany({ where: { animeSeriesId: id } });
         if (data.genreIds.length > 0) {
           await createAnimeGenres(id, data.genreIds, tx);
         }
       }
 
       // Tag ilişkilerini güncelle
-      if (data.tagIds !== undefined) {
-        // Mevcut ilişkileri sil
-        await prisma.animeTag.deleteMany({ where: { animeSeriesId: id } });
-        // Yeni ilişkileri oluştur
+      if (data.tagIds) {
+        await tx.animeTag.deleteMany({ where: { animeSeriesId: id } });
         if (data.tagIds.length > 0) {
           await createAnimeTags(id, data.tagIds, tx);
         }
       }
 
       // Studio ilişkilerini güncelle
-      if (data.studioIds !== undefined) {
-        // Mevcut ilişkileri sil
-        await prisma.animeStudio.deleteMany({ where: { animeSeriesId: id } });
-        // Yeni ilişkileri oluştur
+      if (data.studioIds) {
+        await tx.animeStudio.deleteMany({ where: { animeSeriesId: id } });
         if (data.studioIds.length > 0) {
           await createAnimeStudios(id, data.studioIds, tx);
         }
@@ -428,6 +401,9 @@ export async function updateAnimeSeriesBusiness(
       return updatedAnime;
     });
 
+    // Güncellenmiş anime serisi detaylarını getir
+    const updatedAnimeWithDetails = await findAnimeSeriesByIdWithDetails(id);
+
     // Başarılı güncelleme logu
     await logger.info(
       EVENTS.ADMIN.ANIME_SERIES_UPDATED,
@@ -435,43 +411,44 @@ export async function updateAnimeSeriesBusiness(
       {
         animeSeriesId: result.id,
         title: result.title,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        oldTitle: existingAnime.title
+      },
+      userId
     );
 
-    // Frontend için veriyi dönüştür
-    const transformedData: GetAnimeSeriesDetailsResponse = {
-      ...result,
-      genres: result.animeGenres?.map(ag => ag.genre) || [],
-      tags: result.animeTags?.map(at => at.tag) || [],
-      studios: result.animeStudios?.map(as => as.studio) || [],
-      mediaParts: result.mediaParts?.map(part => ({
-        ...part,
-        partsEpisodes: part.partsEpisodes || []
-      })) || [],
-      comments: result.comments || []
+    // API response tipine uygun dönüşüm
+    const responseData: GetAnimeSeriesDetailsResponse = {
+      ...updatedAnimeWithDetails!,
+      genres: updatedAnimeWithDetails!.animeGenres.map(ag => ag.genre),
+      tags: updatedAnimeWithDetails!.animeTags.map(at => at.tag),
+      studios: updatedAnimeWithDetails!.animeStudios.map(as => as.studio),
+      mediaParts: updatedAnimeWithDetails!.mediaParts.map(mp => ({
+        ...mp,
+        partsEpisodes: mp.partsEpisodes
+      })),
+      comments: updatedAnimeWithDetails!.comments
     };
 
     return {
       success: true,
-      data: transformedData
+      data: responseData,
     };
-
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Anime serisi güncelleme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         animeSeriesId: id,
-        adminId: adminUser.id
-      }
+        data,
+      },
+      userId
     );
 
     throw new BusinessError('Anime serisi güncelleme başarısız');
@@ -481,16 +458,16 @@ export async function updateAnimeSeriesBusiness(
 // Anime serisi silme
 export async function deleteAnimeSeriesBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<{ message: string }>> {
   try {
-    // Anime serisinin var olup olmadığını kontrol et
+    // Anime serisi mevcut mu kontrolü
     const existingAnime = await findAnimeSeriesByIdWithDetails(id);
     if (!existingAnime) {
       throw new NotFoundError('Anime serisi bulunamadı');
     }
 
-    // Anime serisini sil (cascade ile tüm ilişkiler de silinir)
+    // Anime serisini sil (cascade ile ilişkili veriler de silinir)
     await prisma.animeSeries.delete({ where: { id } });
 
     // Başarılı silme logu
@@ -499,31 +476,30 @@ export async function deleteAnimeSeriesBusiness(
       'Anime serisi başarıyla silindi',
       {
         animeSeriesId: id,
-        title: existingAnime.title,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        title: existingAnime.title
+      },
+      userId
     );
 
     return {
       success: true,
-      data: { message: 'Anime serisi başarıyla silindi' }
+      data: { message: 'Anime serisi başarıyla silindi' },
     };
-
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Anime serisi silme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         animeSeriesId: id,
-        adminId: adminUser.id
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Anime serisi silme başarısız');
@@ -533,50 +509,59 @@ export async function deleteAnimeSeriesBusiness(
 // Anime serisi detaylarını getirme (admin için)
 export async function getAnimeSeriesByIdBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<GetAnimeSeriesDetailsResponse>> {
   try {
-    // Anime serisini tüm ilişkileriyle getir
-    const animeSeries = await findAnimeSeriesByIdWithDetails(id);
-
-    if (!animeSeries) {
+    const anime = await findAnimeSeriesByIdWithDetails(id);
+    if (!anime) {
       throw new NotFoundError('Anime serisi bulunamadı');
     }
 
-    // Frontend için veriyi dönüştür
-    const transformedData: GetAnimeSeriesDetailsResponse = {
-      ...animeSeries,
-      genres: animeSeries.animeGenres?.map(ag => ag.genre) || [],
-      tags: animeSeries.animeTags?.map(at => at.tag) || [],
-      studios: animeSeries.animeStudios?.map(as => as.studio) || [],
-      mediaParts: animeSeries.mediaParts?.map(part => ({
-        ...part,
-        partsEpisodes: part.partsEpisodes || []
-      })) || [],
-      comments: animeSeries.comments || []
+    // Başarılı getirme logu
+    await logger.info(
+      EVENTS.ADMIN.ANIME_SERIES_RETRIEVED,
+      'Anime serisi detayı görüntülendi',
+      {
+        animeSeriesId: anime.id,
+        title: anime.title
+      },
+      userId
+    );
+
+    // API response tipine uygun dönüşüm
+    const responseData: GetAnimeSeriesDetailsResponse = {
+      ...anime,
+      genres: anime.animeGenres.map(ag => ag.genre),
+      tags: anime.animeTags.map(at => at.tag),
+      studios: anime.animeStudios.map(as => as.studio),
+      mediaParts: anime.mediaParts.map(mp => ({
+        ...mp,
+        partsEpisodes: mp.partsEpisodes
+      })),
+      comments: anime.comments
     };
 
     return {
       success: true,
-      data: transformedData
+      data: responseData,
     };
-
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Anime serisi detay getirme sırasında beklenmedik hata',
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Anime serisi getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         animeSeriesId: id,
-        adminId: adminUser.id
-      }
+      },
+      userId
     );
 
-    throw new BusinessError('Anime serisi detay getirme başarısız');
+    throw new BusinessError('Anime serisi getirme başarısız');
   }
 }

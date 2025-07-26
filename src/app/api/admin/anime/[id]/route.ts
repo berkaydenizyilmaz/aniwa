@@ -17,10 +17,7 @@ export async function GET(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await getAnimeSeriesByIdBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await getAnimeSeriesByIdBusiness(id, session!.user.id);
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -46,10 +43,7 @@ export async function PUT(
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await updateAnimeSeriesBusiness(id, validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await updateAnimeSeriesBusiness(id, validatedData, session!.user.id);
     
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -71,10 +65,7 @@ export async function DELETE(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await deleteAnimeSeriesBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await deleteAnimeSeriesBusiness(id, session!.user.id);
     
     // Başarılı yanıt
     return NextResponse.json(result);

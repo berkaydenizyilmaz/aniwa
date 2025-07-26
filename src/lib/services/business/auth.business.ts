@@ -4,7 +4,8 @@ import bcrypt from 'bcryptjs';
 import { 
   BusinessError, 
   ConflictError, 
-  UnauthorizedError
+  UnauthorizedError,
+  DatabaseError
 } from '@/lib/errors';
 import { createUser, findUserByUsername, findUserByEmail, findUserBySlug, updateUser } from '@/lib/services/db/user.db';
 import { createUserSettings } from '@/lib/services/db/userProfileSettings.db';
@@ -79,13 +80,14 @@ export async function registerUserBusiness(data: RegisterRequest): Promise<ApiRe
       }
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı kaydı sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
     );
@@ -100,36 +102,25 @@ export async function forgotPasswordBusiness(email: string): Promise<ApiResponse
     // Kullanıcıyı bul
     const user = await findUserByEmail(email);
     if (!user) {
-      // Güvenlik için kullanıcı bulunamasa bile başarılı döner
+      // Güvenlik için kullanıcı bulunamasa da başarılı döndür
       return { success: true };
     }
 
-    // Rastgele token oluştur
+    // Yeni token oluştur
     const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + AUTH.TOKEN_EXPIRES.PASSWORD_RESET);
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 saat
 
-    // Token'ı veritabanına kaydet
     await createVerificationToken({
-      email,
       token,
-      type: AUTH.TOKEN_TYPES.PASSWORD_RESET,
-      expiresAt
+      email,
+      type: 'password-reset',
+      expiresAt,
     });
 
-    // Email gönder
-    const emailSent = await sendPasswordResetEmail(email, token, user.username);
-    if (!emailSent) {
-      // Email gönderimi başarısız logu
-      await logger.error(
-        EVENTS.SYSTEM.EMAIL_SEND_FAILED,
-        'Şifre sıfırlama emaili gönderilemedi',
-        { email },
-        user.id
-      );
-      throw new BusinessError('Email gönderilemedi');
-    }
+    // E-posta gönder
+    await sendPasswordResetEmail(email, token, user.username);
 
-    // Başarılı şifre sıfırlama isteği logu
+    // Başarılı istek logu
     await logger.info(
       EVENTS.AUTH.PASSWORD_RESET_REQUESTED,
       'Şifre sıfırlama isteği gönderildi',
@@ -139,13 +130,14 @@ export async function forgotPasswordBusiness(email: string): Promise<ApiResponse
 
     return { success: true };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Şifre sıfırlama isteği sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', email }
     );
@@ -157,17 +149,13 @@ export async function forgotPasswordBusiness(email: string): Promise<ApiResponse
 // Şifre sıfırlama
 export async function resetPasswordBusiness(token: string, newPassword: string): Promise<ApiResponse<void>> {
   try {
-    // Token'ı bul ve doğrula
+    // Token'ı bul ve kontrol et
     const verificationToken = await findVerificationTokenByToken(token);
-    if (!verificationToken) {
+    if (!verificationToken || verificationToken.type !== 'password-reset') {
       throw new UnauthorizedError('Geçersiz veya süresi dolmuş token');
     }
 
-    if (verificationToken.type !== AUTH.TOKEN_TYPES.PASSWORD_RESET) {
-      throw new UnauthorizedError('Geçersiz token tipi');
-    }
-
-    if (verificationToken.expiresAt < new Date()) {
+    if (verificationToken.expiresAt && verificationToken.expiresAt < new Date()) {
       throw new UnauthorizedError('Token süresi dolmuş');
     }
 
@@ -180,16 +168,13 @@ export async function resetPasswordBusiness(token: string, newPassword: string):
     // Yeni şifreyi hashle
     const passwordHash = await bcrypt.hash(newPassword, AUTH.BCRYPT_SALT_ROUNDS);
 
-    // Transaction ile şifre güncelle ve token sil
+    // Şifreyi güncelle ve token'ı sil
     await prisma.$transaction(async (tx) => {
-      // Şifreyi güncelle
       await updateUser({ id: user.id }, { passwordHash }, tx);
-
-      // Token'ı sil
-      await deleteVerificationTokenByToken(token, tx);
+      await deleteVerificationTokenByToken(token);
     });
 
-    // Başarılı şifre sıfırlama logu
+    // Başarılı sıfırlama logu
     await logger.info(
       EVENTS.AUTH.PASSWORD_RESET_COMPLETED,
       'Şifre başarıyla sıfırlandı',
@@ -199,13 +184,14 @@ export async function resetPasswordBusiness(token: string, newPassword: string):
 
     return { success: true };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Şifre sıfırlama sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', token }
     );

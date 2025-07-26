@@ -44,10 +44,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await createComment(session!.user.id, validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await createComment(session!.user.id, validatedData);
     
     // Başarılı yanıt
     return NextResponse.json(result, { status: 201 });

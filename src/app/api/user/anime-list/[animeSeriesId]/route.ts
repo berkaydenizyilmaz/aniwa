@@ -24,9 +24,6 @@ export async function POST(
     const result = await toggleAnimeInListBusiness(session!.user.id, { 
       ...validatedData,
       animeSeriesId
-    }, {
-      id: session!.user.id,
-      username: session!.user.username
     });
     
     // Başarılı yanıt

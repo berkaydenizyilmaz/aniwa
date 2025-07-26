@@ -21,11 +21,7 @@ export async function PUT(
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await updateMediaPartStreamingLinks(mediaPartId, validatedData, {
-      id: session!.user.id,
-      username: session!.user.username,
-      role: session!.user.roles[0]
-    });
+    const result = await updateMediaPartStreamingLinks(mediaPartId, validatedData, session!.user.id);
     
     // Başarılı yanıt
     return NextResponse.json(result);

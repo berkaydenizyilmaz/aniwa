@@ -16,10 +16,7 @@ export async function POST(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await banUserBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await banUserBusiness(id, session!.user.id);
     
     // Başarılı yanıt
     return NextResponse.json(result);

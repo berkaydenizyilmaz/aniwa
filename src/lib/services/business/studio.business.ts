@@ -3,7 +3,8 @@
 import { 
   BusinessError, 
   ConflictError, 
-  NotFoundError
+  NotFoundError,
+  DatabaseError
 } from '@/lib/errors';
 import { 
   createStudio as createStudioDB, 
@@ -32,7 +33,7 @@ import {
 // Studio oluşturma
 export async function createStudioBusiness(
   data: CreateStudioRequest,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<CreateStudioResponse>> {
   try {
     // Name benzersizlik kontrolü
@@ -63,10 +64,9 @@ export async function createStudioBusiness(
         studioId: result.id, 
         name: result.name, 
         slug: result.slug,
-        isAnimationStudio: result.isAnimationStudio,
-        adminUsername: adminUser.username
+        isAnimationStudio: result.isAnimationStudio
       },
-      adminUser.id
+      userId
     );
 
     return {
@@ -74,16 +74,17 @@ export async function createStudioBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Stüdyo oluşturma sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', name: data.name },
-      adminUser.id
+      userId
     );
     
     throw new BusinessError('Stüdyo oluşturma başarısız');
@@ -93,7 +94,7 @@ export async function createStudioBusiness(
 // Stüdyo getirme (ID ile)
 export async function getStudioBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<GetStudioResponse>> {
   try {
     const studio = await findStudioById(id);
@@ -104,15 +105,12 @@ export async function getStudioBusiness(
     // Başarılı getirme logu
     await logger.info(
       EVENTS.ADMIN.STUDIO_RETRIEVED,
-      'Stüdyo başarıyla getirildi',
+      'Stüdyo detayı görüntülendi',
       { 
         studioId: studio.id, 
-        name: studio.name, 
-        slug: studio.slug,
-        isAnimationStudio: studio.isAnimationStudio,
-        adminUsername: adminUser.username
+        name: studio.name
       },
-      adminUser.id
+      userId
     );
 
     return {
@@ -120,16 +118,17 @@ export async function getStudioBusiness(
       data: studio
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Stüdyo getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', studioId: id },
-      adminUser.id
+      userId
     );
     
     throw new BusinessError('Stüdyo getirme başarısız');
@@ -138,7 +137,7 @@ export async function getStudioBusiness(
 
 // Tüm stüdyoları getirme (filtrelemeli)
 export async function getStudiosBusiness(
-  adminUser: { id: string; username: string },
+  userId: string,
   filters?: GetStudiosRequest
 ): Promise<ApiResponse<GetStudiosResponse>> {
   try {
@@ -147,37 +146,34 @@ export async function getStudiosBusiness(
     const skip = (page - 1) * limit;
 
     // Stüdyoları getir
-    const studios = await findAllStudios();
+    let studios = await findAllStudios();
     
-    // Filtreleme (basit implementasyon)
-    let filteredStudios = studios;
+    // Filtreleme
     if (filters?.search) {
-      filteredStudios = filteredStudios.filter(studio => 
+      studios = studios.filter(studio => 
         studio.name.toLowerCase().includes(filters.search!.toLowerCase())
       );
     }
 
     if (filters?.isAnimationStudio !== undefined) {
-      filteredStudios = filteredStudios.filter(studio => 
-        studio.isAnimationStudio === filters.isAnimationStudio
-      );
+      studios = studios.filter(studio => studio.isAnimationStudio === filters.isAnimationStudio);
     }
-
-    // Sayfalama
-    const total = filteredStudios.length;
-    const paginatedStudios = filteredStudios.slice(skip, skip + limit);
+    
+    const total = studios.length;
+    const paginatedStudios = studios.slice(skip, skip + limit);
     const totalPages = Math.ceil(total / limit);
 
     // Başarılı listeleme logu
     await logger.info(
       EVENTS.ADMIN.STUDIOS_RETRIEVED,
-      'Stüdyolar listelendi',
+      'Stüdyo listesi görüntülendi',
       { 
-        adminUsername: adminUser.username,
-        filters,
-        total
+        total,
+        page,
+        limit,
+        totalPages
       },
-      adminUser.id
+      userId
     );
 
     return {
@@ -191,16 +187,17 @@ export async function getStudiosBusiness(
       }
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Stüdyo listeleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
-      adminUser.id
+      userId
     );
     
     throw new BusinessError('Stüdyo listeleme başarısız');
@@ -211,7 +208,7 @@ export async function getStudiosBusiness(
 export async function updateStudioBusiness(
   id: string, 
   data: UpdateStudioRequest,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<UpdateStudioResponse>> {
   try {
     // Stüdyo mevcut mu kontrolü
@@ -220,26 +217,23 @@ export async function updateStudioBusiness(
       throw new NotFoundError('Stüdyo bulunamadı');
     }
 
-    // Slug benzersizlik kontrolü (eğer isim değiştiyse)
+    // Name güncelleniyorsa benzersizlik kontrolü
     if (data.name && data.name !== existingStudio.name) {
-      const slug = createSlug(data.name);
-      const existingSlug = await findStudioBySlug(slug);
-      if (existingSlug && existingSlug.id !== id) {
+      const nameExists = await findStudioByName(data.name);
+      if (nameExists) {
         throw new ConflictError('Bu stüdyo adı zaten kullanımda');
       }
     }
 
-    // Güncelleme verilerini hazırla
+    // Slug güncelleme
     const updateData: Prisma.StudioUpdateInput = {};
     if (data.name) {
       updateData.name = data.name;
       updateData.slug = createSlug(data.name);
     }
-    if (data.isAnimationStudio !== undefined) {
-      updateData.isAnimationStudio = data.isAnimationStudio;
-    }
+    if (data.isAnimationStudio !== undefined) updateData.isAnimationStudio = data.isAnimationStudio;
 
-    // Stüdyoyu güncelle
+    // Stüdyo güncelle
     const result = await updateStudioDB({ id }, updateData);
 
     // Başarılı güncelleme logu
@@ -251,9 +245,10 @@ export async function updateStudioBusiness(
         name: result.name, 
         slug: result.slug,
         isAnimationStudio: result.isAnimationStudio,
-        adminUsername: adminUser.username
+        oldName: existingStudio.name,
+        oldSlug: existingStudio.slug
       },
-      adminUser.id
+      userId
     );
 
     return {
@@ -261,16 +256,17 @@ export async function updateStudioBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Stüdyo güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', studioId: id, data },
-      adminUser.id
+      userId
     );
     
     throw new BusinessError('Stüdyo güncelleme başarısız');
@@ -280,7 +276,7 @@ export async function updateStudioBusiness(
 // Stüdyo silme
 export async function deleteStudioBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<void>> {
   try {
     // Stüdyo mevcut mu kontrolü
@@ -289,7 +285,7 @@ export async function deleteStudioBusiness(
       throw new NotFoundError('Stüdyo bulunamadı');
     }
 
-    // Stüdyoyu sil
+    // Stüdyo sil
     await deleteStudioDB({ id });
 
     // Başarılı silme logu
@@ -297,27 +293,27 @@ export async function deleteStudioBusiness(
       EVENTS.ADMIN.STUDIO_DELETED,
       'Stüdyo başarıyla silindi',
       { 
-        studioId: existingStudio.id, 
-        name: existingStudio.name, 
-        slug: existingStudio.slug,
-        isAnimationStudio: existingStudio.isAnimationStudio,
-        adminUsername: adminUser.username
+        studioId: id, 
+        name: existingStudio.name
       },
-      adminUser.id
+      userId
     );
 
-    return { success: true };
+    return {
+      success: true
+    };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Stüdyo silme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', studioId: id },
-      adminUser.id
+      userId
     );
     
     throw new BusinessError('Stüdyo silme başarısız');

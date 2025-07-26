@@ -24,10 +24,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await getStudiosBusiness({
-      id: session!.user.id,
-      username: session!.user.username
-    }, validatedFilters);
+    const result = await getStudiosBusiness(session!.user.id, validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -49,10 +46,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await createStudioBusiness(validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await createStudioBusiness(validatedData, session!.user.id);
     
     // Başarılı yanıt
     return NextResponse.json(result, { status: 201 });

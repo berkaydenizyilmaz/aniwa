@@ -3,7 +3,8 @@
 import { 
   BusinessError, 
   NotFoundError,
-  ConflictError
+  ConflictError,
+  DatabaseError
 } from '@/lib/errors';
 import { 
   findUserById, 
@@ -29,7 +30,7 @@ import {
 
 // Tüm kullanıcıları getirme (admin - filtrelemeli)
 export async function getUsersBusiness(
-  adminUser: { id: string; username: string },
+  userId: string,
   filters?: GetUsersRequest
 ): Promise<ApiResponse<GetUsersResponse>> {
   try {
@@ -66,13 +67,14 @@ export async function getUsersBusiness(
     // Başarılı listeleme logu
     await logger.info(
       EVENTS.ADMIN.USERS_RETRIEVED,
-      'Kullanıcılar listelendi',
+      'Kullanıcı listesi görüntülendi',
       { 
-        adminUsername: adminUser.username,
-        filters,
-        total
+        total,
+        page,
+        limit,
+        totalPages
       },
-      adminUser.id
+      userId
     );
 
     return {
@@ -86,26 +88,27 @@ export async function getUsersBusiness(
       }
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı listeleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
-      adminUser.id
+      userId
     );
     
     throw new BusinessError('Kullanıcı listeleme başarısız');
   }
 }
 
-// Tek kullanıcı getirme (admin)
+// Kullanıcı getirme (ID ile)
 export async function getUserBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<GetUserResponse>> {
   try {
     const user = await findUserById(id);
@@ -116,13 +119,12 @@ export async function getUserBusiness(
     // Başarılı getirme logu
     await logger.info(
       EVENTS.ADMIN.USER_RETRIEVED,
-      'Kullanıcı getirildi',
+      'Kullanıcı detayı görüntülendi',
       { 
-        userId: user.id,
-        username: user.username,
-        adminUsername: adminUser.username
+        userId: user.id, 
+        username: user.username
       },
-      adminUser.id
+      userId
     );
 
     return {
@@ -130,27 +132,28 @@ export async function getUserBusiness(
       data: user
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id },
-      adminUser.id
+      userId
     );
     
     throw new BusinessError('Kullanıcı getirme başarısız');
   }
 }
 
-// Kullanıcı güncelleme (admin)
+// Kullanıcı güncelleme
 export async function updateUserBusiness(
   id: string, 
   data: UpdateUserRequest,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<UpdateUserResponse>> {
   try {
     // Kullanıcı mevcut mu kontrolü
@@ -175,14 +178,14 @@ export async function updateUserBusiness(
       }
     }
 
-    // Güncelleme verilerini hazırla
+    // Slug güncelleme
     const updateData: Prisma.UserUpdateInput = {};
     if (data.username) {
       updateData.username = data.username;
       updateData.slug = createSlug(data.username);
     }
-    if (data.email) updateData.email = data.email;
-    if (data.roles) updateData.roles = data.roles as UserRole[];
+    if (data.email !== undefined) updateData.email = data.email;
+    if (data.roles !== undefined) updateData.roles = data.roles;
     if (data.isBanned !== undefined) updateData.isBanned = data.isBanned;
 
     // Kullanıcı güncelle
@@ -191,14 +194,13 @@ export async function updateUserBusiness(
     // Başarılı güncelleme logu
     await logger.info(
       EVENTS.ADMIN.USER_UPDATED,
-      'Admin kullanıcı güncellemesi yapıldı',
+      'Kullanıcı başarıyla güncellendi',
       { 
         userId: result.id, 
-        username: result.username, 
-        updatedFields: Object.keys(updateData),
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        username: result.username,
+        oldUsername: existingUser.username
+      },
+      userId
     );
 
     return {
@@ -206,25 +208,27 @@ export async function updateUserBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı güncelleme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id, data }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id, data },
+      userId
     );
     
     throw new BusinessError('Kullanıcı güncelleme başarısız');
   }
 }
 
-// Kullanıcı banlama (admin)
+// Kullanıcı yasaklama
 export async function banUserBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<UpdateUserResponse>> {
   try {
     // Kullanıcı mevcut mu kontrolü
@@ -234,22 +238,21 @@ export async function banUserBusiness(
     }
 
     if (existingUser.isBanned) {
-      throw new BusinessError('Kullanıcı zaten yasaklı');
+      throw new ConflictError('Kullanıcı zaten yasaklı');
     }
 
-    // Kullanıcıyı banla
+    // Kullanıcıyı yasakla
     const result = await updateUserDB({ id }, { isBanned: true });
 
-    // Başarılı banlama logu
+    // Başarılı yasaklama logu
     await logger.info(
       EVENTS.ADMIN.USER_BANNED,
-      'Kullanıcı yasaklandı',
+      'Kullanıcı başarıyla yasaklandı',
       { 
         userId: result.id, 
-        username: result.username,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        username: result.username
+      },
+      userId
     );
 
     return {
@@ -257,25 +260,27 @@ export async function banUserBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Kullanıcı banlama sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id }
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Kullanıcı yasaklama sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id },
+      userId
     );
     
-    throw new BusinessError('Kullanıcı banlama başarısız');
+    throw new BusinessError('Kullanıcı yasaklama başarısız');
   }
 }
 
-// Kullanıcı ban kaldırma (admin)
+// Kullanıcı yasağını kaldırma
 export async function unbanUserBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<UpdateUserResponse>> {
   try {
     // Kullanıcı mevcut mu kontrolü
@@ -285,22 +290,21 @@ export async function unbanUserBusiness(
     }
 
     if (!existingUser.isBanned) {
-      throw new BusinessError('Kullanıcı zaten yasaklı değil');
+      throw new ConflictError('Kullanıcı zaten yasaklı değil');
     }
 
-    // Kullanıcının banını kaldır
+    // Kullanıcı yasağını kaldır
     const result = await updateUserDB({ id }, { isBanned: false });
 
-    // Başarılı ban kaldırma logu
+    // Başarılı yasak kaldırma logu
     await logger.info(
       EVENTS.ADMIN.USER_UNBANNED,
-      'Kullanıcı yasağı kaldırıldı',
+      'Kullanıcı yasağı başarıyla kaldırıldı',
       { 
         userId: result.id, 
-        username: result.username,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        username: result.username
+      },
+      userId
     );
 
     return {
@@ -308,25 +312,27 @@ export async function unbanUserBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Kullanıcı ban kaldırma sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id }
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Kullanıcı yasak kaldırma sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id },
+      userId
     );
     
-    throw new BusinessError('Kullanıcı ban kaldırma başarısız');
+    throw new BusinessError('Kullanıcı yasak kaldırma başarısız');
   }
 }
 
-// Kullanıcı silme (admin)
+// Kullanıcı silme
 export async function deleteUserBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<void>> {
   try {
     // Kullanıcı mevcut mu kontrolü
@@ -335,34 +341,35 @@ export async function deleteUserBusiness(
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
 
-    // Kullanıcıyı sil
+    // Kullanıcı sil
     await deleteUserDB({ id });
 
     // Başarılı silme logu
     await logger.info(
       EVENTS.ADMIN.USER_DELETED,
-      'Kullanıcı silindi',
+      'Kullanıcı başarıyla silindi',
       { 
         userId: id, 
-        username: existingUser.username,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        username: existingUser.username
+      },
+      userId
     );
 
     return {
       success: true
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı silme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id },
+      userId
     );
     
     throw new BusinessError('Kullanıcı silme başarısız');

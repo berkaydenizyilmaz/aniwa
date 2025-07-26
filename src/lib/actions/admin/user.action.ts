@@ -25,10 +25,7 @@ export async function getUsersAction(filters?: UserFilters): Promise<ServerActio
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getUsersBusiness({
-      id: session!.user.id,
-      username: session!.user.username
-    }, validatedFilters);
+    const result = await getUsersBusiness(session!.user.id, validatedFilters);
 
     return {
       success: true,
@@ -47,10 +44,7 @@ export async function getUserAction(id: string): Promise<ServerActionResponse> {
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getUserBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await getUserBusiness(id, session!.user.id);
 
     return {
       success: true,
@@ -72,10 +66,7 @@ export async function updateUserAction(id: string, data: UpdateUserInput): Promi
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await updateUserBusiness(id, validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await updateUserBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.USERS);
@@ -97,10 +88,7 @@ export async function banUserAction(id: string): Promise<ServerActionResponse> {
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await banUserBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await banUserBusiness(id, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.USERS);
@@ -122,10 +110,7 @@ export async function unbanUserAction(id: string): Promise<ServerActionResponse>
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await unbanUserBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await unbanUserBusiness(id, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.USERS);
@@ -147,10 +132,7 @@ export async function deleteUserAction(id: string): Promise<ServerActionResponse
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    await deleteUserBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    await deleteUserBusiness(id, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.USERS);

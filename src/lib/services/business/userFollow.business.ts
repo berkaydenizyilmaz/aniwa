@@ -1,6 +1,6 @@
 // UserFollow iş mantığı katmanı
 
-import { BusinessError } from '@/lib/errors';
+import { BusinessError, DatabaseError } from '@/lib/errors';
 import {
   createUserFollow as createUserFollowDB,
   findUserFollowByFollowerAndFollowing,
@@ -26,8 +26,7 @@ import {
 // Kullanıcı takip etme/çıkarma (toggle)
 export async function toggleUserFollowBusiness(
   followerId: string,
-  data: ToggleUserFollowRequest,
-  user: { id: string; username: string }
+  data: ToggleUserFollowRequest
 ): Promise<ApiResponse<ToggleUserFollowResponse>> {
   try {
     // Kendini takip etme kontrolü
@@ -62,25 +61,38 @@ export async function toggleUserFollowBusiness(
       }
     });
 
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.FOLLOW_TOGGLED,
+      `Kullanıcı ${result.action === 'followed' ? 'takip edildi' : 'takip çıkarıldı'}`,
+      {
+        action: result.action,
+        followerId,
+        followingId: data.followingId,
+      },
+      followerId
+    );
+
     return {
       success: true,
       data: result,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı takip toggle sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         followerId,
         followingId: data.followingId,
-        username: user.username,
-      }
+      },
+      followerId
     );
 
     throw new BusinessError('Kullanıcı takip işlemi başarısız');
@@ -102,6 +114,20 @@ export async function getUserFollowersBusiness(
     const total = await countFollowers({ followingId: userId });
     const totalPages = Math.ceil(total / limit);
 
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.FOLLOWERS_RETRIEVED,
+      'Kullanıcı takipçileri görüntülendi',
+      {
+        userId,
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+      userId
+    );
+
     return {
       success: true,
       data: {
@@ -110,22 +136,24 @@ export async function getUserFollowersBusiness(
         page,
         limit,
         totalPages,
-      },
+      }
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı takipçileri getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         filters,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Kullanıcı takipçileri getirme başarısız');
@@ -147,6 +175,20 @@ export async function getUserFollowingBusiness(
     const total = await countFollowing({ followerId: userId });
     const totalPages = Math.ceil(total / limit);
 
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.FOLLOWING_RETRIEVED,
+      'Kullanıcı takip edilenler görüntülendi',
+      {
+        userId,
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+      userId
+    );
+
     return {
       success: true,
       data: {
@@ -158,57 +200,67 @@ export async function getUserFollowingBusiness(
       },
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Kullanıcı takip edilenleri getirme sırasında beklenmedik hata',
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Kullanıcı takip edilenler getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         filters,
-      }
+      },
+      userId
     );
 
-    throw new BusinessError('Kullanıcı takip edilenleri getirme başarısız');
+    throw new BusinessError('Kullanıcı takip edilenler getirme başarısız');
   }
 }
 
-// Takip durumunu kontrol etme
+// Takip durumu kontrolü
 export async function checkFollowStatusBusiness(
   followerId: string,
   followingId: string
 ): Promise<ApiResponse<{ isFollowing: boolean }>> {
   try {
-    // Takip durumunu kontrol et
-    const existingFollow = await findUserFollowByFollowerAndFollowing(
-      followerId,
-      followingId
+    const follow = await findUserFollowByFollowerAndFollowing(followerId, followingId);
+
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.FOLLOW_STATUS_CHECKED,
+      'Takip durumu kontrol edildi',
+      {
+        followerId,
+        followingId,
+        isFollowing: !!follow,
+      },
+      followerId
     );
 
     return {
       success: true,
-      data: {
-        isFollowing: !!existingFollow,
-      },
+      data: { isFollowing: !!follow },
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Takip durumu kontrolü sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         followerId,
         followingId,
-      }
+      },
+      followerId
     );
 
     throw new BusinessError('Takip durumu kontrolü başarısız');

@@ -16,10 +16,7 @@ export async function POST(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await toggleFavouriteAnimeBusiness(session!.user.id, { animeSeriesId }, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await toggleFavouriteAnimeBusiness(session!.user.id, { animeSeriesId });
     
     // Başarılı yanıt
     return NextResponse.json(result);

@@ -1,6 +1,6 @@
 // Comment ve CommentLike iş mantığı katmanı
 
-import { BusinessError, NotFoundError } from '@/lib/errors';
+import { BusinessError, NotFoundError, DatabaseError } from '@/lib/errors';
 import {
   createComment as createCommentDB,
   findCommentById,
@@ -34,8 +34,7 @@ import {
 // Yorum oluşturma
 export async function createComment(
   userId: string,
-  data: CreateCommentRequest,
-  user: { id: string; username: string }
+  data: CreateCommentRequest
 ): Promise<ApiResponse<CreateCommentResponse>> {
   try {
     // Transaction ile güvenli işlem
@@ -48,26 +47,40 @@ export async function createComment(
       }, tx);
     });
 
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.COMMENT_CREATED,
+      'Yorum oluşturuldu',
+      {
+        userId,
+        commentId: result.id,
+        animeSeriesId: data.animeSeriesId,
+        animeMediaPartId: data.animeMediaPartId,
+      },
+      userId
+    );
+
     return {
       success: true,
       data: result,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Yorum oluşturma sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
-        username: user.username,
         animeSeriesId: data.animeSeriesId,
         animeMediaPartId: data.animeMediaPartId,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Yorum oluşturma başarısız');
@@ -89,6 +102,20 @@ export async function getUserComments(
     const total = await countComments({ userId });
     const totalPages = Math.ceil(total / limit);
 
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.COMMENTS_RETRIEVED,
+      'Kullanıcı yorumları görüntülendi',
+      {
+        userId,
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+      userId
+    );
+
     return {
       success: true,
       data: {
@@ -100,13 +127,14 @@ export async function getUserComments(
       },
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı yorumları getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -119,7 +147,7 @@ export async function getUserComments(
   }
 }
 
-// Anime serisinin yorumlarını getirme
+// Anime serisi yorumlarını getirme
 export async function getAnimeSeriesComments(
   animeSeriesId: string,
   filters?: GetAnimeCommentsRequest
@@ -129,7 +157,7 @@ export async function getAnimeSeriesComments(
     const limit = filters?.limit || 50;
     const skip = (page - 1) * limit;
 
-    // Anime serisinin yorumlarını getir
+    // Anime serisi yorumlarını getir
     const comments = await findCommentsByAnimeSeriesId(animeSeriesId, skip, limit);
     const total = await countComments({ animeSeriesId });
     const totalPages = Math.ceil(total / limit);
@@ -145,13 +173,14 @@ export async function getAnimeSeriesComments(
       },
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Anime serisi yorumları getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -164,7 +193,7 @@ export async function getAnimeSeriesComments(
   }
 }
 
-// Anime medya parçasının yorumlarını getirme
+// Anime medya parçası yorumlarını getirme
 export async function getAnimeMediaPartComments(
   animeMediaPartId: string,
   filters?: GetAnimeCommentsRequest
@@ -174,7 +203,7 @@ export async function getAnimeMediaPartComments(
     const limit = filters?.limit || 50;
     const skip = (page - 1) * limit;
 
-    // Anime medya parçasının yorumlarını getir
+    // Anime medya parçası yorumlarını getir
     const comments = await findCommentsByAnimeMediaPartId(animeMediaPartId, skip, limit);
     const total = await countComments({ animeMediaPartId });
     const totalPages = Math.ceil(total / limit);
@@ -190,13 +219,14 @@ export async function getAnimeMediaPartComments(
       },
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Anime medya parçası yorumları getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -213,8 +243,7 @@ export async function getAnimeMediaPartComments(
 export async function updateComment(
   commentId: string,
   userId: string,
-  data: { content: string },
-  user: { id: string; username: string }
+  data: { content: string }
 ): Promise<ApiResponse<UpdateCommentResponse>> {
   try {
     // Yorum mevcut mu ve kullanıcıya ait mi kontrolü
@@ -222,38 +251,47 @@ export async function updateComment(
     if (!existingComment) {
       throw new NotFoundError('Yorum bulunamadı');
     }
+
     if (existingComment.userId !== userId) {
-      throw new NotFoundError('Yorum bulunamadı');
+      throw new BusinessError('Bu yorumu düzenleme yetkiniz yok');
     }
 
-    // Transaction ile güvenli işlem
-    const result = await prisma.$transaction(async (tx) => {
-      return await updateCommentDB(
-        { id: commentId },
-        { content: data.content },
-        tx
-      );
-    });
+    // Yorumu güncelle
+    const result = await updateCommentDB({ id: commentId }, { content: data.content });
+
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.COMMENT_UPDATED,
+      'Yorum güncellendi',
+      {
+        commentId,
+        userId,
+        oldContent: existingComment.content,
+        newContent: data.content,
+      },
+      userId
+    );
 
     return {
       success: true,
       data: result,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Yorum güncelleme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         commentId,
         userId,
-        username: user.username,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Yorum güncelleme başarısız');
@@ -263,8 +301,7 @@ export async function updateComment(
 // Yorum silme
 export async function deleteComment(
   commentId: string,
-  userId: string,
-  user: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<DeleteCommentResponse>> {
   try {
     // Yorum mevcut mu ve kullanıcıya ait mi kontrolü
@@ -272,45 +309,55 @@ export async function deleteComment(
     if (!existingComment) {
       throw new NotFoundError('Yorum bulunamadı');
     }
+
     if (existingComment.userId !== userId) {
-      throw new NotFoundError('Yorum bulunamadı');
+      throw new BusinessError('Bu yorumu silme yetkiniz yok');
     }
 
-    // Transaction ile güvenli işlem
-    await prisma.$transaction(async (tx) => {
-      await deleteCommentDB({ id: commentId }, tx);
-    });
+    // Yorumu sil
+    await deleteCommentDB({ id: commentId });
+
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.COMMENT_DELETED,
+      'Yorum silindi',
+      {
+        commentId,
+        userId,
+        content: existingComment.content,
+      },
+      userId
+    );
 
     return {
       success: true,
-      data: undefined,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Yorum silme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         commentId,
         userId,
-        username: user.username,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Yorum silme başarısız');
   }
 }
 
-// Yorum beğenme/beğenmeme (toggle)
+// Yorum beğenisi toggle
 export async function toggleCommentLike(
   userId: string,
-  data: ToggleCommentLikeRequest,
-  user: { id: string; username: string }
+  data: ToggleCommentLikeRequest
 ): Promise<ApiResponse<ToggleCommentLikeResponse>> {
   try {
     // Yorum mevcut mu kontrolü
@@ -319,63 +366,55 @@ export async function toggleCommentLike(
       throw new NotFoundError('Yorum bulunamadı');
     }
 
-    // Mevcut beğeni durumunu kontrol et
+    // Mevcut beğeni kontrolü
     const existingLike = await findCommentLikeByUserAndComment(userId, data.commentId);
 
-    // Transaction ile güvenli işlem
-    const result = await prisma.$transaction(async (tx) => {
-      if (existingLike) {
-        // Beğeni varsa çıkar
-        const deletedLike = await deleteCommentLikeDB(
-          { userId_commentId: { userId, commentId: data.commentId } },
-          tx
-        );
+    let result;
+    if (existingLike) {
+      // Beğeniyi kaldır
+      await deleteCommentLikeDB({ id: existingLike.id });
+      result = { action: 'removed' as const, like: existingLike };
+    } else {
+      // Beğeni ekle
+      const newLike = await createCommentLikeDB({
+        user: { connect: { id: userId } },
+        comment: { connect: { id: data.commentId } },
+      });
+      result = { action: 'added' as const, like: newLike };
+    }
 
-        // Yorum beğeni sayısını güncelle
-        await updateCommentDB(
-          { id: data.commentId },
-          { likeCount: { decrement: 1 } },
-          tx
-        );
-
-        return { action: 'removed' as const, like: deletedLike };
-      } else {
-        // Beğeni yoksa ekle
-        const newLike = await createCommentLikeDB({
-          user: { connect: { id: userId } },
-          comment: { connect: { id: data.commentId } },
-        }, tx);
-
-        // Yorum beğeni sayısını güncelle
-        await updateCommentDB(
-          { id: data.commentId },
-          { likeCount: { increment: 1 } },
-          tx
-        );
-
-        return { action: 'added' as const, like: newLike };
-      }
-    });
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.COMMENT_LIKE_TOGGLED,
+      `Yorum ${result.action === 'added' ? 'beğenildi' : 'beğeni kaldırıldı'}`,
+      {
+        userId,
+        commentId: data.commentId,
+        action: result.action,
+      },
+      userId
+    );
 
     return {
       success: true,
       data: result,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Yorum beğenisi toggle sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         commentId: data.commentId,
-        username: user.username,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Yorum beğenisi işlemi başarısız');

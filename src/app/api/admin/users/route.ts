@@ -26,10 +26,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await getUsersBusiness({
-      id: session!.user.id,
-      username: session!.user.username
-    }, validatedFilters);
+    const result = await getUsersBusiness(session!.user.id, validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);

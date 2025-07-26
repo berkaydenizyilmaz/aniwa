@@ -21,10 +21,7 @@ export async function PUT(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await updateComment(commentId, session!.user.id, validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await updateComment(commentId, session!.user.id, validatedData);
     
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -46,10 +43,7 @@ export async function DELETE(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await deleteComment(commentId, session!.user.id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await deleteComment(commentId, session!.user.id);
     
     // Başarılı yanıt
     return NextResponse.json(result);

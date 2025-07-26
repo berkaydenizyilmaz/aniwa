@@ -3,7 +3,8 @@
 import { 
   BusinessError, 
   ConflictError, 
-  NotFoundError
+  NotFoundError,
+  DatabaseError
 } from '@/lib/errors';
 import { 
   createTag as createTagDB, 
@@ -32,7 +33,7 @@ import {
 // Tag oluşturma
 export async function createTagBusiness(
   data: CreateTagRequest,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<CreateTagResponse>> {
   try {
     // Name benzersizlik kontrolü
@@ -65,10 +66,9 @@ export async function createTagBusiness(
       { 
         tagId: result.id, 
         name: result.name, 
-        slug: result.slug,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        slug: result.slug
+      },
+      userId
     );
 
     return {
@@ -76,15 +76,17 @@ export async function createTagBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Tag oluşturma sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', name: data.name }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', name: data.name },
+      userId
     );
     
     throw new BusinessError('Tag oluşturma başarısız');
@@ -94,7 +96,7 @@ export async function createTagBusiness(
 // Tag getirme (ID ile)
 export async function getTagBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<GetTagResponse>> {
   try {
     const tag = await findTagById(id);
@@ -108,10 +110,9 @@ export async function getTagBusiness(
       'Tag detayı görüntülendi',
       { 
         tagId: tag.id, 
-        name: tag.name,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        name: tag.name
+      },
+      userId
     );
 
     return {
@@ -119,15 +120,17 @@ export async function getTagBusiness(
       data: tag
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Tag getirme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', tagId: id }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', tagId: id },
+      userId
     );
     
     throw new BusinessError('Tag getirme başarısız');
@@ -136,7 +139,7 @@ export async function getTagBusiness(
 
 // Tüm tag'leri getirme (filtrelemeli)
 export async function getTagsBusiness(
-  adminUser: { id: string; username: string },
+  userId: string,
   filters?: GetTagsRequest
 ): Promise<ApiResponse<GetTagsResponse>> {
   try {
@@ -179,10 +182,9 @@ export async function getTagsBusiness(
         total,
         page,
         limit,
-        totalPages,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        totalPages
+      },
+      userId
     );
 
     return {
@@ -196,15 +198,17 @@ export async function getTagsBusiness(
       }
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Tag listeleme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
+      userId
     );
     
     throw new BusinessError('Tag listeleme başarısız');
@@ -215,7 +219,7 @@ export async function getTagsBusiness(
 export async function updateTagBusiness(
   id: string, 
   data: UpdateTagRequest,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<UpdateTagResponse>> {
   try {
     // Tag mevcut mu kontrolü
@@ -254,9 +258,10 @@ export async function updateTagBusiness(
         tagId: result.id, 
         name: result.name, 
         slug: result.slug,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        oldName: existingTag.name,
+        oldSlug: existingTag.slug
+      },
+      userId
     );
 
     return {
@@ -264,15 +269,17 @@ export async function updateTagBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Tag güncelleme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', tagId: id, data }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', tagId: id, data },
+      userId
     );
     
     throw new BusinessError('Tag güncelleme başarısız');
@@ -282,7 +289,7 @@ export async function updateTagBusiness(
 // Tag silme
 export async function deleteTagBusiness(
   id: string,
-  adminUser: { id: string; username: string }
+  userId: string
 ): Promise<ApiResponse<void>> {
   try {
     // Tag mevcut mu kontrolü
@@ -300,25 +307,26 @@ export async function deleteTagBusiness(
       'Tag başarıyla silindi',
       { 
         tagId: id, 
-        name: existingTag.name,
-        adminId: adminUser.id,
-        adminUsername: adminUser.username
-      }
+        name: existingTag.name
+      },
+      userId
     );
 
     return {
       success: true
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Tag silme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', tagId: id }
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', tagId: id },
+      userId
     );
     
     throw new BusinessError('Tag silme başarısız');

@@ -1,6 +1,6 @@
 // UserAnimeTracking iş mantığı katmanı
 
-import { BusinessError } from '@/lib/errors';
+import { BusinessError, DatabaseError } from '@/lib/errors';
 import {
   createUserAnimeTracking as createUserAnimeTrackingDB,
   findUserAnimeTrackingByUserAndAnime,
@@ -34,6 +34,20 @@ export async function getUserAnimeTrackingBusiness(
     const total = await countUserAnimeTracking({ userId });
     const totalPages = Math.ceil(total / limit);
 
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.ANIME_TRACKING_RETRIEVED,
+      'Kullanıcı anime takip kayıtları görüntülendi',
+      {
+        userId,
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+      userId
+    );
+
     return {
       success: true,
       data: {
@@ -45,19 +59,21 @@ export async function getUserAnimeTrackingBusiness(
       },
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı anime takip kayıtları getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         filters,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Anime takip kayıtları getirme başarısız');
@@ -67,8 +83,7 @@ export async function getUserAnimeTrackingBusiness(
 // Anime takip etme/çıkarma (toggle)
 export async function toggleUserAnimeTrackingBusiness(
   userId: string,
-  data: ToggleUserAnimeTrackingRequest,
-  user: { id: string; username: string }
+  data: ToggleUserAnimeTrackingRequest
 ): Promise<ApiResponse<ToggleUserAnimeTrackingResponse>> {
   try {
     // Mevcut takip durumunu kontrol et
@@ -98,65 +113,86 @@ export async function toggleUserAnimeTrackingBusiness(
       }
     });
 
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.ANIME_TRACKING_TOGGLED,
+      `Anime ${result.action === 'tracked' ? 'takip edildi' : 'takip çıkarıldı'}`,
+      {
+        action: result.action,
+        userId,
+        animeSeriesId: data.animeSeriesId,
+      },
+      userId
+    );
+
     return {
       success: true,
       data: result,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Anime takip toggle sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         animeSeriesId: data.animeSeriesId,
-        username: user.username,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Anime takip işlemi başarısız');
   }
 }
 
-// Takip durumunu kontrol etme
+// Takip durumu kontrolü
 export async function checkTrackingStatusBusiness(
   userId: string,
   animeSeriesId: string
 ): Promise<ApiResponse<{ isTracking: boolean }>> {
   try {
-    // Takip durumunu kontrol et
-    const existingTracking = await findUserAnimeTrackingByUserAndAnime(
-      userId,
-      animeSeriesId
+    const tracking = await findUserAnimeTrackingByUserAndAnime(userId, animeSeriesId);
+
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.ANIME_TRACKING_STATUS_CHECKED,
+      'Anime takip durumu kontrol edildi',
+      {
+        userId,
+        animeSeriesId,
+        isTracking: !!tracking,
+      },
+      userId
     );
 
     return {
       success: true,
-      data: {
-        isTracking: !!existingTracking,
-      },
+      data: { isTracking: !!tracking },
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
-      'Anime takip durumu kontrolü sırasında beklenmedik hata',
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Takip durumu kontrolü sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         animeSeriesId,
-      }
+      },
+      userId
     );
 
-    throw new BusinessError('Anime takip durumu kontrolü başarısız');
+    throw new BusinessError('Takip durumu kontrolü başarısız');
   }
 } 

@@ -16,10 +16,7 @@ export async function POST(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await toggleCommentLike(session!.user.id, { commentId }, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await toggleCommentLike(session!.user.id, { commentId });
     
     // Başarılı yanıt
     return NextResponse.json(result);

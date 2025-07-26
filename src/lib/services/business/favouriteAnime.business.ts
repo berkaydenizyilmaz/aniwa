@@ -1,6 +1,6 @@
 // FavouriteAnime iş mantığı katmanı
 
-import { BusinessError } from '@/lib/errors';
+import { BusinessError, DatabaseError } from '@/lib/errors';
 import {
   findFavouriteAnimeSeriesByUserId,
   findFavouriteAnimeSeriesByUserAndAnime,
@@ -35,6 +35,20 @@ export async function getUserFavouriteAnimesBusiness(
     // Sayfalama
     const paginatedFavourites = favouriteAnimes.slice(skip, skip + limit);
 
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.FAVOURITE_ANIMES_RETRIEVED,
+      'Kullanıcı favori animeleri görüntülendi',
+      {
+        userId,
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+      userId
+    );
+
     return {
       success: true,
       data: {
@@ -46,19 +60,21 @@ export async function getUserFavouriteAnimesBusiness(
       },
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı favori animeleri getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         filters,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Favori animeler getirme başarısız');
@@ -68,8 +84,7 @@ export async function getUserFavouriteAnimesBusiness(
 // Favori anime ekleme/çıkarma (toggle)
 export async function toggleFavouriteAnimeBusiness(
   userId: string,
-  data: ToggleFavouriteAnimeRequest,
-  user: { id: string; username: string }
+  data: ToggleFavouriteAnimeRequest
 ): Promise<ApiResponse<ToggleFavouriteAnimeResponse>> {
   try {
     // Mevcut favori durumunu kontrol et
@@ -86,7 +101,7 @@ export async function toggleFavouriteAnimeBusiness(
           where: { id: existingFavourite.id },
         });
 
-        return deletedFavourite;
+        return { action: 'removed' as const, favourite: deletedFavourite };
       } else {
         // Favori yoksa ekle
         // Son sıra numarasını bul
@@ -100,35 +115,48 @@ export async function toggleFavouriteAnimeBusiness(
 
         const newFavourite = await tx.favouriteAnimeSeries.create({
           data: {
-            userId,
-            animeSeriesId: data.animeSeriesId,
+            user: { connect: { id: userId } },
+            animeSeries: { connect: { id: data.animeSeriesId } },
             order: newOrder,
           },
         });
 
-        return newFavourite;
+        return { action: 'added' as const, favourite: newFavourite };
       }
     });
 
+    // Başarılı işlem logu
+    await logger.info(
+      EVENTS.USER.FAVOURITE_ANIME_TOGGLED,
+      `Anime ${result.action === 'added' ? 'favorilere eklendi' : 'favorilerden çıkarıldı'}`,
+      {
+        action: result.action,
+        userId,
+        animeSeriesId: data.animeSeriesId,
+      },
+      userId
+    );
+
     return {
       success: true,
-      data: result,
+      data: result.favourite,
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Favori anime toggle sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         userId,
         animeSeriesId: data.animeSeriesId,
-        username: user.username,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Favori anime işlemi başarısız');

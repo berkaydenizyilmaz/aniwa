@@ -19,10 +19,7 @@ export async function getLogsAction(filters?: LogFilters): Promise<ServerActionR
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getLogsBusiness({
-      id: session!.user.id,
-      username: session!.user.username
-    }, validatedFilters);
+    const result = await getLogsBusiness(session!.user.id, validatedFilters);
 
     return {
       success: true,
@@ -41,10 +38,7 @@ export async function getLogAction(id: string): Promise<ServerActionResponse> {
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getLogBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await getLogBusiness(id, session!.user.id);
 
     return {
       success: true,
