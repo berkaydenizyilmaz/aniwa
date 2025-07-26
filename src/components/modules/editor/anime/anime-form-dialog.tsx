@@ -24,7 +24,7 @@ import {
 import { createAnimeSeriesAction, updateAnimeSeriesAction } from '@/lib/actions/editor/anime.action';
 import { createAnimeSeriesSchema, updateAnimeSeriesSchema, type CreateAnimeSeriesInput, type UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 import { toast } from 'sonner';
-import { AnimeSeries } from '@prisma/client';
+import { AnimeSeries, AnimeType, AnimeStatus, Season, Source } from '@prisma/client';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
@@ -53,14 +53,14 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
       englishTitle: '',
       japaneseTitle: '',
       synonyms: [],
-      type: 'TV',
-      status: 'FINISHED',
+      type: AnimeType.TV,
+      status: AnimeStatus.FINISHED,
       episodes: 0,
       duration: 0,
       isAdult: false,
-      season: 'SPRING',
+      season: Season.SPRING,
       seasonYear: new Date().getFullYear(),
-      source: 'ORIGINAL',
+      source: Source.ORIGINAL,
       countryOfOrigin: 'Japan',
       description: '',
       isMultiPart: false,
@@ -68,6 +68,17 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
   });
 
   const watchedType = watch('type');
+
+  // Tür değiştiğinde sezon ve yıl alanlarını güncelle
+  useEffect(() => {
+    if (watchedType === AnimeType.MOVIE) {
+      setValue('season', undefined);
+      setValue('seasonYear', undefined);
+    } else if (watchedType && !watch('season')) {
+      setValue('season', Season.SPRING);
+      setValue('seasonYear', new Date().getFullYear());
+    }
+  }, [watchedType, setValue, watch]);
 
   // Form'u anime verisi ile doldur (edit mode)
   useEffect(() => {
@@ -82,12 +93,15 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
         episodes: anime.episodes || 0,
         duration: anime.duration || 0,
         isAdult: anime.isAdult || false,
-        season: anime.season || 'SPRING',
-        seasonYear: anime.seasonYear || new Date().getFullYear(),
-        source: anime.source || 'ORIGINAL',
+        season: anime.season || (anime.type !== AnimeType.MOVIE ? Season.SPRING : undefined),
+        seasonYear: anime.seasonYear || (anime.type !== AnimeType.MOVIE ? new Date().getFullYear() : undefined),
+        source: anime.source || Source.ORIGINAL,
         countryOfOrigin: anime.countryOfOrigin || 'Japan',
         description: anime.description || '',
         isMultiPart: anime.isMultiPart,
+        coverImage: anime.coverImage || '',
+        bannerImage: anime.bannerImage || '',
+        trailer: anime.trailer || '',
       });
     } else {
       reset({
@@ -95,17 +109,20 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
         englishTitle: '',
         japaneseTitle: '',
         synonyms: [],
-        type: 'TV',
-        status: 'FINISHED',
+        type: AnimeType.TV,
+        status: AnimeStatus.FINISHED,
         episodes: 0,
         duration: 0,
         isAdult: false,
-        season: 'SPRING',
+        season: Season.SPRING,
         seasonYear: new Date().getFullYear(),
-        source: 'ORIGINAL',
+        source: Source.ORIGINAL,
         countryOfOrigin: 'Japan',
         description: '',
         isMultiPart: false,
+        coverImage: '',
+        bannerImage: '',
+        trailer: '',
       });
     }
   }, [anime, reset]);
@@ -201,17 +218,18 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             <Label htmlFor="type">Tür *</Label>
             <Select
               value={watchedType}
-              onValueChange={(value) => setValue('type', value as 'TV' | 'MOVIE' | 'OVA' | 'ONA')}
+              onValueChange={(value) => setValue('type', value as AnimeType)}
               disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tür seçin" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="TV">TV Series</SelectItem>
-                <SelectItem value="MOVIE">Film</SelectItem>
-                <SelectItem value="OVA">OVA</SelectItem>
-                <SelectItem value="ONA">ONA</SelectItem>
+                {Object.values(AnimeType).map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {errors.type && (
@@ -224,17 +242,18 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             <Label htmlFor="status">Durum *</Label>
             <Select
               {...register('status')}
-              onValueChange={(value) => setValue('status', value as 'FINISHED' | 'RELEASING' | 'NOT_YET_RELEASED' | 'CANCELLED')}
+              onValueChange={(value) => setValue('status', value as AnimeStatus)}
               disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Durum seçin" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="FINISHED">Tamamlandı</SelectItem>
-                <SelectItem value="RELEASING">Devam Ediyor</SelectItem>
-                <SelectItem value="NOT_YET_RELEASED">Henüz Yayınlanmadı</SelectItem>
-                <SelectItem value="CANCELLED">İptal Edildi</SelectItem>
+                {Object.values(AnimeStatus).map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {status}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {errors.status && (
@@ -242,9 +261,12 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             )}
           </div>
 
-          {/* Bölüm Sayısı */}
+          {/* Bölüm Sayısı (OVA/ONA için zorunlu) */}
           <div className="space-y-2">
-            <Label htmlFor="episodes">Bölüm Sayısı</Label>
+            <Label htmlFor="episodes">
+              Bölüm Sayısı
+              {(watchedType === AnimeType.OVA || watchedType === AnimeType.ONA) && ' *'}
+            </Label>
             <Input
               id="episodes"
               type="number"
@@ -286,7 +308,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
           )}
 
           {/* Çok Parçalı (sadece TV Series için) */}
-          {watchedType === 'TV' && (
+          {watchedType === AnimeType.TV && (
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="isMultiPart"
@@ -300,63 +322,66 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             <p className="text-sm text-destructive">{errors.isMultiPart.message}</p>
           )}
 
-          {/* Sezon */}
-          <div className="space-y-2">
-            <Label htmlFor="season">Sezon</Label>
-            <Select
-              {...register('season')}
-              onValueChange={(value) => setValue('season', value as 'SPRING' | 'SUMMER' | 'FALL' | 'WINTER')}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Sezon seçin" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="SPRING">İlkbahar</SelectItem>
-                <SelectItem value="SUMMER">Yaz</SelectItem>
-                <SelectItem value="FALL">Sonbahar</SelectItem>
-                <SelectItem value="WINTER">Kış</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.season && (
-              <p className="text-sm text-destructive">{errors.season.message}</p>
-            )}
-          </div>
+          {/* Sezon (Film hariç zorunlu) */}
+          {watchedType !== AnimeType.MOVIE && (
+            <div className="space-y-2">
+              <Label htmlFor="season">Sezon *</Label>
+              <Select
+                {...register('season')}
+                onValueChange={(value) => setValue('season', value as Season)}
+                disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sezon seçin" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(Season).map((season) => (
+                    <SelectItem key={season} value={season}>
+                      {season}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.season && (
+                <p className="text-sm text-destructive">{errors.season.message}</p>
+              )}
+            </div>
+          )}
 
-          {/* Yıl */}
-          <div className="space-y-2">
-            <Label htmlFor="seasonYear">Yıl</Label>
-            <Input
-              id="seasonYear"
-              type="number"
-              placeholder="2024"
-              {...register('seasonYear', { valueAsNumber: true })}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-            />
-            {errors.seasonYear && (
-              <p className="text-sm text-destructive">{errors.seasonYear.message}</p>
-            )}
-          </div>
+          {/* Yıl (Film hariç zorunlu) */}
+          {watchedType !== AnimeType.MOVIE && (
+            <div className="space-y-2">
+              <Label htmlFor="seasonYear">Yıl *</Label>
+              <Input
+                id="seasonYear"
+                type="number"
+                placeholder="2024"
+                {...register('seasonYear', { valueAsNumber: true })}
+                disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              />
+              {errors.seasonYear && (
+                <p className="text-sm text-destructive">{errors.seasonYear.message}</p>
+              )}
+            </div>
+          )}
 
           {/* Kaynak */}
           <div className="space-y-2">
             <Label htmlFor="source">Kaynak</Label>
             <Select
               {...register('source')}
-              onValueChange={(value) => setValue('source', value as 'ORIGINAL' | 'MANGA' | 'LIGHT_NOVEL' | 'VISUAL_NOVEL' | 'GAME' | 'NOVEL' | 'OTHER')}
+              onValueChange={(value) => setValue('source', value as Source)}
               disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Kaynak seçin" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ORIGINAL">Original</SelectItem>
-                <SelectItem value="MANGA">Manga</SelectItem>
-                <SelectItem value="LIGHT_NOVEL">Light Novel</SelectItem>
-                <SelectItem value="VISUAL_NOVEL">Visual Novel</SelectItem>
-                <SelectItem value="GAME">Game</SelectItem>
-                <SelectItem value="NOVEL">Novel</SelectItem>
-                <SelectItem value="OTHER">Diğer</SelectItem>
+                {Object.values(Source).map((source) => (
+                  <SelectItem key={source} value={source}>
+                    {source}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {errors.source && (
@@ -392,6 +417,56 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             {errors.description && (
               <p className="text-sm text-destructive">{errors.description.message}</p>
             )}
+          </div>
+
+          {/* Görsel İçerik */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Görsel İçerik</h3>
+            
+            {/* Kapak Resmi */}
+            <div className="space-y-2">
+              <Label htmlFor="coverImage">Kapak Resmi URL</Label>
+              <Input
+                id="coverImage"
+                type="url"
+                placeholder="https://example.com/cover.jpg"
+                {...register('coverImage')}
+                disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              />
+              {errors.coverImage && (
+                <p className="text-sm text-destructive">{errors.coverImage.message}</p>
+              )}
+            </div>
+
+            {/* Banner Resmi */}
+            <div className="space-y-2">
+              <Label htmlFor="bannerImage">Banner Resmi URL</Label>
+              <Input
+                id="bannerImage"
+                type="url"
+                placeholder="https://example.com/banner.jpg"
+                {...register('bannerImage')}
+                disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              />
+              {errors.bannerImage && (
+                <p className="text-sm text-destructive">{errors.bannerImage.message}</p>
+              )}
+            </div>
+
+            {/* Tanıtım Videosu */}
+            <div className="space-y-2">
+              <Label htmlFor="trailer">Tanıtım Videosu URL</Label>
+              <Input
+                id="trailer"
+                type="url"
+                placeholder="https://youtube.com/watch?v=..."
+                {...register('trailer')}
+                disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              />
+              {errors.trailer && (
+                <p className="text-sm text-destructive">{errors.trailer.message}</p>
+              )}
+            </div>
           </div>
 
           {/* Butonlar */}

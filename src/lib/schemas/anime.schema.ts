@@ -20,6 +20,32 @@ export const createAnimeSeriesSchema = z.object({
   countryOfOrigin: z.string().optional(),
   description: z.string().optional(),
   isMultiPart: z.boolean(),
+  // Görsel İçerik
+  coverImage: z.string().url('Geçerli bir URL girin').optional(),
+  bannerImage: z.string().url('Geçerli bir URL girin').optional(),
+  trailer: z.string().url('Geçerli bir URL girin').optional(),
+  // İlişkiler
+  genreIds: z.array(z.string()).optional(),
+  tagIds: z.array(z.string()).optional(),
+  studioIds: z.array(z.string()).optional(),
+}).refine((data) => {
+  // Film değilse sezon ve yıl zorunlu
+  if (data.type !== 'MOVIE') {
+    return data.season && data.seasonYear;
+  }
+  return true;
+}, {
+  message: 'Film dışındaki türler için sezon ve yıl zorunludur',
+  path: ['season']
+}).refine((data) => {
+  // OVA/ONA için bölüm sayısı zorunlu
+  if (data.type === 'OVA' || data.type === 'ONA') {
+    return data.episodes && data.episodes > 0;
+  }
+  return true;
+}, {
+  message: 'OVA/ONA türleri için bölüm sayısı zorunludur',
+  path: ['episodes']
 });
 
 // Anime serisi güncelleme şeması
@@ -39,6 +65,32 @@ export const updateAnimeSeriesSchema = z.object({
   countryOfOrigin: z.string().optional(),
   description: z.string().optional(),
   isMultiPart: z.boolean(),
+  // Görsel İçerik
+  coverImage: z.string().url('Geçerli bir URL girin').optional(),
+  bannerImage: z.string().url('Geçerli bir URL girin').optional(),
+  trailer: z.string().url('Geçerli bir URL girin').optional(),
+  // İlişkiler
+  genreIds: z.array(z.string()).optional(),
+  tagIds: z.array(z.string()).optional(),
+  studioIds: z.array(z.string()).optional(),
+}).refine((data) => {
+  // Film değilse sezon ve yıl zorunlu
+  if (data.type !== 'MOVIE') {
+    return data.season && data.seasonYear;
+  }
+  return true;
+}, {
+  message: 'Film dışındaki türler için sezon ve yıl zorunludur',
+  path: ['season']
+}).refine((data) => {
+  // OVA/ONA için bölüm sayısı zorunlu
+  if (data.type === 'OVA' || data.type === 'ONA') {
+    return data.episodes && data.episodes > 0;
+  }
+  return true;
+}, {
+  message: 'OVA/ONA türleri için bölüm sayısı zorunludur',
+  path: ['episodes']
 });
 
 // Anime serisi filtreleme şeması

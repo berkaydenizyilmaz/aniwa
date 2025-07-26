@@ -1,39 +1,35 @@
 'use server';
 
-import { createAnimeSeriesSchema, updateAnimeSeriesSchema, animeSeriesFiltersSchema, type CreateAnimeSeriesInput, type UpdateAnimeSeriesInput, type AnimeSeriesFilters } from '@/lib/schemas/anime.schema';
-import { 
-  createAnimeSeriesBusiness, 
-  getAllAnimeSeriesBusiness, 
-  getAnimeDetailsByIdBusiness,
-  updateAnimeSeriesBusiness, 
-  deleteAnimeSeriesBusiness 
-} from '@/lib/services/business/anime.business';
 import { revalidatePath } from 'next/cache';
-import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
-import { ROUTES } from '@/lib/constants/routes.constants';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
+import { createAnimeSeriesBusiness, getAllAnimeSeriesBusiness, getAnimeSeriesByIdBusiness, updateAnimeSeriesBusiness, deleteAnimeSeriesBusiness } from '@/lib/services/business/anime.business';
+import { getGenresBusiness } from '@/lib/services/business/genre.business';
+import { getTagsBusiness } from '@/lib/services/business/tag.business';
+import { getStudiosBusiness } from '@/lib/services/business/studio.business';
+import { createAnimeSeriesSchema, updateAnimeSeriesSchema, type CreateAnimeSeriesInput, type UpdateAnimeSeriesInput, type AnimeSeriesFilters } from '@/lib/schemas/anime.schema';
+import { handleServerActionError } from '@/lib/utils/server-action-error-handler';
+import { ROUTES } from '@/lib/constants/routes.constants';
 
-// Anime serisi oluşturma
-export async function createAnimeSeriesAction(data: CreateAnimeSeriesInput): Promise<ServerActionResponse> {
+// Anime serisi oluştur
+export async function createAnimeSeriesAction(data: CreateAnimeSeriesInput) {
   try {
     // Zod validation
     const validatedData = createAnimeSeriesSchema.parse(data);
 
-    // Session'dan user bilgisini al
+    // Session kontrolü
     const session = await getServerSession(authConfig);
+    if (!session?.user) {
+      return { success: false, error: 'Oturum bulunamadı' };
+    }
 
-    // Business logic'i kullan
-    const result = await createAnimeSeriesBusiness(validatedData, session!.user.id);
+    // Business logic
+    const result = await createAnimeSeriesBusiness(validatedData, session.user.id);
 
-    // Cache'i temizle
+    // Cache revalidation
     revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
 
-    return {
-      success: true,
-      data: result.data
-    };
-
+    return { success: true, data: result };
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'createAnimeSeriesAction',
@@ -42,23 +38,19 @@ export async function createAnimeSeriesAction(data: CreateAnimeSeriesInput): Pro
   }
 }
 
-// Anime serisi listesi getirme
-export async function getAnimeSeriesAction(filters?: AnimeSeriesFilters): Promise<ServerActionResponse> {
+// Anime serilerini getir (filtreleme ile)
+export async function getAnimeSeriesAction(filters: AnimeSeriesFilters) {
   try {
-    // Zod validation
-    const validatedFilters = filters ? animeSeriesFiltersSchema.parse(filters) : undefined;
-
-    // Session'dan user bilgisini al
+    // Session kontrolü
     const session = await getServerSession(authConfig);
+    if (!session?.user) {
+      return { success: false, error: 'Oturum bulunamadı' };
+    }
 
-    // Business logic'i kullan
-    const result = await getAllAnimeSeriesBusiness(validatedFilters, { id: session!.user.id });
+    // Business logic
+    const result = await getAllAnimeSeriesBusiness(filters);
 
-    return {
-      success: true,
-      data: result.data
-    };
-
+    return { success: true, data: result };
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getAnimeSeriesAction',
@@ -67,20 +59,19 @@ export async function getAnimeSeriesAction(filters?: AnimeSeriesFilters): Promis
   }
 }
 
-// Tek anime serisi getirme
-export async function getAnimeSeriesByIdAction(id: string): Promise<ServerActionResponse> {
+// Anime serisi detayını getir
+export async function getAnimeSeriesByIdAction(id: string) {
   try {
-    // Session'dan user bilgisini al
+    // Session kontrolü
     const session = await getServerSession(authConfig);
+    if (!session?.user) {
+      return { success: false, error: 'Oturum bulunamadı' };
+    }
 
-    // Business logic'i kullan
-    const result = await getAnimeDetailsByIdBusiness(id, { id: session!.user.id });
+    // Business logic
+    const result = await getAnimeSeriesByIdBusiness(id, session.user.id);
 
-    return {
-      success: true,
-      data: result.data
-    };
-
+    return { success: true, data: result };
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getAnimeSeriesByIdAction',
@@ -89,26 +80,25 @@ export async function getAnimeSeriesByIdAction(id: string): Promise<ServerAction
   }
 }
 
-// Anime serisi güncelleme
-export async function updateAnimeSeriesAction(id: string, data: UpdateAnimeSeriesInput): Promise<ServerActionResponse> {
+// Anime serisi güncelle
+export async function updateAnimeSeriesAction(id: string, data: UpdateAnimeSeriesInput) {
   try {
     // Zod validation
     const validatedData = updateAnimeSeriesSchema.parse(data);
 
-    // Session'dan user bilgisini al
+    // Session kontrolü
     const session = await getServerSession(authConfig);
+    if (!session?.user) {
+      return { success: false, error: 'Oturum bulunamadı' };
+    }
 
-    // Business logic'i kullan
-    const result = await updateAnimeSeriesBusiness(id, validatedData, session!.user.id);
+    // Business logic
+    const result = await updateAnimeSeriesBusiness(id, validatedData, session.user.id);
 
-    // Cache'i temizle
+    // Cache revalidation
     revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
 
-    return {
-      success: true,
-      data: result.data
-    };
-
+    return { success: true, data: result };
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'updateAnimeSeriesAction',
@@ -117,26 +107,88 @@ export async function updateAnimeSeriesAction(id: string, data: UpdateAnimeSerie
   }
 }
 
-// Anime serisi silme
-export async function deleteAnimeSeriesAction(id: string): Promise<ServerActionResponse> {
+// Anime serisi sil
+export async function deleteAnimeSeriesAction(id: string) {
   try {
-    // Session'dan user bilgisini al
+    // Session kontrolü
     const session = await getServerSession(authConfig);
+    if (!session?.user) {
+      return { success: false, error: 'Oturum bulunamadı' };
+    }
 
-    // Business logic'i kullan
-    const result = await deleteAnimeSeriesBusiness(id, session!.user.id);
+    // Business logic
+    await deleteAnimeSeriesBusiness(id, session.user.id);
 
-    // Cache'i temizle
+    // Cache revalidation
     revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
 
-    return {
-      success: true,
-      data: result.data
-    };
-
+    return { success: true };
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'deleteAnimeSeriesAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
+  }
+}
+
+// Tüm genre'leri getir
+export async function getAllGenresAction() {
+  try {
+    // Session kontrolü
+    const session = await getServerSession(authConfig);
+    if (!session?.user) {
+      return { success: false, error: 'Oturum bulunamadı' };
+    }
+
+    // Business logic
+    const result = await getGenresBusiness(session.user.id);
+
+    return { success: true, data: result };
+  } catch (error) {
+    return handleServerActionError(error, {
+      actionName: 'getAllGenresAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
+  }
+}
+
+// Tüm tag'leri getir
+export async function getAllTagsAction() {
+  try {
+    // Session kontrolü
+    const session = await getServerSession(authConfig);
+    if (!session?.user) {
+      return { success: false, error: 'Oturum bulunamadı' };
+    }
+
+    // Business logic
+    const result = await getTagsBusiness(session.user.id);
+
+    return { success: true, data: result };
+  } catch (error) {
+    return handleServerActionError(error, {
+      actionName: 'getAllTagsAction',
+      userId: (await getServerSession(authConfig))?.user.id
+    });
+  }
+}
+
+// Tüm studio'ları getir
+export async function getAllStudiosAction() {
+  try {
+    // Session kontrolü
+    const session = await getServerSession(authConfig);
+    if (!session?.user) {
+      return { success: false, error: 'Oturum bulunamadı' };
+    }
+
+    // Business logic
+    const result = await getStudiosBusiness(session.user.id);
+
+    return { success: true, data: result };
+  } catch (error) {
+    return handleServerActionError(error, {
+      actionName: 'getAllStudiosAction',
       userId: (await getServerSession(authConfig))?.user.id
     });
   }
