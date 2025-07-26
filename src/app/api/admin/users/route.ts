@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { userFiltersSchema } from '@/lib/schemas/user.schema';
-import { getAllUsers } from '@/lib/services/business/user.business';
+import { getUsersBusiness } from '@/lib/services/business/user.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
+import { getServerSession } from 'next-auth';
+import { authConfig } from '@/lib/auth/auth.config';
 
 // Tüm kullanıcıları listele (GET)
 export async function GET(request: NextRequest) {
@@ -20,8 +22,14 @@ export async function GET(request: NextRequest) {
     // Input validasyonu
     const validatedFilters = userFiltersSchema.parse(filters);
 
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+
     // Business logic
-    const result = await getAllUsers(validatedFilters);
+    const result = await getUsersBusiness({
+      id: session!.user.id,
+      username: session!.user.username
+    }, validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);

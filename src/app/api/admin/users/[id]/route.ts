@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { updateUserSchema } from '@/lib/schemas/user.schema';
-import { getUserById, updateUser, deleteUser } from '@/lib/services/business/user.business';
+import { getUserBusiness, updateUserBusiness, deleteUserBusiness } from '@/lib/services/business/user.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tek kullanıcı detayı (GET)
@@ -13,8 +13,14 @@ export async function GET(
   try {
     const { id } = await params;
 
+    // Session'dan admin bilgisi al
+    const session = await getServerSession(authConfig);
+
     // Business logic
-    const result = await getUserById(id);
+    const result = await getUserBusiness(id, {
+      id: session!.user.id,
+      username: session!.user.username
+    });
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -40,7 +46,7 @@ export async function PUT(
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await updateUser(id, validatedData, {
+    const result = await updateUserBusiness(id, validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });
@@ -65,7 +71,7 @@ export async function DELETE(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await deleteUser(id, {
+    const result = await deleteUserBusiness(id, {
       id: session!.user.id,
       username: session!.user.username
     });

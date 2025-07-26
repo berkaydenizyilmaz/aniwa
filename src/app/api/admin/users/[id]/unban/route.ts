@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { unbanUser } from '@/lib/services/business/user.business';
+import { unbanUserBusiness } from '@/lib/services/business/user.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Kullanıcı ban kaldır (POST)
@@ -16,7 +16,7 @@ export async function POST(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await unbanUser(id, {
+    const result = await unbanUserBusiness(id, {
       id: session!.user.id,
       username: session!.user.username
     });

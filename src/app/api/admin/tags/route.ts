@@ -27,10 +27,9 @@ export async function GET(request: NextRequest) {
 
     // Business logic 
     const result = await getTagsBusiness({
-      ...validatedFilters,
       id: session!.user.id,
       username: session!.user.username
-    });
+    }, validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);

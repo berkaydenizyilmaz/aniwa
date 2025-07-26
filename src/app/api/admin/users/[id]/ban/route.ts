@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { banUser } from '@/lib/services/business/user.business';
+import { banUserBusiness } from '@/lib/services/business/user.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Kullanıcı banla (POST)
@@ -16,7 +16,7 @@ export async function POST(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await banUser(id, {
+    const result = await banUserBusiness(id, {
       id: session!.user.id,
       username: session!.user.username
     });
