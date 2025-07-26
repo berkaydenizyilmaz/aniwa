@@ -11,6 +11,8 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRole, setSelectedRole] = useState('');
+  const [selectedBanned, setSelectedBanned] = useState<boolean | null>(null);
 
   const handleAddNew = () => {
     setSelectedUser(null);
@@ -30,6 +32,14 @@ export default function UsersPage() {
     setSearchTerm(search);
   };
 
+  const handleRoleChange = (role: string) => {
+    setSelectedRole(role);
+  };
+
+  const handleBannedChange = (isBanned: boolean | null) => {
+    setSelectedBanned(isBanned);
+  };
+
   return (
     <div className="space-y-6">
       {/* Başlık */}
@@ -41,13 +51,20 @@ export default function UsersPage() {
       </div>
 
       {/* Filtreler */}
-      <UserFilters onSearch={handleSearch} onAddNew={handleAddNew} />
+      <UserFilters 
+        onSearch={handleSearch} 
+        onRoleChange={handleRoleChange}
+        onBannedChange={handleBannedChange}
+        onAddNew={handleAddNew} 
+      />
 
       {/* Tablo */}
       <UserTable 
         key={refreshKey}
         onEdit={handleEdit}
         searchTerm={searchTerm}
+        selectedRole={selectedRole}
+        selectedBanned={selectedBanned}
       />
 
       {/* Form Dialog */}

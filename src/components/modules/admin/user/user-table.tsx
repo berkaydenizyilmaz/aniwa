@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Ban, UserCheck } from 'lucide-react';
-import { User } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 import { getUsersAction, deleteUserAction, banUserAction, unbanUserAction } from '@/lib/actions/user.action';
 import { toast } from 'sonner';
 import { GetUsersResponse } from '@/lib/types/api/user.api';
@@ -32,9 +32,11 @@ import { type UserFilters } from '@/lib/schemas/user.schema';
 interface UserTableProps {
   onEdit?: (user: User) => void;
   searchTerm?: string;
+  selectedRole?: string;
+  selectedBanned?: boolean | null;
 }
 
-export function UserTable({ onEdit, searchTerm = '' }: UserTableProps) {
+export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selectedBanned = null }: UserTableProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -50,6 +52,8 @@ export function UserTable({ onEdit, searchTerm = '' }: UserTableProps) {
           limit: 100,
         };
         if (searchTerm) filters.search = searchTerm;
+        if (selectedRole) filters.role = selectedRole as UserRole;
+        if (selectedBanned !== null) filters.isBanned = selectedBanned;
         const result = await getUsersAction(filters);
         if (!result.success) {
           toast.error(result.error || 'Kullanıcılar yüklenirken bir hata oluştu');
@@ -65,7 +69,7 @@ export function UserTable({ onEdit, searchTerm = '' }: UserTableProps) {
       }
     };
     fetchUsers();
-  }, [setLoadingStore, searchTerm]);
+  }, [setLoadingStore, searchTerm, selectedRole, selectedBanned]);
 
   // Client-side filtreleme kaldırıldı, direkt users kullanılıyor
 
