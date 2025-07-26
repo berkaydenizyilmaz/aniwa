@@ -20,7 +20,7 @@ import {
 } from '@/lib/types/api/userAnimeTracking.api';
 
 // Kullanıcının anime takip kayıtlarını getirme
-export async function getUserAnimeTracking(
+export async function getUserAnimeTrackingBusiness(
   userId: string,
   filters?: GetUserAnimeTrackingRequest
 ): Promise<ApiResponse<GetUserAnimeTrackingResponse>> {
@@ -65,7 +65,7 @@ export async function getUserAnimeTracking(
 }
 
 // Anime takip etme/çıkarma (toggle)
-export async function toggleUserAnimeTracking(
+export async function toggleUserAnimeTrackingBusiness(
   userId: string,
   data: ToggleUserAnimeTrackingRequest,
   user: { id: string; username: string }
@@ -124,7 +124,7 @@ export async function toggleUserAnimeTracking(
 }
 
 // Takip durumunu kontrol etme
-export async function checkTrackingStatus(
+export async function checkTrackingStatusBusiness(
   userId: string,
   animeSeriesId: string
 ): Promise<ApiResponse<{ isTracking: boolean }>> {

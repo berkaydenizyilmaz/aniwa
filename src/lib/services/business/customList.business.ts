@@ -29,7 +29,7 @@ import {
 
 
 // Özel liste oluşturma
-export async function createCustomList(
+export async function createCustomListBusiness(
   userId: string,
   data: CreateCustomListRequest,
   user: { id: string; username: string }
@@ -89,7 +89,7 @@ export async function createCustomList(
 }
 
 // Kullanıcının özel listelerini getirme
-export async function getUserCustomLists(
+export async function getUserCustomListsBusiness(
   userId: string,
   filters?: GetUserCustomListsRequest
 ): Promise<ApiResponse<GetUserCustomListsResponse>> {
@@ -138,7 +138,7 @@ export async function getUserCustomLists(
 }
 
 // Özel liste güncelleme
-export async function updateCustomList(
+export async function updateCustomListBusiness(
   listId: string,
   userId: string,
   data: UpdateCustomListRequest,
@@ -213,7 +213,7 @@ export async function updateCustomList(
 }
 
 // Özel liste silme
-export async function deleteCustomList(
+export async function deleteCustomListBusiness(
   listId: string,
   userId: string,
   user: { id: string; username: string }
@@ -271,7 +271,7 @@ export async function deleteCustomList(
 }
 
 // Listeye anime ekleme/çıkarma (toggle)
-export async function toggleAnimeInList(
+export async function toggleAnimeInListBusiness(
   listId: string,
   userAnimeListId: string,
   userId: string,
@@ -348,7 +348,7 @@ export async function toggleAnimeInList(
 }
 
 // Liste içeriğini getirme
-export async function getListItems(
+export async function getListItemsBusiness(
   listId: string,
   userId: string,
   filters?: GetUserCustomListsRequest

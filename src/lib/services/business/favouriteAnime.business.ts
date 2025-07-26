@@ -17,7 +17,7 @@ import {
 } from '@/lib/types/api/favouriteAnime.api';
 
 // Kullanıcının favori animelerini getirme
-export async function getUserFavouriteAnimes(
+export async function getUserFavouriteAnimesBusiness(
   userId: string,
   filters?: GetUserFavouriteAnimesRequest
 ): Promise<ApiResponse<GetUserFavouriteAnimesResponse>> {
@@ -66,7 +66,7 @@ export async function getUserFavouriteAnimes(
 }
 
 // Favori anime ekleme/çıkarma (toggle)
-export async function toggleFavouriteAnime(
+export async function toggleFavouriteAnimeBusiness(
   userId: string,
   data: ToggleFavouriteAnimeRequest,
   user: { id: string; username: string }

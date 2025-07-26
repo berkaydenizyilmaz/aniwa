@@ -24,7 +24,7 @@ import {
 } from '@/lib/types/api/userFollow.api';
 
 // Kullanıcı takip etme/çıkarma (toggle)
-export async function toggleUserFollow(
+export async function toggleUserFollowBusiness(
   followerId: string,
   data: ToggleUserFollowRequest,
   user: { id: string; username: string }
@@ -88,7 +88,7 @@ export async function toggleUserFollow(
 }
 
 // Kullanıcının takipçilerini getirme
-export async function getUserFollowers(
+export async function getUserFollowersBusiness(
   userId: string,
   filters?: GetUserFollowersRequest
 ): Promise<ApiResponse<GetUserFollowersResponse>> {
@@ -133,7 +133,7 @@ export async function getUserFollowers(
 }
 
 // Kullanıcının takip ettiklerini getirme
-export async function getUserFollowing(
+export async function getUserFollowingBusiness(
   userId: string,
   filters?: GetUserFollowingRequest
 ): Promise<ApiResponse<GetUserFollowingResponse>> {
@@ -178,7 +178,7 @@ export async function getUserFollowing(
 }
 
 // Takip durumunu kontrol etme
-export async function checkFollowStatus(
+export async function checkFollowStatusBusiness(
   followerId: string,
   followingId: string
 ): Promise<ApiResponse<{ isFollowing: boolean }>> {

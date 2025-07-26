@@ -21,7 +21,7 @@ import {
 } from '@/lib/types/api/userAnimeList.api';
 
 // Anime'yi listeye ekle/çıkar (Toggle)
-export async function toggleAnimeInList(
+export async function toggleAnimeInListBusiness(
   userId: string,
   data: AddAnimeToListRequest,
   user: { id: string; username: string }
@@ -84,7 +84,7 @@ export async function toggleAnimeInList(
 }
 
 // Kullanıcının anime listesini getirme
-export async function getUserAnimeLists(
+export async function getUserAnimeListsBusiness(
   userId: string,
   filters?: GetUserAnimeListsRequest
 ): Promise<ApiResponse<GetUserAnimeListsResponse>> {
@@ -133,7 +133,7 @@ export async function getUserAnimeLists(
 }
 
 // Belirli anime'nin liste durumunu getirme
-export async function getUserAnimeListByAnime(
+export async function getUserAnimeListByAnimeBusiness(
   userId: string,
   animeSeriesId: string
 ): Promise<ApiResponse<GetUserAnimeListByAnimeResponse>> {

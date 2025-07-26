@@ -25,7 +25,7 @@ import {
 } from "@/lib/types/api/anime.api";
 
 // Anime serisi oluşturma (transaction ile)
-export async function createAnimeSeries(
+export async function createAnimeSeriesBusiness(
   data: CreateAnimeSeriesRequest,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<GetAnimeSeriesDetailsResponse>> {
@@ -169,7 +169,7 @@ export async function createAnimeSeries(
 }
 
 // Anime serisi detaylarını getirme
-export async function getAnimeDetailsById(
+export async function getAnimeDetailsByIdBusiness(
   id: string,
   user?: { id: string; userSettings?: { displayAdultContent: boolean } }
 ): Promise<ApiResponse<GetAnimeSeriesDetailsResponse>> {
@@ -230,7 +230,7 @@ export async function getAnimeDetailsById(
 }
 
 // Tüm anime serilerini getirme (filtrelemeli)
-export async function getAllAnimeSeries(
+export async function getAllAnimeSeriesBusiness(
   filters?: GetAnimeSeriesRequest,
   user?: { id: string; userSettings?: { displayAdultContent: boolean } }
 ): Promise<ApiResponse<GetAllAnimeSeriesResponse>> {
@@ -333,7 +333,7 @@ export async function getAllAnimeSeries(
 }
 
 // Anime serisi güncelleme
-export async function updateAnimeSeries(
+export async function updateAnimeSeriesBusiness(
   id: string,
   data: Partial<CreateAnimeSeriesRequest>,
   adminUser: { id: string; username: string }
@@ -479,7 +479,7 @@ export async function updateAnimeSeries(
 }
 
 // Anime serisi silme
-export async function deleteAnimeSeries(
+export async function deleteAnimeSeriesBusiness(
   id: string,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<{ message: string }>> {
@@ -531,7 +531,7 @@ export async function deleteAnimeSeries(
 }
 
 // Anime serisi detaylarını getirme (admin için)
-export async function getAnimeSeriesById(
+export async function getAnimeSeriesByIdBusiness(
   id: string,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<GetAnimeSeriesDetailsResponse>> {

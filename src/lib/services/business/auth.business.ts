@@ -20,7 +20,7 @@ import { AUTH } from '@/lib/constants/auth.constants';
 import crypto from 'crypto';
 
 // Kullanıcı kaydı
-export async function registerUser(data: RegisterRequest): Promise<ApiResponse<RegisterResponse>> {
+export async function registerUserBusiness(data: RegisterRequest): Promise<ApiResponse<RegisterResponse>> {
   try {
     // Username benzersizlik kontrolü
     const existingUser = await findUserByUsername(data.username);
@@ -95,7 +95,7 @@ export async function registerUser(data: RegisterRequest): Promise<ApiResponse<R
 }
 
 // Şifre sıfırlama isteği
-export async function forgotPassword(email: string): Promise<ApiResponse<void>> {
+export async function forgotPasswordBusiness(email: string): Promise<ApiResponse<void>> {
   try {
     // Kullanıcıyı bul
     const user = await findUserByEmail(email);
@@ -155,7 +155,7 @@ export async function forgotPassword(email: string): Promise<ApiResponse<void>> 
 }
 
 // Şifre sıfırlama
-export async function resetPassword(token: string, newPassword: string): Promise<ApiResponse<void>> {
+export async function resetPasswordBusiness(token: string, newPassword: string): Promise<ApiResponse<void>> {
   try {
     // Token'ı bul ve doğrula
     const verificationToken = await findVerificationTokenByToken(token);
