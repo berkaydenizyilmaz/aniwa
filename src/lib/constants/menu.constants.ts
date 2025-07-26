@@ -48,6 +48,24 @@ export const ADMIN_NAVIGATION_ITEMS = [
   },
 ] as const;
 
+export const EDITOR_NAVIGATION_ITEMS = [
+  { 
+    label: 'Dashboard', 
+    href: ROUTES.PAGES.EDITOR.DASHBOARD, 
+    icon: LayoutDashboard 
+  },
+  { 
+    label: 'Anime',
+    href: ROUTES.PAGES.EDITOR.ANIME,
+    icon: Play
+  },
+  {
+    label: 'Yayın Linkleri',
+    href: ROUTES.PAGES.EDITOR.STREAMING_LINKS,
+    icon: Tv
+  },
+] as const;
+
 export const HEADER_NAVIGATION_ITEMS = [
   { label: 'Anime', href: ROUTES.PAGES.ANIME },
   { label: 'Listeler', href: ROUTES.PAGES.LISTS },

@@ -38,6 +38,8 @@ export const ROUTES = {
     // Editor sayfaları
     EDITOR: {
       DASHBOARD: '/editor',
+      ANIME: '/editor/anime',
+      STREAMING_LINKS: '/editor/yayin-linkleri',
     },
   },
   
@@ -135,10 +137,13 @@ export const ROUTES = {
     EDITOR_ONLY: {
       PAGES: [
         '/editor',            // Editör ana sayfa
+        '/editor/anime',      // Anime yönetimi
+        '/editor/streaming-links', // Streaming link yönetimi
       ],
       API: [
         '/api/editor',        // Editör ana API
         '/api/editor/streaming-links', // Streaming link yönetimi
+        '/api/editor/anime',  // Anime yönetimi
       ],
     },
     
