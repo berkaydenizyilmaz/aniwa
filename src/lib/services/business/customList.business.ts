@@ -25,6 +25,7 @@ import {
   DeleteCustomListResponse,
   GetUserCustomListsRequest,
   AddCustomListItemResponse,
+  GetCustomListItemsResponse,
 } from '@/lib/types/api/customList.api';
 
 
@@ -95,7 +96,6 @@ export async function getUserCustomListsBusiness(
   try {
     const page = filters?.page || 1;
     const limit = filters?.limit || 50;
-    const skip = (page - 1) * limit;
 
     // Kullanıcının listelerini getir
     const lists = await findCustomListsByUserId(userId);
@@ -356,11 +356,10 @@ export async function getListItemsBusiness(
   listId: string,
   userId: string,
   filters?: GetUserCustomListsRequest
-): Promise<ApiResponse<GetUserCustomListsResponse>> {
+): Promise<ApiResponse<GetCustomListItemsResponse>> {
   try {
     const page = filters?.page || 1;
     const limit = filters?.limit || 50;
-    const skip = (page - 1) * limit;
 
     // Liste mevcut mu kontrolü
     const existingList = await findCustomListById(listId);
@@ -371,7 +370,7 @@ export async function getListItemsBusiness(
     // Liste itemlarını getir
     const items = await prisma.customListItem.findMany({
       where: { customListId: listId },
-      skip,
+      skip: (page - 1) * limit,
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: {

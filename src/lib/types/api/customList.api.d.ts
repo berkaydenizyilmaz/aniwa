@@ -23,6 +23,15 @@ export interface GetUserCustomListsResponse {
   totalPages: number;
 }
 
+// Liste itemları için response tipi
+export interface GetCustomListItemsResponse {
+  customListItems: CustomListItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 // CustomListItem response tipleri
 export type AddCustomListItemResponse = CustomListItem;
 export type RemoveCustomListItemResponse = void;
