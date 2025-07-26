@@ -148,7 +148,7 @@ export function StudioTable({ onEdit, searchTerm = '' }: StudioTableProps) {
                 <TableCell>{studio.name}</TableCell>
                 <TableCell className="text-muted-foreground">{studio.slug}</TableCell>
                 <TableCell className="text-muted-foreground">
-                  {studio.isAnimationStudio ? 'Animasyon Stüdyosu' : 'Prodüksiyon Stüdyosu'}
+                  {studio.isAnimationStudio ? 'Animasyon Stüdyosu' : 'Diğer'}
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">

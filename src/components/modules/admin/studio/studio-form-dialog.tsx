@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,13 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { createStudioAction, updateStudioAction } from '@/lib/actions/studio.action';
 import { createStudioSchema, updateStudioSchema, type CreateStudioInput, type UpdateStudioInput } from '@/lib/schemas/studio.schema';
 import { toast } from 'sonner';
@@ -41,7 +35,7 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
     register,
     handleSubmit,
     reset,
-    setValue,
+    control,
     formState: { errors }
   } = useForm<CreateStudioInput | UpdateStudioInput>({
     resolver: zodResolver(isEdit ? updateStudioSchema : createStudioSchema),
@@ -125,20 +119,25 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
 
           {/* Stüdyo Türü */}
           <div className="space-y-2">
-            <Label htmlFor="isAnimationStudio">Stüdyo Türü</Label>
-            <Select
-              value={isEdit ? (studio?.isAnimationStudio ? 'true' : 'false') : 'true'}
-              onValueChange={(value) => setValue('isAnimationStudio', value === 'true')}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_STUDIO)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Stüdyo türünü seçin" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="true">Animasyon Stüdyosu</SelectItem>
-                <SelectItem value="false">Prodüksiyon Stüdyosu</SelectItem>
-              </SelectContent>
-            </Select>
+            <Controller
+              name="isAnimationStudio"
+              control={control}
+              render={({ field }) => (
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isAnimationStudio"
+                    checked={field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                    disabled={isLoading(LOADING_KEYS.FORMS.CREATE_STUDIO)}
+                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <Label htmlFor="isAnimationStudio" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Animasyon Stüdyosu
+                  </Label>
+                </div>
+              )}
+            />
             {errors.isAnimationStudio && (
               <p className="text-sm text-destructive">{errors.isAnimationStudio.message}</p>
             )}
