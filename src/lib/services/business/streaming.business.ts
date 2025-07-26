@@ -35,7 +35,7 @@ import {
 // =============================================================================
 
 // Streaming platform oluşturma
-export async function createStreamingPlatform(
+export async function createStreamingPlatformBusiness(
   data: CreateStreamingPlatformRequest,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<CreateStreamingPlatformResponse>> {
@@ -83,8 +83,9 @@ export async function createStreamingPlatform(
 }
 
 // Streaming platform detayı getirme
-export async function getStreamingPlatformById(
-  id: string
+export async function getStreamingPlatformBusiness(
+  id: string,
+  adminUser: { id: string; username: string }
 ): Promise<ApiResponse<GetStreamingPlatformResponse>> {
   try {
     const platform = await findStreamingPlatformById(id);
@@ -92,6 +93,18 @@ export async function getStreamingPlatformById(
     if (!platform) {
       throw new NotFoundError('Streaming platform bulunamadı');
     }
+
+    // Başarılı getirme logu
+    await logger.info(
+      EVENTS.ADMIN.STREAMING_PLATFORM_RETRIEVED,
+      'Streaming platform detayı görüntülendi',
+      {
+        platformId: platform.id,
+        name: platform.name,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username,
+      }
+    );
 
     return {
       success: true,
@@ -109,6 +122,7 @@ export async function getStreamingPlatformById(
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         platformId: id,
+        adminId: adminUser.id,
       }
     );
 
@@ -117,7 +131,8 @@ export async function getStreamingPlatformById(
 }
 
 // Tüm streaming platformları getirme
-export async function getAllStreamingPlatforms(
+export async function getStreamingPlatformsBusiness(
+  adminUser: { id: string; username: string },
   filters?: GetStreamingPlatformsRequest
 ): Promise<ApiResponse<GetAllStreamingPlatformsResponse>> {
   try {
@@ -147,6 +162,20 @@ export async function getAllStreamingPlatforms(
     ]);
 
     const totalPages = Math.ceil(total / limit);
+
+    // Başarılı listeleme logu
+    await logger.info(
+      EVENTS.ADMIN.STREAMING_PLATFORMS_RETRIEVED,
+      'Streaming platformları listelendi',
+      {
+        totalCount: total,
+        page,
+        limit,
+        filters,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username,
+      }
+    );
 
     return {
       success: true,
@@ -178,7 +207,7 @@ export async function getAllStreamingPlatforms(
 }
 
 // Streaming platform güncelleme
-export async function updateStreamingPlatform(
+export async function updateStreamingPlatformBusiness(
   id: string,
   data: UpdateStreamingPlatformRequest,
   adminUser: { id: string; username: string }
@@ -235,7 +264,7 @@ export async function updateStreamingPlatform(
 }
 
 // Streaming platform silme
-export async function deleteStreamingPlatform(
+export async function deleteStreamingPlatformBusiness(
   id: string,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<{ message: string }>> {

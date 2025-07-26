@@ -6,6 +6,7 @@ export const LOADING_KEYS = {
     STUDIOS: 'studios-page',
     USERS: 'users-page',
     LOGS: 'logs-page',
+    STREAMING_PLATFORMS: 'streaming-platforms-page',
   },
   
   // Form loading'leri
@@ -18,6 +19,8 @@ export const LOADING_KEYS = {
     UPDATE_STUDIO: 'update-studio-form',
     CREATE_USER: 'create-user-form',
     UPDATE_USER: 'update-user-form',
+    CREATE_STREAMING_PLATFORM: 'create-streaming-platform-form',
+    UPDATE_STREAMING_PLATFORM: 'update-streaming-platform-form',
   },
   
   // Auth loading'leri
@@ -40,6 +43,7 @@ export const LOADING_KEYS = {
     SEARCH_TAGS: 'search-tags',
     SEARCH_GENRES: 'search-genres',
     SEARCH_STUDIOS: 'search-studios',
+    DELETE_STREAMING_PLATFORM: 'delete-streaming-platform',
   },
 } as const;
 

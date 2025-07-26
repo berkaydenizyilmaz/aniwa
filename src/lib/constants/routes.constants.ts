@@ -27,6 +27,7 @@ export const ROUTES = {
       STUDIOS: '/yonetim/studyolar',
       LOGS: '/yonetim/loglar',
       USERS: '/yonetim/kullanicilar',
+      STREAMING_PLATFORMS: '/yonetim/streaming-platforms',
     },
     
     // Moderator sayfaları

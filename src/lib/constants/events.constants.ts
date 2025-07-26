@@ -61,6 +61,8 @@ export const EVENTS = {
     ANIME_SERIES_UPDATED: 'admin_anime_series_updated',
     ANIME_SERIES_DELETED: 'admin_anime_series_deleted',
     STREAMING_PLATFORM_CREATED: 'admin_streaming_platform_created',
+    STREAMING_PLATFORM_RETRIEVED: 'admin_streaming_platform_retrieved',
+    STREAMING_PLATFORMS_RETRIEVED: 'admin_streaming_platforms_retrieved',
     STREAMING_PLATFORM_UPDATED: 'admin_streaming_platform_updated',
     STREAMING_PLATFORM_DELETED: 'admin_streaming_platform_deleted',
   },
