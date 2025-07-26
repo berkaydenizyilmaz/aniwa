@@ -31,6 +31,18 @@ export async function findStreamingPlatformById(
   }
 }
 
+// Streaming platform getirme (name ile)
+export async function findStreamingPlatformByName(
+  name: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<StreamingPlatform | null> {
+  try {
+    return await client.streamingPlatform.findFirst({ where: { name } });
+  } catch (error) {
+    handleDatabaseError(error, 'Streaming platform name ile bulma', { name });
+  }
+}
+
 // Tüm streaming platformları getirme (filtrelemeli)
 export async function findAllStreamingPlatforms(
   where?: Prisma.StreamingPlatformWhereInput,

@@ -220,11 +220,19 @@ export async function updateGenreBusiness(
       }
     }
 
-    // Slug güncelleme
+    // Slug güncelleme ve benzersizlik kontrolü
     const updateData: Prisma.GenreUpdateInput = {};
     if (data.name) {
+      const newSlug = createSlug(data.name);
+      // Slug değişiyorsa benzersizlik kontrolü
+      if (newSlug !== existingGenre.slug) {
+        const slugExists = await findGenreBySlug(newSlug);
+        if (slugExists) {
+          throw new ConflictError('Bu tür adı zaten kullanımda');
+        }
+      }
       updateData.name = data.name;
-      updateData.slug = createSlug(data.name);
+      updateData.slug = newSlug;
     }
 
     // Genre güncelle

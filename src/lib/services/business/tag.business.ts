@@ -236,11 +236,19 @@ export async function updateTagBusiness(
       }
     }
 
-    // Slug güncelleme
+    // Slug güncelleme ve benzersizlik kontrolü
     const updateData: Prisma.TagUpdateInput = {};
     if (data.name) {
+      const newSlug = createSlug(data.name);
+      // Slug değişiyorsa benzersizlik kontrolü
+      if (newSlug !== existingTag.slug) {
+        const slugExists = await findTagBySlug(newSlug);
+        if (slugExists) {
+          throw new ConflictError('Bu etiket adı zaten kullanımda');
+        }
+      }
       updateData.name = data.name;
-      updateData.slug = createSlug(data.name);
+      updateData.slug = newSlug;
     }
     if (data.description !== undefined) updateData.description = data.description;
     if (data.category !== undefined) updateData.category = data.category;

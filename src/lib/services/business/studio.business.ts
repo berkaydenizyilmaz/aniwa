@@ -225,11 +225,19 @@ export async function updateStudioBusiness(
       }
     }
 
-    // Slug güncelleme
+    // Slug güncelleme ve benzersizlik kontrolü
     const updateData: Prisma.StudioUpdateInput = {};
     if (data.name) {
+      const newSlug = createSlug(data.name);
+      // Slug değişiyorsa benzersizlik kontrolü
+      if (newSlug !== existingStudio.slug) {
+        const slugExists = await findStudioBySlug(newSlug);
+        if (slugExists) {
+          throw new ConflictError('Bu stüdyo adı zaten kullanımda');
+        }
+      }
       updateData.name = data.name;
-      updateData.slug = createSlug(data.name);
+      updateData.slug = newSlug;
     }
     if (data.isAnimationStudio !== undefined) updateData.isAnimationStudio = data.isAnimationStudio;
 

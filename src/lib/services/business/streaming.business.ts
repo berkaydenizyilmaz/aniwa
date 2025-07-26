@@ -1,9 +1,10 @@
 // Streaming iş mantığı katmanı
 
-import { BusinessError, NotFoundError, DatabaseError } from '@/lib/errors';
+import { BusinessError, NotFoundError, ConflictError, DatabaseError } from '@/lib/errors';
 import {
   createStreamingPlatform as createStreamingPlatformDB,
   findStreamingPlatformById,
+  findStreamingPlatformByName,
   findAllStreamingPlatforms,
   countStreamingPlatforms,
   updateStreamingPlatform as updateStreamingPlatformDB,
@@ -41,6 +42,12 @@ export async function createStreamingPlatformBusiness(
   userId: string
 ): Promise<ApiResponse<CreateStreamingPlatformResponse>> {
   try {
+    // Name benzersizlik kontrolü
+    const existingPlatform = await findStreamingPlatformByName(data.name);
+    if (existingPlatform) {
+      throw new ConflictError('Bu platform adı zaten kullanımda');
+    }
+
     // Platform oluştur
     const result = await createStreamingPlatformDB({
       name: data.name,
@@ -204,6 +211,14 @@ export async function updateStreamingPlatformBusiness(
     const existingPlatform = await findStreamingPlatformById(id);
     if (!existingPlatform) {
       throw new NotFoundError('Streaming platform bulunamadı');
+    }
+
+    // Name güncelleniyorsa benzersizlik kontrolü
+    if (data.name && data.name !== existingPlatform.name) {
+      const nameExists = await findStreamingPlatformByName(data.name);
+      if (nameExists) {
+        throw new ConflictError('Bu platform adı zaten kullanımda');
+      }
     }
 
     // Güncelleme verilerini hazırla
