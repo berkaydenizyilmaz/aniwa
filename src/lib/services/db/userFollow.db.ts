@@ -3,6 +3,7 @@
 import { Prisma, UserFollow } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
+import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // UserFollow CRUD operasyonları
 
@@ -11,9 +12,13 @@ export async function createUserFollow(
     data: Prisma.UserFollowCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow> {
-    return await client.userFollow.create({
-        data,
-    });
+    try {
+        return await client.userFollow.create({
+            data,
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Takip ilişkisi oluşturma', { data });
+    }
 }
 
 // ID ile takip ilişkisi bulur
@@ -21,27 +26,31 @@ export async function findUserFollowById(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow | null> {
-    return await client.userFollow.findUnique({
-        where: { id },
-        include: {
-            follower: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
-                    bio: true,
+    try {
+        return await client.userFollow.findUnique({
+            where: { id },
+            include: {
+                follower: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                        bio: true,
+                    },
+                },
+                following: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                        bio: true,
+                    },
                 },
             },
-            following: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
-                    bio: true,
-                },
-            },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Takip ilişkisi ID ile bulma', { id });
+    }
 }
 
 // Kullanıcı ve takip edilen ile takip ilişkisi bulur
@@ -50,30 +59,34 @@ export async function findUserFollowByFollowerAndFollowing(
     followingId: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow | null> {
-    return await client.userFollow.findUnique({
-        where: {
-            followerId_followingId: {
-                followerId,
-                followingId,
-            },
-        },
-        include: {
-            follower: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
+    try {
+        return await client.userFollow.findUnique({
+            where: {
+                followerId_followingId: {
+                    followerId,
+                    followingId,
                 },
             },
-            following: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
+            include: {
+                follower: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                    },
+                },
+                following: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                    },
                 },
             },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Kullanıcı ve takip edilen ile takip ilişkisi bulma', { followerId, followingId });
+    }
 }
 
 // Kullanıcının takipçilerini listeler
@@ -83,22 +96,26 @@ export async function findFollowersByUserId(
     take?: number,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow[]> {
-    return await client.userFollow.findMany({
-        where: { followingId: userId },
-        skip,
-        take,
-        orderBy: { createdAt: 'desc' },
-        include: {
-            follower: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
-                    bio: true,
+    try {
+        return await client.userFollow.findMany({
+            where: { followingId: userId },
+            skip,
+            take,
+            orderBy: { createdAt: 'desc' },
+            include: {
+                follower: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                        bio: true,
+                    },
                 },
             },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Kullanıcının takipçilerini bulma', { userId, skip, take });
+    }
 }
 
 // Kullanıcının takip ettiklerini listeler
@@ -108,22 +125,26 @@ export async function findFollowingByUserId(
     take?: number,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow[]> {
-    return await client.userFollow.findMany({
-        where: { followerId: userId },
-        skip,
-        take,
-        orderBy: { createdAt: 'desc' },
-        include: {
-            following: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
-                    bio: true,
+    try {
+        return await client.userFollow.findMany({
+            where: { followerId: userId },
+            skip,
+            take,
+            orderBy: { createdAt: 'desc' },
+            include: {
+                following: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                        bio: true,
+                    },
                 },
             },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Kullanıcının takip ettiklerini bulma', { userId, skip, take });
+    }
 }
 
 // Tüm takip ilişkilerini listeler (filtrelemeli)
@@ -134,28 +155,32 @@ export async function findAllUserFollows(
     orderBy?: Prisma.UserFollowOrderByWithRelationInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow[]> {
-    return await client.userFollow.findMany({
-        where,
-        skip,
-        take,
-        orderBy,
-        include: {
-            follower: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
+    try {
+        return await client.userFollow.findMany({
+            where,
+            skip,
+            take,
+            orderBy,
+            include: {
+                follower: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                    },
+                },
+                following: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                    },
                 },
             },
-            following: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
-                },
-            },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Tüm takip ilişkilerini listeleme', { where, skip, take, orderBy });
+    }
 }
 
 // Takip ilişkisini siler
@@ -163,7 +188,11 @@ export async function deleteUserFollow(
     where: Prisma.UserFollowWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow> {
-    return await client.userFollow.delete({ where });
+    try {
+        return await client.userFollow.delete({ where });
+    } catch (error) {
+        handleDatabaseError(error, 'Takip ilişkisi silme', { where });
+    }
 }
 
 // Takipçi sayısını döner
@@ -171,7 +200,11 @@ export async function countFollowers(
     where?: Prisma.UserFollowWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
-    return await client.userFollow.count({ where });
+    try {
+        return await client.userFollow.count({ where });
+    } catch (error) {
+        handleDatabaseError(error, 'Takipçi sayma', { where });
+    }
 }
 
 // Takip edilen sayısını döner
@@ -179,5 +212,9 @@ export async function countFollowing(
     where?: Prisma.UserFollowWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
-    return await client.userFollow.count({ where });
+    try {
+        return await client.userFollow.count({ where });
+    } catch (error) {
+        handleDatabaseError(error, 'Takip edilen sayma', { where });
+    }
 } 

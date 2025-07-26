@@ -3,6 +3,7 @@
 import { Prisma, AnimeSeries, AnimeMediaPart, Episode } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
+import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Anime Serisi CRUD İşlemleri
 
@@ -11,7 +12,11 @@ export async function createAnimeSeries(
   data: Prisma.AnimeSeriesCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries> {
-  return await client.animeSeries.create({ data });
+  try {
+    return await client.animeSeries.create({ data });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime serisi oluşturma', { data });
+  }
 }
 
 // Anime serisi getirme (ID ile)
@@ -19,7 +24,11 @@ export async function findAnimeSeriesById(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries | null> {
-  return await client.animeSeries.findUnique({ where: { id } });
+  try {
+    return await client.animeSeries.findUnique({ where: { id } });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime serisi ID ile bulma', { id });
+  }
 }
 
 // Anime serisi getirme (Anilist ID ile)
@@ -27,7 +36,11 @@ export async function findAnimeSeriesByAnilistId(
   anilistId: number,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries | null> {
-  return await client.animeSeries.findUnique({ where: { anilistId } });
+  try {
+    return await client.animeSeries.findUnique({ where: { anilistId } });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime serisi Anilist ID ile bulma', { anilistId });
+  }
 }
 
 // Anime serisi getirme (MAL ID ile)
@@ -35,7 +48,11 @@ export async function findAnimeSeriesByMalId(
   idMal: number,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries | null> {
-  return await client.animeSeries.findUnique({ where: { idMal } });
+  try {
+    return await client.animeSeries.findUnique({ where: { idMal } });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime serisi MAL ID ile bulma', { idMal });
+  }
 }
 
 // Anime serisi getirme (Aniwa Public ID ile)
@@ -43,7 +60,11 @@ export async function findAnimeSeriesByPublicId(
   aniwaPublicId: number,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries | null> {
-  return await client.animeSeries.findUnique({ where: { aniwaPublicId } });
+  try {
+    return await client.animeSeries.findUnique({ where: { aniwaPublicId } });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime serisi Aniwa Public ID ile bulma', { aniwaPublicId });
+  }
 }
 
 // Tüm anime serilerini getirme (filtrelemeli)
@@ -54,12 +75,16 @@ export async function findAllAnimeSeries(
   orderBy?: Prisma.AnimeSeriesOrderByWithRelationInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries[]> {
-  return await client.animeSeries.findMany({
-    where,
-    skip,
-    take,
-    orderBy,
-  });
+  try {
+    return await client.animeSeries.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Tüm anime serilerini listeleme', { where, skip, take, orderBy });
+  }
 }
 
 // Anime serisi güncelleme
@@ -68,7 +93,11 @@ export async function updateAnimeSeries(
   data: Prisma.AnimeSeriesUpdateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries> {
-  return await client.animeSeries.update({ where, data });
+  try {
+    return await client.animeSeries.update({ where, data });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime serisi güncelleme', { where, data });
+  }
 }
 
 // Anime serisi silme
@@ -76,7 +105,11 @@ export async function deleteAnimeSeries(
   where: Prisma.AnimeSeriesWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries> {
-  return await client.animeSeries.delete({ where });
+  try {
+    return await client.animeSeries.delete({ where });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime serisi silme', { where });
+  }
 }
 
 // Anime serisi sayısı
@@ -84,7 +117,11 @@ export async function countAnimeSeries(
   where?: Prisma.AnimeSeriesWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
-  return await client.animeSeries.count({ where });
+  try {
+    return await client.animeSeries.count({ where });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime serisi sayma', { where });
+  }
 }
 
 // Anime serisi getirme (detaylı - tüm ilişkilerle)
@@ -98,7 +135,6 @@ export async function findAnimeSeriesByIdWithDetails(
     animeStudios: { include: { studio: true } };
     mediaParts: { 
       include: { partsEpisodes: { orderBy: { episodeNumber: 'asc' } } };
-      orderBy: { displayOrder: 'asc' }
     };
     streamingLinks: true;
     comments: { 
@@ -108,38 +144,27 @@ export async function findAnimeSeriesByIdWithDetails(
     };
   };
 }> | null> {
-  return await client.animeSeries.findUnique({
-    where: { id },
-    include: {
-      animeGenres: {
-        include: { genre: true }
-      },
-      animeTags: {
-        include: { tag: true }
-      },
-      animeStudios: {
-        include: { studio: true }
-      },
-      mediaParts: {
-        include: {
-          partsEpisodes: {
-            orderBy: { episodeNumber: 'asc' }
-          }
+  try {
+    return await client.animeSeries.findUnique({
+      where: { id },
+      include: {
+        animeGenres: { include: { genre: true } },
+        animeTags: { include: { tag: true } },
+        animeStudios: { include: { studio: true } },
+        mediaParts: { 
+          include: { partsEpisodes: { orderBy: { episodeNumber: 'asc' } } }
         },
-        orderBy: { displayOrder: 'asc' }
-      },
-      streamingLinks: true,
-      comments: {
-        include: {
-          user: {
-            select: { id: true, username: true, profilePicture: true }
-          }
+        streamingLinks: true,
+        comments: { 
+          include: { user: { select: { id: true, username: true, profilePicture: true } } },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
         },
-        orderBy: { createdAt: 'desc' },
-        take: 10
-      }
-    }
-  });
+      },
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime serisi detaylı bulma', { id });
+  }
 }
 
 // Tüm anime serilerini getirme (detaylı - filtrelemeli)
@@ -157,36 +182,36 @@ export async function findAllAnimeSeriesWithDetails(
     mediaParts: { select: { id: true, title: true, type: true, episodes: true } };
   };
 }>[]> {
-  return await client.animeSeries.findMany({
-    where,
-    skip,
-    take,
-    orderBy,
-    include: {
-      animeGenres: {
-        include: { genre: true }
+  try {
+    return await client.animeSeries.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include: {
+        animeGenres: { include: { genre: true } },
+        animeTags: { include: { tag: true } },
+        animeStudios: { include: { studio: true } },
+        mediaParts: { select: { id: true, title: true, type: true, episodes: true } },
       },
-      animeTags: {
-        include: { tag: true }
-      },
-      animeStudios: {
-        include: { studio: true }
-      },
-      mediaParts: {
-        select: { id: true, title: true, type: true, episodes: true }
-      }
-    }
-  });
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Tüm anime serilerini detaylı listeleme', { where, skip, take, orderBy });
+  }
 }
 
-// Anime Medya Parçası CRUD İşlemleri
+// Anime Media Part CRUD İşlemleri
 
 // Anime medya parçası oluşturma
 export async function createAnimeMediaPart(
   data: Prisma.AnimeMediaPartCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeMediaPart> {
-  return await client.animeMediaPart.create({ data });
+  try {
+    return await client.animeMediaPart.create({ data });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime medya parçası oluşturma', { data });
+  }
 }
 
 // Anime medya parçası getirme (ID ile)
@@ -194,7 +219,11 @@ export async function findAnimeMediaPartById(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeMediaPart | null> {
-  return await client.animeMediaPart.findUnique({ where: { id } });
+  try {
+    return await client.animeMediaPart.findUnique({ where: { id } });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime medya parçası ID ile bulma', { id });
+  }
 }
 
 // Anime medya parçası getirme (Anilist ID ile)
@@ -202,19 +231,30 @@ export async function findAnimeMediaPartByAnilistId(
   anilistId: number,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeMediaPart | null> {
-  return await client.animeMediaPart.findUnique({ where: { anilistId } });
+  try {
+    return await client.animeMediaPart.findUnique({ where: { anilistId } });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime medya parçası Anilist ID ile bulma', { anilistId });
+  }
 }
 
-// Seriye ait medya parçalarını getirme
+// Anime serisi için medya parçalarını getirme
 export async function findAnimeMediaPartsBySeriesId(
   seriesId: string,
   orderBy?: Prisma.AnimeMediaPartOrderByWithRelationInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeMediaPart[]> {
-  return await client.animeMediaPart.findMany({
-    where: { seriesId },
-    orderBy,
-  });
+  try {
+    return await client.animeMediaPart.findMany({
+      where: { seriesId },
+      orderBy,
+      include: {
+        partsEpisodes: { orderBy: { episodeNumber: 'asc' } },
+      },
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime serisi için medya parçalarını bulma', { seriesId, orderBy });
+  }
 }
 
 // Tüm anime medya parçalarını getirme (filtrelemeli)
@@ -225,12 +265,20 @@ export async function findAllAnimeMediaParts(
   orderBy?: Prisma.AnimeMediaPartOrderByWithRelationInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeMediaPart[]> {
-  return await client.animeMediaPart.findMany({
-    where,
-    skip,
-    take,
-    orderBy,
-  });
+  try {
+    return await client.animeMediaPart.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include: {
+        animeSeries: { select: { id: true, title: true, englishTitle: true } },
+        partsEpisodes: { orderBy: { episodeNumber: 'asc' } },
+      },
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Tüm anime medya parçalarını listeleme', { where, skip, take, orderBy });
+  }
 }
 
 // Anime medya parçası güncelleme
@@ -239,7 +287,11 @@ export async function updateAnimeMediaPart(
   data: Prisma.AnimeMediaPartUpdateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeMediaPart> {
-  return await client.animeMediaPart.update({ where, data });
+  try {
+    return await client.animeMediaPart.update({ where, data });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime medya parçası güncelleme', { where, data });
+  }
 }
 
 // Anime medya parçası silme
@@ -247,7 +299,11 @@ export async function deleteAnimeMediaPart(
   where: Prisma.AnimeMediaPartWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeMediaPart> {
-  return await client.animeMediaPart.delete({ where });
+  try {
+    return await client.animeMediaPart.delete({ where });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime medya parçası silme', { where });
+  }
 }
 
 // Anime medya parçası sayısı
@@ -255,53 +311,87 @@ export async function countAnimeMediaParts(
   where?: Prisma.AnimeMediaPartWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
-  return await client.animeMediaPart.count({ where });
+  try {
+    return await client.animeMediaPart.count({ where });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime medya parçası sayma', { where });
+  }
 }
 
-// Bölüm CRUD İşlemleri
+// Episode CRUD İşlemleri
 
-// Bölüm oluşturma
+// Episode oluşturma
 export async function createEpisode(
   data: Prisma.EpisodeCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode> {
-  return await client.episode.create({ data });
+  try {
+    return await client.episode.create({ data });
+  } catch (error) {
+    handleDatabaseError(error, 'Episode oluşturma', { data });
+  }
 }
 
-// Bölüm getirme (ID ile)
+// Episode getirme (ID ile)
 export async function findEpisodeById(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode | null> {
-  return await client.episode.findUnique({ where: { id } });
+  try {
+    return await client.episode.findUnique({ where: { id } });
+  } catch (error) {
+    handleDatabaseError(error, 'Episode ID ile bulma', { id });
+  }
 }
 
-// Bölüm getirme (medya parçası ID ve bölüm numarası ile)
+// Episode getirme (medya parçası ve bölüm numarası ile)
 export async function findEpisodeByNumber(
   mediaPartId: string,
   episodeNumber: number,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode | null> {
-  return await client.episode.findUnique({
-    where: {
-      mediaPartId_episodeNumber: {
-        mediaPartId,
-        episodeNumber,
+  try {
+    return await client.episode.findUnique({
+      where: {
+        mediaPartId_episodeNumber: {
+          mediaPartId,
+          episodeNumber,
+        },
       },
-    },
-  });
+      include: {
+        animeMediaPart: {
+          include: {
+            animeSeries: { select: { id: true, title: true, englishTitle: true } },
+          },
+        },
+      },
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Episode numarası ile bulma', { mediaPartId, episodeNumber });
+  }
 }
 
-// Medya parçasına ait bölümleri getirme
+// Medya parçası için bölümleri getirme
 export async function findEpisodesByMediaPartId(
   mediaPartId: string,
   orderBy?: Prisma.EpisodeOrderByWithRelationInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode[]> {
-  return await client.episode.findMany({
-    where: { mediaPartId },
-    orderBy,
-  });
+  try {
+    return await client.episode.findMany({
+      where: { mediaPartId },
+      orderBy,
+      include: {
+        animeMediaPart: {
+          include: {
+            animeSeries: { select: { id: true, title: true, englishTitle: true } },
+          },
+        },
+      },
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Medya parçası için bölümleri bulma', { mediaPartId, orderBy });
+  }
 }
 
 // Tüm bölümleri getirme (filtrelemeli)
@@ -312,40 +402,63 @@ export async function findAllEpisodes(
   orderBy?: Prisma.EpisodeOrderByWithRelationInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode[]> {
-  return await client.episode.findMany({
-    where,
-    skip,
-    take,
-    orderBy,
-  });
+  try {
+    return await client.episode.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include: {
+        animeMediaPart: {
+          include: {
+            animeSeries: { select: { id: true, title: true, englishTitle: true } },
+          },
+        },
+      },
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Tüm bölümleri listeleme', { where, skip, take, orderBy });
+  }
 }
 
-// Bölüm güncelleme
+// Episode güncelleme
 export async function updateEpisode(
   where: Prisma.EpisodeWhereUniqueInput,
   data: Prisma.EpisodeUpdateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode> {
-  return await client.episode.update({ where, data });
+  try {
+    return await client.episode.update({ where, data });
+  } catch (error) {
+    handleDatabaseError(error, 'Episode güncelleme', { where, data });
+  }
 }
 
-// Bölüm silme
+// Episode silme
 export async function deleteEpisode(
   where: Prisma.EpisodeWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode> {
-  return await client.episode.delete({ where });
+  try {
+    return await client.episode.delete({ where });
+  } catch (error) {
+    handleDatabaseError(error, 'Episode silme', { where });
+  }
 }
 
-// Bölüm sayısı
+// Episode sayısı
 export async function countEpisodes(
   where?: Prisma.EpisodeWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
-  return await client.episode.count({ where });
-} 
+  try {
+    return await client.episode.count({ where });
+  } catch (error) {
+    handleDatabaseError(error, 'Episode sayma', { where });
+  }
+}
 
-// Anime İlişkileri CRUD İşlemleri
+// İlişki CRUD İşlemleri
 
 // Anime-Genre ilişkisi oluşturma
 export async function createAnimeGenre(
@@ -353,10 +466,14 @@ export async function createAnimeGenre(
   genreId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeGenreGetPayload<{ include: { genre: true } }>> {
-  return await client.animeGenre.create({
-    data: { animeSeriesId, genreId },
-    include: { genre: true }
-  });
+  try {
+    return await client.animeGenre.create({
+      data: { animeSeriesId, genreId },
+      include: { genre: true },
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime-Genre ilişkisi oluşturma', { animeSeriesId, genreId });
+  }
 }
 
 // Anime-Tag ilişkisi oluşturma
@@ -365,10 +482,14 @@ export async function createAnimeTag(
   tagId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeTagGetPayload<{ include: { tag: true } }>> {
-  return await client.animeTag.create({
-    data: { animeSeriesId, tagId },
-    include: { tag: true }
-  });
+  try {
+    return await client.animeTag.create({
+      data: { animeSeriesId, tagId },
+      include: { tag: true },
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime-Tag ilişkisi oluşturma', { animeSeriesId, tagId });
+  }
 }
 
 // Anime-Studio ilişkisi oluşturma
@@ -377,44 +498,57 @@ export async function createAnimeStudio(
   studioId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.AnimeStudioGetPayload<{ include: { studio: true } }>> {
-  return await client.animeStudio.create({
-    data: { animeSeriesId, studioId },
-    include: { studio: true }
-  });
+  try {
+    return await client.animeStudio.create({
+      data: { animeSeriesId, studioId },
+      include: { studio: true },
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime-Studio ilişkisi oluşturma', { animeSeriesId, studioId });
+  }
 }
 
-// Anime-Genre ilişkilerini toplu oluşturma
+// Toplu Anime-Genre ilişkileri oluşturma
 export async function createAnimeGenres(
   animeSeriesId: string,
   genreIds: string[],
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.BatchPayload> {
-  if (genreIds.length === 0) return { count: 0 };
-  
-  const data = genreIds.map(genreId => ({ animeSeriesId, genreId }));
-  return await client.animeGenre.createMany({ data });
+  try {
+    return await client.animeGenre.createMany({
+      data: genreIds.map(genreId => ({ animeSeriesId, genreId })),
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Toplu Anime-Genre ilişkileri oluşturma', { animeSeriesId, genreIds });
+  }
 }
 
-// Anime-Tag ilişkilerini toplu oluşturma
+// Toplu Anime-Tag ilişkileri oluşturma
 export async function createAnimeTags(
   animeSeriesId: string,
   tagIds: string[],
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.BatchPayload> {
-  if (tagIds.length === 0) return { count: 0 };
-  
-  const data = tagIds.map(tagId => ({ animeSeriesId, tagId }));
-  return await client.animeTag.createMany({ data });
+  try {
+    return await client.animeTag.createMany({
+      data: tagIds.map(tagId => ({ animeSeriesId, tagId })),
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Toplu Anime-Tag ilişkileri oluşturma', { animeSeriesId, tagIds });
+  }
 }
 
-// Anime-Studio ilişkilerini toplu oluşturma
+// Toplu Anime-Studio ilişkileri oluşturma
 export async function createAnimeStudios(
   animeSeriesId: string,
   studioIds: string[],
   client: PrismaClientOrTransaction = prisma
 ): Promise<Prisma.BatchPayload> {
-  if (studioIds.length === 0) return { count: 0 };
-  
-  const data = studioIds.map(studioId => ({ animeSeriesId, studioId }));
-  return await client.animeStudio.createMany({ data });
+  try {
+    return await client.animeStudio.createMany({
+      data: studioIds.map(studioId => ({ animeSeriesId, studioId })),
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Toplu Anime-Studio ilişkileri oluşturma', { animeSeriesId, studioIds });
+  }
 } 

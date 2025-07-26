@@ -26,4 +26,7 @@ export const ERROR_CODES = {
   
   // Dış servis hataları
   EXTERNAL_SERVICE_ERROR: 'EXTERNAL_SERVICE_ERROR',
+  
+  // Veritabanı hataları
+  DATABASE_ERROR: 'DATABASE_ERROR',
 } as const;

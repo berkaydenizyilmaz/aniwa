@@ -48,8 +48,6 @@ export class ConflictError extends BusinessError {
     }
 }
 
-
-
 // HTTP 429 - Rate limit hatası
 export class RateLimitExceededError extends BusinessError {
     constructor(message: string, details?: Record<string, unknown>) {
@@ -79,5 +77,29 @@ export class ExternalServiceError extends BusinessError {
     constructor(message: string, details?: Record<string, unknown>) {
         super(message, ERROR_CODES.EXTERNAL_SERVICE_ERROR, details);
         this.name = 'ExternalServiceError';
+    }
+}
+
+// HTTP 500 - Veritabanı hatası (genel)
+export class DatabaseError extends BusinessError {
+    constructor(message: string, details?: Record<string, unknown>) {
+        super(message, ERROR_CODES.DATABASE_ERROR, details);
+        this.name = 'DatabaseError';
+    }
+}
+
+// HTTP 500 - Veritabanı bağlantı hatası
+export class DatabaseConnectionError extends DatabaseError {
+    constructor(message: string, details?: Record<string, unknown>) {
+        super(message, details);
+        this.name = 'DatabaseConnectionError';
+    }
+}
+
+// HTTP 500 - Veritabanı sorgu hatası
+export class DatabaseQueryError extends DatabaseError {
+    constructor(message: string, details?: Record<string, unknown>) {
+        super(message, details);
+        this.name = 'DatabaseQueryError';
     }
 }

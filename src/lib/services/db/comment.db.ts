@@ -3,6 +3,7 @@
 import { Prisma, Comment, CommentLike } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
+import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Comment CRUD operasyonları
 
@@ -11,9 +12,13 @@ export async function createComment(
     data: Prisma.CommentCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Comment> {
-    return await client.comment.create({
-        data,
-    });
+    try {
+        return await client.comment.create({
+            data,
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Yorum oluşturma', { data });
+    }
 }
 
 // ID ile yorum bulur
@@ -21,28 +26,32 @@ export async function findCommentById(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Comment | null> {
-    return await client.comment.findUnique({
-        where: { id },
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
+    try {
+        return await client.comment.findUnique({
+            where: { id },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                    },
                 },
-            },
-            commentLikes: {
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            username: true,
+                commentLikes: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                            },
                         },
                     },
                 },
             },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Yorum ID ile bulma', { id });
+    }
 }
 
 // Kullanıcının yorumlarını listeler
@@ -52,34 +61,38 @@ export async function findCommentsByUserId(
     take?: number,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Comment[]> {
-    return await client.comment.findMany({
-        where: { userId },
-        skip,
-        take,
-        orderBy: { createdAt: 'desc' },
-        include: {
-            animeSeries: {
-                select: {
-                    id: true,
-                    title: true,
-                    englishTitle: true,
-                    coverImage: true,
+    try {
+        return await client.comment.findMany({
+            where: { userId },
+            skip,
+            take,
+            orderBy: { createdAt: 'desc' },
+            include: {
+                animeSeries: {
+                    select: {
+                        id: true,
+                        title: true,
+                        englishTitle: true,
+                        coverImage: true,
+                    },
+                },
+                animeMediaPart: {
+                    select: {
+                        id: true,
+                        title: true,
+                        type: true,
+                    },
+                },
+                commentLikes: {
+                    select: {
+                        id: true,
+                    },
                 },
             },
-            animeMediaPart: {
-                select: {
-                    id: true,
-                    title: true,
-                    type: true,
-                },
-            },
-            commentLikes: {
-                select: {
-                    id: true,
-                },
-            },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Kullanıcının yorumlarını bulma', { userId, skip, take });
+    }
 }
 
 // Anime serisinin yorumlarını listeler
@@ -89,31 +102,30 @@ export async function findCommentsByAnimeSeriesId(
     take?: number,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Comment[]> {
-    return await client.comment.findMany({
-        where: { animeSeriesId },
-        skip,
-        take,
-        orderBy: { createdAt: 'desc' },
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
+    try {
+        return await client.comment.findMany({
+            where: { animeSeriesId },
+            skip,
+            take,
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                    },
                 },
-            },
-            commentLikes: {
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            username: true,
-                        },
+                commentLikes: {
+                    select: {
+                        id: true,
                     },
                 },
             },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Anime serisinin yorumlarını bulma', { animeSeriesId, skip, take });
+    }
 }
 
 // Anime medya parçasının yorumlarını listeler
@@ -123,31 +135,35 @@ export async function findCommentsByAnimeMediaPartId(
     take?: number,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Comment[]> {
-    return await client.comment.findMany({
-        where: { animeMediaPartId },
-        skip,
-        take,
-        orderBy: { createdAt: 'desc' },
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
+    try {
+        return await client.comment.findMany({
+            where: { animeMediaPartId },
+            skip,
+            take,
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                    },
                 },
-            },
-            commentLikes: {
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            username: true,
+                commentLikes: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                            },
                         },
                     },
                 },
             },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Anime medya parçasının yorumlarını bulma', { animeMediaPartId, skip, take });
+    }
 }
 
 // Tüm yorumları listeler (filtrelemeli)
@@ -158,46 +174,50 @@ export async function findAllComments(
     orderBy?: Prisma.CommentOrderByWithRelationInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Comment[]> {
-    return await client.comment.findMany({
-        where,
-        skip,
-        take,
-        orderBy,
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
+    try {
+        return await client.comment.findMany({
+            where,
+            skip,
+            take,
+            orderBy,
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                    },
                 },
-            },
-            animeSeries: {
-                select: {
-                    id: true,
-                    title: true,
-                    englishTitle: true,
-                    coverImage: true,
+                animeSeries: {
+                    select: {
+                        id: true,
+                        title: true,
+                        englishTitle: true,
+                        coverImage: true,
+                    },
                 },
-            },
-            animeMediaPart: {
-                select: {
-                    id: true,
-                    title: true,
-                    type: true,
+                animeMediaPart: {
+                    select: {
+                        id: true,
+                        title: true,
+                        type: true,
+                    },
                 },
-            },
-            commentLikes: {
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            username: true,
+                commentLikes: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                            },
                         },
                     },
                 },
             },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Tüm yorumları listeleme', { where, skip, take, orderBy });
+    }
 }
 
 // Yorum bilgilerini günceller
@@ -206,18 +226,26 @@ export async function updateComment(
     data: Prisma.CommentUpdateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Comment> {
-    return await client.comment.update({
-        where,
-        data,
-    });
+    try {
+        return await client.comment.update({
+            where,
+            data,
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Yorum güncelleme', { where, data });
+    }
 }
 
-// Yorumu siler
+// Yorum'u siler
 export async function deleteComment(
     where: Prisma.CommentWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Comment> {
-    return await client.comment.delete({ where });
+    try {
+        return await client.comment.delete({ where });
+    } catch (error) {
+        handleDatabaseError(error, 'Yorum silme', { where });
+    }
 }
 
 // Yorum sayısını döner
@@ -225,35 +253,47 @@ export async function countComments(
     where?: Prisma.CommentWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
-    return await client.comment.count({ where });
+    try {
+        return await client.comment.count({ where });
+    } catch (error) {
+        handleDatabaseError(error, 'Yorum sayma', { where });
+    }
 }
 
 // CommentLike CRUD operasyonları
 
-// Yeni yorum beğenisi oluşturur
+// Yorum beğenisi oluşturur
 export async function createCommentLike(
     data: Prisma.CommentLikeCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CommentLike> {
-    return await client.commentLike.create({
-        data,
-    });
+    try {
+        return await client.commentLike.create({
+            data,
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Yorum beğenisi oluşturma', { data });
+    }
 }
 
-// Kullanıcı ve yorum ile beğeni bulur
+// Kullanıcının yorum beğenisini bulur
 export async function findCommentLikeByUserAndComment(
     userId: string,
     commentId: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CommentLike | null> {
-    return await client.commentLike.findUnique({
-        where: {
-            userId_commentId: {
-                userId,
-                commentId,
+    try {
+        return await client.commentLike.findUnique({
+            where: {
+                userId_commentId: {
+                    userId,
+                    commentId,
+                },
             },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Kullanıcının yorum beğenisini bulma', { userId, commentId });
+    }
 }
 
 // Yorumun beğenilerini listeler
@@ -263,78 +303,87 @@ export async function findCommentLikesByCommentId(
     take?: number,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CommentLike[]> {
-    return await client.commentLike.findMany({
-        where: { commentId },
-        skip,
-        take,
-        orderBy: { createdAt: 'desc' },
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    username: true,
-                    profilePicture: true,
+    try {
+        return await client.commentLike.findMany({
+            where: { commentId },
+            skip,
+            take,
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profilePicture: true,
+                    },
                 },
             },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Yorumun beğenilerini bulma', { commentId, skip, take });
+    }
 }
 
-// Kullanıcının beğendiği yorumları listeler
+// Kullanıcının beğenilerini listeler
 export async function findCommentLikesByUserId(
     userId: string,
     skip?: number,
     take?: number,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CommentLike[]> {
-    return await client.commentLike.findMany({
-        where: { userId },
-        skip,
-        take,
-        orderBy: { createdAt: 'desc' },
-        include: {
-            comment: {
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            username: true,
-                            profilePicture: true,
+    try {
+        return await client.commentLike.findMany({
+            where: { userId },
+            skip,
+            take,
+            orderBy: { createdAt: 'desc' },
+            include: {
+                comment: {
+                    include: {
+                        animeSeries: {
+                            select: {
+                                id: true,
+                                title: true,
+                                englishTitle: true,
+                                coverImage: true,
+                            },
                         },
-                    },
-                    animeSeries: {
-                        select: {
-                            id: true,
-                            title: true,
-                            englishTitle: true,
-                            coverImage: true,
-                        },
-                    },
-                    animeMediaPart: {
-                        select: {
-                            id: true,
-                            title: true,
-                            type: true,
+                        animeMediaPart: {
+                            select: {
+                                id: true,
+                                title: true,
+                                type: true,
+                            },
                         },
                     },
                 },
             },
-        },
-    });
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Kullanıcının beğenilerini bulma', { userId, skip, take });
+    }
 }
 
-// Beğeniyi siler
+// Yorum beğenisini siler
 export async function deleteCommentLike(
     where: Prisma.CommentLikeWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<CommentLike> {
-    return await client.commentLike.delete({ where });
+    try {
+        return await client.commentLike.delete({ where });
+    } catch (error) {
+        handleDatabaseError(error, 'Yorum beğenisi silme', { where });
+    }
 }
 
-// Beğeni sayısını döner
+// Yorum beğeni sayısını döner
 export async function countCommentLikes(
     where?: Prisma.CommentLikeWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
-    return await client.commentLike.count({ where });
+    try {
+        return await client.commentLike.count({ where });
+    } catch (error) {
+        handleDatabaseError(error, 'Yorum beğeni sayma', { where });
+    }
 } 

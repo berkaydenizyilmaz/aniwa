@@ -3,7 +3,8 @@
 import { 
   BusinessError, 
   ConflictError, 
-  NotFoundError
+  NotFoundError,
+  DatabaseError
 } from '@/lib/errors';
 import { 
   createGenre as createGenreDB, 
@@ -71,7 +72,8 @@ export async function createGenreBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
@@ -115,10 +117,11 @@ export async function getGenreBusiness(
       data: genre
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
-    
+
     // Beklenmedik hata logu
     await logger.error(
       EVENTS.SYSTEM.BUSINESS_ERROR,
@@ -179,7 +182,8 @@ export async function getGenresBusiness(
       }
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
@@ -245,7 +249,8 @@ export async function updateGenreBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
@@ -290,7 +295,8 @@ export async function deleteGenreBusiness(
 
     return { success: true };
   } catch (error) {
-    if (error instanceof BusinessError) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     

@@ -3,6 +3,7 @@
 import { Prisma, Genre } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
+import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Genre CRUD operasyonları
 
@@ -11,9 +12,13 @@ export async function createGenre(
     data: Prisma.GenreCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre> {
-    return await client.genre.create({
-        data,
-    });
+    try {
+        return await client.genre.create({
+            data,
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Genre oluşturma', { data });
+    }
 }
 
 // ID ile genre bulur
@@ -21,9 +26,13 @@ export async function findGenreById(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre | null> {
-    return await client.genre.findUnique({
-        where: { id },
-    });
+    try {
+        return await client.genre.findUnique({
+            where: { id },
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Genre ID ile bulma', { id });
+    }
 }
 
 // Slug ile genre bulur
@@ -31,9 +40,13 @@ export async function findGenreBySlug(
     slug: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre | null> {
-    return await client.genre.findUnique({
-        where: { slug },
-    });
+    try {
+        return await client.genre.findUnique({
+            where: { slug },
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Genre slug ile bulma', { slug });
+    }
 }
 
 // Name ile genre bulur
@@ -41,18 +54,26 @@ export async function findGenreByName(
     name: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre | null> {
-    return await client.genre.findUnique({
-        where: { name },
-    });
+    try {
+        return await client.genre.findUnique({
+            where: { name },
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Genre name ile bulma', { name });
+    }
 }
 
 // Tüm genre'leri listeler
 export async function findAllGenres(
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre[]> {
-    return await client.genre.findMany({
-        orderBy: { name: 'asc' },
-    });
+    try {
+        return await client.genre.findMany({
+            orderBy: { name: 'asc' },
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Tüm genre\'leri listeleme');
+    }
 }
 
 // Genre bilgilerini günceller
@@ -61,10 +82,14 @@ export async function updateGenre(
     data: Prisma.GenreUpdateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre> {
-    return await client.genre.update({
-        where,
-        data,
-    });
+    try {
+        return await client.genre.update({
+            where,
+            data,
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Genre güncelleme', { where, data });
+    }
 }
 
 // Genre'yi siler
@@ -72,7 +97,11 @@ export async function deleteGenre(
     where: Prisma.GenreWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<Genre> {
-    return await client.genre.delete({ where });
+    try {
+        return await client.genre.delete({ where });
+    } catch (error) {
+        handleDatabaseError(error, 'Genre silme', { where });
+    }
 }
 
 // Genre sayısını döner
@@ -80,5 +109,9 @@ export async function countGenres(
     where?: Prisma.GenreWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
-    return await client.genre.count({ where });
-} 
+    try {
+        return await client.genre.count({ where });
+    } catch (error) {
+        handleDatabaseError(error, 'Genre sayma', { where });
+    }
+}
