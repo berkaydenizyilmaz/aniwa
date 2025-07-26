@@ -28,7 +28,10 @@ import {
 } from '@/lib/types/api/user.api';
 
 // Tüm kullanıcıları getirme (admin - filtrelemeli)
-export async function getAllUsers(filters?: GetUsersRequest): Promise<ApiResponse<GetUsersResponse>> {
+export async function getUsersBusiness(
+  adminUser: { id: string; username: string },
+  filters?: GetUsersRequest
+): Promise<ApiResponse<GetUsersResponse>> {
   try {
     const page = filters?.page || 1;
     const limit = filters?.limit || 50;
@@ -60,6 +63,18 @@ export async function getAllUsers(filters?: GetUsersRequest): Promise<ApiRespons
 
     const totalPages = Math.ceil(total / limit);
 
+    // Başarılı listeleme logu
+    await logger.info(
+      EVENTS.ADMIN.USERS_RETRIEVED,
+      'Kullanıcılar listelendi',
+      { 
+        adminId: adminUser.id,
+        adminUsername: adminUser.username,
+        filters,
+        total
+      }
+    );
+
     return {
       success: true,
       data: {
@@ -87,12 +102,27 @@ export async function getAllUsers(filters?: GetUsersRequest): Promise<ApiRespons
 }
 
 // Tek kullanıcı getirme (admin)
-export async function getUserById(id: string): Promise<ApiResponse<GetUserResponse>> {
+export async function getUserBusiness(
+  id: string,
+  adminUser: { id: string; username: string }
+): Promise<ApiResponse<GetUserResponse>> {
   try {
     const user = await findUserById(id);
     if (!user) {
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
+
+    // Başarılı getirme logu
+    await logger.info(
+      EVENTS.ADMIN.USER_RETRIEVED,
+      'Kullanıcı getirildi',
+      { 
+        userId: user.id,
+        username: user.username,
+        adminId: adminUser.id,
+        adminUsername: adminUser.username
+      }
+    );
 
     return {
       success: true,
@@ -115,7 +145,7 @@ export async function getUserById(id: string): Promise<ApiResponse<GetUserRespon
 }
 
 // Kullanıcı güncelleme (admin)
-export async function updateUser(
+export async function updateUserBusiness(
   id: string, 
   data: UpdateUserRequest,
   adminUser: { id: string; username: string }
@@ -190,7 +220,7 @@ export async function updateUser(
 }
 
 // Kullanıcı banlama (admin)
-export async function banUser(
+export async function banUserBusiness(
   id: string,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<UpdateUserResponse>> {
@@ -241,7 +271,7 @@ export async function banUser(
 }
 
 // Kullanıcı ban kaldırma (admin)
-export async function unbanUser(
+export async function unbanUserBusiness(
   id: string,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<UpdateUserResponse>> {
@@ -292,7 +322,7 @@ export async function unbanUser(
 }
 
 // Kullanıcı silme (admin)
-export async function deleteUser(
+export async function deleteUserBusiness(
   id: string,
   adminUser: { id: string; username: string }
 ): Promise<ApiResponse<void>> {
