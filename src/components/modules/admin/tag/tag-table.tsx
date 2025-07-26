@@ -54,7 +54,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
           limit: 100,
         };
         if (searchTerm) filters.search = searchTerm;
-        if (selectedCategory) filters.category = selectedCategory as TagCategory;
+        if (selectedCategory && selectedCategory !== 'all') filters.category = selectedCategory as TagCategory;
         if (selectedAdult !== null) filters.isAdult = selectedAdult;
         if (selectedSpoiler !== null) filters.isSpoiler = selectedSpoiler;
         const result = await getTagsAction(filters);
