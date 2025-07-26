@@ -31,9 +31,10 @@ import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 interface TagTableProps {
   onEdit?: (tag: Tag) => void;
   searchTerm?: string;
+  selectedCategory?: string;
 }
 
-export function TagTable({ onEdit, searchTerm = '' }: TagTableProps) {
+export function TagTable({ onEdit, searchTerm = '', selectedCategory = '' }: TagTableProps) {
   const [tags, setTags] = useState<Tag[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
@@ -64,11 +65,15 @@ export function TagTable({ onEdit, searchTerm = '' }: TagTableProps) {
     fetchTags();
   }, [setLoadingStore]);
 
-  // Arama filtreleme
-  const filteredTags = tags.filter(tag =>
-    tag.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    tag.slug.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Arama ve kategori filtreleme
+  const filteredTags = tags.filter(tag => {
+    const matchesSearch = tag.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tag.slug.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesCategory = !selectedCategory || tag.category === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
 
   const handleEdit = (tag: Tag) => {
     onEdit?.(tag);

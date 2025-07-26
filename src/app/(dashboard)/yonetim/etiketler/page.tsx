@@ -11,6 +11,7 @@ export default function TagsPage() {
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   const handleAddNew = () => {
     setSelectedTag(null);
@@ -30,6 +31,10 @@ export default function TagsPage() {
     setSearchTerm(search);
   };
 
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+  };
+
   return (
     <div className="space-y-6">
       {/* Başlık */}
@@ -41,13 +46,14 @@ export default function TagsPage() {
       </div>
 
       {/* Filtreler */}
-      <TagFilters onSearch={handleSearch} onAddNew={handleAddNew} />
+      <TagFilters onSearch={handleSearch} onCategoryChange={handleCategoryChange} onAddNew={handleAddNew} />
 
       {/* Tablo */}
       <TagTable 
         key={refreshKey}
         onEdit={handleEdit}
         searchTerm={searchTerm}
+        selectedCategory={selectedCategory}
       />
 
       {/* Form Dialog */}
