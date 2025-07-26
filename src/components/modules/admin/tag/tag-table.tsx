@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Tag, TagCategory } from '@prisma/client';
 import { getTagsAction, deleteTagAction } from '@/lib/actions/tag.action';
 import { toast } from 'sonner';
@@ -42,6 +42,10 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
   const [tags, setTags] = useState<Tag[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalTags, setTotalTags] = useState(0);
+  const [limit] = useState(50);
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   // Tag'leri getir (server-side filtreleme)
@@ -50,8 +54,8 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
       try {
         setLoadingStore(LOADING_KEYS.PAGES.TAGS, true);
         const filters: TagFilters = {
-          page: 1,
-          limit: 100,
+          page: currentPage,
+          limit: limit,
         };
         if (searchTerm) filters.search = searchTerm;
         if (selectedCategory && selectedCategory !== 'all') filters.category = selectedCategory as TagCategory;
@@ -64,6 +68,8 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
         }
         const data = result.data as GetTagsResponse;
         setTags(data.tags);
+        setTotalPages(data.totalPages);
+        setTotalTags(data.total);
       } catch (error) {
         console.error('Fetch tags error:', error);
         toast.error('Etiketler yüklenirken bir hata oluştu');
@@ -72,7 +78,12 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
       }
     };
     fetchTags();
-  }, [setLoadingStore, searchTerm, selectedCategory, selectedAdult, selectedSpoiler]);
+  }, [setLoadingStore, searchTerm, selectedCategory, selectedAdult, selectedSpoiler, currentPage, limit]);
+
+  // Filtreler değiştiğinde sayfa 1'e dön
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory, selectedAdult, selectedSpoiler]);
 
   // Client-side filtreleme kaldırıldı, direkt tags kullanılıyor
   const handleEdit = (tag: Tag) => {
@@ -101,10 +112,12 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
       setDeleteDialogOpen(false);
 
       // Tabloyu yenile
-      const fetchResult = await getTagsAction();
+      const fetchResult = await getTagsAction({ page: currentPage, limit });
       if (fetchResult.success) {
         const data = fetchResult.data as GetTagsResponse;
         setTags(data.tags);
+        setTotalPages(data.totalPages);
+        setTotalTags(data.total);
       }
 
     } catch (error) {
@@ -113,6 +126,45 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
     } finally {
       setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_TAG, false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
   };
 
   if (isLoading(LOADING_KEYS.PAGES.TAGS)) {
@@ -183,6 +235,78 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
         {tags.length === 0 && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun etiket bulunamadı.' : 'Henüz etiket bulunmuyor.'}
+          </div>
+        )}
+
+        {/* Sayfalama */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between p-4 border-t border-border/50">
+            <div className="text-sm text-muted-foreground">
+              Toplam {totalTags} etiket, {currentPage}. sayfa / {totalPages} sayfa
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* İlk sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.TAGS)}
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
+              
+              {/* Önceki sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.TAGS)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              {/* Sayfa numaraları */}
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, index) => (
+                  <div key={index}>
+                    {page === '...' ? (
+                      <span className="px-2 py-1 text-muted-foreground">...</span>
+                    ) : (
+                      <Button
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handlePageChange(page as number)}
+                        disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Sonraki sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.TAGS)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              
+              {/* Son sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.TAGS)}
+              >
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         )}
       </div>

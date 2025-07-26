@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, Ban, UserCheck } from 'lucide-react';
+import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { User, UserRole } from '@prisma/client';
-import { getUsersAction, deleteUserAction, banUserAction, unbanUserAction } from '@/lib/actions/user.action';
+import { getUsersAction, deleteUserAction } from '@/lib/actions/user.action';
 import { toast } from 'sonner';
 import { GetUsersResponse } from '@/lib/types/api/user.api';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -40,16 +40,20 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
   const [users, setUsers] = useState<User[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [limit] = useState(50);
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
-  // Kullanıcıları getir (server-side filtreleme)
+  // User'ları getir (server-side filtreleme)
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         setLoadingStore(LOADING_KEYS.PAGES.USERS, true);
         const filters: UserFilters = {
-          page: 1,
-          limit: 100,
+          page: currentPage,
+          limit: limit,
         };
         if (searchTerm) filters.search = searchTerm;
         if (selectedRole) filters.role = selectedRole as UserRole;
@@ -61,6 +65,8 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
         }
         const data = result.data as GetUsersResponse;
         setUsers(data.users);
+        setTotalPages(data.totalPages);
+        setTotalUsers(data.total);
       } catch (error) {
         console.error('Fetch users error:', error);
         toast.error('Kullanıcılar yüklenirken bir hata oluştu');
@@ -69,10 +75,14 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
       }
     };
     fetchUsers();
-  }, [setLoadingStore, searchTerm, selectedRole, selectedBanned]);
+  }, [setLoadingStore, searchTerm, selectedRole, selectedBanned, currentPage, limit]);
+
+  // Filtreler değiştiğinde sayfa 1'e dön
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedRole, selectedBanned]);
 
   // Client-side filtreleme kaldırıldı, direkt users kullanılıyor
-
   const handleEdit = (user: User) => {
     onEdit?.(user);
   };
@@ -80,66 +90,6 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
   const handleDelete = (user: User) => {
     setSelectedUser(user);
     setDeleteDialogOpen(true);
-  };
-
-  const handleBan = async (user: User) => {
-    if (isLoading(LOADING_KEYS.ACTIONS.BAN_USER)) return;
-
-    setLoadingStore(LOADING_KEYS.ACTIONS.BAN_USER, true);
-
-    try {
-      const result = await banUserAction(user.id);
-
-      if (!result.success) {
-        toast.error(result.error || 'Ban işlemi başarısız oldu');
-        return;
-      }
-
-      toast.success('Kullanıcı başarıyla banlandı!');
-      
-      // Tabloyu yenile
-      const fetchResult = await getUsersAction();
-      if (fetchResult.success) {
-        const data = fetchResult.data as GetUsersResponse;
-        setUsers(data.users);
-      }
-
-    } catch (error) {
-      console.error('Ban user error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.ACTIONS.BAN_USER, false);
-    }
-  };
-
-  const handleUnban = async (user: User) => {
-    if (isLoading(LOADING_KEYS.ACTIONS.UNBAN_USER)) return;
-
-    setLoadingStore(LOADING_KEYS.ACTIONS.UNBAN_USER, true);
-
-    try {
-      const result = await unbanUserAction(user.id);
-
-      if (!result.success) {
-        toast.error(result.error || 'Ban kaldırma işlemi başarısız oldu');
-        return;
-      }
-
-      toast.success('Kullanıcının banı başarıyla kaldırıldı!');
-      
-      // Tabloyu yenile
-      const fetchResult = await getUsersAction();
-      if (fetchResult.success) {
-        const data = fetchResult.data as GetUsersResponse;
-        setUsers(data.users);
-      }
-
-    } catch (error) {
-      console.error('Unban user error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.ACTIONS.UNBAN_USER, false);
-    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -159,10 +109,12 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
       setDeleteDialogOpen(false);
 
       // Tabloyu yenile
-      const fetchResult = await getUsersAction();
+      const fetchResult = await getUsersAction({ page: currentPage, limit });
       if (fetchResult.success) {
         const data = fetchResult.data as GetUsersResponse;
         setUsers(data.users);
+        setTotalPages(data.totalPages);
+        setTotalUsers(data.total);
       }
 
     } catch (error) {
@@ -171,6 +123,45 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
     } finally {
       setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_USER, false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
   };
 
   if (isLoading(LOADING_KEYS.PAGES.USERS)) {
@@ -184,7 +175,6 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
               <Skeleton className="h-4 flex-1" />
               <Skeleton className="h-4 flex-1" />
               <div className="flex gap-2">
-                <Skeleton className="h-8 w-8" />
                 <Skeleton className="h-8 w-8" />
                 <Skeleton className="h-8 w-8" />
               </div>
@@ -201,11 +191,11 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-1/4">Kullanıcı Adı</TableHead>
-              <TableHead className="w-1/4">E-posta</TableHead>
-              <TableHead className="w-1/4">Roller</TableHead>
-              <TableHead className="w-1/4">Durum</TableHead>
-              <TableHead className="w-1/4">İşlemler</TableHead>
+              <TableHead className="w-1/5">Kullanıcı Adı</TableHead>
+              <TableHead className="w-1/5">Email</TableHead>
+              <TableHead className="w-1/5">Roller</TableHead>
+              <TableHead className="w-1/5">Durum</TableHead>
+              <TableHead className="w-1/5">İşlemler</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -214,15 +204,15 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
                 <TableCell>{user.username}</TableCell>
                 <TableCell className="text-muted-foreground">{user.email}</TableCell>
                 <TableCell className="text-muted-foreground">
-                  {user.roles.join(', ')}
+                  {user.roles?.join(', ') || '-'}
                 </TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  <span className={`px-2 py-1 rounded-full text-xs ${
                     user.isBanned 
-                      ? 'bg-red-100 text-red-800' 
-                      : 'bg-green-100 text-green-800'
+                      ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' 
+                      : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                   }`}>
-                    {user.isBanned ? 'Banlı' : 'Aktif'}
+                    {user.isBanned ? 'Yasaklı' : 'Aktif'}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -235,27 +225,6 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    {user.isBanned ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleUnban(user)}
-                        className="h-8 w-8 p-0"
-                        disabled={isLoading(LOADING_KEYS.ACTIONS.UNBAN_USER)}
-                      >
-                        <UserCheck className="h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleBan(user)}
-                        className="h-8 w-8 p-0"
-                        disabled={isLoading(LOADING_KEYS.ACTIONS.BAN_USER)}
-                      >
-                        <Ban className="h-4 w-4" />
-                      </Button>
-                    )}
                     <Button
                       variant="ghost-destructive"
                       size="sm"
@@ -276,23 +245,96 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
             {searchTerm ? 'Arama kriterlerine uygun kullanıcı bulunamadı.' : 'Henüz kullanıcı bulunmuyor.'}
           </div>
         )}
+
+        {/* Sayfalama */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between p-4 border-t border-border/50">
+            <div className="text-sm text-muted-foreground">
+              Toplam {totalUsers} kullanıcı, {currentPage}. sayfa / {totalPages} sayfa
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* İlk sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.USERS)}
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
+              
+              {/* Önceki sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.USERS)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              {/* Sayfa numaraları */}
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, index) => (
+                  <div key={index}>
+                    {page === '...' ? (
+                      <span className="px-2 py-1 text-muted-foreground">...</span>
+                    ) : (
+                      <Button
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handlePageChange(page as number)}
+                        disabled={isLoading(LOADING_KEYS.PAGES.USERS)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Sonraki sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.USERS)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              
+              {/* Son sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.USERS)}
+              >
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Silme Dialog */}
+      {/* Delete Alert Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Kullanıcıyı Sil</AlertDialogTitle>
             <AlertDialogDescription>
-              Bu kullanıcıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+              <strong>{selectedUser?.username}</strong> kullanıcısını silmek istediğinizden emin misiniz?
+              Bu işlem geri alınamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>İptal</AlertDialogCancel>
+            <AlertDialogCancel disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_USER)}>İptal</AlertDialogCancel>
             <Button
-              variant="destructive"
               onClick={handleDeleteConfirm}
               disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_USER)}
+              variant="destructive"
             >
               Sil
             </Button>

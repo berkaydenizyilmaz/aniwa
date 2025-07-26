@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Studio } from '@prisma/client';
 import { getStudiosAction, deleteStudioAction } from '@/lib/actions/studio.action';
 import { toast } from 'sonner';
@@ -39,6 +39,10 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
   const [studios, setStudios] = useState<Studio[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedStudio, setSelectedStudio] = useState<Studio | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalStudios, setTotalStudios] = useState(0);
+  const [limit] = useState(50);
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   // Studio'ları getir (server-side filtreleme)
@@ -47,8 +51,8 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
       try {
         setLoadingStore(LOADING_KEYS.PAGES.STUDIOS, true);
         const filters: StudioFilters = {
-          page: 1,
-          limit: 100,
+          page: currentPage,
+          limit: limit,
         };
         if (searchTerm) filters.search = searchTerm;
         if (selectedStudioType !== null) filters.isAnimationStudio = selectedStudioType;
@@ -59,6 +63,8 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
         }
         const data = result.data as GetStudiosResponse;
         setStudios(data.studios);
+        setTotalPages(data.totalPages);
+        setTotalStudios(data.total);
       } catch (error) {
         console.error('Fetch studios error:', error);
         toast.error('Stüdyolar yüklenirken bir hata oluştu');
@@ -67,7 +73,12 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
       }
     };
     fetchStudios();
-  }, [setLoadingStore, searchTerm, selectedStudioType]);
+  }, [setLoadingStore, searchTerm, selectedStudioType, currentPage, limit]);
+
+  // Filtreler değiştiğinde sayfa 1'e dön
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedStudioType]);
 
   // Client-side filtreleme kaldırıldı, direkt studios kullanılıyor
   const handleEdit = (studio: Studio) => {
@@ -96,10 +107,12 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
       setDeleteDialogOpen(false);
 
       // Tabloyu yenile
-      const fetchResult = await getStudiosAction();
+      const fetchResult = await getStudiosAction({ page: currentPage, limit });
       if (fetchResult.success) {
         const data = fetchResult.data as GetStudiosResponse;
         setStudios(data.studios);
+        setTotalPages(data.totalPages);
+        setTotalStudios(data.total);
       }
 
     } catch (error) {
@@ -108,6 +121,45 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
     } finally {
       setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_STUDIO, false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
   };
 
   if (isLoading(LOADING_KEYS.PAGES.STUDIOS)) {
@@ -178,6 +230,78 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
         {studios.length === 0 && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun stüdyo bulunamadı.' : 'Henüz stüdyo bulunmuyor.'}
+          </div>
+        )}
+
+        {/* Sayfalama */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between p-4 border-t border-border/50">
+            <div className="text-sm text-muted-foreground">
+              Toplam {totalStudios} stüdyo, {currentPage}. sayfa / {totalPages} sayfa
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* İlk sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
+              
+              {/* Önceki sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              {/* Sayfa numaraları */}
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, index) => (
+                  <div key={index}>
+                    {page === '...' ? (
+                      <span className="px-2 py-1 text-muted-foreground">...</span>
+                    ) : (
+                      <Button
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handlePageChange(page as number)}
+                        disabled={isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Sonraki sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              
+              {/* Son sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+              >
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         )}
       </div>

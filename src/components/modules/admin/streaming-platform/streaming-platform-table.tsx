@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { StreamingPlatform } from '@prisma/client';
 import { getStreamingPlatformsAction, deleteStreamingPlatformAction } from '@/lib/actions/streaming-platform.action';
 import { toast } from 'sonner';
-import { GetAllStreamingPlatformsResponse } from '@/lib/types/api/streaming.api';
+import { GetStreamingPlatformsResponse } from '@/lib/types/api/streaming-platform.api';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -27,85 +27,137 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
-import { type StreamingPlatformFilters } from '@/lib/schemas/streaming.schema';
+import { type StreamingPlatformFilters } from '@/lib/schemas/streaming-platform.schema';
 
 interface StreamingPlatformTableProps {
-  onEdit?: (platform: StreamingPlatform) => void;
+  onEdit?: (streamingPlatform: StreamingPlatform) => void;
   searchTerm?: string;
 }
 
 export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPlatformTableProps) {
-  const [platforms, setPlatforms] = useState<StreamingPlatform[]>([]);
+  const [streamingPlatforms, setStreamingPlatforms] = useState<StreamingPlatform[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedPlatform, setSelectedPlatform] = useState<StreamingPlatform | null>(null);
+  const [selectedStreamingPlatform, setSelectedStreamingPlatform] = useState<StreamingPlatform | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalStreamingPlatforms, setTotalStreamingPlatforms] = useState(0);
+  const [limit] = useState(50);
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
-  // Platform'ları getir (server-side filtreleme)
+  // Streaming Platform'ları getir (server-side filtreleme)
   useEffect(() => {
-    const fetchPlatforms = async () => {
+    const fetchStreamingPlatforms = async () => {
       try {
         setLoadingStore(LOADING_KEYS.PAGES.STREAMING_PLATFORMS, true);
         const filters: StreamingPlatformFilters = {
-          page: 1,
-          limit: 100,
+          page: currentPage,
+          limit: limit,
         };
         if (searchTerm) filters.search = searchTerm;
         const result = await getStreamingPlatformsAction(filters);
         if (!result.success) {
-          toast.error(result.error || 'Platformlar yüklenirken bir hata oluştu');
+          toast.error(result.error || 'Yayın platformları yüklenirken bir hata oluştu');
           return;
         }
-        const data = result.data as GetAllStreamingPlatformsResponse;
-        setPlatforms(data.platforms);
+        const data = result.data as GetStreamingPlatformsResponse;
+        setStreamingPlatforms(data.streamingPlatforms);
+        setTotalPages(data.totalPages);
+        setTotalStreamingPlatforms(data.total);
       } catch (error) {
-        console.error('Fetch platforms error:', error);
-        toast.error('Platformlar yüklenirken bir hata oluştu');
+        console.error('Fetch streaming platforms error:', error);
+        toast.error('Yayın platformları yüklenirken bir hata oluştu');
       } finally {
         setLoadingStore(LOADING_KEYS.PAGES.STREAMING_PLATFORMS, false);
       }
     };
-    fetchPlatforms();
-  }, [setLoadingStore, searchTerm]);
+    fetchStreamingPlatforms();
+  }, [setLoadingStore, searchTerm, currentPage, limit]);
 
-  // Client-side filtreleme kaldırıldı, direkt platforms kullanılıyor
-  const handleEdit = (platform: StreamingPlatform) => {
-    onEdit?.(platform);
+  // Filtreler değiştiğinde sayfa 1'e dön
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  // Client-side filtreleme kaldırıldı, direkt streamingPlatforms kullanılıyor
+  const handleEdit = (streamingPlatform: StreamingPlatform) => {
+    onEdit?.(streamingPlatform);
   };
 
-  const handleDelete = (platform: StreamingPlatform) => {
-    setSelectedPlatform(platform);
+  const handleDelete = (streamingPlatform: StreamingPlatform) => {
+    setSelectedStreamingPlatform(streamingPlatform);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedPlatform || isLoading(LOADING_KEYS.ACTIONS.DELETE_STREAMING_PLATFORM)) return;
+    if (!selectedStreamingPlatform || isLoading(LOADING_KEYS.ACTIONS.DELETE_STREAMING_PLATFORM)) return;
 
     setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_STREAMING_PLATFORM, true);
 
     try {
-      const result = await deleteStreamingPlatformAction(selectedPlatform.id);
+      const result = await deleteStreamingPlatformAction(selectedStreamingPlatform.id);
 
       if (!result.success) {
         toast.error(result.error || 'Silme işlemi başarısız oldu');
         return;
       }
 
-      toast.success('Platform başarıyla silindi!');
+      toast.success('Yayın platformu başarıyla silindi!');
       setDeleteDialogOpen(false);
 
       // Tabloyu yenile
-      const fetchResult = await getStreamingPlatformsAction();
+      const fetchResult = await getStreamingPlatformsAction({ page: currentPage, limit });
       if (fetchResult.success) {
-        const data = fetchResult.data as GetAllStreamingPlatformsResponse;
-        setPlatforms(data.platforms);
+        const data = fetchResult.data as GetStreamingPlatformsResponse;
+        setStreamingPlatforms(data.streamingPlatforms);
+        setTotalPages(data.totalPages);
+        setTotalStreamingPlatforms(data.total);
       }
 
     } catch (error) {
-      console.error('Delete platform error:', error);
+      console.error('Delete streaming platform error:', error);
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_STREAMING_PLATFORM, false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
   };
 
   if (isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)) {
@@ -139,16 +191,16 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
             </TableRow>
           </TableHeader>
           <TableBody>
-            {platforms.map((platform) => (
-              <TableRow key={platform.id}>
-                <TableCell>{platform.name}</TableCell>
-                <TableCell className="text-muted-foreground">{platform.baseUrl}</TableCell>
+            {streamingPlatforms.map((streamingPlatform) => (
+              <TableRow key={streamingPlatform.id}>
+                <TableCell>{streamingPlatform.name}</TableCell>
+                <TableCell className="text-muted-foreground">{streamingPlatform.baseUrl}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleEdit(platform)}
+                      onClick={() => handleEdit(streamingPlatform)}
                       className="h-8 w-8 p-0"
                     >
                       <Edit className="h-4 w-4" />
@@ -156,7 +208,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
                     <Button
                       variant="ghost-destructive"
                       size="sm"
-                      onClick={() => handleDelete(platform)}
+                      onClick={() => handleDelete(streamingPlatform)}
                       className="h-8 w-8 p-0"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -168,9 +220,81 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
           </TableBody>
         </Table>
 
-        {platforms.length === 0 && (
+        {streamingPlatforms.length === 0 && (
           <div className="p-8 text-center text-muted-foreground">
-            {searchTerm ? 'Arama kriterlerine uygun platform bulunamadı.' : 'Henüz platform bulunmuyor.'}
+            {searchTerm ? 'Arama kriterlerine uygun yayın platformu bulunamadı.' : 'Henüz yayın platformu bulunmuyor.'}
+          </div>
+        )}
+
+        {/* Sayfalama */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between p-4 border-t border-border/50">
+            <div className="text-sm text-muted-foreground">
+              Toplam {totalStreamingPlatforms} yayın platformu, {currentPage}. sayfa / {totalPages} sayfa
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* İlk sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)}
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
+              
+              {/* Önceki sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              {/* Sayfa numaraları */}
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, index) => (
+                  <div key={index}>
+                    {page === '...' ? (
+                      <span className="px-2 py-1 text-muted-foreground">...</span>
+                    ) : (
+                      <Button
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handlePageChange(page as number)}
+                        disabled={isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Sonraki sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              
+              {/* Son sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)}
+              >
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         )}
       </div>
@@ -179,9 +303,9 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Platformu Sil</AlertDialogTitle>
+            <AlertDialogTitle>Yayın Platformunu Sil</AlertDialogTitle>
             <AlertDialogDescription>
-              <strong>{selectedPlatform?.name}</strong> platformunu silmek istediğinizden emin misiniz?
+              <strong>{selectedStreamingPlatform?.name}</strong> yayın platformunu silmek istediğinizden emin misiniz?
               Bu işlem geri alınamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>

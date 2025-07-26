@@ -8,7 +8,7 @@ import { GetLogsResponse } from '@/lib/types/api/log.api';
 import { type LogFilters } from '@/lib/schemas/log.schema';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Eye } from 'lucide-react';
+import { Eye, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -37,6 +37,10 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
   const [logs, setLogs] = useState<(Log & { user?: { id: string; username: string; email: string } | null })[]>([]);
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<(Log & { user?: { id: string; username: string; email: string } | null }) | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalLogs, setTotalLogs] = useState(0);
+  const [limit] = useState(50);
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   // Log'ları getir
@@ -47,8 +51,8 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
         
         // Filtreleri hazırla
         const filters: LogFilters = {
-          page: 1,
-          limit: 50
+          page: currentPage,
+          limit: limit
         };
         if (selectedLevel !== 'all') {
           filters.level = selectedLevel as LogLevel;
@@ -72,6 +76,8 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
 
         const data = result.data as GetLogsResponse;
         setLogs(data.logs);
+        setTotalPages(data.totalPages);
+        setTotalLogs(data.total);
       } catch (error) {
         console.error('Fetch logs error:', error);
         toast.error('Loglar yüklenirken bir hata oluştu');
@@ -81,9 +87,14 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
     };
 
     fetchLogs();
-  }, [setLoadingStore, searchTerm, selectedLevel, selectedStartDate, selectedEndDate]);
+  }, [setLoadingStore, searchTerm, selectedLevel, selectedStartDate, selectedEndDate, currentPage, limit]);
 
-    // Server-side filtreleme kullanıldığı için client-side filtreleme gerekmez
+  // Filtreler değiştiğinde sayfa 1'e dön
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedLevel, selectedStartDate, selectedEndDate]);
+
+  // Server-side filtreleme kullanıldığı için client-side filtreleme gerekmez
   const filteredLogs = logs;
 
   const formatDate = (date: Date) => {
@@ -108,6 +119,45 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
   const handleViewMetadata = (log: Log & { user?: { id: string; username: string; email: string } | null }) => {
     setSelectedLog(log);
     setMetadataDialogOpen(true);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
   };
 
   if (isLoading(LOADING_KEYS.PAGES.LOGS)) {
@@ -181,6 +231,78 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
         {filteredLogs.length === 0 && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun log bulunamadı.' : 'Henüz log bulunmuyor.'}
+          </div>
+        )}
+
+        {/* Sayfalama */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between p-4 border-t border-border/50">
+            <div className="text-sm text-muted-foreground">
+              Toplam {totalLogs} log, {currentPage}. sayfa / {totalPages} sayfa
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* İlk sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.LOGS)}
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
+              
+              {/* Önceki sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.LOGS)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              {/* Sayfa numaraları */}
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, index) => (
+                  <div key={index}>
+                    {page === '...' ? (
+                      <span className="px-2 py-1 text-muted-foreground">...</span>
+                    ) : (
+                      <Button
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handlePageChange(page as number)}
+                        disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Sonraki sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.LOGS)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              
+              {/* Son sayfa */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.LOGS)}
+              >
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         )}
       </div>
