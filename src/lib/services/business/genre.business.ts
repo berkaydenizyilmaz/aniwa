@@ -77,7 +77,7 @@ export async function createGenreBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Genre oluşturma sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', name: data.name },
       userId
@@ -121,7 +121,7 @@ export async function getGenreBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Genre getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id },
       userId
@@ -185,7 +185,7 @@ export async function getGenresBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Genre listeleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
       userId
@@ -233,7 +233,9 @@ export async function updateGenreBusiness(
       { 
         genreId: result.id, 
         name: result.name, 
-        slug: result.slug
+        slug: result.slug,
+        oldName: existingGenre.name,
+        oldSlug: existingGenre.slug
       },
       userId
     );
@@ -249,7 +251,7 @@ export async function updateGenreBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Genre güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id, data },
       userId
@@ -294,7 +296,7 @@ export async function deleteGenreBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.API_ERROR,
+      EVENTS.SYSTEM.BUSINESS_ERROR,
       'Genre silme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id },
       userId
