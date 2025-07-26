@@ -24,10 +24,7 @@ export async function createGenreAction(data: CreateGenreInput): Promise<ServerA
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await createGenreBusiness(validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await createGenreBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.GENRES);
@@ -52,10 +49,7 @@ export async function getGenresAction(filters?: GenreFilters): Promise<ServerAct
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getGenresBusiness({
-      id: session!.user.id,
-      username: session!.user.username
-    }, validatedFilters);
+    const result = await getGenresBusiness(session!.user.id, validatedFilters);
 
     return {
       success: true,
@@ -74,10 +68,7 @@ export async function getGenreAction(id: string): Promise<ServerActionResponse> 
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await getGenreBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await getGenreBusiness(id, session!.user.id);
 
     return {
       success: true,
@@ -99,10 +90,7 @@ export async function updateGenreAction(id: string, data: UpdateGenreInput): Pro
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    const result = await updateGenreBusiness(id, validatedData, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    const result = await updateGenreBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.GENRES);
@@ -124,10 +112,7 @@ export async function deleteGenreAction(id: string): Promise<ServerActionRespons
     const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
-    await deleteGenreBusiness(id, {
-      id: session!.user.id,
-      username: session!.user.username
-    });
+    await deleteGenreBusiness(id, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.ADMIN.GENRES);

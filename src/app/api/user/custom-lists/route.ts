@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { getUserCustomLists, createCustomList } from '@/lib/services/business/customList.business';
+import { getUserCustomListsBusiness, createCustomListBusiness } from '@/lib/services/business/customList.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 import { createCustomListSchema, customListFiltersSchema } from '@/lib/schemas/customList.schema';
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const validatedFilters = customListFiltersSchema.parse(filters);
 
     // Business logic
-    const result = await getUserCustomLists(session!.user.id, validatedFilters);
+    const result = await getUserCustomListsBusiness(session!.user.id, validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await createCustomList(session!.user.id, validatedData, {
+    const result = await createCustomListBusiness(session!.user.id, validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });

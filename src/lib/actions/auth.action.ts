@@ -4,9 +4,9 @@ import { registerSchema, type RegisterInput } from '@/lib/schemas/auth.schema';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '@/lib/schemas/auth.schema';
 import { resetPasswordSchema, type ResetPasswordInput } from '@/lib/schemas/auth.schema';
 import { 
-  registerUser as registerUserBusiness, 
-  forgotPassword as forgotPasswordBusiness, 
-  resetPassword as resetPasswordBusiness 
+  registerUserBusiness, 
+  forgotPasswordBusiness, 
+  resetPasswordBusiness 
 } from '@/lib/services/business/auth.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';

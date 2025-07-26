@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { toggleFavouriteAnime } from '@/lib/services/business/favouriteAnime.business';
+import { toggleFavouriteAnimeBusiness } from '@/lib/services/business/favouriteAnime.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Favori anime ekle/çıkar (POST) - Toggle
@@ -16,7 +16,7 @@ export async function POST(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await toggleFavouriteAnime(session!.user.id, { animeSeriesId }, {
+    const result = await toggleFavouriteAnimeBusiness(session!.user.id, { animeSeriesId }, {
       id: session!.user.id,
       username: session!.user.username
     });

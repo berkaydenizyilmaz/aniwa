@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { toggleAnimeInList } from '@/lib/services/business/userAnimeList.business';
+import { toggleAnimeInListBusiness } from '@/lib/services/business/userAnimeList.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 import { addAnimeToListSchema } from '@/lib/schemas/userAnimeList.schema';
 
@@ -21,7 +21,7 @@ export async function POST(
     const validatedData = addAnimeToListSchema.parse(body);
 
     // Business logic - Toggle
-    const result = await toggleAnimeInList(session!.user.id, { 
+    const result = await toggleAnimeInListBusiness(session!.user.id, { 
       ...validatedData,
       animeSeriesId
     }, {

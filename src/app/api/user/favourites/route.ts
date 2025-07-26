@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { getUserFavouriteAnimes } from '@/lib/services/business/favouriteAnime.business';
+import { getUserFavouriteAnimesBusiness } from '@/lib/services/business/favouriteAnime.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 import { favouriteAnimeFiltersSchema } from '@/lib/schemas/favouriteAnime.schema';
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const validatedFilters = favouriteAnimeFiltersSchema.parse(filters);
 
     // Business logic
-    const result = await getUserFavouriteAnimes(session!.user.id, validatedFilters);
+    const result = await getUserFavouriteAnimesBusiness(session!.user.id, validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);

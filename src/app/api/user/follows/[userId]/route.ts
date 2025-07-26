@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { toggleUserFollow, checkFollowStatus } from '@/lib/services/business/userFollow.business';
+import { toggleUserFollowBusiness, checkFollowStatusBusiness } from '@/lib/services/business/userFollow.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Kullanıcı takip etme/çıkarma (POST) - Toggle
@@ -16,7 +16,7 @@ export async function POST(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await toggleUserFollow(session!.user.id, { followingId }, {
+    const result = await toggleUserFollowBusiness(session!.user.id, { followingId }, {
       id: session!.user.id,
       username: session!.user.username
     });
@@ -41,7 +41,7 @@ export async function GET(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await checkFollowStatus(session!.user.id, followingId);
+    const result = await checkFollowStatusBusiness(session!.user.id, followingId);
     
     // Başarılı yanıt
     return NextResponse.json(result);

@@ -6,7 +6,7 @@ import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } 
 import { StreamingPlatform } from '@prisma/client';
 import { getStreamingPlatformsAction, deleteStreamingPlatformAction } from '@/lib/actions/admin/streaming-platform.action';
 import { toast } from 'sonner';
-import { GetStreamingPlatformsResponse } from '@/lib/types/api/streaming-platform.api';
+import { GetAllStreamingPlatformsResponse } from '@/lib/types/api/streaming.api';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
-import { type StreamingPlatformFilters } from '@/lib/schemas/streaming-platform.schema';
+import { type StreamingPlatformFilters } from '@/lib/schemas/streaming.schema';
 
 interface StreamingPlatformTableProps {
   onEdit?: (streamingPlatform: StreamingPlatform) => void;
@@ -59,8 +59,8 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
           toast.error(result.error || 'Yayın platformları yüklenirken bir hata oluştu');
           return;
         }
-        const data = result.data as GetStreamingPlatformsResponse;
-        setStreamingPlatforms(data.streamingPlatforms);
+        const data = result.data as GetAllStreamingPlatformsResponse;
+        setStreamingPlatforms(data.platforms);
         setTotalPages(data.totalPages);
         setTotalStreamingPlatforms(data.total);
       } catch (error) {
@@ -107,8 +107,8 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
       // Tabloyu yenile
       const fetchResult = await getStreamingPlatformsAction({ page: currentPage, limit });
       if (fetchResult.success) {
-        const data = fetchResult.data as GetStreamingPlatformsResponse;
-        setStreamingPlatforms(data.streamingPlatforms);
+        const data = fetchResult.data as GetAllStreamingPlatformsResponse;
+        setStreamingPlatforms(data.platforms);
         setTotalPages(data.totalPages);
         setTotalStreamingPlatforms(data.total);
       }

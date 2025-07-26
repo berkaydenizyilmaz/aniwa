@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { toggleUserAnimeTracking, checkTrackingStatus } from '@/lib/services/business/userAnimeTracking.business';
+import { toggleUserAnimeTrackingBusiness, checkTrackingStatusBusiness } from '@/lib/services/business/userAnimeTracking.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Anime takip etme/çıkarma (POST) - Toggle
@@ -16,7 +16,7 @@ export async function POST(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await toggleUserAnimeTracking(session!.user.id, { animeSeriesId }, {
+    const result = await toggleUserAnimeTrackingBusiness(session!.user.id, { animeSeriesId }, {
       id: session!.user.id,
       username: session!.user.username
     });
@@ -41,7 +41,7 @@ export async function GET(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await checkTrackingStatus(session!.user.id, animeSeriesId);
+    const result = await checkTrackingStatusBusiness(session!.user.id, animeSeriesId);
     
     // Başarılı yanıt
     return NextResponse.json(result);

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { resetPasswordSchema } from '@/lib/schemas/auth.schema';
-import { resetPassword } from '@/lib/services/business/auth.business';
+import { resetPasswordBusiness } from '@/lib/services/business/auth.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 export async function POST(request: NextRequest) {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const validatedData = resetPasswordSchema.parse(body);
     
     // Business logic
-    const result = await resetPassword(validatedData.token, validatedData.password);
+    const result = await resetPasswordBusiness(validatedData.token, validatedData.password);
     
     // Başarılı yanıt
     return NextResponse.json(result, { status: 200 });

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { getUserFollowers, getUserFollowing } from '@/lib/services/business/userFollow.business';
+import { getUserFollowersBusiness, getUserFollowingBusiness } from '@/lib/services/business/userFollow.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 import { getUserFollowersSchema, getUserFollowingSchema } from '@/lib/schemas/userFollow.schema';
 
@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
 
     // Business logic
     const result = type === 'following'
-      ? await getUserFollowing(session!.user.id, validatedFilters)
-      : await getUserFollowers(session!.user.id, validatedFilters);
+      ? await getUserFollowingBusiness(session!.user.id, validatedFilters)
+      : await getUserFollowersBusiness(session!.user.id, validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);

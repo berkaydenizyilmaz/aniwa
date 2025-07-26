@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { updateAnimeSeriesSchema } from '@/lib/schemas/anime.schema';
-import { getAnimeSeriesById, updateAnimeSeries, deleteAnimeSeries } from '@/lib/services/business/anime.business';
+import { getAnimeSeriesByIdBusiness, updateAnimeSeriesBusiness, deleteAnimeSeriesBusiness } from '@/lib/services/business/anime.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // GET: Anime serisi detayı getir
@@ -17,7 +17,7 @@ export async function GET(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await getAnimeSeriesById(id, {
+    const result = await getAnimeSeriesByIdBusiness(id, {
       id: session!.user.id,
       username: session!.user.username
     });
@@ -46,7 +46,7 @@ export async function PUT(
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await updateAnimeSeries(id, validatedData, {
+    const result = await updateAnimeSeriesBusiness(id, validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });
@@ -71,7 +71,7 @@ export async function DELETE(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await deleteAnimeSeries(id, {
+    const result = await deleteAnimeSeriesBusiness(id, {
       id: session!.user.id,
       username: session!.user.username
     });

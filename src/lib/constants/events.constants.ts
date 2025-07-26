@@ -61,6 +61,12 @@ export const EVENTS = {
     STREAMING_PLATFORMS_RETRIEVED: 'admin_streaming_platforms_retrieved',
     STREAMING_PLATFORM_UPDATED: 'admin_streaming_platform_updated',
     STREAMING_PLATFORM_DELETED: 'admin_streaming_platform_deleted',
+    
+    // Anime Management
+    ANIME_SERIES_CREATED: 'admin_anime_series_created',
+    ANIME_SERIES_RETRIEVED: 'admin_anime_series_retrieved',
+    ANIME_SERIES_UPDATED: 'admin_anime_series_updated',
+    ANIME_SERIES_DELETED: 'admin_anime_series_deleted',
   },
 
   // Editor Events

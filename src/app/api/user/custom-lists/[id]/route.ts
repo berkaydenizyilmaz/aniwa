@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { getListItems, updateCustomList, deleteCustomList } from '@/lib/services/business/customList.business';
+import { getListItemsBusiness, updateCustomListBusiness, deleteCustomListBusiness } from '@/lib/services/business/customList.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 import { updateCustomListSchema, customListFiltersSchema } from '@/lib/schemas/customList.schema';
 
@@ -27,7 +27,7 @@ export async function GET(
     const validatedFilters = customListFiltersSchema.parse(filters);
 
     // Business logic
-    const result = await getListItems(id, session!.user.id, validatedFilters);
+    const result = await getListItemsBusiness(id, session!.user.id, validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);
@@ -53,7 +53,7 @@ export async function PUT(
     const session = await getServerSession(authConfig);
     
     // Business logic
-    const result = await updateCustomList(id, session!.user.id, validatedData, {
+    const result = await updateCustomListBusiness(id, session!.user.id, validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });
@@ -78,7 +78,7 @@ export async function DELETE(
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await deleteCustomList(id, session!.user.id, {
+    const result = await deleteCustomListBusiness(id, session!.user.id, {
       id: session!.user.id,
       username: session!.user.username
     });

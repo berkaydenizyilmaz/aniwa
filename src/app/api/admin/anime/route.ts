@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { createAnimeSeriesSchema } from '@/lib/schemas/anime.schema';
-import { createAnimeSeries } from '@/lib/services/business/anime.business';
+import { createAnimeSeriesBusiness } from '@/lib/services/business/anime.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // POST: Anime serisi oluştur
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await createAnimeSeries(validatedData, {
+    const result = await createAnimeSeriesBusiness(validatedData, {
       id: session!.user.id,
       username: session!.user.username
     });
