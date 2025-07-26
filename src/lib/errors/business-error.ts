@@ -48,13 +48,7 @@ export class ConflictError extends BusinessError {
     }
 }
 
-// HTTP 400 - Validasyon hatası
-export class ValidationError extends BusinessError {
-    constructor(message: string, details?: Record<string, unknown>) {
-        super(message, ERROR_CODES.VALIDATION_ERROR, details);
-        this.name = 'ValidationError';
-    }
-}
+
 
 // HTTP 429 - Rate limit hatası
 export class RateLimitExceededError extends BusinessError {
