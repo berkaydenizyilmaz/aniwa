@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2 } from 'lucide-react';
-import { Tag } from '@prisma/client';
+import { Tag, TagCategory } from '@prisma/client';
 import { getTagsAction, deleteTagAction } from '@/lib/actions/tag.action';
 import { toast } from 'sonner';
 import { GetTagsResponse } from '@/lib/types/api/tag.api';
@@ -28,6 +28,7 @@ import {
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { MASTER_DATA } from '@/lib/constants/masterData.constants';
+import { type TagFilters } from '@/lib/schemas/tag.schema';
 
 interface TagTableProps {
   onEdit?: (tag: Tag) => void;
@@ -43,18 +44,24 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
-  // Tag'leri getir
+  // Tag'leri getir (server-side filtreleme)
   useEffect(() => {
     const fetchTags = async () => {
       try {
         setLoadingStore(LOADING_KEYS.PAGES.TAGS, true);
-        const result = await getTagsAction();
-
+        const filters: TagFilters = {
+          page: 1,
+          limit: 100,
+        };
+        if (searchTerm) filters.search = searchTerm;
+        if (selectedCategory) filters.category = selectedCategory as TagCategory;
+        if (selectedAdult !== null) filters.isAdult = selectedAdult;
+        if (selectedSpoiler !== null) filters.isSpoiler = selectedSpoiler;
+        const result = await getTagsAction(filters);
         if (!result.success) {
           toast.error(result.error || 'Etiketler yüklenirken bir hata oluştu');
           return;
         }
-
         const data = result.data as GetTagsResponse;
         setTags(data.tags);
       } catch (error) {
@@ -64,22 +71,10 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
         setLoadingStore(LOADING_KEYS.PAGES.TAGS, false);
       }
     };
-
     fetchTags();
-  }, [setLoadingStore]);
+  }, [setLoadingStore, searchTerm, selectedCategory, selectedAdult, selectedSpoiler]);
 
-    // Arama ve filtreleme
-  const filteredTags = tags.filter(tag => {
-    const matchesSearch = tag.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tag.slug.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesCategory = !selectedCategory || tag.category === selectedCategory;
-    const matchesAdult = selectedAdult === null || tag.isAdult === selectedAdult;
-    const matchesSpoiler = selectedSpoiler === null || tag.isSpoiler === selectedSpoiler;
-    
-    return matchesSearch && matchesCategory && matchesAdult && matchesSpoiler;
-  });
-
+  // Client-side filtreleme kaldırıldı, direkt tags kullanılıyor
   const handleEdit = (tag: Tag) => {
     onEdit?.(tag);
   };
@@ -153,7 +148,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredTags.map((tag) => (
+            {tags.map((tag) => (
               <TableRow key={tag.id}>
                 <TableCell>{tag.name}</TableCell>
                 <TableCell className="text-muted-foreground">{tag.slug}</TableCell>
@@ -185,7 +180,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
           </TableBody>
         </Table>
 
-        {filteredTags.length === 0 && (
+        {tags.length === 0 && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun etiket bulunamadı.' : 'Henüz etiket bulunmuyor.'}
           </div>

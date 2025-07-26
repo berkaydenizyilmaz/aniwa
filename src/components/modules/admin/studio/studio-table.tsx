@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { type StudioFilters } from '@/lib/schemas/studio.schema';
 
 interface StudioTableProps {
   onEdit?: (studio: Studio) => void;
@@ -40,18 +41,22 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
   const [selectedStudio, setSelectedStudio] = useState<Studio | null>(null);
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
-  // Studio'ları getir
+  // Studio'ları getir (server-side filtreleme)
   useEffect(() => {
     const fetchStudios = async () => {
       try {
         setLoadingStore(LOADING_KEYS.PAGES.STUDIOS, true);
-        const result = await getStudiosAction();
-
+        const filters: StudioFilters = {
+          page: 1,
+          limit: 100,
+        };
+        if (searchTerm) filters.search = searchTerm;
+        if (selectedStudioType !== null) filters.isAnimationStudio = selectedStudioType;
+        const result = await getStudiosAction(filters);
         if (!result.success) {
           toast.error(result.error || 'Stüdyolar yüklenirken bir hata oluştu');
           return;
         }
-
         const data = result.data as GetStudiosResponse;
         setStudios(data.studios);
       } catch (error) {
@@ -61,20 +66,10 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
         setLoadingStore(LOADING_KEYS.PAGES.STUDIOS, false);
       }
     };
-
     fetchStudios();
-  }, [setLoadingStore]);
+  }, [setLoadingStore, searchTerm, selectedStudioType]);
 
-  // Arama ve stüdyo türü filtreleme
-  const filteredStudios = studios.filter(studio => {
-    const matchesSearch = studio.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         studio.slug.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStudioType = selectedStudioType === null || studio.isAnimationStudio === selectedStudioType;
-    
-    return matchesSearch && matchesStudioType;
-  });
-
+  // Client-side filtreleme kaldırıldı, direkt studios kullanılıyor
   const handleEdit = (studio: Studio) => {
     onEdit?.(studio);
   };
@@ -148,7 +143,7 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredStudios.map((studio) => (
+            {studios.map((studio) => (
               <TableRow key={studio.id}>
                 <TableCell>{studio.name}</TableCell>
                 <TableCell className="text-muted-foreground">{studio.slug}</TableCell>
@@ -180,7 +175,7 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
           </TableBody>
         </Table>
 
-        {filteredStudios.length === 0 && (
+        {studios.length === 0 && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun stüdyo bulunamadı.' : 'Henüz stüdyo bulunmuyor.'}
           </div>

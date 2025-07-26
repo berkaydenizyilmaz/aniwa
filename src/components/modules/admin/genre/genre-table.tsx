@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { type GenreFilters } from '@/lib/schemas/genre.schema';
 
 interface GenreTableProps {
   onEdit?: (genre: Genre) => void;
@@ -39,18 +40,21 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
   const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
-  // Genre'leri getir
+  // Genre'leri getir (server-side filtreleme)
   useEffect(() => {
     const fetchGenres = async () => {
       try {
         setLoadingStore(LOADING_KEYS.PAGES.GENRES, true);
-        const result = await getGenresAction();
-
+        const filters: GenreFilters = {
+          page: 1,
+          limit: 100,
+        };
+        if (searchTerm) filters.search = searchTerm;
+        const result = await getGenresAction(filters);
         if (!result.success) {
           toast.error(result.error || 'Türler yüklenirken bir hata oluştu');
           return;
         }
-
         const data = result.data as GetGenresResponse;
         setGenres(data.genres);
       } catch (error) {
@@ -60,15 +64,10 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
         setLoadingStore(LOADING_KEYS.PAGES.GENRES, false);
       }
     };
-
     fetchGenres();
-  }, [setLoadingStore]);
+  }, [setLoadingStore, searchTerm]);
 
-  // Arama filtreleme
-  const filteredGenres = genres.filter(genre =>
-    genre.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    genre.slug.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Client-side filtreleme kaldırıldı, direkt genres kullanılıyor
 
   const handleEdit = (genre: Genre) => {
     onEdit?.(genre);
@@ -141,7 +140,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredGenres.map((genre) => (
+            {genres.map((genre) => (
               <TableRow key={genre.id}>
                 <TableCell>{genre.name}</TableCell>
                 <TableCell className="text-muted-foreground">{genre.slug}</TableCell>
@@ -170,7 +169,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
           </TableBody>
         </Table>
 
-        {filteredGenres.length === 0 && (
+        {genres.length === 0 && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun tür bulunamadı.' : 'Henüz tür bulunmuyor.'}
           </div>
