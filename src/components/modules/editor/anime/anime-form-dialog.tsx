@@ -191,7 +191,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[1200px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="min-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEdit ? 'Anime Düzenle' : 'Yeni Anime Ekle'}
