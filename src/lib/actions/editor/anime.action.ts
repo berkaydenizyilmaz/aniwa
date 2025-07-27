@@ -42,10 +42,7 @@ export async function getAnimeSeriesAction(filters: AnimeSeriesFilters) {
     const session = await getServerSession(authConfig);
 
     // Business logic
-    const result = await getAllAnimeSeriesBusiness(filters, { 
-      id: session!.user.id,
-      userSettings: { displayAdultContent: true } // Editor tüm içeriği görebilir
-    });
+    const result = await getAllAnimeSeriesBusiness(filters, session!.user.id);
 
     return result;
   } catch (error) {
@@ -143,7 +140,7 @@ export async function getAllTagsAction() {
     // Session kontrolü
     const session = await getServerSession(authConfig);
 
-    // Business logic
+    // Business logic - editor tüm tag'leri görebilir
     const result = await getTagsBusiness(session!.user.id);
 
     return result;

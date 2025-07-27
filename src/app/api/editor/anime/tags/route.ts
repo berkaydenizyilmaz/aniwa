@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     // Session'dan editor bilgisi al
     const session = await getServerSession(authConfig);
 
-    // Business logic - tüm tag'leri getir
+    // Business logic - editor için tüm tag'leri getir
     const result = await getTagsBusiness(session!.user.id);
 
     // Başarılı yanıt

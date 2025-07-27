@@ -28,10 +28,7 @@ export async function GET(request: NextRequest) {
     const validatedFilters = animeSeriesFiltersSchema.parse(filters);
 
     // Business logic
-    const result = await getAllAnimeSeriesBusiness(validatedFilters, {
-      id: session!.user.id,
-      userSettings: { displayAdultContent: true } // Editor tüm içeriği görebilir
-    });
+    const result = await getAllAnimeSeriesBusiness(validatedFilters);
 
     // Başarılı yanıt
     return NextResponse.json(result);

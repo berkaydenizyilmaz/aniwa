@@ -149,7 +149,7 @@ export async function createAnimeSeriesBusiness(
 // Tüm anime serilerini getirme (filtrelemeli)
 export async function getAllAnimeSeriesBusiness(
   filters?: GetAnimeSeriesRequest,
-  user?: { id: string; userSettings?: { displayAdultContent: boolean } }
+  userId?: string
 ): Promise<ApiResponse<GetAllAnimeSeriesResponse>> {
   try {
     const page = filters?.page || 1;
@@ -187,10 +187,8 @@ export async function getAllAnimeSeriesBusiness(
       where.source = filters.source as Source;
     }
 
-    // Yetişkin içerik kontrolü (sadece kullanıcı varsa)
-    if (user && !user.userSettings?.displayAdultContent) {
-      where.isAdult = false;
-    }
+    // Yetişkin içerik kontrolü - editor için tüm içerik gösterilir
+    // Kullanıcılar için ayrı fonksiyon kullanılacak
 
     // Anime serilerini getir
     const [animeSeries, total] = await Promise.all([
@@ -219,6 +217,20 @@ export async function getAllAnimeSeriesBusiness(
       })
     );
 
+    // Başarılı listeleme logu
+    await logger.info(
+      EVENTS.ADMIN.ANIME_SERIES_RETRIEVED,
+      'Anime serileri listesi görüntülendi',
+      {
+        total,
+        page,
+        limit,
+        totalPages,
+        filters
+      },
+      userId
+    );
+
     // API response tipine uygun dönüşüm
     const responseData: GetAllAnimeSeriesResponse = {
       animeSeries: animeWithRelations,
@@ -245,7 +257,8 @@ export async function getAllAnimeSeriesBusiness(
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         filters,
-      }
+      },
+      userId
     );
 
     throw new BusinessError('Anime serileri listeleme başarısız');
