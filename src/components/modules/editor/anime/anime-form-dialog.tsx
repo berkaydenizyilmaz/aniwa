@@ -204,7 +204,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Başlık */}
           <div className="space-y-2">
-            <Label htmlFor="title">Başlık (Türkçe) *</Label>
+            <Label htmlFor="title">Başlık (Türkçe)</Label>
             <Input
               id="title"
               type="text"
@@ -249,7 +249,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
 
           {/* Tür */}
           <div className="space-y-2">
-            <Label htmlFor="type">Tür *</Label>
+            <Label htmlFor="type">Tür</Label>
             <Select
               value={watchedType}
               onValueChange={(value) => setValue('type', value as AnimeType)}
@@ -273,7 +273,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
 
           {/* Durum */}
           <div className="space-y-2">
-            <Label htmlFor="status">Durum *</Label>
+            <Label htmlFor="status">Durum</Label>
             <Select
               {...register('status')}
               onValueChange={(value) => setValue('status', value as AnimeStatus)}
@@ -300,7 +300,6 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             <div className="space-y-2">
               <Label htmlFor="episodes">
                 Bölüm Sayısı
-                {(watchedType === AnimeType.OVA || watchedType === AnimeType.ONA) && ' *'}
               </Label>
               <Input
                 id="episodes"
