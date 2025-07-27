@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { CreateAnimeSeriesInput, UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 import { LoadingKey } from '@/lib/constants/loading.constants';
 import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
-import { CloudinaryUpload } from '@/components/ui/cloudinary-upload';
 
 interface AnimeMediaSectionProps {
   form: {
@@ -40,13 +39,7 @@ export function AnimeMediaSection({ form, isLoading, loadingKey }: AnimeMediaSec
         {/* Kapak Resmi */}
         <div className="space-y-3">
           <Label htmlFor="coverImage">Kapak Resmi</Label>
-          <CloudinaryUpload
-            onUploadComplete={handleCoverUpload}
-            onUploadError={(error) => console.error('Cover upload error:', error)}
-            disabled={isLoading(loadingKey)}
-            accept={UPLOAD_CONFIGS.ANIME_COVER.accept}
-            maxSize={UPLOAD_CONFIGS.ANIME_COVER.maxSize}
-          />
+          
           {errors.coverImage && (
             <p className="text-sm text-destructive">{errors.coverImage.message}</p>
           )}
@@ -55,13 +48,7 @@ export function AnimeMediaSection({ form, isLoading, loadingKey }: AnimeMediaSec
         {/* Banner Resmi */}
         <div className="space-y-3">
           <Label htmlFor="bannerImage">Banner Resmi</Label>
-          <CloudinaryUpload
-            onUploadComplete={handleBannerUpload}
-            onUploadError={(error) => console.error('Banner upload error:', error)}
-            disabled={isLoading(loadingKey)}
-            accept={UPLOAD_CONFIGS.ANIME_BANNER.accept}
-            maxSize={UPLOAD_CONFIGS.ANIME_BANNER.maxSize}
-          />
+          
           {errors.bannerImage && (
             <p className="text-sm text-destructive">{errors.bannerImage.message}</p>
           )}
