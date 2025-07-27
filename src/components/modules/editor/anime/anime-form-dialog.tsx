@@ -89,6 +89,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
         isAdult: anime.isAdult || false,
         season: anime.season || (anime.type !== AnimeType.MOVIE ? Season.SPRING : undefined),
         seasonYear: anime.seasonYear || (anime.type !== AnimeType.MOVIE ? new Date().getFullYear() : undefined),
+        releaseDate: anime.releaseDate ? new Date(anime.releaseDate) : undefined,
         source: anime.source || Source.ORIGINAL,
         countryOfOrigin: anime.countryOfOrigin || 'Japan',
         description: anime.description || '',
@@ -390,6 +391,22 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             />
             {errors.seasonYear && (
               <p className="text-sm text-destructive">{errors.seasonYear.message}</p>
+            )}
+          </div>
+
+          {/* Yayınlanma Tarihi */}
+          <div className="space-y-2">
+            <Label htmlFor="releaseDate">Yayınlanma Tarihi</Label>
+            <Input
+              id="releaseDate"
+              type="date"
+              {...register('releaseDate', { 
+                setValueAs: (value) => value ? new Date(value) : undefined 
+              })}
+              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            />
+            {errors.releaseDate && (
+              <p className="text-sm text-destructive">{errors.releaseDate.message}</p>
             )}
           </div>
 

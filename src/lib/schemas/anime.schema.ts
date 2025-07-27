@@ -59,6 +59,7 @@ export const updateAnimeSeriesSchema = z.object({
   isAdult: z.boolean(),
   season: z.nativeEnum(ANIME.SEASON).optional(),
   seasonYear: z.number().min(ANIME.YEAR.MIN, 'Yıl 1900\'den büyük olmalı').max(ANIME.YEAR.MAX, 'Yıl 2100\'den küçük olmalı').optional(),
+  releaseDate: z.date().optional(),
   source: z.nativeEnum(ANIME.SOURCE).optional(),
   countryOfOrigin: z.string().optional(),
   description: z.string().optional(),
