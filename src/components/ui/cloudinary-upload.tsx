@@ -12,7 +12,7 @@ interface CloudinaryUploadProps {
   onUploadError: (error: string) => void;
   disabled?: boolean;
   accept?: string;
-  maxSize?: number; // 5MB default
+  maxSize?: number;
   className?: string;
 }
 
@@ -36,12 +36,18 @@ export function CloudinaryUpload({
     setProgress(0);
 
     try {
-      // Environment variables kontrolü
-      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET || 'aniwa_uploads';
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'aniwa_uploads';
+
+      console.log('Environment variables:', {
+        cloudName,
+        uploadPreset,
+        hasCloudName: !!cloudName,
+        hasUploadPreset: !!uploadPreset
+      });
 
       if (!cloudName) {
-        throw new Error('Cloudinary cloud name missing. Please check CLOUDINARY_CLOUD_NAME environment variable.');
+        throw new Error('Cloudinary cloud name missing. Please check NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME environment variable.');
       }
 
       console.log('Uploading to Cloudinary:', { cloudName, uploadPreset, fileName: file.name });
@@ -50,6 +56,13 @@ export function CloudinaryUpload({
       const formData = new FormData();
       formData.append('file', file);
       formData.append('upload_preset', uploadPreset);
+
+      console.log('FormData created:', {
+        fileSize: file.size,
+        fileName: file.name,
+        fileType: file.type,
+        uploadPreset
+      });
 
       // Upload işlemi
       const response = await fetch(
