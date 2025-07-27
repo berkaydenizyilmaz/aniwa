@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { AnimeSeries, Genre, Tag, Studio } from '@prisma/client';
+import { Separator } from '@/components/ui/separator';
+import { AnimeSeries, Genre, Tag, Studio, AnimeType } from '@prisma/client';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { toast } from 'sonner';
@@ -63,7 +64,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
 
   // Tür değiştiğinde sezon, yıl ve bölüm sayısı alanlarını güncelle
   useEffect(() => {
-    if (watchedType === 'MOVIE') {
+    if (watchedType === AnimeType.MOVIE) {
       setValue('season', undefined);
       setValue('seasonYear', undefined);
       setValue('episodes', 1); // Film için bölüm sayısı 1
@@ -86,8 +87,8 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
         episodes: anime.episodes || 0,
         duration: anime.duration || 0,
         isAdult: anime.isAdult || false,
-        season: anime.season || (anime.type !== 'MOVIE' ? 'SPRING' : undefined),
-        seasonYear: anime.seasonYear || (anime.type !== 'MOVIE' ? new Date().getFullYear() : undefined),
+        season: anime.season || (anime.type !== AnimeType.MOVIE ? 'SPRING' : undefined),
+        seasonYear: anime.seasonYear || (anime.type !== AnimeType.MOVIE ? new Date().getFullYear() : undefined),
         releaseDate: anime.releaseDate ? new Date(anime.releaseDate) : undefined,
         source: anime.source || 'ORIGINAL',
         countryOfOrigin: anime.countryOfOrigin || 'Japan',
@@ -154,7 +155,8 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
 
   const onSubmit = async (data: CreateAnimeSeriesInput | UpdateAnimeSeriesInput) => {
     try {
-      setLoadingStore(LOADING_KEYS.FORMS.CREATE_ANIME, true);
+      const loadingKey = isEdit ? LOADING_KEYS.FORMS.UPDATE_ANIME : LOADING_KEYS.FORMS.CREATE_ANIME;
+      setLoadingStore(loadingKey, true);
 
       if (isEdit && anime) {
         const result = await updateAnimeSeriesAction(anime.id, data);
@@ -179,40 +181,53 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
       console.error('Form gönderilirken hata:', error);
       toast.error('Beklenmedik bir hata oluştu');
     } finally {
-      setLoadingStore(LOADING_KEYS.FORMS.CREATE_ANIME, false);
+      const loadingKey = isEdit ? LOADING_KEYS.FORMS.UPDATE_ANIME : LOADING_KEYS.FORMS.CREATE_ANIME;
+      setLoadingStore(loadingKey, false);
     }
   };
 
+  // Loading key helper
+  const getFormLoadingKey = () => isEdit ? LOADING_KEYS.FORMS.UPDATE_ANIME : LOADING_KEYS.FORMS.CREATE_ANIME;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEdit ? 'Anime Düzenle' : 'Yeni Anime Ekle'}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Temel Bilgiler */}
           <AnimeBasicInfoSection 
             form={{ register, watch, setValue, formState: { errors } }} 
-            isLoading={isLoading} 
+            isLoading={isLoading}
+            loadingKey={getFormLoadingKey()}
           />
+
+          <Separator className="my-6" />
 
           {/* Görsel İçerik */}
           <AnimeMediaSection 
             form={{ register, formState: { errors } }} 
-            isLoading={isLoading} 
+            isLoading={isLoading}
+            loadingKey={getFormLoadingKey()}
           />
+
+          <Separator className="my-6" />
 
           {/* İlişkiler */}
           <AnimeRelationsSection 
             form={{ watch, setValue, formState: { errors } }}
             isLoading={isLoading}
+            loadingKey={getFormLoadingKey()}
             genres={genres}
             tags={tags}
             studios={studios}
           />
+
+          <Separator className="my-6" />
 
           {/* Butonlar */}
           <div className="flex justify-end gap-2 pt-4">
@@ -220,15 +235,15 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              disabled={isLoading(isEdit ? LOADING_KEYS.FORMS.UPDATE_ANIME : LOADING_KEYS.FORMS.CREATE_ANIME)}
             >
               İptal
             </Button>
             <Button
               type="submit"
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              disabled={isLoading(isEdit ? LOADING_KEYS.FORMS.UPDATE_ANIME : LOADING_KEYS.FORMS.CREATE_ANIME)}
             >
-              {isLoading(LOADING_KEYS.FORMS.CREATE_ANIME) ? 'Kaydediliyor...' : (isEdit ? 'Güncelle' : 'Oluştur')}
+              {isLoading(isEdit ? LOADING_KEYS.FORMS.UPDATE_ANIME : LOADING_KEYS.FORMS.CREATE_ANIME) ? 'Kaydediliyor...' : (isEdit ? 'Güncelle' : 'Oluştur')}
             </Button>
           </div>
         </form>

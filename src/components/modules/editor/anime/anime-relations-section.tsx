@@ -4,7 +4,7 @@ import { UseFormWatch, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { CreateAnimeSeriesInput, UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
-import { LOADING_KEYS, LoadingKey } from '@/lib/constants/loading.constants';
+import { LoadingKey } from '@/lib/constants/loading.constants';
 import { Genre, Tag, Studio } from '@prisma/client';
 
 interface AnimeRelationsSectionProps {
@@ -14,6 +14,7 @@ interface AnimeRelationsSectionProps {
     formState: { errors: FieldErrors<CreateAnimeSeriesInput | UpdateAnimeSeriesInput> };
   };
   isLoading: (key: LoadingKey) => boolean;
+  loadingKey: LoadingKey;
   genres: Genre[];
   tags: Tag[];
   studios: Studio[];
@@ -22,6 +23,7 @@ interface AnimeRelationsSectionProps {
 export function AnimeRelationsSection({ 
   form, 
   isLoading, 
+  loadingKey,
   genres, 
   tags, 
   studios 
@@ -29,8 +31,11 @@ export function AnimeRelationsSection({
   const { watch, setValue, formState: { errors } } = form;
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">İlişkiler</h3>
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <h3 className="text-xl font-semibold text-foreground">İlişkiler</h3>
+        <p className="text-sm text-muted-foreground">Anime&apos;nin tür, etiket ve stüdyo ilişkilerini seçin</p>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Türler */}
@@ -42,7 +47,7 @@ export function AnimeRelationsSection({
             onSelectionChange={(ids) => setValue('genreIds', ids)}
             placeholder="Tür seçin..."
             searchPlaceholder="Tür ara..."
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           />
           {errors.genreIds && (
             <p className="text-sm text-destructive">{errors.genreIds.message}</p>
@@ -58,7 +63,7 @@ export function AnimeRelationsSection({
             onSelectionChange={(ids) => setValue('tagIds', ids)}
             placeholder="Etiket seçin..."
             searchPlaceholder="Etiket ara..."
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           />
           {errors.tagIds && (
             <p className="text-sm text-destructive">{errors.tagIds.message}</p>
@@ -74,7 +79,7 @@ export function AnimeRelationsSection({
             onSelectionChange={(ids) => setValue('studioIds', ids)}
             placeholder="Stüdyo seçin..."
             searchPlaceholder="Stüdyo ara..."
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           />
           {errors.studioIds && (
             <p className="text-sm text-destructive">{errors.studioIds.message}</p>

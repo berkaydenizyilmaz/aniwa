@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CreateAnimeSeriesInput, UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
-import { LOADING_KEYS, LoadingKey } from '@/lib/constants/loading.constants';
+import { LoadingKey } from '@/lib/constants/loading.constants';
 
 interface AnimeBasicInfoSectionProps {
   form: {
@@ -18,15 +18,19 @@ interface AnimeBasicInfoSectionProps {
     formState: { errors: FieldErrors<CreateAnimeSeriesInput | UpdateAnimeSeriesInput> };
   };
   isLoading: (key: LoadingKey) => boolean;
+  loadingKey: LoadingKey;
 }
 
-export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSectionProps) {
+export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasicInfoSectionProps) {
   const { register, watch, setValue, formState: { errors } } = form;
   const watchedType = watch('type');
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Temel Bilgiler</h3>
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <h3 className="text-xl font-semibold text-foreground">Temel Bilgiler</h3>
+        <p className="text-sm text-muted-foreground">Anime&apos;nin temel bilgilerini girin</p>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Başlık */}
@@ -37,7 +41,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
             type="text"
             placeholder="Türkçe başlık"
             {...register('title')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           />
           {errors.title && (
             <p className="text-sm text-destructive">{errors.title.message}</p>
@@ -52,7 +56,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
             type="text"
             placeholder="English title"
             {...register('englishTitle')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           />
           {errors.englishTitle && (
             <p className="text-sm text-destructive">{errors.englishTitle.message}</p>
@@ -67,7 +71,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
             type="text"
             placeholder="Japonca başlık"
             {...register('japaneseTitle')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           />
           {errors.japaneseTitle && (
             <p className="text-sm text-destructive">{errors.japaneseTitle.message}</p>
@@ -80,7 +84,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
           <Select
             value={watchedType}
             onValueChange={(value) => setValue('type', value as AnimeType)}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Tür seçin" />
@@ -104,7 +108,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
           <Select
             {...register('status')}
             onValueChange={(value) => setValue('status', value as AnimeStatus)}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Durum seçin" />
@@ -133,7 +137,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
               type="number"
               placeholder="0"
               {...register('episodes', { valueAsNumber: true })}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              disabled={isLoading(loadingKey)}
             />
             {errors.episodes && (
               <p className="text-sm text-destructive">{errors.episodes.message}</p>
@@ -149,7 +153,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
             type="number"
             placeholder="0"
             {...register('duration', { valueAsNumber: true })}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           />
           {errors.duration && (
             <p className="text-sm text-destructive">{errors.duration.message}</p>
@@ -162,7 +166,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
           <Select
             {...register('season')}
             onValueChange={(value) => setValue('season', value as Season)}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Sezon seçin" />
@@ -188,7 +192,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
             type="number"
             placeholder="2024"
             {...register('seasonYear', { valueAsNumber: true })}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           />
           {errors.seasonYear && (
             <p className="text-sm text-destructive">{errors.seasonYear.message}</p>
@@ -204,7 +208,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
             {...register('releaseDate', { 
               setValueAs: (value) => value ? new Date(value) : undefined 
             })}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           />
           {errors.releaseDate && (
             <p className="text-sm text-destructive">{errors.releaseDate.message}</p>
@@ -217,7 +221,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
           <Select
             {...register('source')}
             onValueChange={(value) => setValue('source', value as Source)}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Kaynak seçin" />
@@ -243,7 +247,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
             type="text"
             placeholder="Japan"
             {...register('countryOfOrigin')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           />
           {errors.countryOfOrigin && (
             <p className="text-sm text-destructive">{errors.countryOfOrigin.message}</p>
@@ -258,7 +262,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
           <Checkbox
             id="isAdult"
             {...register('isAdult')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            disabled={isLoading(loadingKey)}
           />
           <Label htmlFor="isAdult">Yetişkin İçerik</Label>
         </div>
@@ -272,7 +276,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
             <Checkbox
               id="isMultiPart"
               {...register('isMultiPart')}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              disabled={isLoading(loadingKey)}
             />
             <Label htmlFor="isMultiPart">Çok Parçalı (Sezonlar)</Label>
           </div>
@@ -289,7 +293,7 @@ export function AnimeBasicInfoSection({ form, isLoading }: AnimeBasicInfoSection
           id="description"
           placeholder="Anime açıklaması..."
           {...register('description')}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+          disabled={isLoading(loadingKey)}
           rows={4}
         />
         {errors.description && (
