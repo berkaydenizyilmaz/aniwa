@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { CreateAnimeSeriesInput, UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 import { LoadingKey } from '@/lib/constants/loading.constants';
-import { ANIME } from '@/lib/constants/anime.constants';
 
 interface AnimeBasicInfoSectionProps {
   form: {
@@ -105,9 +104,9 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           <Label htmlFor="anilistId">AniList ID</Label>
           <Input
             id="anilistId"
-            type="text"
-            placeholder="AniList ID (opsiyonel)"
-            {...register('anilistId')}
+            type="number"
+            placeholder="AniList ID"
+            {...register('anilistId', { valueAsNumber: true })}
             disabled={isLoading(loadingKey)}
           />
           {errors.anilistId && (
@@ -115,14 +114,14 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           )}
         </div>
 
-        {/* MyAnimeList ID */}
+        {/* MAL ID */}
         <div className="space-y-2">
-          <Label htmlFor="idMal">MyAnimeList ID</Label>
+          <Label htmlFor="idMal">MAL ID</Label>
           <Input
             id="idMal"
-            type="text"
-            placeholder="MAL ID (opsiyonel)"
-            {...register('idMal')}
+            type="number"
+            placeholder="MAL ID"
+            {...register('idMal', { valueAsNumber: true })}
             disabled={isLoading(loadingKey)}
           />
           {errors.idMal && (
@@ -179,16 +178,16 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
         </div>
 
         {/* Bölüm Sayısı (Film hariç, çok parçalı hariç) */}
-        {watchedType !== ANIME.TYPE.MOVIE && !watchedIsMultiPart && (
+        {watchedType !== AnimeType.MOVIE && !watchedIsMultiPart && (
           <div className="space-y-2">
             <Label htmlFor="episodes">
               Bölüm Sayısı
             </Label>
             <Input
               id="episodes"
-              type="text"
+              type="number"
               placeholder="Toplam bölüm sayısı"
-              {...register('episodes')}
+              {...register('episodes', { valueAsNumber: true })}
               disabled={isLoading(loadingKey)}
             />
             {errors.episodes && (
@@ -198,16 +197,16 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
         )}
 
         {/* Süre (Film veya tek parçalı) */}
-        {(watchedType === ANIME.TYPE.MOVIE || !watchedIsMultiPart) && (
+        {(watchedType === AnimeType.MOVIE || !watchedIsMultiPart) && (
           <div className="space-y-2">
             <Label htmlFor="duration">
               Süre (Dakika)
             </Label>
             <Input
               id="duration"
-              type="text"
-              placeholder={watchedType === ANIME.TYPE.MOVIE ? "Film süresi" : "Bölüm süresi"}
-              {...register('duration')}
+              type="number"
+              placeholder={watchedType === AnimeType.MOVIE ? "Film süresi" : "Bölüm süresi"}
+              {...register('duration', { valueAsNumber: true })}
               disabled={isLoading(loadingKey)}
             />
             {errors.duration && (
