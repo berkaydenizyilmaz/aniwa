@@ -41,8 +41,8 @@ export async function createAnimeSeriesBusiness(
   try {
     // Transaction ile tüm işlemleri yap
     const result = await prisma.$transaction(async (tx) => {
-      // Film türü için bölüm sayısını 1 yap
-      const episodes = data.type === AnimeType.MOVIE ? 1 : data.episodes;
+      // Film türü için bölüm sayısını 1 yap, çok parçalı anime'lerde undefined bırak
+      const episodes = data.type === AnimeType.MOVIE ? 1 : (data.isMultiPart ? undefined : data.episodes);
       
       // AniwaPublicId için son ID'yi bul ve 1 artır (güvenli şekilde)
       const lastAnime = await tx.animeSeries.findFirst({
@@ -65,7 +65,7 @@ export async function createAnimeSeriesBusiness(
           type: data.type as AnimeType,
           status: data.status as AnimeStatus,
           episodes: episodes,
-          duration: data.duration,
+          duration: data.isMultiPart ? undefined : data.duration,
           isAdult: data.isAdult,
           season: data.season as Season,
           seasonYear: data.seasonYear,
@@ -291,8 +291,8 @@ export async function updateAnimeSeriesBusiness(
 
     // Transaction ile güncelleme
     const result = await prisma.$transaction(async (tx) => {
-      // Film türü için bölüm sayısını 1 yap
-      const episodes = data.type === AnimeType.MOVIE ? 1 : data.episodes;
+      // Film türü için bölüm sayısını 1 yap, çok parçalı anime'lerde undefined bırak
+      const episodes = data.type === AnimeType.MOVIE ? 1 : (data.isMultiPart ? undefined : data.episodes);
       
       // Anime serisi güncelle
       const updatedAnime = await updateAnimeSeriesDB(
@@ -307,7 +307,7 @@ export async function updateAnimeSeriesBusiness(
           type: data.type as AnimeType,
           status: data.status as AnimeStatus,
           episodes: episodes,
-          duration: data.duration,
+          duration: data.isMultiPart ? undefined : data.duration,
           isAdult: data.isAdult,
           season: data.season as Season,
           seasonYear: data.seasonYear,

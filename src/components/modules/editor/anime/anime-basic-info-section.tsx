@@ -24,6 +24,7 @@ interface AnimeBasicInfoSectionProps {
 export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasicInfoSectionProps) {
   const { register, watch, setValue, formState: { errors } } = form;
   const watchedType = watch('type');
+  const watchedIsMultiPart = watch('isMultiPart');
 
   return (
     <div className="space-y-6">
@@ -177,7 +178,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
         </div>
 
         {/* Bölüm Sayısı (Film hariç tüm türler için) */}
-        {watchedType !== AnimeType.MOVIE && (
+        {watchedType !== AnimeType.MOVIE && !watchedIsMultiPart && (
           <div className="space-y-2">
             <Label htmlFor="episodes">
               Bölüm Sayısı
@@ -185,7 +186,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
             <Input
               id="episodes"
               type="number"
-              placeholder="0"
+              placeholder="Toplam bölüm sayısı"
               {...register('episodes', { valueAsNumber: true })}
               disabled={isLoading(loadingKey)}
             />
@@ -195,20 +196,24 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           </div>
         )}
 
-        {/* Süre */}
-        <div className="space-y-2">
-          <Label htmlFor="duration">Süre (dakika)</Label>
-          <Input
-            id="duration"
-            type="number"
-            placeholder="0"
-            {...register('duration', { valueAsNumber: true })}
-            disabled={isLoading(loadingKey)}
-          />
-          {errors.duration && (
-            <p className="text-sm text-destructive">{errors.duration.message}</p>
-          )}
-        </div>
+        {/* Süre (Film için veya tek parçalı anime'ler için) */}
+        {(watchedType === AnimeType.MOVIE || !watchedIsMultiPart) && (
+          <div className="space-y-2">
+            <Label htmlFor="duration">
+              Süre (Dakika)
+            </Label>
+            <Input
+              id="duration"
+              type="number"
+              placeholder={watchedType === AnimeType.MOVIE ? "Film süresi" : "Bölüm süresi"}
+              {...register('duration', { valueAsNumber: true })}
+              disabled={isLoading(loadingKey)}
+            />
+            {errors.duration && (
+              <p className="text-sm text-destructive">{errors.duration.message}</p>
+            )}
+          </div>
+        )}
 
         {/* Sezon */}
         <div className="space-y-2">
@@ -325,7 +330,8 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           <div className="flex items-center space-x-2">
             <Checkbox
               id="isMultiPart"
-              {...register('isMultiPart')}
+              checked={watchedIsMultiPart}
+              onCheckedChange={(checked) => setValue('isMultiPart', checked as boolean)}
               disabled={isLoading(loadingKey)}
             />
             <Label htmlFor="isMultiPart">Çok Parçalı (Sezonlar)</Label>
