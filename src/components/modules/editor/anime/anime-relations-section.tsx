@@ -37,7 +37,7 @@ export function AnimeRelationsSection({
         <p className="text-sm text-muted-foreground">Anime&apos;nin tür, etiket ve stüdyo ilişkilerini seçin</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Türler */}
         <div className="space-y-2">
           <Label>Türler</Label>
