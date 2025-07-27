@@ -96,10 +96,12 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
 
         {/* AniList ID */}
         <div className="space-y-2">
-          <Label htmlFor="anilistId">AniList ID</Label>
+          <Label htmlFor="anilistId">
+            AniList ID
+          </Label>
           <Input
             id="anilistId"
-            type="number"
+            type="text"
             placeholder="AniList ID"
             {...register('anilistId', { valueAsNumber: true })}
             disabled={isLoading(loadingKey)}
@@ -111,10 +113,12 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
 
         {/* MAL ID */}
         <div className="space-y-2">
-          <Label htmlFor="idMal">MAL ID</Label>
+          <Label htmlFor="idMal">
+            MAL ID
+          </Label>
           <Input
             id="idMal"
-            type="number"
+            type="text"
             placeholder="MAL ID"
             {...register('idMal', { valueAsNumber: true })}
             disabled={isLoading(loadingKey)}
@@ -180,7 +184,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
             </Label>
             <Input
               id="episodes"
-              type="number"
+              type="text"
               placeholder="Toplam bölüm sayısı"
               {...register('episodes', { valueAsNumber: true })}
               disabled={isLoading(loadingKey)}
@@ -199,7 +203,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
             </Label>
             <Input
               id="duration"
-              type="number"
+              type="text"
               placeholder={watchedType === AnimeType.MOVIE ? "Film süresi" : "Bölüm süresi"}
               {...register('duration', { valueAsNumber: true })}
               disabled={isLoading(loadingKey)}
@@ -239,7 +243,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           <Label htmlFor="seasonYear">Yıl</Label>
           <Input
             id="seasonYear"
-            type="number"
+            type="text"
             placeholder="2024"
             {...register('seasonYear', { valueAsNumber: true })}
             disabled={isLoading(loadingKey)}
