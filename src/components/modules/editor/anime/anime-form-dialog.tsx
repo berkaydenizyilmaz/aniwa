@@ -231,6 +231,8 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             form={{ register, setValue, formState: { errors } }} 
             isLoading={isLoading}
             loadingKey={getFormLoadingKey()}
+            existingCoverImage={anime?.coverImage || undefined}
+            existingBannerImage={anime?.bannerImage || undefined}
           />
 
           <Separator className="my-6" />

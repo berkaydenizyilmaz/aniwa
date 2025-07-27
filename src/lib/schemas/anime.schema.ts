@@ -9,12 +9,44 @@ export const createAnimeSeriesSchema = z.object({
   englishTitle: z.string().optional(),
   japaneseTitle: z.string().optional(),
   synonyms: z.array(z.string()).optional(),
-  anilistId: z.number().positive('AniList ID pozitif olmalı').optional(),
-  idMal: z.number().positive('MAL ID pozitif olmalı').optional(),
+  anilistId: z.string().optional().refine((val) => {
+    if (!val) return true; // Boş ise geçerli
+    const num = parseInt(val, 10);
+    return !isNaN(num) && num > 0;
+  }, 'AniList ID geçerli bir pozitif sayı olmalı').transform((val) => {
+    if (!val) return undefined;
+    const num = parseInt(val, 10);
+    return isNaN(num) ? undefined : num;
+  }),
+  idMal: z.string().optional().refine((val) => {
+    if (!val) return true; // Boş ise geçerli
+    const num = parseInt(val, 10);
+    return !isNaN(num) && num > 0;
+  }, 'MAL ID geçerli bir pozitif sayı olmalı').transform((val) => {
+    if (!val) return undefined;
+    const num = parseInt(val, 10);
+    return isNaN(num) ? undefined : num;
+  }),
   type: z.nativeEnum(ANIME.TYPE),
   status: z.nativeEnum(ANIME.STATUS),
-  episodes: z.number().min(1, 'Bölüm sayısı 1\'den büyük olmalı').optional(),
-  duration: z.number().min(ANIME.DURATION.MIN, 'Süre 1 dakikadan fazla olmalı').optional(),
+  episodes: z.string().optional().refine((val) => {
+    if (!val) return true; // Boş ise geçerli
+    const num = parseInt(val, 10);
+    return !isNaN(num) && num >= 1;
+  }, 'Bölüm sayısı 1\'den büyük olmalı').transform((val) => {
+    if (!val) return undefined;
+    const num = parseInt(val, 10);
+    return isNaN(num) ? undefined : num;
+  }),
+  duration: z.string().optional().refine((val) => {
+    if (!val) return true; // Boş ise geçerli
+    const num = parseInt(val, 10);
+    return !isNaN(num) && num >= ANIME.DURATION.MIN;
+  }, 'Süre 1 dakikadan fazla olmalı').transform((val) => {
+    if (!val) return undefined;
+    const num = parseInt(val, 10);
+    return isNaN(num) ? undefined : num;
+  }),
   isAdult: z.boolean(),
   season: z.nativeEnum(ANIME.SEASON).optional(),
   seasonYear: z.number().min(ANIME.YEAR.MIN, 'Yıl 1900\'den büyük olmalı').max(ANIME.YEAR.MAX, 'Yıl 2100\'den küçük olmalı').optional(),
@@ -56,12 +88,44 @@ export const updateAnimeSeriesSchema = z.object({
   englishTitle: z.string().optional(),
   japaneseTitle: z.string().optional(),
   synonyms: z.array(z.string()).optional(),
-  anilistId: z.number().positive('AniList ID pozitif olmalı').optional(),
-  idMal: z.number().positive('MAL ID pozitif olmalı').optional(),
+  anilistId: z.string().optional().refine((val) => {
+    if (!val) return true; // Boş ise geçerli
+    const num = parseInt(val, 10);
+    return !isNaN(num) && num > 0;
+  }, 'AniList ID pozitif olmalı').transform((val) => {
+    if (!val) return undefined;
+    const num = parseInt(val, 10);
+    return isNaN(num) ? undefined : num;
+  }),
+  idMal: z.string().optional().refine((val) => {
+    if (!val) return true; // Boş ise geçerli
+    const num = parseInt(val, 10);
+    return !isNaN(num) && num > 0;
+  }, 'MAL ID pozitif olmalı').transform((val) => {
+    if (!val) return undefined;
+    const num = parseInt(val, 10);
+    return isNaN(num) ? undefined : num;
+  }),
   type: z.nativeEnum(ANIME.TYPE),
   status: z.nativeEnum(ANIME.STATUS),
-  episodes: z.number().min(1, 'Bölüm sayısı 1\'den büyük olmalı').optional(),
-  duration: z.number().min(ANIME.DURATION.MIN, 'Süre 1 dakikadan fazla olmalı').optional(),
+  episodes: z.string().optional().refine((val) => {
+    if (!val) return true; // Boş ise geçerli
+    const num = parseInt(val, 10);
+    return !isNaN(num) && num >= 1;
+  }, 'Bölüm sayısı 1\'den büyük olmalı').transform((val) => {
+    if (!val) return undefined;
+    const num = parseInt(val, 10);
+    return isNaN(num) ? undefined : num;
+  }),
+  duration: z.string().optional().refine((val) => {
+    if (!val) return true; // Boş ise geçerli
+    const num = parseInt(val, 10);
+    return !isNaN(num) && num >= ANIME.DURATION.MIN;
+  }, 'Süre 1 dakikadan fazla olmalı').transform((val) => {
+    if (!val) return undefined;
+    const num = parseInt(val, 10);
+    return isNaN(num) ? undefined : num;
+  }),
   isAdult: z.boolean(),
   season: z.nativeEnum(ANIME.SEASON).optional(),
   seasonYear: z.number().min(ANIME.YEAR.MIN, 'Yıl 1900\'den büyük olmalı').max(ANIME.YEAR.MAX, 'Yıl 2100\'den küçük olmalı').optional(),
@@ -75,6 +139,8 @@ export const updateAnimeSeriesSchema = z.object({
   bannerImage: z.string().optional(),
   coverImageFile: z.string().optional(), // Base64 dosya
   bannerImageFile: z.string().optional(), // Base64 dosya
+  coverImageToDelete: z.boolean().optional(), // Mevcut resmi silmek için
+  bannerImageToDelete: z.boolean().optional(), // Mevcut resmi silmek için
   trailer: z.string().url('Geçerli bir URL girin').optional(),
   // İlişkiler
   genreIds: z.array(z.string()).optional(),

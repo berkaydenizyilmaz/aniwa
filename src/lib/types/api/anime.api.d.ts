@@ -42,6 +42,8 @@ export interface GetAllAnimeSeriesResponse {
 export interface CreateAnimeSeriesRequest extends CreateAnimeSeriesInput {
   coverImageFile?: string; // Base64 dosya
   bannerImageFile?: string; // Base64 dosya
+  coverImageToDelete?: boolean; // Mevcut resmi silmek için
+  bannerImageToDelete?: boolean; // Mevcut resmi silmek için
 }
 
 export type GetAnimeSeriesRequest = AnimeSeriesFilters; 

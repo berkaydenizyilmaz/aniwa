@@ -104,9 +104,9 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           <Label htmlFor="anilistId">AniList ID</Label>
           <Input
             id="anilistId"
-            type="number"
+            type="text"
             placeholder="AniList ID (opsiyonel)"
-            {...register('anilistId', { valueAsNumber: true })}
+            {...register('anilistId')}
             disabled={isLoading(loadingKey)}
           />
           {errors.anilistId && (
@@ -119,9 +119,9 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           <Label htmlFor="idMal">MyAnimeList ID</Label>
           <Input
             id="idMal"
-            type="number"
+            type="text"
             placeholder="MAL ID (opsiyonel)"
-            {...register('idMal', { valueAsNumber: true })}
+            {...register('idMal')}
             disabled={isLoading(loadingKey)}
           />
           {errors.idMal && (
@@ -157,7 +157,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
         <div className="space-y-2">
           <Label htmlFor="status">Durum</Label>
           <Select
-            {...register('status')}
+            value={watch('status')}
             onValueChange={(value) => setValue('status', value as AnimeStatus)}
             disabled={isLoading(loadingKey)}
           >
@@ -185,9 +185,9 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
             </Label>
             <Input
               id="episodes"
-              type="number"
+              type="text"
               placeholder="Toplam bölüm sayısı"
-              {...register('episodes', { valueAsNumber: true })}
+              {...register('episodes')}
               disabled={isLoading(loadingKey)}
             />
             {errors.episodes && (
@@ -204,9 +204,9 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
             </Label>
             <Input
               id="duration"
-              type="number"
+              type="text"
               placeholder={watchedType === AnimeType.MOVIE ? "Film süresi" : "Bölüm süresi"}
-              {...register('duration', { valueAsNumber: true })}
+              {...register('duration')}
               disabled={isLoading(loadingKey)}
             />
             {errors.duration && (
@@ -219,7 +219,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
         <div className="space-y-2">
           <Label htmlFor="season">Sezon</Label>
           <Select
-            {...register('season')}
+            value={watch('season')}
             onValueChange={(value) => setValue('season', value as Season)}
             disabled={isLoading(loadingKey)}
           >
@@ -274,7 +274,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
         <div className="space-y-2">
           <Label htmlFor="source">Kaynak</Label>
           <Select
-            {...register('source')}
+            value={watch('source')}
             onValueChange={(value) => setValue('source', value as Source)}
             disabled={isLoading(loadingKey)}
           >
@@ -325,18 +325,16 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           <p className="text-sm text-destructive">{errors.isAdult.message}</p>
         )}
 
-        {/* Çok Parçalı (Film hariç tüm türler için) */}
-        {watchedType !== AnimeType.MOVIE && (
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="isMultiPart"
-              checked={watchedIsMultiPart}
-              onCheckedChange={(checked) => setValue('isMultiPart', checked as boolean)}
-              disabled={isLoading(loadingKey)}
-            />
-            <Label htmlFor="isMultiPart">Çok Parçalı (Sezonlar)</Label>
-          </div>
-        )}
+        {/* Çok Parçalı */}
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="isMultiPart"
+            checked={watchedIsMultiPart}
+            onCheckedChange={(checked) => setValue('isMultiPart', checked as boolean)}
+            disabled={isLoading(loadingKey)}
+          />
+          <Label htmlFor="isMultiPart">Çok Parçalı (Sezonlar)</Label>
+        </div>
         {errors.isMultiPart && (
           <p className="text-sm text-destructive">{errors.isMultiPart.message}</p>
         )}

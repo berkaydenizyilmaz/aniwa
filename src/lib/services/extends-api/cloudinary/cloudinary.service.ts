@@ -198,4 +198,37 @@ export class CloudinaryService {
       },
     });
   }
+
+  /**
+   * Cloudinary URL'den public ID çıkarma
+   */
+  static extractPublicIdFromUrl(url: string): string | null {
+    try {
+      // Cloudinary URL formatı: https://res.cloudinary.com/cloud_name/image/upload/v1234567890/folder/public_id.jpg
+      const urlParts = url.split('/');
+      const uploadIndex = urlParts.findIndex(part => part === 'upload');
+      
+      if (uploadIndex === -1 || uploadIndex + 2 >= urlParts.length) {
+        return null;
+      }
+      
+      // upload'dan sonraki kısım public ID'dir (version hariç)
+      const publicIdParts = urlParts.slice(uploadIndex + 2);
+      
+      // Version kısmını çıkar (v ile başlayan)
+      const filteredParts = publicIdParts.filter(part => !part.startsWith('v'));
+      
+      if (filteredParts.length === 0) {
+        return null;
+      }
+      
+      // Dosya uzantısını çıkar
+      const publicId = filteredParts.join('/').split('.')[0];
+      
+      return publicId || null;
+    } catch (error) {
+      console.error('Public ID extraction error:', error);
+      return null;
+    }
+  }
 } 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,16 +19,24 @@ interface AnimeMediaSectionProps {
   };
   isLoading: (key: LoadingKey) => boolean;
   loadingKey: LoadingKey;
+  existingCoverImage?: string;
+  existingBannerImage?: string;
 }
 
-export function AnimeMediaSection({ form, isLoading, loadingKey }: AnimeMediaSectionProps) {
+export function AnimeMediaSection({ form, isLoading, loadingKey, existingCoverImage, existingBannerImage }: AnimeMediaSectionProps) {
   const { register, setValue, formState: { errors } } = form;
   
-  const [coverPreview, setCoverPreview] = useState<string | null>(null);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(existingCoverImage || null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(existingBannerImage || null);
   
   const coverInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
+
+  // Mevcut resimler değiştiğinde preview'ları güncelle
+  useEffect(() => {
+    setCoverPreview(existingCoverImage || null);
+    setBannerPreview(existingBannerImage || null);
+  }, [existingCoverImage, existingBannerImage]);
 
   const handleFileSelect = (
     file: File,
@@ -71,6 +79,16 @@ export function AnimeMediaSection({ form, isLoading, loadingKey }: AnimeMediaSec
     setValue(setValueField, undefined);
   };
 
+  const handleRemoveExistingImage = (
+    imageType: 'coverImage' | 'bannerImage',
+    setPreview: (preview: string | null) => void
+  ) => {
+    setPreview(null);
+    // Mevcut resmi silmek için özel bir alan set et
+    setValue(`${imageType}ToDelete`, true);
+    setValue(imageType, '');
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -92,16 +110,33 @@ export function AnimeMediaSection({ form, isLoading, loadingKey }: AnimeMediaSec
                 height={600}
                 className="w-full h-64 object-cover"
               />
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                className="absolute top-2 right-2"
-                onClick={() => handleRemoveFile(setCoverPreview, 'coverImageFile')}
-                disabled={isLoading(loadingKey)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="absolute top-2 right-2 flex gap-1">
+                {/* Yeni seçilen dosyayı sil */}
+                {coverPreview !== existingCoverImage && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleRemoveFile(setCoverPreview, 'coverImageFile')}
+                    disabled={isLoading(loadingKey)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+                {/* Mevcut resmi sil */}
+                {existingCoverImage && coverPreview === existingCoverImage && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleRemoveExistingImage('coverImage', setCoverPreview)}
+                    disabled={isLoading(loadingKey)}
+                    title="Mevcut resmi sil"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           ) : (
             <div className="border-2 border-dashed rounded-lg p-6 text-center">
@@ -152,16 +187,33 @@ export function AnimeMediaSection({ form, isLoading, loadingKey }: AnimeMediaSec
                 height={400}
                 className="w-full h-32 object-cover"
               />
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                className="absolute top-2 right-2"
-                onClick={() => handleRemoveFile(setBannerPreview, 'bannerImageFile')}
-                disabled={isLoading(loadingKey)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="absolute top-2 right-2 flex gap-1">
+                {/* Yeni seçilen dosyayı sil */}
+                {bannerPreview !== existingBannerImage && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleRemoveFile(setBannerPreview, 'bannerImageFile')}
+                    disabled={isLoading(loadingKey)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+                {/* Mevcut resmi sil */}
+                {existingBannerImage && bannerPreview === existingBannerImage && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleRemoveExistingImage('bannerImage', setBannerPreview)}
+                    disabled={isLoading(loadingKey)}
+                    title="Mevcut resmi sil"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           ) : (
             <div className="border-2 border-dashed rounded-lg p-6 text-center">

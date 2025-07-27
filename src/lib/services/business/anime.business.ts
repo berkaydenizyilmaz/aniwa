@@ -22,6 +22,7 @@ import {
   findAnimeStudiosBySeriesIdDB,
 } from "@/lib/services/db/animeStudio.db";
 import { UploadService } from "@/lib/services/extends-api/cloudinary/upload.service";
+import { CloudinaryService } from "@/lib/services/extends-api/cloudinary/cloudinary.service";
 import { UPLOAD_CONFIGS } from "@/lib/constants/cloudinary.constants";
 import { Prisma, AnimeType, AnimeStatus, Season, Source } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
@@ -341,6 +342,74 @@ export async function updateAnimeSeriesBusiness(
       // Film türü için bölüm sayısını 1 yap, çok parçalı anime'lerde undefined bırak
       const episodes = data.type === AnimeType.MOVIE ? 1 : (data.isMultiPart ? undefined : data.episodes);
       
+      // Resim işlemleri
+      let coverImageUrl = data.coverImage;
+      let bannerImageUrl = data.bannerImage;
+      
+      // Mevcut resimleri sil (eğer isteniyorsa)
+      try {
+        if (data.coverImageToDelete && existingAnime.coverImage) {
+          const coverPublicId = CloudinaryService.extractPublicIdFromUrl(existingAnime.coverImage);
+          if (coverPublicId) {
+            await CloudinaryService.deleteFile(coverPublicId, 'image');
+          }
+          coverImageUrl = '';
+        }
+        
+        if (data.bannerImageToDelete && existingAnime.bannerImage) {
+          const bannerPublicId = CloudinaryService.extractPublicIdFromUrl(existingAnime.bannerImage);
+          if (bannerPublicId) {
+            await CloudinaryService.deleteFile(bannerPublicId, 'image');
+          }
+          bannerImageUrl = '';
+        }
+      } catch (cloudinaryError) {
+        logger.error(
+          EVENTS.SYSTEM.BUSINESS_ERROR,
+          'Cloudinary resim silme hatası (güncelleme)',
+          {
+            error: cloudinaryError instanceof Error ? cloudinaryError.message : String(cloudinaryError),
+            animeSeriesId: id
+          },
+          userId
+        );
+      }
+      
+      // Yeni resim dosyalarını yükle (eğer varsa)
+      if (data.coverImageFile || data.bannerImageFile) {
+        try {
+          const coverBuffer = data.coverImageFile ? UploadService.base64ToBuffer(data.coverImageFile) : undefined;
+          const bannerBuffer = data.bannerImageFile ? UploadService.base64ToBuffer(data.bannerImageFile) : undefined;
+          
+          if (coverBuffer) UploadService.validateImageFile(coverBuffer, UPLOAD_CONFIGS.ANIME_COVER.maxSize);
+          if (bannerBuffer) UploadService.validateImageFile(bannerBuffer, UPLOAD_CONFIGS.ANIME_BANNER.maxSize);
+          
+          const uploadResult = await UploadService.uploadAnimeImages(
+            coverBuffer,
+            bannerBuffer,
+            id
+          );
+          
+          if (uploadResult.coverImage) {
+            coverImageUrl = uploadResult.coverImage.secureUrl;
+          }
+          if (uploadResult.bannerImage) {
+            bannerImageUrl = uploadResult.bannerImage.secureUrl;
+          }
+        } catch (uploadError) {
+          logger.error(
+            EVENTS.SYSTEM.BUSINESS_ERROR,
+            'Resim yükleme hatası (güncelleme)',
+            {
+              error: uploadError instanceof Error ? uploadError.message : String(uploadError),
+              userId
+            },
+            userId
+          );
+          throw new BusinessError('Resim yüklenirken hata oluştu');
+        }
+      }
+      
       // Anime serisi güncelle
       const updatedAnime = await updateAnimeSeriesDB(
         { id },
@@ -361,8 +430,8 @@ export async function updateAnimeSeriesBusiness(
           releaseDate: data.releaseDate,
           source: data.source as Source,
           countryOfOrigin: data.countryOfOrigin,
-          coverImage: data.coverImage,
-          bannerImage: data.bannerImage,
+          coverImage: coverImageUrl,
+          bannerImage: bannerImageUrl,
           description: data.description,
           trailer: data.trailer,
         },
@@ -464,6 +533,36 @@ export async function deleteAnimeSeriesBusiness(
     const existingAnime = await findAnimeSeriesByIdDB(id);
     if (!existingAnime) {
       throw new NotFoundError('Anime serisi bulunamadı');
+    }
+
+    // Cloudinary'den resimleri sil (eğer varsa)
+    try {
+      if (existingAnime.coverImage) {
+        const coverPublicId = CloudinaryService.extractPublicIdFromUrl(existingAnime.coverImage);
+        if (coverPublicId) {
+          await CloudinaryService.deleteFile(coverPublicId, 'image');
+        }
+      }
+      
+      if (existingAnime.bannerImage) {
+        const bannerPublicId = CloudinaryService.extractPublicIdFromUrl(existingAnime.bannerImage);
+        if (bannerPublicId) {
+          await CloudinaryService.deleteFile(bannerPublicId, 'image');
+        }
+      }
+    } catch (cloudinaryError) {
+      // Cloudinary silme hatası kritik değil, logla ama devam et
+      logger.error(
+        EVENTS.SYSTEM.BUSINESS_ERROR,
+        'Cloudinary resim silme hatası',
+        {
+          error: cloudinaryError instanceof Error ? cloudinaryError.message : String(cloudinaryError),
+          animeSeriesId: id,
+          coverImage: existingAnime.coverImage,
+          bannerImage: existingAnime.bannerImage
+        },
+        userId
+      );
     }
 
     // Anime serisini sil (cascade ile ilişkili veriler de silinir)
