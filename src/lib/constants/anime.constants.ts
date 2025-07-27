@@ -1,7 +1,5 @@
 // Anime sabitleri
 
-import { AnimeType, AnimeStatus, Season, Source } from '@prisma/client';
-
 export const ANIME = {
   // Title kuralları
   TITLE: {
@@ -33,10 +31,4 @@ export const ANIME = {
     MAX_LIMIT: 100,
     DEFAULT_LIMIT: 50,
   },
-  
-  // Prisma enum'ları
-  TYPE: AnimeType,
-  STATUS: AnimeStatus,
-  SEASON: Season,
-  SOURCE: Source,
 } as const; 

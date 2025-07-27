@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { CreateAnimeSeriesInput, UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 import { LoadingKey } from '@/lib/constants/loading.constants';
+import { ANIME } from '@/lib/constants/anime.constants';
 
 interface AnimeBasicInfoSectionProps {
   form: {
@@ -177,8 +178,8 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           )}
         </div>
 
-        {/* Bölüm Sayısı (Film hariç tüm türler için) */}
-        {watchedType !== AnimeType.MOVIE && !watchedIsMultiPart && (
+        {/* Bölüm Sayısı (Film hariç, çok parçalı hariç) */}
+        {watchedType !== ANIME.TYPE.MOVIE && !watchedIsMultiPart && (
           <div className="space-y-2">
             <Label htmlFor="episodes">
               Bölüm Sayısı
@@ -196,8 +197,8 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           </div>
         )}
 
-        {/* Süre (Film için veya tek parçalı anime'ler için) */}
-        {(watchedType === AnimeType.MOVIE || !watchedIsMultiPart) && (
+        {/* Süre (Film veya tek parçalı) */}
+        {(watchedType === ANIME.TYPE.MOVIE || !watchedIsMultiPart) && (
           <div className="space-y-2">
             <Label htmlFor="duration">
               Süre (Dakika)
@@ -205,7 +206,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
             <Input
               id="duration"
               type="text"
-              placeholder={watchedType === AnimeType.MOVIE ? "Film süresi" : "Bölüm süresi"}
+              placeholder={watchedType === ANIME.TYPE.MOVIE ? "Film süresi" : "Bölüm süresi"}
               {...register('duration')}
               disabled={isLoading(loadingKey)}
             />

@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 import { ANIME } from '@/lib/constants/anime.constants';
+import { AnimeStatus, AnimeType, Season, Source } from '@prisma/client';
 
 // Anime serisi oluşturma şeması
 export const createAnimeSeriesSchema = z.object({
@@ -27,8 +28,8 @@ export const createAnimeSeriesSchema = z.object({
     const num = parseInt(val, 10);
     return isNaN(num) ? undefined : num;
   }),
-  type: z.nativeEnum(ANIME.TYPE),
-  status: z.nativeEnum(ANIME.STATUS),
+  type: z.nativeEnum(AnimeType),
+  status: z.nativeEnum(AnimeStatus),
   episodes: z.string().optional().refine((val) => {
     if (!val) return true; // Boş ise geçerli
     const num = parseInt(val, 10);
@@ -48,10 +49,10 @@ export const createAnimeSeriesSchema = z.object({
     return isNaN(num) ? undefined : num;
   }),
   isAdult: z.boolean(),
-  season: z.nativeEnum(ANIME.SEASON).optional(),
+  season: z.nativeEnum(Season).optional(),
   seasonYear: z.number().min(ANIME.YEAR.MIN, 'Yıl 1900\'den büyük olmalı').max(ANIME.YEAR.MAX, 'Yıl 2100\'den küçük olmalı').optional(),
   releaseDate: z.date().optional(),
-  source: z.nativeEnum(ANIME.SOURCE).optional(),
+  source: z.nativeEnum(Source).optional(),
   countryOfOrigin: z.string().optional(),
   description: z.string().optional(),
   isMultiPart: z.boolean(),
@@ -71,15 +72,6 @@ export const createAnimeSeriesSchema = z.object({
 }, {
   message: 'Sezon ve yıl bilgisi opsiyoneldir',
   path: ['season']
-}).refine((data) => {
-  // OVA/ONA için bölüm sayısı zorunlu
-  if (data.type === 'OVA' || data.type === 'ONA') {
-    return data.episodes && data.episodes > 0;
-  }
-  return true;
-}, {
-  message: 'OVA/ONA türleri için bölüm sayısı zorunludur',
-  path: ['episodes']
 });
 
 // Anime serisi güncelleme şeması
@@ -106,8 +98,8 @@ export const updateAnimeSeriesSchema = z.object({
     const num = parseInt(val, 10);
     return isNaN(num) ? undefined : num;
   }),
-  type: z.nativeEnum(ANIME.TYPE),
-  status: z.nativeEnum(ANIME.STATUS),
+  type: z.nativeEnum(AnimeType),
+  status: z.nativeEnum(AnimeStatus),
   episodes: z.string().optional().refine((val) => {
     if (!val) return true; // Boş ise geçerli
     const num = parseInt(val, 10);
@@ -127,10 +119,10 @@ export const updateAnimeSeriesSchema = z.object({
     return isNaN(num) ? undefined : num;
   }),
   isAdult: z.boolean(),
-  season: z.nativeEnum(ANIME.SEASON).optional(),
+  season: z.nativeEnum(Season).optional(),
   seasonYear: z.number().min(ANIME.YEAR.MIN, 'Yıl 1900\'den büyük olmalı').max(ANIME.YEAR.MAX, 'Yıl 2100\'den küçük olmalı').optional(),
   releaseDate: z.date().optional(),
-  source: z.nativeEnum(ANIME.SOURCE).optional(),
+  source: z.nativeEnum(Source).optional(),
   countryOfOrigin: z.string().optional(),
   description: z.string().optional(),
   isMultiPart: z.boolean(),
@@ -152,25 +144,16 @@ export const updateAnimeSeriesSchema = z.object({
 }, {
   message: 'Sezon ve yıl bilgisi opsiyoneldir',
   path: ['season']
-}).refine((data) => {
-  // OVA/ONA için bölüm sayısı zorunlu
-  if (data.type === 'OVA' || data.type === 'ONA') {
-    return data.episodes && data.episodes > 0;
-  }
-  return true;
-}, {
-  message: 'OVA/ONA türleri için bölüm sayısı zorunludur',
-  path: ['episodes']
 });
 
 // Anime serisi filtreleme şeması
 export const animeSeriesFiltersSchema = z.object({
   search: z.string().optional(),
-  type: z.nativeEnum(ANIME.TYPE).optional(),
-  status: z.nativeEnum(ANIME.STATUS).optional(),
-  season: z.nativeEnum(ANIME.SEASON).optional(),
-  seasonYear: z.number().min(ANIME.YEAR.MIN).max(ANIME.YEAR.MAX).optional(),
-  source: z.nativeEnum(ANIME.SOURCE).optional(),
+  type: z.nativeEnum(AnimeType).optional(),
+  status: z.nativeEnum(AnimeStatus).optional(),
+  season: z.nativeEnum(Season).optional(),
+  seasonYear: z.number().min(ANIME.YEAR.MIN, 'Yıl 1900\'den büyük olmalı').max(ANIME.YEAR.MAX, 'Yıl 2100\'den küçük olmalı').optional(),
+  source: z.nativeEnum(Source).optional(),
   sortBy: z.enum(['title', 'averageScore', 'popularity', 'createdAt', 'seasonYear']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
   page: z.number().min(ANIME.PAGINATION.MIN_PAGE).default(ANIME.PAGINATION.MIN_PAGE),
