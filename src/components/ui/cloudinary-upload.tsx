@@ -37,11 +37,11 @@ export function CloudinaryUpload({
 
     try {
       // Environment variables kontrolü
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+      const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET || 'aniwa_uploads';
 
-      if (!cloudName || !uploadPreset) {
-        throw new Error('Cloudinary configuration missing. Please check environment variables.');
+      if (!cloudName) {
+        throw new Error('Cloudinary cloud name missing. Please check CLOUDINARY_CLOUD_NAME environment variable.');
       }
 
       console.log('Uploading to Cloudinary:', { cloudName, uploadPreset, fileName: file.name });
