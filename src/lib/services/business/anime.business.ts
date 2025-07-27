@@ -41,6 +41,9 @@ export async function createAnimeSeriesBusiness(
   try {
     // Transaction ile tüm işlemleri yap
     const result = await prisma.$transaction(async (tx) => {
+      // Film türü için bölüm sayısını 1 yap
+      const episodes = data.type === AnimeType.MOVIE ? 1 : data.episodes;
+      
       // Anime serisi oluştur
       const animeSeries = await createAnimeSeriesDB(
         {
@@ -50,7 +53,7 @@ export async function createAnimeSeriesBusiness(
           synonyms: data.synonyms || [],
           type: data.type as AnimeType,
           status: data.status as AnimeStatus,
-          episodes: data.episodes,
+          episodes: episodes,
           duration: data.duration,
           isAdult: data.isAdult,
           season: data.season as Season,
@@ -263,6 +266,9 @@ export async function updateAnimeSeriesBusiness(
 
     // Transaction ile güncelleme
     const result = await prisma.$transaction(async (tx) => {
+      // Film türü için bölüm sayısını 1 yap
+      const episodes = data.type === AnimeType.MOVIE ? 1 : data.episodes;
+      
       // Anime serisi güncelle
       const updatedAnime = await updateAnimeSeriesDB(
         { id },
@@ -273,7 +279,7 @@ export async function updateAnimeSeriesBusiness(
           synonyms: data.synonyms,
           type: data.type as AnimeType,
           status: data.status as AnimeStatus,
-          episodes: data.episodes,
+          episodes: episodes,
           duration: data.duration,
           isAdult: data.isAdult,
           season: data.season as Season,

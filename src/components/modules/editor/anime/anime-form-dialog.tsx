@@ -63,11 +63,12 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
 
   const watchedType = watch('type');
 
-  // Tür değiştiğinde sezon ve yıl alanlarını güncelle
+  // Tür değiştiğinde sezon, yıl ve bölüm sayısı alanlarını güncelle
   useEffect(() => {
     if (watchedType === AnimeType.MOVIE) {
       setValue('season', undefined);
       setValue('seasonYear', undefined);
+      setValue('episodes', 1); // Film için bölüm sayısı 1
     } else if (watchedType && !watch('season')) {
       setValue('season', Season.SPRING);
       setValue('seasonYear', new Date().getFullYear());
@@ -294,23 +295,25 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             )}
           </div>
 
-          {/* Bölüm Sayısı (OVA/ONA için zorunlu) */}
-          <div className="space-y-2">
-            <Label htmlFor="episodes">
-              Bölüm Sayısı
-              {(watchedType === AnimeType.OVA || watchedType === AnimeType.ONA) && ' *'}
-            </Label>
-            <Input
-              id="episodes"
-              type="number"
-              placeholder="0"
-              {...register('episodes', { valueAsNumber: true })}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-            />
-            {errors.episodes && (
-              <p className="text-sm text-destructive">{errors.episodes.message}</p>
-            )}
-          </div>
+          {/* Bölüm Sayısı (Film hariç tüm türler için) */}
+          {watchedType !== AnimeType.MOVIE && (
+            <div className="space-y-2">
+              <Label htmlFor="episodes">
+                Bölüm Sayısı
+                {(watchedType === AnimeType.OVA || watchedType === AnimeType.ONA) && ' *'}
+              </Label>
+              <Input
+                id="episodes"
+                type="number"
+                placeholder="0"
+                {...register('episodes', { valueAsNumber: true })}
+                disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              />
+              {errors.episodes && (
+                <p className="text-sm text-destructive">{errors.episodes.message}</p>
+              )}
+            </div>
+          )}
 
           {/* Süre */}
           <div className="space-y-2">
@@ -340,7 +343,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             <p className="text-sm text-destructive">{errors.isAdult.message}</p>
           )}
 
-          {/* Çok Parçalı (sadece TV Series için) */}
+          {/* Çok Parçalı (sadece TV Series için, Film hariç) */}
           {watchedType === AnimeType.TV && (
             <div className="flex items-center space-x-2">
               <Checkbox
