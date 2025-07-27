@@ -376,6 +376,7 @@ model AnimeSeries {
   isAdult           Boolean?          // Yetişkin içeriği
   season            Season?           // Çıkış sezonu
   seasonYear        Int?              // Çıkış yılı
+  releaseDate       DateTime?         // Yayınlanma tarihi
   source            Source?           // Kaynak materyal
   countryOfOrigin   String?           // Köken ülke
 

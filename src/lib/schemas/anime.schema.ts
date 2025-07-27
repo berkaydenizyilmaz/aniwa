@@ -16,6 +16,7 @@ export const createAnimeSeriesSchema = z.object({
   isAdult: z.boolean(),
   season: z.nativeEnum(ANIME.SEASON).optional(),
   seasonYear: z.number().min(ANIME.YEAR.MIN, 'Yıl 1900\'den büyük olmalı').max(ANIME.YEAR.MAX, 'Yıl 2100\'den küçük olmalı').optional(),
+  releaseDate: z.date().optional(),
   source: z.nativeEnum(ANIME.SOURCE).optional(),
   countryOfOrigin: z.string().optional(),
   description: z.string().optional(),
@@ -28,14 +29,11 @@ export const createAnimeSeriesSchema = z.object({
   genreIds: z.array(z.string()).optional(),
   tagIds: z.array(z.string()).optional(),
   studioIds: z.array(z.string()).optional(),
-}).refine((data) => {
-  // Film değilse sezon ve yıl zorunlu
-  if (data.type !== 'MOVIE') {
-    return data.season && data.seasonYear;
-  }
+}).refine(() => {
+  // Tüm türler için sezon ve yıl opsiyonel (film dahil)
   return true;
 }, {
-  message: 'Film dışındaki türler için sezon ve yıl zorunludur',
+  message: 'Sezon ve yıl bilgisi opsiyoneldir',
   path: ['season']
 }).refine((data) => {
   // OVA/ONA için bölüm sayısı zorunlu
@@ -73,14 +71,11 @@ export const updateAnimeSeriesSchema = z.object({
   genreIds: z.array(z.string()).optional(),
   tagIds: z.array(z.string()).optional(),
   studioIds: z.array(z.string()).optional(),
-}).refine((data) => {
-  // Film değilse sezon ve yıl zorunlu
-  if (data.type !== 'MOVIE') {
-    return data.season && data.seasonYear;
-  }
+}).refine(() => {
+  // Tüm türler için sezon ve yıl opsiyonel (film dahil)
   return true;
 }, {
-  message: 'Film dışındaki türler için sezon ve yıl zorunludur',
+  message: 'Sezon ve yıl bilgisi opsiyoneldir',
   path: ['season']
 }).refine((data) => {
   // OVA/ONA için bölüm sayısı zorunlu

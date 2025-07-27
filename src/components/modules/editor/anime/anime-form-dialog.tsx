@@ -354,48 +354,44 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             <p className="text-sm text-destructive">{errors.isMultiPart.message}</p>
           )}
 
-          {/* Sezon (Film hariç zorunlu) */}
-          {watchedType !== AnimeType.MOVIE && (
-            <div className="space-y-2">
-              <Label htmlFor="season">Sezon *</Label>
-              <Select
-                {...register('season')}
-                onValueChange={(value) => setValue('season', value as Season)}
-                disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sezon seçin" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(Season).map((season) => (
-                    <SelectItem key={season} value={season}>
-                      {season}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.season && (
-                <p className="text-sm text-destructive">{errors.season.message}</p>
-              )}
-            </div>
-          )}
+          {/* Sezon */}
+          <div className="space-y-2">
+            <Label htmlFor="season">Sezon</Label>
+            <Select
+              {...register('season')}
+              onValueChange={(value) => setValue('season', value as Season)}
+              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sezon seçin" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(Season).map((season) => (
+                  <SelectItem key={season} value={season}>
+                    {season}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.season && (
+              <p className="text-sm text-destructive">{errors.season.message}</p>
+            )}
+          </div>
 
-          {/* Yıl (Film hariç zorunlu) */}
-          {watchedType !== AnimeType.MOVIE && (
-            <div className="space-y-2">
-              <Label htmlFor="seasonYear">Yıl *</Label>
-              <Input
-                id="seasonYear"
-                type="number"
-                placeholder="2024"
-                {...register('seasonYear', { valueAsNumber: true })}
-                disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-              />
-              {errors.seasonYear && (
-                <p className="text-sm text-destructive">{errors.seasonYear.message}</p>
-              )}
-            </div>
-          )}
+          {/* Yıl */}
+          <div className="space-y-2">
+            <Label htmlFor="seasonYear">Yıl</Label>
+            <Input
+              id="seasonYear"
+              type="number"
+              placeholder="2024"
+              {...register('seasonYear', { valueAsNumber: true })}
+              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            />
+            {errors.seasonYear && (
+              <p className="text-sm text-destructive">{errors.seasonYear.message}</p>
+            )}
+          </div>
 
           {/* Kaynak */}
           <div className="space-y-2">
