@@ -86,12 +86,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
             id="synonyms"
             type="text"
             placeholder="Virgülle ayırarak alternatif başlıkları girin"
-            value={watch('synonyms')?.join(', ') || ''}
-            onChange={(e) => {
-              const value = e.target.value;
-              const synonyms = value.split(',').map(s => s.trim()).filter(s => s.length > 0);
-              setValue('synonyms', synonyms);
-            }}
+            {...register('synonyms')}
             disabled={isLoading(loadingKey)}
           />
           {errors.synonyms && (
