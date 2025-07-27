@@ -44,6 +44,14 @@ export async function createAnimeSeriesBusiness(
       // Film türü için bölüm sayısını 1 yap
       const episodes = data.type === AnimeType.MOVIE ? 1 : data.episodes;
       
+      // AniwaPublicId için son ID'yi bul ve 1 artır (güvenli şekilde)
+      const lastAnime = await tx.animeSeries.findFirst({
+        where: { aniwaPublicId: { not: null } },
+        orderBy: { aniwaPublicId: 'desc' },
+        select: { aniwaPublicId: true }
+      });
+      const nextPublicId = (lastAnime?.aniwaPublicId || 0) + 1;
+      
       // Anime serisi oluştur
       const animeSeries = await createAnimeSeriesDB(
         {
@@ -51,6 +59,9 @@ export async function createAnimeSeriesBusiness(
           englishTitle: data.englishTitle,
           japaneseTitle: data.japaneseTitle,
           synonyms: data.synonyms || [],
+          anilistId: data.anilistId,
+          idMal: data.idMal,
+          aniwaPublicId: nextPublicId,
           type: data.type as AnimeType,
           status: data.status as AnimeStatus,
           episodes: episodes,
@@ -291,6 +302,8 @@ export async function updateAnimeSeriesBusiness(
           englishTitle: data.englishTitle,
           japaneseTitle: data.japaneseTitle,
           synonyms: data.synonyms,
+          anilistId: data.anilistId,
+          idMal: data.idMal,
           type: data.type as AnimeType,
           status: data.status as AnimeStatus,
           episodes: episodes,
