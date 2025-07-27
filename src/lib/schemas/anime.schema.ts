@@ -24,8 +24,8 @@ export const createAnimeSeriesSchema = z.object({
   description: z.string().optional(),
   isMultiPart: z.boolean(),
   // Görsel İçerik
-  coverImage: z.string().url('Geçerli bir URL girin').optional(),
-  bannerImage: z.string().url('Geçerli bir URL girin').optional(),
+  coverImage: z.string().optional(),
+  bannerImage: z.string().optional(),
   coverImageFile: z.string().optional(), // Base64 dosya
   bannerImageFile: z.string().optional(), // Base64 dosya
   trailer: z.string().url('Geçerli bir URL girin').optional(),
@@ -71,8 +71,8 @@ export const updateAnimeSeriesSchema = z.object({
   description: z.string().optional(),
   isMultiPart: z.boolean(),
   // Görsel İçerik
-  coverImage: z.string().url('Geçerli bir URL girin').optional(),
-  bannerImage: z.string().url('Geçerli bir URL girin').optional(),
+  coverImage: z.string().optional(),
+  bannerImage: z.string().optional(),
   coverImageFile: z.string().optional(), // Base64 dosya
   bannerImageFile: z.string().optional(), // Base64 dosya
   trailer: z.string().url('Geçerli bir URL girin').optional(),

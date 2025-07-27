@@ -1,10 +1,23 @@
 import { v2 as cloudinary } from 'cloudinary';
 
 // Cloudinary konfigürasyonu
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
+const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET;
+
+console.log('Cloudinary config:', {
+  cloudName,
+  apiKey: apiKey ? '***' : undefined,
+  apiSecret: apiSecret ? '***' : undefined,
+  hasCloudName: !!cloudName,
+  hasApiKey: !!apiKey,
+  hasApiSecret: !!apiSecret
+});
+
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: cloudName,
+  api_key: apiKey,
+  api_secret: apiSecret,
 });
 
 export interface CloudinaryUploadResult {
