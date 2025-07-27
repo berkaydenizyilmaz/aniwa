@@ -261,7 +261,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
               type="submit"
               disabled={isLoading(isEdit ? LOADING_KEYS.FORMS.UPDATE_ANIME : LOADING_KEYS.FORMS.CREATE_ANIME)}
             >
-              {isLoading(isEdit ? LOADING_KEYS.FORMS.UPDATE_ANIME : LOADING_KEYS.FORMS.CREATE_ANIME) ? 'Kaydediliyor...' : (isEdit ? 'Güncelle' : 'Oluştur')}
+              {isEdit ? 'Güncelle' : 'Oluştur'}
             </Button>
           </div>
         </form>

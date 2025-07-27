@@ -53,6 +53,34 @@ export class CloudinaryService {
         resource_type: options.resourceType || 'image',
       };
 
+      // Buffer ise stream olarak yükle
+      if (Buffer.isBuffer(file)) {
+        return new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            uploadOptions,
+            (error, result) => {
+              if (error) {
+                reject(new Error(`Cloudinary upload failed: ${error.message}`));
+              } else if (result) {
+                resolve({
+                  publicId: result.public_id,
+                  url: result.url,
+                  secureUrl: result.secure_url,
+                  width: result.width,
+                  height: result.height,
+                  format: result.format,
+                  size: result.bytes,
+                });
+              } else {
+                reject(new Error('Upload result is undefined'));
+              }
+            }
+          );
+          uploadStream.end(file);
+        });
+      }
+
+      // String ise direkt yükle
       const result = await cloudinary.uploader.upload(file as string, uploadOptions);
 
       return {

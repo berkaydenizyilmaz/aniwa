@@ -86,7 +86,15 @@ export async function createAnimeSeriesBusiness(
             bannerImageUrl = uploadResult.bannerImage.secureUrl;
           }
         } catch (uploadError) {
-          logger.error('Resim yükleme hatası:', { error: uploadError, userId });
+          logger.error(
+            EVENTS.SYSTEM.BUSINESS_ERROR,
+            'Resim yükleme hatası',
+            {
+              error: uploadError instanceof Error ? uploadError.message : String(uploadError),
+              userId
+            },
+            userId
+          );
           throw new BusinessError('Resim yüklenirken hata oluştu');
         }
       }
