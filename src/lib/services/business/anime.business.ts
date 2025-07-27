@@ -58,6 +58,7 @@ export async function createAnimeSeriesBusiness(
           isAdult: data.isAdult,
           season: data.season as Season,
           seasonYear: data.seasonYear,
+          releaseDate: data.releaseDate,
           source: data.source as Source,
           countryOfOrigin: data.countryOfOrigin,
           coverImage: data.coverImage,
@@ -186,8 +187,8 @@ export async function getAllAnimeSeriesBusiness(
       where.source = filters.source as Source;
     }
 
-    // Yetişkin içerik kontrolü
-    if (!user?.userSettings?.displayAdultContent) {
+    // Yetişkin içerik kontrolü (sadece kullanıcı varsa)
+    if (user && !user.userSettings?.displayAdultContent) {
       where.isAdult = false;
     }
 
@@ -284,6 +285,7 @@ export async function updateAnimeSeriesBusiness(
           isAdult: data.isAdult,
           season: data.season as Season,
           seasonYear: data.seasonYear,
+          releaseDate: data.releaseDate,
           source: data.source as Source,
           countryOfOrigin: data.countryOfOrigin,
           coverImage: data.coverImage,
@@ -430,7 +432,7 @@ export async function deleteAnimeSeriesBusiness(
   }
 }
 
-// Anime serisi detaylarını getirme (admin için)
+// Anime serisi detaylarını getirme
 export async function getAnimeSeriesByIdBusiness(
   id: string,
   userId: string
