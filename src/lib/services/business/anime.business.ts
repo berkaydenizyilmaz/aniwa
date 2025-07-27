@@ -21,6 +21,8 @@ import {
   createAnimeStudiosDB,
   findAnimeStudiosBySeriesIdDB,
 } from "@/lib/services/db/animeStudio.db";
+import { UploadService } from "@/lib/services/extends-api/cloudinary/upload.service";
+import { UPLOAD_CONFIGS } from "@/lib/constants/cloudinary.constants";
 import { Prisma, AnimeType, AnimeStatus, Season, Source } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/utils/logger";
@@ -52,6 +54,43 @@ export async function createAnimeSeriesBusiness(
       });
       const nextPublicId = (lastAnime?.aniwaPublicId || 0) + 1;
       
+      // Geçici anime ID oluştur (upload için)
+      const tempAnimeId = `temp_${Date.now()}`;
+      
+      // Resim dosyalarını yükle (eğer varsa)
+      let coverImageUrl = data.coverImage;
+      let bannerImageUrl = data.bannerImage;
+      
+      if (data.coverImageFile || data.bannerImageFile) {
+        try {
+          // Base64'ten Buffer'a çevir
+          const coverBuffer = data.coverImageFile ? UploadService.base64ToBuffer(data.coverImageFile) : undefined;
+          const bannerBuffer = data.bannerImageFile ? UploadService.base64ToBuffer(data.bannerImageFile) : undefined;
+          
+          // Dosya validasyonu
+          if (coverBuffer) UploadService.validateImageFile(coverBuffer, UPLOAD_CONFIGS.ANIME_COVER.maxSize);
+          if (bannerBuffer) UploadService.validateImageFile(bannerBuffer, UPLOAD_CONFIGS.ANIME_BANNER.maxSize);
+          
+          // Cloudinary'ye yükle
+          const uploadResult = await UploadService.uploadAnimeImages(
+            coverBuffer,
+            bannerBuffer,
+            tempAnimeId
+          );
+          
+          // URL'leri güncelle
+          if (uploadResult.coverImage) {
+            coverImageUrl = uploadResult.coverImage.secureUrl;
+          }
+          if (uploadResult.bannerImage) {
+            bannerImageUrl = uploadResult.bannerImage.secureUrl;
+          }
+        } catch (uploadError) {
+          logger.error('Resim yükleme hatası:', { error: uploadError, userId });
+          throw new BusinessError('Resim yüklenirken hata oluştu');
+        }
+      }
+      
       // Anime serisi oluştur
       const animeSeries = await createAnimeSeriesDB(
         {
@@ -72,8 +111,8 @@ export async function createAnimeSeriesBusiness(
           releaseDate: data.releaseDate,
           source: data.source as Source,
           countryOfOrigin: data.countryOfOrigin,
-          coverImage: data.coverImage,
-          bannerImage: data.bannerImage,
+          coverImage: coverImageUrl,
+          bannerImage: bannerImageUrl,
           description: data.description,
           trailer: data.trailer,
           isMultiPart: data.isMultiPart,

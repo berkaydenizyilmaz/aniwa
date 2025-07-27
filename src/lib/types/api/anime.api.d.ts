@@ -38,8 +38,12 @@ export interface GetAllAnimeSeriesResponse {
   totalPages: number;
 }
 
-// Anime API istek tipleri
-export type CreateAnimeSeriesRequest = CreateAnimeSeriesInput;
+// Anime API istek tipleri - Base64 dosya alanları eklenmiş
+export interface CreateAnimeSeriesRequest extends CreateAnimeSeriesInput {
+  coverImageFile?: string; // Base64 dosya
+  bannerImageFile?: string; // Base64 dosya
+}
+
 export type GetAnimeSeriesRequest = AnimeSeriesFilters; 
 
 // İlişki API tipleri

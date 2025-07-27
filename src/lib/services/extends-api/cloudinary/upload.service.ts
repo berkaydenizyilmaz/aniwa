@@ -1,4 +1,5 @@
 import { CloudinaryService, CloudinaryUploadResult } from './cloudinary.service';
+import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
 
 export interface UploadAnimeImagesResult {
   coverImage?: CloudinaryUploadResult;
@@ -82,7 +83,7 @@ export class UploadService {
   /**
    * Dosya formatını kontrol et
    */
-  static validateImageFile(file: Buffer, maxSize: number = 5 * 1024 * 1024): boolean {
+  static validateImageFile(file: Buffer, maxSize: number = UPLOAD_CONFIGS.ANIME_COVER.maxSize): boolean {
     // Dosya boyutu kontrolü
     if (file.length > maxSize) {
       throw new Error(`Dosya boyutu ${Math.round(maxSize / 1024 / 1024)}MB'dan büyük olamaz`);
