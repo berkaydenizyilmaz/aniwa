@@ -42,7 +42,7 @@ export function AnimeFilters({ onSearch, onAddNew }: AnimeFiltersProps) {
         </div>
 
         {/* Yeni Anime Ekle */}
-        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={isLoading(LOADING_KEYS.PAGES.ANIME) || isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}>
+        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME_PAGE) || isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}>
           <Plus className="h-4 w-4" />
           Yeni Anime Ekle
         </Button>

@@ -7,7 +7,7 @@ export const LOADING_KEYS = {
     USERS: 'users-page',
     LOGS: 'logs-page',
     STREAMING_PLATFORMS: 'streaming-platforms-page',
-    ANIME: 'anime-page',
+    EDITOR_ANIME_PAGE: 'editor-anime-page',
   },
   
   // Form loading'leri

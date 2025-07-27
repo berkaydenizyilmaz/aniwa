@@ -47,7 +47,7 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
   useEffect(() => {
     const fetchAnimeSeries = async () => {
       try {
-        setLoadingStore(LOADING_KEYS.PAGES.ANIME, true);
+        setLoadingStore(LOADING_KEYS.PAGES.EDITOR_ANIME_PAGE, true);
         const filters: AnimeSeriesFilters = {
           page: currentPage,
           limit: limit,
@@ -68,7 +68,7 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
         console.error('Fetch anime series error:', error);
         toast.error('Anime serileri yüklenirken bir hata oluştu');
       } finally {
-        setLoadingStore(LOADING_KEYS.PAGES.ANIME, false);
+        setLoadingStore(LOADING_KEYS.PAGES.EDITOR_ANIME_PAGE, false);
       }
     };
     fetchAnimeSeries();
@@ -165,7 +165,7 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
     return pages;
   };
 
-  if (isLoading(LOADING_KEYS.PAGES.ANIME)) {
+      if (isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME_PAGE)) {
     return (
       <div className="glass-card">
         <div className="p-4">
@@ -272,7 +272,7 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.ANIME)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME_PAGE)}
               >
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
@@ -282,7 +282,7 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.ANIME)}
+                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME_PAGE)}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -294,7 +294,7 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
                   variant={page === currentPage ? "default" : "outline"}
                   size="sm"
                   onClick={() => typeof page === 'number' ? handlePageChange(page) : undefined}
-                  disabled={typeof page !== 'number' || isLoading(LOADING_KEYS.PAGES.ANIME)}
+                  disabled={typeof page !== 'number' || isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME_PAGE)}
                   className="w-8 h-8 p-0"
                 >
                   {page}
@@ -306,7 +306,7 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.ANIME)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME_PAGE)}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -316,7 +316,7 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.ANIME)}
+                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME_PAGE)}
               >
                 <ChevronsRight className="h-4 w-4" />
               </Button>
