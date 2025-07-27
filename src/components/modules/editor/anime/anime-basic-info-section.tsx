@@ -35,11 +35,11 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Başlık */}
         <div className="space-y-2">
-          <Label htmlFor="title">Başlık (Türkçe)</Label>
+          <Label htmlFor="title">Başlık (Romaji)</Label>
           <Input
             id="title"
             type="text"
-            placeholder="Türkçe başlık"
+            placeholder="Romaji başlık"
             {...register('title')}
             disabled={isLoading(loadingKey)}
           />
