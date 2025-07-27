@@ -12,7 +12,7 @@ import { ApiResponse } from '@/lib/types/api';
 import {
   GetStreamingLinksRequest,
   UpdateStreamingLinksRequest,
-  GetAllStreamingLinksResponse,
+  GetStreamingLinksResponse,
   UpdateStreamingLinksResponse,
 } from '@/lib/types/api/streamingLink.api';
 
@@ -184,7 +184,7 @@ export async function updateEpisodeStreamingLinksBusiness(
 // Tüm streaming linklerini getirme
 export async function getAllStreamingLinksBusiness(
   filters?: GetStreamingLinksRequest
-): Promise<ApiResponse<GetAllStreamingLinksResponse>> {
+): Promise<ApiResponse<GetStreamingLinksResponse>> {
   try {
     const page = filters?.page || 1;
     const limit = filters?.limit || 50;

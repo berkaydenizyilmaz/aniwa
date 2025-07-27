@@ -2,13 +2,13 @@
 
 import { BusinessError, DatabaseError } from '@/lib/errors';
 import {
-  createUserFollow as createUserFollowDB,
-  findUserFollowByFollowerAndFollowing,
-  findFollowersByUserId,
-  findFollowingByUserId,
-  deleteUserFollow as deleteUserFollowDB,
-  countFollowers,
-  countFollowing,
+  createUserFollowDB,
+  findUserFollowByFollowerAndFollowingDB,
+  findFollowersByUserIdDB,
+  findFollowingByUserIdDB,
+  deleteUserFollowDB,
+  countFollowersDB,
+  countFollowingDB,
 } from '@/lib/services/db/userFollow.db';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/utils/logger';
@@ -35,7 +35,7 @@ export async function toggleUserFollowBusiness(
     }
 
     // Mevcut takip durumunu kontrol et
-    const existingFollow = await findUserFollowByFollowerAndFollowing(
+    const existingFollow = await findUserFollowByFollowerAndFollowingDB(
       followerId,
       data.followingId
     );
@@ -44,10 +44,9 @@ export async function toggleUserFollowBusiness(
     const result = await prisma.$transaction(async (tx) => {
       if (existingFollow) {
         // Takip varsa çıkar
-        const deletedFollow = await deleteUserFollowDB(
-          { followerId_followingId: { followerId, followingId: data.followingId } },
-          tx
-        );
+        const deletedFollow = await deleteUserFollowDB({
+          followerId_followingId: { followerId, followingId: data.followingId }
+        }, tx);
 
         return { action: 'unfollowed' as const, follow: deletedFollow };
       } else {
@@ -110,8 +109,8 @@ export async function getUserFollowersBusiness(
     const skip = (page - 1) * limit;
 
     // Kullanıcının takipçilerini getir
-    const followers = await findFollowersByUserId(userId, skip, limit);
-    const total = await countFollowers({ followingId: userId });
+    const followers = await findFollowersByUserIdDB(userId, skip, limit);
+    const total = await countFollowersDB({ followingId: userId });
     const totalPages = Math.ceil(total / limit);
 
     // Başarılı işlem logu
@@ -171,8 +170,8 @@ export async function getUserFollowingBusiness(
     const skip = (page - 1) * limit;
 
     // Kullanıcının takip ettiklerini getir
-    const following = await findFollowingByUserId(userId, skip, limit);
-    const total = await countFollowing({ followerId: userId });
+    const following = await findFollowingByUserIdDB(userId, skip, limit);
+    const total = await countFollowingDB({ followerId: userId });
     const totalPages = Math.ceil(total / limit);
 
     // Başarılı işlem logu
@@ -227,7 +226,7 @@ export async function checkFollowStatusBusiness(
   followingId: string
 ): Promise<ApiResponse<{ isFollowing: boolean }>> {
   try {
-    const follow = await findUserFollowByFollowerAndFollowing(followerId, followingId);
+    const follow = await findUserFollowByFollowerAndFollowingDB(followerId, followingId);
 
     // Başarılı işlem logu
     await logger.info(

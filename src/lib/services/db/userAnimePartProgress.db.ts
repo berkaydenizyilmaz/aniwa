@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Yeni anime parça ilerlemesi oluşturur
-export async function createUserAnimePartProgress(
+export async function createUserAnimePartProgressDB(
     data: Prisma.UserAnimePartProgressCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserAnimePartProgress> {
@@ -20,7 +20,7 @@ export async function createUserAnimePartProgress(
 }
 
 // ID ile anime parça ilerlemesi bulur
-export async function findUserAnimePartProgressById(
+export async function findUserAnimePartProgressByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserAnimePartProgress | null> {
@@ -62,7 +62,7 @@ export async function findUserAnimePartProgressById(
 }
 
 // Liste ve parça ile anime parça ilerlemesi bulur
-export async function findUserAnimePartProgressByListAndPart(
+export async function findUserAnimePartProgressByListAndPartDB(
     userAnimeListId: string,
     animeMediaPartId: string,
     client: PrismaClientOrTransaction = prisma
@@ -82,7 +82,7 @@ export async function findUserAnimePartProgressByListAndPart(
 }
 
 // Anime parça ilerlemesi bilgilerini günceller
-export async function updateUserAnimePartProgress(
+export async function updateUserAnimePartProgressDB(
     where: Prisma.UserAnimePartProgressWhereUniqueInput,
     data: Prisma.UserAnimePartProgressUpdateInput,
     client: PrismaClientOrTransaction = prisma
@@ -98,7 +98,7 @@ export async function updateUserAnimePartProgress(
 }
 
 // Anime parça ilerlemesini siler
-export async function deleteUserAnimePartProgress(
+export async function deleteUserAnimePartProgressDB(
     where: Prisma.UserAnimePartProgressWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserAnimePartProgress> {
@@ -110,7 +110,7 @@ export async function deleteUserAnimePartProgress(
 }
 
 // Anime parça ilerlemesi sayısını döner
-export async function countUserAnimePartProgress(
+export async function countUserAnimePartProgressDB(
     where?: Prisma.UserAnimePartProgressWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

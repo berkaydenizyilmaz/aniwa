@@ -2,10 +2,10 @@
 
 import { BusinessError, DatabaseError } from '@/lib/errors';
 import {
-  createUserAnimeList as createUserAnimeListDB,
-  findUserAnimeListByUserAndAnime,
-  findUserAnimeListsByUserId,
-  deleteUserAnimeList as deleteUserAnimeListDB,
+  createUserAnimeListDB,
+  findUserAnimeListByUserAndAnimeDB,
+  findUserAnimeListsByUserIdDB,
+  deleteUserAnimeListDB,
 } from '@/lib/services/db/userAnimeList.db';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/utils/logger';
@@ -27,7 +27,7 @@ export async function toggleAnimeInListBusiness(
 ): Promise<ApiResponse<AddAnimeToListResponse | RemoveAnimeFromListResponse>> {
   try {
     // Anime zaten listede mi kontrolü
-    const existingList = await findUserAnimeListByUserAndAnime(userId, data.animeSeriesId);
+    const existingList = await findUserAnimeListByUserAndAnimeDB(userId, data.animeSeriesId);
     
     if (existingList) {
       // Anime listede varsa çıkar
@@ -119,7 +119,7 @@ export async function getUserAnimeListsBusiness(
     const skip = (page - 1) * limit;
 
     // Kullanıcının anime listesini getir
-    const userAnimeLists = await findUserAnimeListsByUserId(userId);
+    const userAnimeLists = await findUserAnimeListsByUserIdDB(userId);
 
     const total = userAnimeLists.length;
     const totalPages = Math.ceil(total / limit);
@@ -179,7 +179,7 @@ export async function getUserAnimeListByAnimeBusiness(
   animeSeriesId: string
 ): Promise<ApiResponse<GetUserAnimeListByAnimeResponse>> {
   try {
-    const userAnimeList = await findUserAnimeListByUserAndAnime(userId, animeSeriesId);
+    const userAnimeList = await findUserAnimeListByUserAndAnimeDB(userId, animeSeriesId);
 
     // Başarılı işlem logu
     await logger.info(

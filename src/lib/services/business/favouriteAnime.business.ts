@@ -2,8 +2,8 @@
 
 import { BusinessError, DatabaseError } from '@/lib/errors';
 import {
-  findFavouriteAnimeSeriesByUserId,
-  findFavouriteAnimeSeriesByUserAndAnime,
+  findFavouriteAnimeSeriesByUserIdDB,
+  findFavouriteAnimeSeriesByUserAndAnimeDB,
 } from '@/lib/services/db/favouriteAnime.db';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/utils/logger';
@@ -27,7 +27,7 @@ export async function getUserFavouriteAnimesBusiness(
     const skip = (page - 1) * limit;
 
     // Kullanıcının favori animelerini getir
-    const favouriteAnimes = await findFavouriteAnimeSeriesByUserId(userId);
+    const favouriteAnimes = await findFavouriteAnimeSeriesByUserIdDB(userId);
     
     const total = favouriteAnimes.length;
     const totalPages = Math.ceil(total / limit);
@@ -88,7 +88,7 @@ export async function toggleFavouriteAnimeBusiness(
 ): Promise<ApiResponse<ToggleFavouriteAnimeResponse>> {
   try {
     // Mevcut favori durumunu kontrol et
-    const existingFavourite = await findFavouriteAnimeSeriesByUserAndAnime(
+    const existingFavourite = await findFavouriteAnimeSeriesByUserAndAnimeDB(
       userId,
       data.animeSeriesId
     );

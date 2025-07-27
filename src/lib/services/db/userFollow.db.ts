@@ -8,7 +8,7 @@ import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 // UserFollow CRUD operasyonları
 
 // Yeni takip ilişkisi oluşturur
-export async function createUserFollow(
+export async function createUserFollowDB(
     data: Prisma.UserFollowCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow> {
@@ -22,7 +22,7 @@ export async function createUserFollow(
 }
 
 // ID ile takip ilişkisi bulur
-export async function findUserFollowById(
+export async function findUserFollowByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow | null> {
@@ -54,7 +54,7 @@ export async function findUserFollowById(
 }
 
 // Kullanıcı ve takip edilen ile takip ilişkisi bulur
-export async function findUserFollowByFollowerAndFollowing(
+export async function findUserFollowByFollowerAndFollowingDB(
     followerId: string,
     followingId: string,
     client: PrismaClientOrTransaction = prisma
@@ -90,7 +90,7 @@ export async function findUserFollowByFollowerAndFollowing(
 }
 
 // Kullanıcının takipçilerini listeler
-export async function findFollowersByUserId(
+export async function findFollowersByUserIdDB(
     userId: string,
     skip?: number,
     take?: number,
@@ -119,7 +119,7 @@ export async function findFollowersByUserId(
 }
 
 // Kullanıcının takip ettiklerini listeler
-export async function findFollowingByUserId(
+export async function findFollowingByUserIdDB(
     userId: string,
     skip?: number,
     take?: number,
@@ -148,7 +148,7 @@ export async function findFollowingByUserId(
 }
 
 // Tüm takip ilişkilerini listeler (filtrelemeli)
-export async function findAllUserFollows(
+export async function findAllUserFollowsDB(
     where?: Prisma.UserFollowWhereInput,
     skip?: number,
     take?: number,
@@ -184,7 +184,7 @@ export async function findAllUserFollows(
 }
 
 // Takip ilişkisini siler
-export async function deleteUserFollow(
+export async function deleteUserFollowDB(
     where: Prisma.UserFollowWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserFollow> {
@@ -196,7 +196,7 @@ export async function deleteUserFollow(
 }
 
 // Takipçi sayısını döner
-export async function countFollowers(
+export async function countFollowersDB(
     where?: Prisma.UserFollowWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
@@ -208,7 +208,7 @@ export async function countFollowers(
 }
 
 // Takip edilen sayısını döner
-export async function countFollowing(
+export async function countFollowingDB(
     where?: Prisma.UserFollowWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

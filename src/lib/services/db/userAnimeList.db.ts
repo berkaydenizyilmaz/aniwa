@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Yeni anime listesi oluşturur
-export async function createUserAnimeList(
+export async function createUserAnimeListDB(
     data: Prisma.UserAnimeListCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserAnimeList> {
@@ -20,7 +20,7 @@ export async function createUserAnimeList(
 }
 
 // ID ile anime listesi bulur
-export async function findUserAnimeListById(
+export async function findUserAnimeListByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserAnimeList | null> {
@@ -57,7 +57,7 @@ export async function findUserAnimeListById(
 }
 
 // Kullanıcı ve anime ile anime listesi bulur
-export async function findUserAnimeListByUserAndAnime(
+export async function findUserAnimeListByUserAndAnimeDB(
     userId: string,
     animeSeriesId: string,
     client: PrismaClientOrTransaction = prisma
@@ -100,7 +100,7 @@ export async function findUserAnimeListByUserAndAnime(
 }
 
 // Kullanıcının anime listelerini getirir
-export async function findUserAnimeListsByUserId(
+export async function findUserAnimeListsByUserIdDB(
     userId: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserAnimeList[]> {
@@ -131,7 +131,7 @@ export async function findUserAnimeListsByUserId(
 }
 
 // Anime listesi bilgilerini günceller
-export async function updateUserAnimeList(
+export async function updateUserAnimeListDB(
     where: Prisma.UserAnimeListWhereUniqueInput,
     data: Prisma.UserAnimeListUpdateInput,
     client: PrismaClientOrTransaction = prisma
@@ -147,7 +147,7 @@ export async function updateUserAnimeList(
 }
 
 // Anime listesini siler
-export async function deleteUserAnimeList(
+export async function deleteUserAnimeListDB(
     where: Prisma.UserAnimeListWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserAnimeList> {
@@ -159,7 +159,7 @@ export async function deleteUserAnimeList(
 }
 
 // Anime listesi sayısını döner
-export async function countUserAnimeLists(
+export async function countUserAnimeListsDB(
     where?: Prisma.UserAnimeListWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

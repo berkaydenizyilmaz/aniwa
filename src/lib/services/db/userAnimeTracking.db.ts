@@ -8,7 +8,7 @@ import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 // UserAnimeTracking CRUD operasyonları
 
 // Yeni anime takip kaydı oluşturur
-export async function createUserAnimeTracking(
+export async function createUserAnimeTrackingDB(
     data: Prisma.UserAnimeTrackingCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserAnimeTracking> {
@@ -22,7 +22,7 @@ export async function createUserAnimeTracking(
 }
 
 // ID ile anime takip kaydı bulur
-export async function findUserAnimeTrackingById(
+export async function findUserAnimeTrackingByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserAnimeTracking | null> {
@@ -59,7 +59,7 @@ export async function findUserAnimeTrackingById(
 }
 
 // Kullanıcı ve anime serisi ile anime takip kaydı bulur
-export async function findUserAnimeTrackingByUserAndAnime(
+export async function findUserAnimeTrackingByUserAndAnimeDB(
     userId: string,
     animeSeriesId: string,
     client: PrismaClientOrTransaction = prisma
@@ -102,7 +102,7 @@ export async function findUserAnimeTrackingByUserAndAnime(
 }
 
 // Kullanıcının tüm anime takip kayıtlarını listeler
-export async function findUserAnimeTrackingByUserId(
+export async function findUserAnimeTrackingByUserIdDB(
     userId: string,
     skip?: number,
     take?: number,
@@ -137,7 +137,7 @@ export async function findUserAnimeTrackingByUserId(
 }
 
 // Anime serisinin takip eden kullanıcılarını listeler
-export async function findUserAnimeTrackingByAnimeSeriesId(
+export async function findUserAnimeTrackingByAnimeSeriesIdDB(
     animeSeriesId: string,
     skip?: number,
     take?: number,
@@ -165,7 +165,7 @@ export async function findUserAnimeTrackingByAnimeSeriesId(
 }
 
 // Tüm anime takip kayıtlarını listeler (filtrelemeli)
-export async function findAllUserAnimeTracking(
+export async function findAllUserAnimeTrackingDB(
     where?: Prisma.UserAnimeTrackingWhereInput,
     skip?: number,
     take?: number,
@@ -208,7 +208,7 @@ export async function findAllUserAnimeTracking(
 }
 
 // Anime takip kaydını siler
-export async function deleteUserAnimeTracking(
+export async function deleteUserAnimeTrackingDB(
     where: Prisma.UserAnimeTrackingWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<UserAnimeTracking> {
@@ -220,7 +220,7 @@ export async function deleteUserAnimeTracking(
 }
 
 // Anime takip kaydı sayısını döner
-export async function countUserAnimeTracking(
+export async function countUserAnimeTrackingDB(
     where?: Prisma.UserAnimeTrackingWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

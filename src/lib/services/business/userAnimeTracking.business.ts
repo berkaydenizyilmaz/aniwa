@@ -2,11 +2,11 @@
 
 import { BusinessError, DatabaseError } from '@/lib/errors';
 import {
-  createUserAnimeTracking as createUserAnimeTrackingDB,
-  findUserAnimeTrackingByUserAndAnime,
-  findUserAnimeTrackingByUserId,
-  deleteUserAnimeTracking as deleteUserAnimeTrackingDB,
-  countUserAnimeTracking,
+  createUserAnimeTrackingDB,
+  findUserAnimeTrackingByUserAndAnimeDB,
+  findUserAnimeTrackingByUserIdDB,
+  deleteUserAnimeTrackingDB,
+  countUserAnimeTrackingDB,
 } from '@/lib/services/db/userAnimeTracking.db';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/utils/logger';
@@ -30,8 +30,8 @@ export async function getUserAnimeTrackingBusiness(
     const skip = (page - 1) * limit;
 
     // Kullanıcının anime takip kayıtlarını getir
-    const trackingRecords = await findUserAnimeTrackingByUserId(userId, skip, limit);
-    const total = await countUserAnimeTracking({ userId });
+    const trackingRecords = await findUserAnimeTrackingByUserIdDB(userId, skip, limit);
+    const total = await countUserAnimeTrackingDB({ userId });
     const totalPages = Math.ceil(total / limit);
 
     // Başarılı işlem logu
@@ -87,7 +87,7 @@ export async function toggleUserAnimeTrackingBusiness(
 ): Promise<ApiResponse<ToggleUserAnimeTrackingResponse>> {
   try {
     // Mevcut takip durumunu kontrol et
-    const existingTracking = await findUserAnimeTrackingByUserAndAnime(
+    const existingTracking = await findUserAnimeTrackingByUserAndAnimeDB(
       userId,
       data.animeSeriesId
     );
@@ -96,17 +96,16 @@ export async function toggleUserAnimeTrackingBusiness(
     const result = await prisma.$transaction(async (tx) => {
       if (existingTracking) {
         // Takip varsa çıkar
-        const deletedTracking = await deleteUserAnimeTrackingDB(
-          { userId_animeSeriesId: { userId, animeSeriesId: data.animeSeriesId } },
-          tx
-        );
+        const deletedTracking = await deleteUserAnimeTrackingDB({
+          userId_animeSeriesId: { userId, animeSeriesId: data.animeSeriesId }
+        }, tx);
 
         return { action: 'untracked' as const, tracking: deletedTracking };
       } else {
         // Takip yoksa ekle
         const newTracking = await createUserAnimeTrackingDB({
           user: { connect: { id: userId } },
-          animeSeries: { connect: { id: data.animeSeriesId } },
+          animeSeries: { connect: { id: data.animeSeriesId } }
         }, tx);
 
         return { action: 'tracked' as const, tracking: newTracking };
@@ -157,7 +156,7 @@ export async function checkTrackingStatusBusiness(
   animeSeriesId: string
 ): Promise<ApiResponse<{ isTracking: boolean }>> {
   try {
-    const tracking = await findUserAnimeTrackingByUserAndAnime(userId, animeSeriesId);
+    const tracking = await findUserAnimeTrackingByUserAndAnimeDB(userId, animeSeriesId);
 
     // Başarılı işlem logu
     await logger.info(

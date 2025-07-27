@@ -8,7 +8,7 @@ import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 // Favori anime CRUD operasyonları
 
 // Yeni favori anime oluşturur
-export async function createFavouriteAnimeSeries(
+export async function createFavouriteAnimeSeriesDB(
     data: Prisma.FavouriteAnimeSeriesCreateInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<FavouriteAnimeSeries> {
@@ -22,7 +22,7 @@ export async function createFavouriteAnimeSeries(
 }
 
 // ID ile favori anime bulur
-export async function findFavouriteAnimeSeriesById(
+export async function findFavouriteAnimeSeriesByIdDB(
     id: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<FavouriteAnimeSeries | null> {
@@ -36,7 +36,7 @@ export async function findFavouriteAnimeSeriesById(
 }
 
 // Kullanıcı ve anime serisi ile favori anime bulur
-export async function findFavouriteAnimeSeriesByUserAndAnime(
+export async function findFavouriteAnimeSeriesByUserAndAnimeDB(
     userId: string,
     animeSeriesId: string,
     client: PrismaClientOrTransaction = prisma
@@ -56,7 +56,7 @@ export async function findFavouriteAnimeSeriesByUserAndAnime(
 }
 
 // Kullanıcının tüm favori animelerini listeler
-export async function findFavouriteAnimeSeriesByUserId(
+export async function findFavouriteAnimeSeriesByUserIdDB(
   userId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<FavouriteAnimeSeries[]> {
@@ -87,7 +87,7 @@ export async function findFavouriteAnimeSeriesByUserId(
 }
 
 // Anime serisinin favori sayısını döner
-export async function findFavouriteAnimeSeriesByAnimeSeriesId(
+export async function findFavouriteAnimeSeriesByAnimeSeriesIdDB(
     animeSeriesId: string,
     client: PrismaClientOrTransaction = prisma
 ): Promise<FavouriteAnimeSeries[]> {
@@ -110,7 +110,7 @@ export async function findFavouriteAnimeSeriesByAnimeSeriesId(
 }
 
 // Tüm favori animeleri listeler (filtrelemeli)
-export async function findAllFavouriteAnimeSeries(
+export async function findAllFavouriteAnimeSeriesDB(
     where?: Prisma.FavouriteAnimeSeriesWhereInput,
     skip?: number,
     take?: number,
@@ -153,7 +153,7 @@ export async function findAllFavouriteAnimeSeries(
 }
 
 // Favori anime bilgilerini günceller
-export async function updateFavouriteAnimeSeries(
+export async function updateFavouriteAnimeSeriesDB(
     where: Prisma.FavouriteAnimeSeriesWhereUniqueInput,
     data: Prisma.FavouriteAnimeSeriesUpdateInput,
     client: PrismaClientOrTransaction = prisma
@@ -169,7 +169,7 @@ export async function updateFavouriteAnimeSeries(
 }
 
 // Favori anime'yi siler
-export async function deleteFavouriteAnimeSeries(
+export async function deleteFavouriteAnimeSeriesDB(
     where: Prisma.FavouriteAnimeSeriesWhereUniqueInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<FavouriteAnimeSeries> {
@@ -181,7 +181,7 @@ export async function deleteFavouriteAnimeSeries(
 }
 
 // Favori anime sayısını döner
-export async function countFavouriteAnimeSeries(
+export async function countFavouriteAnimeSeriesDB(
     where?: Prisma.FavouriteAnimeSeriesWhereInput,
     client: PrismaClientOrTransaction = prisma
 ): Promise<number> {

@@ -6,7 +6,7 @@ import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
 // Anime ilişkisi oluşturma
-export async function createAnimeRelation(
+export async function createAnimeRelationDB(
   data: Prisma.AnimeRelationCreateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeRelation> {
@@ -18,7 +18,7 @@ export async function createAnimeRelation(
 }
 
 // Anime ilişkisi getirme (ID ile)
-export async function findAnimeRelationById(
+export async function findAnimeRelationByIdDB(
   id: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeRelation | null> {
@@ -30,7 +30,7 @@ export async function findAnimeRelationById(
 }
 
 // Anime'nin kaynak ilişkilerini getirme
-export async function findAnimeSourceRelations(
+export async function findAnimeSourceRelationsDB(
   sourceAnimeId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeRelation[]> {
@@ -47,7 +47,7 @@ export async function findAnimeSourceRelations(
 }
 
 // Anime'nin hedef ilişkilerini getirme
-export async function findAnimeTargetRelations(
+export async function findAnimeTargetRelationsDB(
   targetAnimeId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeRelation[]> {
@@ -64,7 +64,7 @@ export async function findAnimeTargetRelations(
 }
 
 // Anime'nin tüm ilişkilerini getirme
-export async function findAnimeAllRelations(
+export async function findAnimeAllRelationsDB(
   animeId: string,
   client: PrismaClientOrTransaction = prisma
 ): Promise<{
@@ -73,8 +73,8 @@ export async function findAnimeAllRelations(
 }> {
   try {
     const [sourceRelations, targetRelations] = await Promise.all([
-      findAnimeSourceRelations(animeId, client),
-      findAnimeTargetRelations(animeId, client),
+      findAnimeSourceRelationsDB(animeId, client),
+      findAnimeTargetRelationsDB(animeId, client),
     ]);
 
     return { sourceRelations, targetRelations };
@@ -84,7 +84,7 @@ export async function findAnimeAllRelations(
 }
 
 // Tüm anime ilişkilerini getirme (filtrelemeli)
-export async function findAllAnimeRelations(
+export async function findAllAnimeRelationsDB(
   where?: Prisma.AnimeRelationWhereInput,
   skip?: number,
   take?: number,
@@ -103,12 +103,17 @@ export async function findAllAnimeRelations(
       },
     });
   } catch (error) {
-    handleDatabaseError(error, 'Tüm anime ilişkilerini listeleme', { where, skip, take, orderBy });
+    handleDatabaseError(error, 'Tüm anime ilişkilerini listeleme', {
+      where,
+      skip,
+      take,
+      orderBy,
+    });
   }
 }
 
 // Anime ilişkisi güncelleme
-export async function updateAnimeRelation(
+export async function updateAnimeRelationDB(
   where: Prisma.AnimeRelationWhereUniqueInput,
   data: Prisma.AnimeRelationUpdateInput,
   client: PrismaClientOrTransaction = prisma
@@ -121,7 +126,7 @@ export async function updateAnimeRelation(
 }
 
 // Anime ilişkisi silme
-export async function deleteAnimeRelation(
+export async function deleteAnimeRelationDB(
   where: Prisma.AnimeRelationWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeRelation> {
@@ -133,7 +138,7 @@ export async function deleteAnimeRelation(
 }
 
 // Anime ilişkisi sayısı
-export async function countAnimeRelations(
+export async function countAnimeRelationsDB(
   where?: Prisma.AnimeRelationWhereInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<number> {
