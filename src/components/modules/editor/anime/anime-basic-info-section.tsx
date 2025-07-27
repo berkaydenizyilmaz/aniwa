@@ -78,6 +78,56 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           )}
         </div>
 
+        {/* Alternatif Başlıklar */}
+        <div className="space-y-2">
+          <Label htmlFor="synonyms">Alternatif Başlıklar</Label>
+          <Input
+            id="synonyms"
+            type="text"
+            placeholder="Virgülle ayırarak alternatif başlıkları girin"
+            value={watch('synonyms')?.join(', ') || ''}
+            onChange={(e) => {
+              const value = e.target.value;
+              const synonyms = value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+              setValue('synonyms', synonyms);
+            }}
+            disabled={isLoading(loadingKey)}
+          />
+          {errors.synonyms && (
+            <p className="text-sm text-destructive">{errors.synonyms.message}</p>
+          )}
+        </div>
+
+        {/* AniList ID */}
+        <div className="space-y-2">
+          <Label htmlFor="anilistId">AniList ID</Label>
+          <Input
+            id="anilistId"
+            type="number"
+            placeholder="AniList ID (opsiyonel)"
+            {...register('anilistId', { valueAsNumber: true })}
+            disabled={isLoading(loadingKey)}
+          />
+          {errors.anilistId && (
+            <p className="text-sm text-destructive">{errors.anilistId.message}</p>
+          )}
+        </div>
+
+        {/* MyAnimeList ID */}
+        <div className="space-y-2">
+          <Label htmlFor="idMal">MyAnimeList ID</Label>
+          <Input
+            id="idMal"
+            type="number"
+            placeholder="MAL ID (opsiyonel)"
+            {...register('idMal', { valueAsNumber: true })}
+            disabled={isLoading(loadingKey)}
+          />
+          {errors.idMal && (
+            <p className="text-sm text-destructive">{errors.idMal.message}</p>
+          )}
+        </div>
+
         {/* Tür */}
         <div className="space-y-2">
           <Label htmlFor="type">Tür</Label>
