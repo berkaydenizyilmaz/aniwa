@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const validatedFilters = animeSeriesFiltersSchema.parse(filters);
 
     // Business logic
-    const result = await getAllAnimeSeriesBusiness(validatedFilters);
+    const result = await getAllAnimeSeriesBusiness(validatedFilters, session!.user.id);
 
     // Başarılı yanıt
     return NextResponse.json(result);
