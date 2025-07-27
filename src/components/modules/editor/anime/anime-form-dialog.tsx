@@ -343,8 +343,8 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             <p className="text-sm text-destructive">{errors.isAdult.message}</p>
           )}
 
-          {/* Çok Parçalı (sadece TV Series için, Film hariç) */}
-          {watchedType === AnimeType.TV && (
+          {/* Çok Parçalı (Film hariç tüm türler için) */}
+          {watchedType !== AnimeType.MOVIE && (
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="isMultiPart"
