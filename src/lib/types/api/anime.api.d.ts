@@ -40,7 +40,7 @@ export interface GetAllAnimeSeriesResponse {
 
 // Anime API istek tipleri
 export type CreateAnimeSeriesRequest = CreateAnimeSeriesInput;
-export type GetAnimeSeriesRequest = AnimeSeriesFilters;
+export type GetAnimeSeriesRequest = AnimeSeriesFilters; 
 
 // İlişki API tipleri
 export interface CreateAnimeRelationRequest {
