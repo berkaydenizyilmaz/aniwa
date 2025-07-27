@@ -403,7 +403,7 @@ model AnimeSeries {
   favouritedBy      FavouriteAnimeSeries[]
   trackedByUsers    UserAnimeTracking[] @relation("AnimeTrackedByUsers")
 
-    // Çok Parçalı Kontrol
+  // Çok Parçalı Kontrol
   isMultiPart       Boolean           @default(false) // Çok sezonlu mu?
 
   // İlişkiler

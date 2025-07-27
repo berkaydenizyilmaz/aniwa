@@ -10,6 +10,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Badge } from '@/components/ui/badge';
+import { CheckIcon, ChevronsUpDownIcon, XIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { AnimeType, AnimeStatus, Season, Source, AnimeSeries, Genre, Tag, Studio } from '@prisma/client';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
@@ -22,6 +27,112 @@ interface AnimeFormDialogProps {
   onOpenChange: (open: boolean) => void;
   anime?: AnimeSeries & { genres?: Genre[]; tags?: Tag[]; studios?: Studio[] } | null;
   onSuccess?: () => void;
+}
+
+// Multi-select komponenti
+interface MultiSelectProps {
+  options: { id: string; name: string }[];
+  selectedIds: string[];
+  onSelectionChange: (ids: string[]) => void;
+  placeholder: string;
+  searchPlaceholder: string;
+  disabled?: boolean;
+}
+
+function MultiSelect({ options, selectedIds, onSelectionChange, placeholder, searchPlaceholder, disabled }: MultiSelectProps) {
+  const [open, setOpen] = useState(false);
+
+  const selectedItems = options.filter(option => selectedIds.includes(option.id));
+
+  const handleSelect = (id: string) => {
+    if (selectedIds.includes(id)) {
+      onSelectionChange(selectedIds.filter(selectedId => selectedId !== id));
+    } else {
+      onSelectionChange([...selectedIds, id]);
+    }
+  };
+
+  const handleRemove = (id: string) => {
+    onSelectionChange(selectedIds.filter(selectedId => selectedId !== id));
+  };
+
+  return (
+    <div className="space-y-2">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between h-9 border-2 border-border/60 data-[placeholder]:text-muted-foreground focus-visible:border-primary/80 focus-visible:ring-primary/20 transition-colors outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 hover:bg-transparent hover:text-foreground hover:border-border/60"
+            disabled={disabled}
+          >
+            {selectedItems.length > 0 ? (
+              <span className="text-sm">
+                {selectedItems.length} öğe seçildi
+              </span>
+            ) : (
+              <span className="text-muted-foreground text-sm">{placeholder}</span>
+            )}
+            <ChevronsUpDownIcon className="size-4 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[400px] p-0" align="start">
+          <Command className="rounded-md border shadow-md">
+            <CommandInput placeholder={searchPlaceholder} className="border-0 focus:ring-0 placeholder:text-muted-foreground" />
+            <CommandList className="max-h-[300px]">
+              <CommandEmpty className="text-muted-foreground py-6">Sonuç bulunamadı.</CommandEmpty>
+              <CommandGroup>
+                {options.map((option) => (
+                  <CommandItem
+                    key={option.id}
+                    onSelect={() => handleSelect(option.id)}
+                    className="relative flex w-full items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground group"
+                  >
+                    <CheckIcon
+                      className={cn(
+                        "absolute right-2 size-4",
+                        selectedIds.includes(option.id) ? "opacity-100" : "opacity-0",
+                        "group-focus:text-accent-foreground"
+                      )}
+                    />
+                    <span className={cn(
+                      selectedIds.includes(option.id) ? "font-medium" : ""
+                    )}>
+                      {option.name}
+                    </span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      
+      {/* Seçilen öğeleri göster */}
+      {selectedItems.length > 0 && (
+        <div className="flex flex-wrap gap-2 p-2 bg-muted/30 rounded-md border border-border/50">
+          {selectedItems.map((item) => (
+            <Badge 
+              key={item.id} 
+              variant="secondary" 
+              className="text-xs bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors group"
+            >
+              {item.name}
+              <button
+                type="button"
+                onClick={() => handleRemove(item.id)}
+                className="ml-1.5 rounded-full p-0.5 hover:bg-primary/20 transition-colors outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-1"
+              >
+                <XIcon className="h-3 w-3 text-primary/70 group-hover:text-primary" />
+                <span className="sr-only">Kaldır</span>
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeFormDialogProps) {
@@ -523,28 +634,14 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             {/* Türler */}
             <div className="space-y-2">
               <Label>Türler</Label>
-              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
-                {genres.map((genre) => (
-                  <div key={genre.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`genre-${genre.id}`}
-                      checked={watch('genreIds')?.includes(genre.id) || false}
-                      onCheckedChange={(checked) => {
-                        const currentIds = watch('genreIds') || [];
-                        if (checked) {
-                          setValue('genreIds', [...currentIds, genre.id]);
-                        } else {
-                          setValue('genreIds', currentIds.filter(id => id !== genre.id));
-                        }
-                      }}
-                      disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-                    />
-                    <Label htmlFor={`genre-${genre.id}`} className="text-sm cursor-pointer">
-                      {genre.name}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              <MultiSelect
+                options={genres}
+                selectedIds={watch('genreIds') || []}
+                onSelectionChange={(ids) => setValue('genreIds', ids)}
+                placeholder="Tür seçin..."
+                searchPlaceholder="Tür ara..."
+                disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              />
               {errors.genreIds && (
                 <p className="text-sm text-destructive">{errors.genreIds.message}</p>
               )}
@@ -553,28 +650,14 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             {/* Etiketler */}
             <div className="space-y-2">
               <Label>Etiketler</Label>
-              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
-                {tags.map((tag) => (
-                  <div key={tag.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`tag-${tag.id}`}
-                      checked={watch('tagIds')?.includes(tag.id) || false}
-                      onCheckedChange={(checked) => {
-                        const currentIds = watch('tagIds') || [];
-                        if (checked) {
-                          setValue('tagIds', [...currentIds, tag.id]);
-                        } else {
-                          setValue('tagIds', currentIds.filter(id => id !== tag.id));
-                        }
-                      }}
-                      disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-                    />
-                    <Label htmlFor={`tag-${tag.id}`} className="text-sm cursor-pointer">
-                      {tag.name}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              <MultiSelect
+                options={tags}
+                selectedIds={watch('tagIds') || []}
+                onSelectionChange={(ids) => setValue('tagIds', ids)}
+                placeholder="Etiket seçin..."
+                searchPlaceholder="Etiket ara..."
+                disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              />
               {errors.tagIds && (
                 <p className="text-sm text-destructive">{errors.tagIds.message}</p>
               )}
@@ -583,28 +666,14 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
             {/* Stüdyolar */}
             <div className="space-y-2">
               <Label>Stüdyolar</Label>
-              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
-                {studios.map((studio) => (
-                  <div key={studio.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`studio-${studio.id}`}
-                      checked={watch('studioIds')?.includes(studio.id) || false}
-                      onCheckedChange={(checked) => {
-                        const currentIds = watch('studioIds') || [];
-                        if (checked) {
-                          setValue('studioIds', [...currentIds, studio.id]);
-                        } else {
-                          setValue('studioIds', currentIds.filter(id => id !== studio.id));
-                        }
-                      }}
-                      disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-                    />
-                    <Label htmlFor={`studio-${studio.id}`} className="text-sm cursor-pointer">
-                      {studio.name}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              <MultiSelect
+                options={studios}
+                selectedIds={watch('studioIds') || []}
+                onSelectionChange={(ids) => setValue('studioIds', ids)}
+                placeholder="Stüdyo seçin..."
+                searchPlaceholder="Stüdyo ara..."
+                disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+              />
               {errors.studioIds && (
                 <p className="text-sm text-destructive">{errors.studioIds.message}</p>
               )}
