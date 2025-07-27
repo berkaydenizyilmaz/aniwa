@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { AnimeSeries, Genre, Tag, Studio, AnimeType } from '@prisma/client';
+import { AnimeSeries, Genre, Tag, Studio, AnimeType, AnimeStatus, Season, Source } from '@prisma/client';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { toast } from 'sonner';
@@ -46,14 +46,14 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
       englishTitle: '',
       japaneseTitle: '',
       synonyms: [],
-      type: 'TV',
-      status: 'FINISHED',
+      type: AnimeType.TV,
+      status: AnimeStatus.FINISHED,
       episodes: 0,
       duration: 0,
       isAdult: false,
-      season: 'SPRING',
+      season: Season.SPRING,
       seasonYear: new Date().getFullYear(),
-      source: 'ORIGINAL',
+      source: Source.ORIGINAL,
       countryOfOrigin: 'Japan',
       description: '',
       isMultiPart: false,
@@ -69,7 +69,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
       setValue('seasonYear', undefined);
       setValue('episodes', 1); // Film için bölüm sayısı 1
     } else if (watchedType && !watch('season')) {
-      setValue('season', 'SPRING');
+      setValue('season', Season.SPRING);
       setValue('seasonYear', new Date().getFullYear());
     }
   }, [watchedType, setValue, watch]);
@@ -87,10 +87,10 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
         episodes: anime.episodes || 0,
         duration: anime.duration || 0,
         isAdult: anime.isAdult || false,
-        season: anime.season || (anime.type !== AnimeType.MOVIE ? 'SPRING' : undefined),
+        season: anime.season || (anime.type !== AnimeType.MOVIE ? Season.SPRING : undefined),
         seasonYear: anime.seasonYear || (anime.type !== AnimeType.MOVIE ? new Date().getFullYear() : undefined),
         releaseDate: anime.releaseDate ? new Date(anime.releaseDate) : undefined,
-        source: anime.source || 'ORIGINAL',
+        source: anime.source || Source.ORIGINAL,
         countryOfOrigin: anime.countryOfOrigin || 'Japan',
         description: anime.description || '',
         isMultiPart: anime.isMultiPart,
@@ -108,14 +108,14 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
         englishTitle: '',
         japaneseTitle: '',
         synonyms: [],
-        type: 'TV',
-        status: 'FINISHED',
+        type: AnimeType.TV,
+        status: AnimeStatus.FINISHED,
         episodes: 0,
         duration: 0,
         isAdult: false,
-        season: 'SPRING',
+        season: Season.SPRING,
         seasonYear: new Date().getFullYear(),
-        source: 'ORIGINAL',
+        source: Source.ORIGINAL,
         countryOfOrigin: 'Japan',
         description: '',
         isMultiPart: false,
@@ -191,7 +191,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[1200px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEdit ? 'Anime Düzenle' : 'Yeni Anime Ekle'}
