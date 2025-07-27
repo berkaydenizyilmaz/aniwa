@@ -101,7 +101,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           </Label>
           <Input
             id="anilistId"
-            type="text"
+            type="number"
             placeholder="AniList ID"
             {...register('anilistId', { valueAsNumber: true })}
             disabled={isLoading(loadingKey)}
@@ -118,7 +118,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           </Label>
           <Input
             id="idMal"
-            type="text"
+            type="number"
             placeholder="MAL ID"
             {...register('idMal', { valueAsNumber: true })}
             disabled={isLoading(loadingKey)}
@@ -184,7 +184,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
             </Label>
             <Input
               id="episodes"
-              type="text"
+              type="number"
               placeholder="Toplam bölüm sayısı"
               {...register('episodes', { valueAsNumber: true })}
               disabled={isLoading(loadingKey)}
@@ -203,7 +203,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
             </Label>
             <Input
               id="duration"
-              type="text"
+              type="number"
               placeholder={watchedType === AnimeType.MOVIE ? "Film süresi" : "Bölüm süresi"}
               {...register('duration', { valueAsNumber: true })}
               disabled={isLoading(loadingKey)}
@@ -243,7 +243,7 @@ export function AnimeBasicInfoSection({ form, isLoading, loadingKey }: AnimeBasi
           <Label htmlFor="seasonYear">Yıl</Label>
           <Input
             id="seasonYear"
-            type="text"
+            type="number"
             placeholder="2024"
             {...register('seasonYear', { valueAsNumber: true })}
             disabled={isLoading(loadingKey)}
