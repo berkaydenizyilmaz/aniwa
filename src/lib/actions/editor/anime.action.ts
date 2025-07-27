@@ -19,17 +19,14 @@ export async function createAnimeSeriesAction(data: CreateAnimeSeriesInput) {
 
     // Session kontrolü
     const session = await getServerSession(authConfig);
-    if (!session?.user) {
-      return { success: false, error: 'Oturum bulunamadı' };
-    }
 
     // Business logic
-    const result = await createAnimeSeriesBusiness(validatedData, session.user.id);
+    const result = await createAnimeSeriesBusiness(validatedData, session!.user.id);
 
     // Cache revalidation
     revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
 
-    return { success: true, data: result };
+    return result;
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'createAnimeSeriesAction',
@@ -43,14 +40,11 @@ export async function getAnimeSeriesAction(filters: AnimeSeriesFilters) {
   try {
     // Session kontrolü
     const session = await getServerSession(authConfig);
-    if (!session?.user) {
-      return { success: false, error: 'Oturum bulunamadı' };
-    }
 
     // Business logic
-    const result = await getAllAnimeSeriesBusiness(filters);
+    const result = await getAllAnimeSeriesBusiness(filters, { id: session!.user.id });
 
-    return { success: true, data: result };
+    return result;
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getAnimeSeriesAction',
@@ -64,14 +58,11 @@ export async function getAnimeSeriesByIdAction(id: string) {
   try {
     // Session kontrolü
     const session = await getServerSession(authConfig);
-    if (!session?.user) {
-      return { success: false, error: 'Oturum bulunamadı' };
-    }
 
     // Business logic
-    const result = await getAnimeSeriesByIdBusiness(id, session.user.id);
+    const result = await getAnimeSeriesByIdBusiness(id, session!.user.id);
 
-    return { success: true, data: result };
+    return result;
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getAnimeSeriesByIdAction',
@@ -88,17 +79,14 @@ export async function updateAnimeSeriesAction(id: string, data: UpdateAnimeSerie
 
     // Session kontrolü
     const session = await getServerSession(authConfig);
-    if (!session?.user) {
-      return { success: false, error: 'Oturum bulunamadı' };
-    }
 
     // Business logic
-    const result = await updateAnimeSeriesBusiness(id, validatedData, session.user.id);
+    const result = await updateAnimeSeriesBusiness(id, validatedData, session!.user.id);
 
     // Cache revalidation
     revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
 
-    return { success: true, data: result };
+    return result;
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'updateAnimeSeriesAction',
@@ -112,12 +100,9 @@ export async function deleteAnimeSeriesAction(id: string) {
   try {
     // Session kontrolü
     const session = await getServerSession(authConfig);
-    if (!session?.user) {
-      return { success: false, error: 'Oturum bulunamadı' };
-    }
 
     // Business logic
-    await deleteAnimeSeriesBusiness(id, session.user.id);
+    await deleteAnimeSeriesBusiness(id, session!.user.id);
 
     // Cache revalidation
     revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
@@ -136,14 +121,11 @@ export async function getAllGenresAction() {
   try {
     // Session kontrolü
     const session = await getServerSession(authConfig);
-    if (!session?.user) {
-      return { success: false, error: 'Oturum bulunamadı' };
-    }
 
     // Business logic
-    const result = await getGenresBusiness(session.user.id);
+    const result = await getGenresBusiness(session!.user.id);
 
-    return { success: true, data: result };
+    return result;
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getAllGenresAction',
@@ -157,14 +139,11 @@ export async function getAllTagsAction() {
   try {
     // Session kontrolü
     const session = await getServerSession(authConfig);
-    if (!session?.user) {
-      return { success: false, error: 'Oturum bulunamadı' };
-    }
 
     // Business logic
-    const result = await getTagsBusiness(session.user.id);
+    const result = await getTagsBusiness(session!.user.id);
 
-    return { success: true, data: result };
+    return result;
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getAllTagsAction',
@@ -178,14 +157,11 @@ export async function getAllStudiosAction() {
   try {
     // Session kontrolü
     const session = await getServerSession(authConfig);
-    if (!session?.user) {
-      return { success: false, error: 'Oturum bulunamadı' };
-    }
-
+    
     // Business logic
-    const result = await getStudiosBusiness(session.user.id);
+    const result = await getStudiosBusiness(session!.user.id);
 
-    return { success: true, data: result };
+    return result;
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getAllStudiosAction',

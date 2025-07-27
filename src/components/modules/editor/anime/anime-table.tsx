@@ -6,7 +6,6 @@ import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, P
 import { AnimeSeries } from '@prisma/client';
 import { getAnimeSeriesAction, deleteAnimeSeriesAction } from '@/lib/actions/editor/anime.action';
 import { toast } from 'sonner';
-import { GetAllAnimeSeriesResponse } from '@/lib/types/api/anime.api';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -56,13 +55,15 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
         if (searchTerm) filters.search = searchTerm;
         const result = await getAnimeSeriesAction(filters);
         if (!result.success) {
-          toast.error(result.error || 'Anime serileri yüklenirken bir hata oluştu');
+          const errorMessage = 'error' in result ? result.error : 'Anime serileri yüklenirken bir hata oluştu';
+          toast.error(errorMessage);
           return;
         }
-        const data = result.data as GetAllAnimeSeriesResponse;
-        setAnimeSeries(data.animeSeries);
-        setTotalPages(data.totalPages);
-        setTotalAnime(data.total);
+        if (result.data) {
+          setAnimeSeries(result.data.animeSeries);
+          setTotalPages(result.data.totalPages);
+          setTotalAnime(result.data.total);
+        }
       } catch (error) {
         console.error('Fetch anime series error:', error);
         toast.error('Anime serileri yüklenirken bir hata oluştu');
@@ -96,7 +97,8 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
       const result = await deleteAnimeSeriesAction(selectedAnime.id);
 
       if (!result.success) {
-        toast.error(result.error || 'Silme işlemi başarısız oldu');
+        const errorMessage = 'error' in result ? result.error : 'Silme işlemi başarısız oldu';
+        toast.error(errorMessage);
         return;
       }
 
@@ -111,11 +113,10 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
       };
       if (searchTerm) filters.search = searchTerm;
       const refreshResult = await getAnimeSeriesAction(filters);
-      if (refreshResult.success) {
-        const data = refreshResult.data as GetAllAnimeSeriesResponse;
-        setAnimeSeries(data.animeSeries);
-        setTotalPages(data.totalPages);
-        setTotalAnime(data.total);
+      if (refreshResult.success && refreshResult.data) {
+        setAnimeSeries(refreshResult.data.animeSeries);
+        setTotalPages(refreshResult.data.totalPages);
+        setTotalAnime(refreshResult.data.total);
       }
 
     } catch (error) {
@@ -201,7 +202,7 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {animeSeries.map((anime) => (
+            {animeSeries?.map((anime) => (
               <TableRow key={anime.id}>
                 <TableCell className="font-medium">{anime.title}</TableCell>
                 <TableCell>{anime.type}</TableCell>

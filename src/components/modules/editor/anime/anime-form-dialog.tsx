@@ -1,43 +1,37 @@
 'use client';
 
-import { useEffect } from 'react';  
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { createAnimeSeriesAction, updateAnimeSeriesAction } from '@/lib/actions/editor/anime.action';
-import { createAnimeSeriesSchema, updateAnimeSeriesSchema, type CreateAnimeSeriesInput, type UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
-import { toast } from 'sonner';
-import { AnimeSeries, AnimeType, AnimeStatus, Season, Source } from '@prisma/client';
+import { AnimeType, AnimeStatus, Season, Source, AnimeSeries, Genre, Tag, Studio } from '@prisma/client';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { toast } from 'sonner';
+import { createAnimeSeriesAction, updateAnimeSeriesAction, getAllGenresAction, getAllTagsAction, getAllStudiosAction } from '@/lib/actions/editor/anime.action';
+import { CreateAnimeSeriesInput, UpdateAnimeSeriesInput, createAnimeSeriesSchema, updateAnimeSeriesSchema } from '@/lib/schemas/anime.schema';
 
 interface AnimeFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  anime?: AnimeSeries | null;
+  anime?: AnimeSeries & { genres?: Genre[]; tags?: Tag[]; studios?: Studio[] } | null;
   onSuccess?: () => void;
 }
 
 export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeFormDialogProps) {
   const isEdit = !!anime;
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+
+  // İlişki verileri için state'ler
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [studios, setStudios] = useState<Studio[]>([]);
 
   const {
     register,
@@ -102,6 +96,9 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
         coverImage: anime.coverImage || '',
         bannerImage: anime.bannerImage || '',
         trailer: anime.trailer || '',
+        genreIds: [],
+        tagIds: [],
+        studioIds: [],
       });
     } else {
       reset({
@@ -123,9 +120,41 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
         coverImage: '',
         bannerImage: '',
         trailer: '',
+        genreIds: [],
+        tagIds: [],
+        studioIds: [],
       });
     }
   }, [anime, reset]);
+
+  // İlişki verilerini yükle
+  useEffect(() => {
+    const loadRelationData = async () => {
+      try {
+        const [genresResult, tagsResult, studiosResult] = await Promise.all([
+          getAllGenresAction(),
+          getAllTagsAction(),
+          getAllStudiosAction()
+        ]);
+
+        if (genresResult.success && genresResult.data) {
+          setGenres(genresResult.data.genres);
+        }
+        if (tagsResult.success && tagsResult.data) {
+          setTags(tagsResult.data.tags);
+        }
+        if (studiosResult.success && studiosResult.data) {
+          setStudios(studiosResult.data.studios);
+        }
+      } catch (error) {
+        console.error('İlişki verileri yüklenirken hata:', error);
+      }
+    };
+
+    if (open) {
+      loadRelationData();
+    }
+  }, [open]);
 
   const onSubmit = async (data: CreateAnimeSeriesInput | UpdateAnimeSeriesInput) => {
     if (isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)) return;
@@ -142,7 +171,10 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
       }
 
       if (!result.success) {
-        toast.error(result.error || `${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
+        const errorMessage = 'error' in result ? result.error :
+          'details' in result && result.details ? String(result.details) :
+            `${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`;
+        toast.error(errorMessage);
         return;
       }
 
@@ -422,7 +454,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
           {/* Görsel İçerik */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Görsel İçerik</h3>
-            
+
             {/* Kapak Resmi */}
             <div className="space-y-2">
               <Label htmlFor="coverImage">Kapak Resmi URL</Label>
@@ -465,6 +497,101 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
               />
               {errors.trailer && (
                 <p className="text-sm text-destructive">{errors.trailer.message}</p>
+              )}
+            </div>
+          </div>
+
+          {/* İlişkiler */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">İlişkiler</h3>
+
+            {/* Türler */}
+            <div className="space-y-2">
+              <Label>Türler</Label>
+              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
+                {genres.map((genre) => (
+                  <div key={genre.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`genre-${genre.id}`}
+                      checked={watch('genreIds')?.includes(genre.id) || false}
+                      onCheckedChange={(checked) => {
+                        const currentIds = watch('genreIds') || [];
+                        if (checked) {
+                          setValue('genreIds', [...currentIds, genre.id]);
+                        } else {
+                          setValue('genreIds', currentIds.filter(id => id !== genre.id));
+                        }
+                      }}
+                      disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+                    />
+                    <Label htmlFor={`genre-${genre.id}`} className="text-sm cursor-pointer">
+                      {genre.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              {errors.genreIds && (
+                <p className="text-sm text-destructive">{errors.genreIds.message}</p>
+              )}
+            </div>
+
+            {/* Etiketler */}
+            <div className="space-y-2">
+              <Label>Etiketler</Label>
+              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
+                {tags.map((tag) => (
+                  <div key={tag.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`tag-${tag.id}`}
+                      checked={watch('tagIds')?.includes(tag.id) || false}
+                      onCheckedChange={(checked) => {
+                        const currentIds = watch('tagIds') || [];
+                        if (checked) {
+                          setValue('tagIds', [...currentIds, tag.id]);
+                        } else {
+                          setValue('tagIds', currentIds.filter(id => id !== tag.id));
+                        }
+                      }}
+                      disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+                    />
+                    <Label htmlFor={`tag-${tag.id}`} className="text-sm cursor-pointer">
+                      {tag.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              {errors.tagIds && (
+                <p className="text-sm text-destructive">{errors.tagIds.message}</p>
+              )}
+            </div>
+
+            {/* Stüdyolar */}
+            <div className="space-y-2">
+              <Label>Stüdyolar</Label>
+              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
+                {studios.map((studio) => (
+                  <div key={studio.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`studio-${studio.id}`}
+                      checked={watch('studioIds')?.includes(studio.id) || false}
+                      onCheckedChange={(checked) => {
+                        const currentIds = watch('studioIds') || [];
+                        if (checked) {
+                          setValue('studioIds', [...currentIds, studio.id]);
+                        } else {
+                          setValue('studioIds', currentIds.filter(id => id !== studio.id));
+                        }
+                      }}
+                      disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+                    />
+                    <Label htmlFor={`studio-${studio.id}`} className="text-sm cursor-pointer">
+                      {studio.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              {errors.studioIds && (
+                <p className="text-sm text-destructive">{errors.studioIds.message}</p>
               )}
             </div>
           </div>
