@@ -36,25 +36,41 @@ export function CloudinaryUpload({
     setProgress(0);
 
     try {
+      // Environment variables kontrolü
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+
+      if (!cloudName || !uploadPreset) {
+        throw new Error('Cloudinary configuration missing. Please check environment variables.');
+      }
+
+      console.log('Uploading to Cloudinary:', { cloudName, uploadPreset, fileName: file.name });
+
       // FormData oluştur
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '');
+      formData.append('upload_preset', uploadPreset);
 
       // Upload işlemi
       const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
         {
           method: 'POST',
           body: formData,
         }
       );
 
+      console.log('Cloudinary response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Upload failed');
+        const errorText = await response.text();
+        console.error('Cloudinary error response:', errorText);
+        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+      console.log('Cloudinary success response:', data);
+      
       const url = data.secure_url;
       
       setUploadedUrl(url);
@@ -62,7 +78,8 @@ export function CloudinaryUpload({
       onUploadComplete(url);
     } catch (error) {
       console.error('Upload error:', error);
-      onUploadError('Upload failed. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed. Please try again.';
+      onUploadError(errorMessage);
     } finally {
       setUploading(false);
     }

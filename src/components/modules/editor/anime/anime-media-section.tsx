@@ -1,14 +1,17 @@
 'use client';
 
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreateAnimeSeriesInput, UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 import { LoadingKey } from '@/lib/constants/loading.constants';
+import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
+import { CloudinaryUpload } from '@/components/ui/cloudinary-upload';
 
 interface AnimeMediaSectionProps {
   form: {
     register: UseFormRegister<CreateAnimeSeriesInput | UpdateAnimeSeriesInput>;
+    setValue: UseFormSetValue<CreateAnimeSeriesInput | UpdateAnimeSeriesInput>;
     formState: { errors: FieldErrors<CreateAnimeSeriesInput | UpdateAnimeSeriesInput> };
   };
   isLoading: (key: LoadingKey) => boolean;
@@ -16,7 +19,15 @@ interface AnimeMediaSectionProps {
 }
 
 export function AnimeMediaSection({ form, isLoading, loadingKey }: AnimeMediaSectionProps) {
-  const { register, formState: { errors } } = form;
+  const { register, setValue, formState: { errors } } = form;
+
+  const handleCoverUpload = (url: string) => {
+    setValue('coverImage', url);
+  };
+
+  const handleBannerUpload = (url: string) => {
+    setValue('bannerImage', url);
+  };
 
   return (
     <div className="space-y-6">
@@ -25,16 +36,16 @@ export function AnimeMediaSection({ form, isLoading, loadingKey }: AnimeMediaSec
         <p className="text-sm text-muted-foreground">Anime&apos;nin görsel içeriklerini ekleyin</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Kapak Resmi */}
-        <div className="space-y-2">
-          <Label htmlFor="coverImage">Kapak Resmi URL</Label>
-          <Input
-            id="coverImage"
-            type="url"
-            placeholder="https://example.com/cover.jpg"
-            {...register('coverImage')}
+        <div className="space-y-3">
+          <Label htmlFor="coverImage">Kapak Resmi</Label>
+          <CloudinaryUpload
+            onUploadComplete={handleCoverUpload}
+            onUploadError={(error) => console.error('Cover upload error:', error)}
             disabled={isLoading(loadingKey)}
+            accept={UPLOAD_CONFIGS.ANIME_COVER.accept}
+            maxSize={UPLOAD_CONFIGS.ANIME_COVER.maxSize}
           />
           {errors.coverImage && (
             <p className="text-sm text-destructive">{errors.coverImage.message}</p>
@@ -42,14 +53,14 @@ export function AnimeMediaSection({ form, isLoading, loadingKey }: AnimeMediaSec
         </div>
 
         {/* Banner Resmi */}
-        <div className="space-y-2">
-          <Label htmlFor="bannerImage">Banner Resmi URL</Label>
-          <Input
-            id="bannerImage"
-            type="url"
-            placeholder="https://example.com/banner.jpg"
-            {...register('bannerImage')}
+        <div className="space-y-3">
+          <Label htmlFor="bannerImage">Banner Resmi</Label>
+          <CloudinaryUpload
+            onUploadComplete={handleBannerUpload}
+            onUploadError={(error) => console.error('Banner upload error:', error)}
             disabled={isLoading(loadingKey)}
+            accept={UPLOAD_CONFIGS.ANIME_BANNER.accept}
+            maxSize={UPLOAD_CONFIGS.ANIME_BANNER.maxSize}
           />
           {errors.bannerImage && (
             <p className="text-sm text-destructive">{errors.bannerImage.message}</p>

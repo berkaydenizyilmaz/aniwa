@@ -216,7 +216,7 @@ export function AnimeFormDialog({ open, onOpenChange, anime, onSuccess }: AnimeF
 
           {/* Görsel İçerik */}
           <AnimeMediaSection 
-            form={{ register, formState: { errors } }} 
+            form={{ register, setValue, formState: { errors } }} 
             isLoading={isLoading}
             loadingKey={getFormLoadingKey()}
           />
