@@ -8,7 +8,7 @@ Amaç: Editör, Aniwa'ya yeni bir anime serisi veya filmi ekleyecek. aniwaPublic
 
     Toplanacak Tek Alan:
 
-        type (Anime Tipi): Seçenekler: TV, MOVIE, TV_SHORT, SPECIAL, OVA, ONA, MUSIC. (Zorunlu)
+        type (Anime Tipi): Seçenekler: TV, MOVIE, TV_SHORT, SPECIAL, OVA, ONA. (Zorunlu)
 
     Akış İlerlemesi: Editör bu alanı seçer ve "Devam Et" butonuna tıklar. Bu seçim, bir sonraki ana formun yapısını belirler.
 
