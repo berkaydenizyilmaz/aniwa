@@ -79,7 +79,7 @@ export function SinglePartAnimeForm({
         title: anime.title,
         englishTitle: anime.englishTitle || '',
         japaneseTitle: anime.japaneseTitle || '',
-        synonyms: anime.synonyms || [],
+        synonyms: Array.isArray(anime.synonyms) ? anime.synonyms.join(', ') : anime.synonyms || '',
         synopsis: anime.synopsis || '',
         episodes: 1,
         duration: anime.duration || undefined,
@@ -95,6 +95,7 @@ export function SinglePartAnimeForm({
         anilistId: anime.anilistId || undefined,
         malId: anime.malId || undefined,
         trailer: anime.trailer || '',
+        isMultiPart: false,
       });
     } else {
       reset({
@@ -102,7 +103,7 @@ export function SinglePartAnimeForm({
         title: '',
         englishTitle: '',
         japaneseTitle: '',
-        synonyms: [],
+        synonyms: '',
         synopsis: '',
         episodes: 1,
         duration: undefined,
@@ -118,6 +119,7 @@ export function SinglePartAnimeForm({
         anilistId: undefined,
         malId: undefined,
         trailer: '',
+        isMultiPart: false,
       });
     }
   }, [anime, reset, currentType]);
@@ -185,6 +187,7 @@ export function SinglePartAnimeForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full max-w-4xl">
+
       {/* Temel Bilgiler */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Durum */}

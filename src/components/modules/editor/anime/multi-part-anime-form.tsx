@@ -77,7 +77,7 @@ export function MultiPartAnimeForm({
         title: anime.title,
         englishTitle: anime.englishTitle || '',
         japaneseTitle: anime.japaneseTitle || '',
-        synonyms: anime.synonyms || [],
+        synonyms: Array.isArray(anime.synonyms) ? anime.synonyms.join(', ') : anime.synonyms || '',
         synopsis: anime.synopsis || '',
 
         status: anime.status,
@@ -86,7 +86,7 @@ export function MultiPartAnimeForm({
         seasonYear: anime.seasonYear || undefined,
         releaseDate: anime.releaseDate?.toISOString() || undefined,
         source: anime.source || undefined,
-        countryOfOrigin: anime.countryOfOrigin || '',
+        countryOfOrigin: anime.countryOfOrigin || undefined,
         anilistAverageScore: anime.anilistAverageScore || undefined,
         anilistPopularity: anime.anilistPopularity || undefined,
         anilistId: anime.anilistId || undefined,
@@ -99,7 +99,7 @@ export function MultiPartAnimeForm({
         title: '',
         englishTitle: '',
         japaneseTitle: '',
-        synonyms: [],
+        synonyms: '',
         synopsis: '',
 
         status: AnimeStatus.RELEASING,
@@ -108,12 +108,13 @@ export function MultiPartAnimeForm({
         seasonYear: undefined,
         releaseDate: undefined,
         source: undefined,
-        countryOfOrigin: '',
+        countryOfOrigin: undefined,
         anilistAverageScore: undefined,
         anilistPopularity: undefined,
         anilistId: undefined,
         malId: undefined,
         trailer: '',
+        isMultiPart: true,
       });
     }
   }, [anime, selectedType, reset]);
@@ -181,6 +182,8 @@ export function MultiPartAnimeForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full max-w-4xl">
+
+      
       {/* Temel Bilgiler */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Tür (Edit mode'da göster) */}
