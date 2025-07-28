@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { ANIME } from '@/lib/constants/anime.constants';
-import { AnimeStatus, AnimeType, Season, Source } from '@prisma/client';
+import { AnimeStatus, AnimeType, Season, Source, CountryOfOrigin } from '@prisma/client';
 
 // İlk form - Anime tipi seçimi
 export const selectAnimeTypeSchema = z.object({

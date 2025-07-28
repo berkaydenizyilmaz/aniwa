@@ -19,7 +19,7 @@ import { createAnimeSeriesAction, updateAnimeSeriesAction, getAllGenresAction, g
 import { createAnimeSeriesSchema, updateAnimeSeriesSchema } from '@/lib/schemas/anime.schema';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { AnimeSeries, AnimeType, AnimeStatus, Season, Source, Genre, Tag, Studio } from '@prisma/client';
+import { AnimeSeries, AnimeType, AnimeStatus, Season, Source, Genre, Tag, Studio, CountryOfOrigin } from '@prisma/client';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { MultiSelect } from '@/components/ui/multi-select';
@@ -84,7 +84,7 @@ export function MultiPartAnimeForm({
         isAdult: anime.isAdult || false,
         season: anime.season || undefined,
         seasonYear: anime.seasonYear || undefined,
-        releaseDate: anime.releaseDate || undefined,
+        releaseDate: anime.releaseDate?.toISOString() || undefined,
         source: anime.source || undefined,
         countryOfOrigin: anime.countryOfOrigin || '',
         anilistAverageScore: anime.anilistAverageScore || undefined,
@@ -389,13 +389,21 @@ export function MultiPartAnimeForm({
       {/* Country of Origin */}
       <div className="space-y-2">
         <Label htmlFor="countryOfOrigin">Köken Ülke</Label>
-        <Input
-          id="countryOfOrigin"
-          type="text"
-          placeholder="Köken ülke"
-          {...register('countryOfOrigin')}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
+          <Select
+          value={watch('countryOfOrigin')}
+          onValueChange={(value) => setValue('countryOfOrigin', value as CountryOfOrigin)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Köken ülke seçin" />
+          </SelectTrigger>  
+          <SelectContent>
+            {Object.values(CountryOfOrigin).map((country) => (
+              <SelectItem key={country} value={country}>
+                {country}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {errors.countryOfOrigin && (
           <p className="text-sm text-destructive">{errors.countryOfOrigin.message}</p>
         )}

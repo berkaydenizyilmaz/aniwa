@@ -139,6 +139,13 @@ enum RelationType {
   PARALLEL      // Paralel hikaye
 }
 
+// Ülke Kökeni
+enum CountryOfOrigin {
+  JAPAN       // Japonya
+  SOUTH_KOREA // Güney Kore
+  CHINA       // Çin
+}
+
 // =============================================================================
 // DOĞRULAMA VE GÜVENLİK MODELLERİ
 // =============================================================================
@@ -379,7 +386,7 @@ model AnimeSeries {
   seasonYear        Int?              // Çıkış yılı
   releaseDate       DateTime?         // Yayınlanma tarihi
   source            Source?           // Kaynak materyal
-  countryOfOrigin   String?           // Köken ülke
+  countryOfOrigin   CountryOfOrigin?  // Köken ülke
 
   // Puanlama ve Popülerlik
   anilistAverageScore Float?

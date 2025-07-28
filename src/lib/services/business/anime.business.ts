@@ -24,7 +24,7 @@ import {
 import { UploadService } from "@/lib/services/extends-api/cloudinary/upload.service";
 import { CloudinaryService } from "@/lib/services/extends-api/cloudinary/cloudinary.service";
 import { UPLOAD_CONFIGS } from "@/lib/constants/cloudinary.constants";
-import { Prisma, AnimeType, AnimeStatus, Season, Source } from "@prisma/client";
+import { Prisma, AnimeType, AnimeStatus, Season, Source, CountryOfOrigin } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/utils/logger";
 import { EVENTS } from "@/lib/constants/events.constants";
@@ -123,7 +123,7 @@ export async function createAnimeSeriesBusiness(
           seasonYear: data.seasonYear === '' ? null : data.seasonYear,
           releaseDate: data.releaseDate,
           source: data.source as Source,
-          countryOfOrigin: data.countryOfOrigin,
+          countryOfOrigin: data.countryOfOrigin as CountryOfOrigin,
           coverImage: coverImageUrl,
           bannerImage: bannerImageUrl,
           synopsis: data.synopsis,
@@ -439,7 +439,7 @@ export async function updateAnimeSeriesBusiness(
           seasonYear: data.seasonYear === '' ? null : data.seasonYear,
           releaseDate: data.releaseDate,
           source: data.source as Source,
-          countryOfOrigin: data.countryOfOrigin,
+          countryOfOrigin: data.countryOfOrigin as CountryOfOrigin,
           coverImage: coverImageUrl,
           bannerImage: bannerImageUrl,
           synopsis: data.synopsis,
