@@ -18,7 +18,7 @@ import {
 import { createAnimeSeriesAction, updateAnimeSeriesAction } from '@/lib/actions/editor/anime.action';
 import { createAnimeSeriesSchema, updateAnimeSeriesSchema, type CreateAnimeSeriesInput, type UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 import { toast } from 'sonner';
-import { AnimeSeries, AnimeStatus, Season } from '@prisma/client';
+import { AnimeSeries, AnimeStatus, Season, Source } from '@prisma/client';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 
@@ -263,6 +263,21 @@ export function SinglePartAnimeForm({
         </div>
       </div>
 
+      {/* Synonyms */}
+      <div className="space-y-2">
+        <Label htmlFor="synonyms">Alternatif Başlıklar</Label>
+        <Input
+          id="synonyms"
+          type="text"
+          placeholder="Virgülle ayrılmış alternatif başlıklar"
+          {...register('synonyms')}
+          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+        />
+        {errors.synonyms && (
+          <p className="text-sm text-destructive">{errors.synonyms.message}</p>
+        )}
+      </div>
+
       {/* Synopsis */}
       <div className="space-y-2">
         <Label htmlFor="synopsis">Özet</Label>
@@ -275,6 +290,105 @@ export function SinglePartAnimeForm({
         />
         {errors.synopsis && (
           <p className="text-sm text-destructive">{errors.synopsis.message}</p>
+        )}
+      </div>
+
+      {/* Release Date */}
+      <div className="space-y-2">
+        <Label htmlFor="releaseDate">Yayın Tarihi</Label>
+        <Input
+          id="releaseDate"
+          type="date"
+          {...register('releaseDate')}
+          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+        />
+        {errors.releaseDate && (
+          <p className="text-sm text-destructive">{errors.releaseDate.message}</p>
+        )}
+      </div>
+
+      {/* Source */}
+      <div className="space-y-2">
+        <Label htmlFor="source">Kaynak Materyal</Label>
+        <Select
+          value={watch('source')}
+          onValueChange={(value) => setValue('source', value as Source)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Kaynak seçin" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.values(Source).map((source) => (
+              <SelectItem key={source} value={source}>
+                {source}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {errors.source && (
+          <p className="text-sm text-destructive">{errors.source.message}</p>
+        )}
+      </div>
+
+      {/* Country of Origin */}
+      <div className="space-y-2">
+        <Label htmlFor="countryOfOrigin">Köken Ülke</Label>
+        <Input
+          id="countryOfOrigin"
+          type="text"
+          placeholder="Köken ülke"
+          {...register('countryOfOrigin')}
+          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+        />
+        {errors.countryOfOrigin && (
+          <p className="text-sm text-destructive">{errors.countryOfOrigin.message}</p>
+        )}
+      </div>
+
+      {/* AniList Scores */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="anilistAverageScore">AniList Ortalama Puan</Label>
+          <Input
+            id="anilistAverageScore"
+            type="number"
+            step="0.01"
+            placeholder="Ortalama puan"
+            {...register('anilistAverageScore')}
+            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+          />
+          {errors.anilistAverageScore && (
+            <p className="text-sm text-destructive">{errors.anilistAverageScore.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="anilistPopularity">AniList Popülerlik</Label>
+          <Input
+            id="anilistPopularity"
+            type="number"
+            placeholder="Popülerlik"
+            {...register('anilistPopularity')}
+            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+          />
+          {errors.anilistPopularity && (
+            <p className="text-sm text-destructive">{errors.anilistPopularity.message}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Trailer */}
+      <div className="space-y-2">
+        <Label htmlFor="trailer">Tanıtım Videosu URL</Label>
+        <Input
+          id="trailer"
+          type="url"
+          placeholder="Trailer URL'si"
+          {...register('trailer')}
+          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+        />
+        {errors.trailer && (
+          <p className="text-sm text-destructive">{errors.trailer.message}</p>
         )}
       </div>
 
