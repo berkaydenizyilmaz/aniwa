@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -15,12 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { createAnimeSeriesAction, updateAnimeSeriesAction } from '@/lib/actions/editor/anime.action';
+import { createAnimeSeriesAction, updateAnimeSeriesAction, getAllGenresAction, getAllTagsAction, getAllStudiosAction } from '@/lib/actions/editor/anime.action';
 import { createAnimeSeriesSchema, updateAnimeSeriesSchema, type CreateAnimeSeriesInput, type UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 import { toast } from 'sonner';
-import { AnimeSeries, AnimeStatus, Season, Source } from '@prisma/client';
+import { AnimeSeries, AnimeStatus, Season, Source, Genre, Tag, Studio, AnimeType } from '@prisma/client';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { MultiSelect } from '@/components/ui/multi-select';
+import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
 
 interface SinglePartAnimeFormProps {
   anime?: AnimeSeries | null;
@@ -36,6 +38,14 @@ export function SinglePartAnimeForm({
   const isEdit = !!anime;
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
+  // State'ler
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [studios, setStudios] = useState<Studio[]>([]);
+  const [selectedGenreIds, setSelectedGenreIds] = useState<string[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  const [selectedStudioIds, setSelectedStudioIds] = useState<string[]>([]);
+
   const {
     register,
     handleSubmit,
@@ -46,7 +56,7 @@ export function SinglePartAnimeForm({
   } = useForm<CreateAnimeSeriesInput | UpdateAnimeSeriesInput>({
     resolver: zodResolver(isEdit ? updateAnimeSeriesSchema : createAnimeSeriesSchema),
     defaultValues: {
-      type: 'MOVIE',
+      type: AnimeType.MOVIE,
       title: '',
       status: AnimeStatus.RELEASING,
       isAdult: false,
@@ -58,7 +68,7 @@ export function SinglePartAnimeForm({
   useEffect(() => {
     if (anime) {
       reset({
-        type: 'MOVIE',
+        type: AnimeType.MOVIE,
         title: anime.title,
         englishTitle: anime.englishTitle || '',
         japaneseTitle: anime.japaneseTitle || '',
@@ -81,7 +91,7 @@ export function SinglePartAnimeForm({
       });
     } else {
       reset({
-        type: 'MOVIE',
+        type: AnimeType.MOVIE,
         title: '',
         englishTitle: '',
         japaneseTitle: '',
@@ -104,6 +114,34 @@ export function SinglePartAnimeForm({
       });
     }
   }, [anime, reset]);
+
+  // Genre, tag, studio verilerini getir
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [genresResult, tagsResult, studiosResult] = await Promise.all([
+          getAllGenresAction(),
+          getAllTagsAction(),
+          getAllStudiosAction()
+        ]);
+
+        if (genresResult.success && genresResult.data) {
+          setGenres(genresResult.data.genres || []);
+        }
+        if (tagsResult.success && tagsResult.data) {
+          setTags(tagsResult.data.tags || []);
+        }
+        if (studiosResult.success && studiosResult.data) {
+          setStudios(studiosResult.data.studios || []);
+        }
+      } catch (error) {
+        console.error('Fetch data error:', error);
+        toast.error('Veriler yüklenirken bir hata oluştu');
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const onSubmit = async (data: CreateAnimeSeriesInput | UpdateAnimeSeriesInput) => {
     if (isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)) return;
@@ -405,6 +443,97 @@ export function SinglePartAnimeForm({
         {errors.anilistId && (
           <p className="text-sm text-destructive">{errors.anilistId.message}</p>
         )}
+      </div>
+
+      {/* MyAnimeList ID (Opsiyonel) */}
+      <div className="space-y-2">
+        <Label htmlFor="malId">MyAnimeList ID</Label>
+        <Input
+          id="malId"
+          type="number"
+          placeholder="MyAnimeList ID"
+          {...register('malId')}
+          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+        />
+        {errors.malId && (
+          <p className="text-sm text-destructive">{errors.malId.message}</p>
+        )}
+      </div>
+
+      {/* Genre Seçimi */}
+      <div className="space-y-2">
+        <Label>Türler</Label>
+        <MultiSelect
+          options={genres.map(genre => ({ id: genre.id, name: genre.name }))}
+          selectedIds={selectedGenreIds}
+          onSelectionChange={setSelectedGenreIds}
+          placeholder="Tür seçin"
+          searchPlaceholder="Tür ara..."
+          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+        />
+      </div>
+
+      {/* Tag Seçimi */}
+      <div className="space-y-2">
+        <Label>Etiketler</Label>
+        <MultiSelect
+          options={tags.map(tag => ({ id: tag.id, name: tag.name }))}
+          selectedIds={selectedTagIds}
+          onSelectionChange={setSelectedTagIds}
+          placeholder="Etiket seçin"
+          searchPlaceholder="Etiket ara..."
+          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+        />
+      </div>
+
+      {/* Studio Seçimi */}
+      <div className="space-y-2">
+        <Label>Stüdyolar</Label>
+        <MultiSelect
+          options={studios.map(studio => ({ id: studio.id, name: studio.name }))}
+          selectedIds={selectedStudioIds}
+          onSelectionChange={setSelectedStudioIds}
+          placeholder="Stüdyo seçin"
+          searchPlaceholder="Stüdyo ara..."
+          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+        />
+      </div>
+
+      {/* Resim Yükleme */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="coverImage">Kapak Görseli</Label>
+          <Input
+            id="coverImage"
+            type="file"
+            accept={UPLOAD_CONFIGS.ANIME_COVER.accept}
+            {...register('coverImageFile')}
+            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Maksimum {UPLOAD_CONFIGS.ANIME_COVER.maxSize / (1024 * 1024)}MB
+          </p>
+          {errors.coverImageFile && (
+            <p className="text-sm text-destructive">{errors.coverImageFile.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="bannerImage">Banner Görseli</Label>
+          <Input
+            id="bannerImage"
+            type="file"
+            accept={UPLOAD_CONFIGS.ANIME_BANNER.accept}
+            {...register('bannerImageFile')}
+            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Maksimum {UPLOAD_CONFIGS.ANIME_BANNER.maxSize / (1024 * 1024)}MB
+          </p>
+          {errors.bannerImageFile && (
+            <p className="text-sm text-destructive">{errors.bannerImageFile.message}</p>
+          )}
+        </div>
       </div>
 
       {/* Yetişkin İçerik */}
