@@ -180,7 +180,7 @@ export function SinglePartAnimeForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full max-w-4xl">
       {/* Temel Bilgiler */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Durum */}
@@ -208,7 +208,7 @@ export function SinglePartAnimeForm({
 
         {/* Süre */}
         <div className="space-y-2">
-          <Label htmlFor="duration">Süre (dakika)</Label>
+          <Label htmlFor="duration">Süre (dakika) *</Label>
           <Input
             id="duration"
             type="number"

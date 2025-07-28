@@ -58,6 +58,11 @@ export const createAnimeSeriesSchema = z.object({
   if (data.type === AnimeType.MOVIE && !data.anilistId) {
     return false;
   }
+  
+  // MOVIE ise duration zorunlu
+  if (data.type === AnimeType.MOVIE && !data.duration) {
+    return false;
+  }
 
   // Çok parçalı anime için episodes ve duration girilemez
   if (data.isMultiPart && (data.episodes !== undefined || data.duration !== undefined)) {
@@ -66,7 +71,7 @@ export const createAnimeSeriesSchema = z.object({
 
   return true;
 }, {
-  message: "Film türü için AniList ID zorunludur",
+  message: "Film türü için AniList ID ve süre zorunludur",
   path: ["anilistId"]
 });
 
@@ -119,6 +124,11 @@ export const updateAnimeSeriesSchema = z.object({
   if (data.type === AnimeType.MOVIE && !data.anilistId) {
     return false;
   }
+  
+  // MOVIE ise duration zorunlu
+  if (data.type === AnimeType.MOVIE && !data.duration) {
+    return false;
+  }
 
   // Çok parçalı anime için episodes ve duration girilemez
   if (data.isMultiPart && (data.episodes !== undefined || data.duration !== undefined)) {
@@ -127,7 +137,7 @@ export const updateAnimeSeriesSchema = z.object({
 
   return true;
 }, {
-  message: "Film türü için AniList ID zorunludur",
+  message: "Film türü için AniList ID ve süre zorunludur",
   path: ["anilistId"]
 });
 

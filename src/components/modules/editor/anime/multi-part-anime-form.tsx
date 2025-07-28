@@ -179,7 +179,7 @@ export function MultiPartAnimeForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full max-w-4xl">
       {/* Temel Bilgiler */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Tür (Edit mode'da göster) */}
