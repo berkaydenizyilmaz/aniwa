@@ -79,7 +79,7 @@ export function EditorSidebar() {
             </div>
 
             {/* Navigation */}
-            <nav className={`flex-1 space-y-2 ${isCollapsed ? 'py-2' : 'p-4'}`}>
+            <nav className={`flex-1 space-y-3 ${isCollapsed ? 'py-2' : 'p-4'}`}>
               {EDITOR_NAVIGATION_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
@@ -121,7 +121,7 @@ export function EditorSidebar() {
             </nav>
 
             {/* Bottom Section */}
-            <div className={`border-t space-y-2 ${isCollapsed ? 'py-2' : 'p-4'}`}>
+            <div className={`border-t space-y-3 ${isCollapsed ? 'py-2' : 'p-4'}`}>
               {/* Ana Sayfaya Dön */}
               <Tooltip delayDuration={300} open={isCollapsed ? undefined : false}>
                 <TooltipTrigger asChild>

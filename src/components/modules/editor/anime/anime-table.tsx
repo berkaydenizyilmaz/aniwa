@@ -292,7 +292,7 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
               onClick={handleDeleteConfirm}
               disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_ANIME)}
             >
-              {isLoading(LOADING_KEYS.ACTIONS.DELETE_ANIME) ? 'Siliniyor...' : 'Sil'}
+              Sil
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
