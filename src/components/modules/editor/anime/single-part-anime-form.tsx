@@ -32,8 +32,8 @@ interface SinglePartAnimeFormProps {
   onCancel?: () => void;
 }
 
-export function SinglePartAnimeForm({ 
-  anime, 
+export function SinglePartAnimeForm({
+  anime,
   onSuccess,
   onCancel
 }: SinglePartAnimeFormProps) {
@@ -62,7 +62,7 @@ export function SinglePartAnimeForm({
     defaultValues: {
       type: AnimeType.MOVIE,
       title: '',
-      status: AnimeStatus.RELEASING,
+      status: undefined,
       isAdult: false,
       episodes: 1,
     },
@@ -103,7 +103,7 @@ export function SinglePartAnimeForm({
         synopsis: '',
         episodes: 1,
         duration: undefined,
-        status: AnimeStatus.RELEASING,
+        status: undefined,
         isAdult: false,
         season: undefined,
         seasonYear: undefined,
@@ -155,7 +155,7 @@ export function SinglePartAnimeForm({
     try {
       // isMultiPart'ı type'a göre belirle
       const isMultiPart = data.type !== AnimeType.MOVIE;
-      
+
       let result;
 
       if (isEdit && anime) {
@@ -188,7 +188,7 @@ export function SinglePartAnimeForm({
         <div className="space-y-2">
           <Label htmlFor="status">Durum *</Label>
           <Select
-            value={watch('status')}
+            value={watch('status') || ''}
             onValueChange={(value) => setValue('status', value as AnimeStatus)}
           >
             <SelectTrigger>
@@ -384,7 +384,7 @@ export function SinglePartAnimeForm({
         >
           <SelectTrigger>
             <SelectValue placeholder="Köken ülke seçin" />
-          </SelectTrigger>  
+          </SelectTrigger>
           <SelectContent>
             {Object.values(CountryOfOrigin).map((country) => (
               <SelectItem key={country} value={country}>
