@@ -358,7 +358,7 @@ model AnimeRelation {
 // Ana Anime Serisi Modeli
 model AnimeSeries {
   id                String            @id @default(auto()) @map("_id") @db.ObjectId
-  anilistId         Int               @unique // Anilist API ID'si
+  anilistId         Int?              @unique // Anilist API ID'si
   malId             Int?              @unique // MyAnimeList ID'si
   aniwaPublicId     Int               @unique // Aniwa'ya özel public ID
   
@@ -366,7 +366,7 @@ model AnimeSeries {
   title             String            // Ana başlık (romaji)
   englishTitle      String?           // İngilizce başlık
   japaneseTitle     String?           // Japonca başlık
-  synonyms          String[]?         // Alternatif başlıklar
+  synonyms          String[]          // Alternatif başlıklar
   
   // Temel Bilgiler
   synopsis          String?           @db.String // Açıklama/Özet
@@ -405,7 +405,7 @@ model AnimeSeries {
   trackedByUsers    UserAnimeTracking[] @relation("AnimeTrackedByUsers")
 
   // Çok Parçalı Kontrol
-  isMultiPart       Boolean           @default(false) // Çok sezonlu mu?
+  isMultiPart       Boolean?          @default(false) // Çok sezonlu mu?
 
   // İlişkiler
   sourceRelations   AnimeRelation[]   @relation("SourceRelations")
@@ -418,8 +418,8 @@ model AnimeSeries {
 // Anime Medya Parçası (Sezon/Film/OVA)
 model AnimeMediaPart {
   id                String            @id @default(auto()) @map("_id") @db.ObjectId
-  anilistId         Int               @unique // Anilist ID'si
-  malId
+  anilistId         Int?              @unique // Anilist ID'si
+  malId             Int?              @unique // MyAnimeList ID'si
   
   // Temel Bilgiler
   title             String            // Parçanın başlığı
