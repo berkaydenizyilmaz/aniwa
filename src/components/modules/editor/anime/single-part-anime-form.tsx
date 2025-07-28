@@ -28,16 +28,19 @@ import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
 
 interface SinglePartAnimeFormProps {
   anime?: AnimeSeries | null;
+  selectedType?: AnimeType;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
 export function SinglePartAnimeForm({
   anime,
+  selectedType,
   onSuccess,
   onCancel
 }: SinglePartAnimeFormProps) {
   const isEdit = !!anime;
+  const currentType = selectedType || anime?.type || AnimeType.MOVIE;
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   // State'ler
@@ -60,7 +63,7 @@ export function SinglePartAnimeForm({
   } = useForm({
     resolver: zodResolver(isEdit ? updateAnimeSeriesSchema : createAnimeSeriesSchema),
     defaultValues: {
-      type: AnimeType.MOVIE,
+      type: currentType,
       title: '',
       status: undefined,
       isAdult: false,
@@ -72,7 +75,7 @@ export function SinglePartAnimeForm({
   useEffect(() => {
     if (anime) {
       reset({
-        type: AnimeType.MOVIE,
+        type: currentType,
         title: anime.title,
         englishTitle: anime.englishTitle || '',
         japaneseTitle: anime.japaneseTitle || '',
@@ -95,7 +98,7 @@ export function SinglePartAnimeForm({
       });
     } else {
       reset({
-        type: AnimeType.MOVIE,
+        type: currentType,
         title: '',
         englishTitle: '',
         japaneseTitle: '',
@@ -117,7 +120,7 @@ export function SinglePartAnimeForm({
         trailer: '',
       });
     }
-  }, [anime, reset]);
+  }, [anime, reset, currentType]);
 
   // Genre, tag, studio verilerini getir
   useEffect(() => {
@@ -154,7 +157,7 @@ export function SinglePartAnimeForm({
 
     try {
       // isMultiPart'ı type'a göre belirle
-      const isMultiPart = data.type !== AnimeType.MOVIE;
+      const isMultiPart = false; // Single part form için her zaman false
 
       let result;
 

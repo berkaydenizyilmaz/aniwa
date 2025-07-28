@@ -153,7 +153,7 @@ export function MultiPartAnimeForm({
 
     try {
       // isMultiPart'ı type'a göre belirle
-      const isMultiPart = data.type !== AnimeType.MOVIE;
+      const isMultiPart = true; // Multi part form için her zaman true
 
       let result;
 

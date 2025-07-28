@@ -15,6 +15,7 @@ interface AnimeFormDialogProps {
   onOpenChange: (open: boolean) => void;
   anime?: AnimeSeries | null;
   selectedType?: AnimeType;
+  selectedIsMultiPart?: boolean | null;
   onSuccess?: () => void;
 }
 
@@ -23,6 +24,7 @@ export function AnimeFormDialog({
   onOpenChange, 
   anime, 
   selectedType,
+  selectedIsMultiPart,
   onSuccess 
 }: AnimeFormDialogProps) {
   const isEdit = !!anime;
@@ -37,8 +39,10 @@ export function AnimeFormDialog({
     onOpenChange(false);
   };
 
-  // MOVIE ise tek parçalı form, diğerleri çok parçalı
-  const isSinglePart = currentType === AnimeType.MOVIE;
+  // Form tipini belirle
+  const isSinglePart = isEdit 
+    ? currentType === AnimeType.MOVIE 
+    : selectedIsMultiPart === false || currentType === AnimeType.MOVIE;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -52,6 +56,7 @@ export function AnimeFormDialog({
         {isSinglePart ? (
           <SinglePartAnimeForm
             anime={anime}
+            selectedType={currentType}
             onSuccess={handleSuccess}
             onCancel={handleCancel}
           />
