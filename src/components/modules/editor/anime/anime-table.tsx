@@ -196,16 +196,18 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
                     <TableCell>
                       <div className="flex gap-2">
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() => handleEdit(anime)}
+                          className="h-8 w-8 p-0"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="ghost-destructive"
                           size="sm"
                           onClick={() => handleDelete(anime)}
+                          className="h-8 w-8 p-0"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
