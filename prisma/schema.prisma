@@ -358,17 +358,18 @@ model AnimeRelation {
 // Ana Anime Serisi Modeli
 model AnimeSeries {
   id                String            @id @default(auto()) @map("_id") @db.ObjectId
-  anilistId         Int?              @unique // Anilist API ID'si
-  idMal             Int?              @unique // MyAnimeList ID'si
-  aniwaPublicId     Int?              @unique // Aniwa'ya özel public ID
+  anilistId         Int               @unique // Anilist API ID'si
+  malId             Int?              @unique // MyAnimeList ID'si
+  aniwaPublicId     Int               @unique // Aniwa'ya özel public ID
   
   // Başlık Bilgileri
   title             String            // Ana başlık (romaji)
   englishTitle      String?           // İngilizce başlık
   japaneseTitle     String?           // Japonca başlık
-  synonyms          String[]          // Alternatif başlıklar
+  synonyms          String[]?         // Alternatif başlıklar
   
   // Temel Bilgiler
+  synopsis          String?           @db.String // Açıklama/Özet
   type              AnimeType         // Medya tipi
   status            AnimeStatus       @default(RELEASING) // Yayın durumu
   episodes          Int?              // Toplam bölüm sayısı
@@ -417,7 +418,8 @@ model AnimeSeries {
 // Anime Medya Parçası (Sezon/Film/OVA)
 model AnimeMediaPart {
   id                String            @id @default(auto()) @map("_id") @db.ObjectId
-  anilistId         Int?              @unique // Anilist ID'si
+  anilistId         Int               @unique // Anilist ID'si
+  malId
   
   // Temel Bilgiler
   title             String            // Parçanın başlığı
