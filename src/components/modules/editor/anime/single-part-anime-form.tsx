@@ -65,7 +65,7 @@ export function SinglePartAnimeForm({
     defaultValues: {
       type: currentType,
       title: '',
-      status: undefined,
+      status: anime?.status,
       isAdult: false,
       episodes: 1,
     },
@@ -97,6 +97,8 @@ export function SinglePartAnimeForm({
         trailer: anime.trailer || '',
         isMultiPart: false,
       });
+      
+
     } else {
       reset({
         type: currentType,
@@ -194,7 +196,7 @@ export function SinglePartAnimeForm({
         <div className="space-y-2">
           <Label htmlFor="status">Durum *</Label>
           <Select
-            value={watch('status') || ''}
+            value={watch('status') || undefined}
             onValueChange={(value) => setValue('status', value as AnimeStatus)}
           >
             <SelectTrigger>

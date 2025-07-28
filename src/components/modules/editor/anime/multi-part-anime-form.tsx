@@ -215,7 +215,7 @@ export function MultiPartAnimeForm({
         <div className="space-y-2">
           <Label htmlFor="status">Durum *</Label>
           <Select
-            value={watch('status') || ''}
+            value={watch('status') || undefined}
             onValueChange={(value) => setValue('status', value as AnimeStatus)}
           >
             <SelectTrigger>
