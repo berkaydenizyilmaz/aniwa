@@ -16,7 +16,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { createAnimeSeriesAction, updateAnimeSeriesAction, getAllGenresAction, getAllTagsAction, getAllStudiosAction } from '@/lib/actions/editor/anime.action';
-import { createAnimeSeriesSchema, updateAnimeSeriesSchema, type CreateAnimeSeriesInput, type UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
+import { createAnimeSeriesSchema, updateAnimeSeriesSchema } from '@/lib/schemas/anime.schema';
+import { z } from 'zod';
 import { toast } from 'sonner';
 import { AnimeSeries, AnimeType, AnimeStatus, Season, Source, Genre, Tag, Studio } from '@prisma/client';
 import { useLoadingStore } from '@/lib/stores/loading.store';
@@ -58,7 +59,7 @@ export function MultiPartAnimeForm({
     watch,
     setValue,
     formState: { errors }
-  } = useForm<CreateAnimeSeriesInput | UpdateAnimeSeriesInput>({
+  } = useForm({
     resolver: zodResolver(isEdit ? updateAnimeSeriesSchema : createAnimeSeriesSchema),
     defaultValues: {
       type: selectedType,
@@ -145,7 +146,7 @@ export function MultiPartAnimeForm({
     fetchData();
   }, []);
 
-  const onSubmit = async (data: CreateAnimeSeriesInput | UpdateAnimeSeriesInput) => {
+  const onSubmit = async (data: z.infer<typeof createAnimeSeriesSchema> | z.infer<typeof updateAnimeSeriesSchema>) => {
     if (isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)) return;
 
     setLoadingStore(LOADING_KEYS.FORMS.CREATE_ANIME, true);
