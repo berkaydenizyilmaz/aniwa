@@ -279,36 +279,7 @@ export function MultiPartAnimeForm({
         </div>
       </div>
 
-      {/* Bölüm Sayısı ve Süre */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="episodes">Bölüm Sayısı</Label>
-          <Input
-            id="episodes"
-            type="number"
-            placeholder="Bölüm sayısı"
-            {...register('episodes')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-          />
-          {errors.episodes && (
-            <p className="text-sm text-destructive">{errors.episodes.message}</p>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="duration">Süre (dakika)</Label>
-          <Input
-            id="duration"
-            type="number"
-            placeholder="Bölüm süresi"
-            {...register('duration')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-          />
-          {errors.duration && (
-            <p className="text-sm text-destructive">{errors.duration.message}</p>
-          )}
-        </div>
-      </div>
 
       {/* Sezon ve Yıl */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
