@@ -69,30 +69,46 @@ export function MultiPartAnimeForm({
     },
   });
 
+
+
   // Form'u anime verisi ile doldur (edit mode)
   useEffect(() => {
-    if (anime) {
-      reset({
-        type: anime.type,
-        title: anime.title,
-        englishTitle: anime.englishTitle || '',
-        japaneseTitle: anime.japaneseTitle || '',
-        synonyms: Array.isArray(anime.synonyms) ? anime.synonyms.join(', ') : anime.synonyms || '',
-        synopsis: anime.synopsis || '',
-
-        status: anime.status,
-        isAdult: anime.isAdult || false,
-        season: anime.season || undefined,
-        seasonYear: anime.seasonYear || undefined,
-        releaseDate: anime.releaseDate?.toISOString() || undefined,
-        source: anime.source || undefined,
-        countryOfOrigin: anime.countryOfOrigin || undefined,
-        anilistAverageScore: anime.anilistAverageScore || undefined,
-        anilistPopularity: anime.anilistPopularity || undefined,
-        anilistId: anime.anilistId || undefined,
-        malId: anime.malId || undefined,
-        trailer: anime.trailer || '',
-      });
+    if (anime && isEdit) {
+              reset({
+          type: selectedType,
+          title: anime.title,
+          englishTitle: anime.englishTitle || '',
+          japaneseTitle: anime.japaneseTitle || '',
+          synonyms: Array.isArray(anime.synonyms) ? anime.synonyms.join(', ') : anime.synonyms || '',
+          synopsis: anime.synopsis || '',
+          episodes: anime.episodes || undefined,
+          duration: anime.duration || undefined,
+          status: anime.status,
+          isAdult: anime.isAdult || false,
+          season: anime.season || undefined,
+          seasonYear: anime.seasonYear || undefined,
+          releaseDate: anime.releaseDate?.toISOString().split('T')[0] || undefined,
+          source: anime.source || undefined,
+          countryOfOrigin: anime.countryOfOrigin || undefined,
+          anilistAverageScore: anime.anilistAverageScore || undefined,
+          anilistPopularity: anime.anilistPopularity || undefined,
+          anilistId: anime.anilistId || undefined,
+          malId: anime.malId || undefined,
+          trailer: anime.trailer || '',
+          isMultiPart: true,
+        });
+        
+        // Genre, tag, studio seçimlerini ayarla (eğer anime verisinde varsa)
+        const animeWithRelations = anime as AnimeSeries & { genres?: Genre[]; tags?: Tag[]; studios?: Studio[] };
+        if (animeWithRelations.genres) {
+          setSelectedGenreIds(animeWithRelations.genres.map(g => g.id));
+        }
+        if (animeWithRelations.tags) {
+          setSelectedTagIds(animeWithRelations.tags.map(t => t.id));
+        }
+        if (animeWithRelations.studios) {
+          setSelectedStudioIds(animeWithRelations.studios.map(s => s.id));
+        }
     } else {
       reset({
         type: selectedType,
@@ -117,7 +133,7 @@ export function MultiPartAnimeForm({
         isMultiPart: true,
       });
     }
-  }, [anime, selectedType, reset]);
+  }, [anime, selectedType, reset, isEdit]);
 
   // Genre, tag, studio verilerini getir
   useEffect(() => {

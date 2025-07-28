@@ -71,34 +71,47 @@ export function SinglePartAnimeForm({
     },
   });
 
+
+
   // Form'u anime verisi ile doldur (edit mode)
   useEffect(() => {
-    if (anime) {
-      reset({
-        type: currentType,
-        title: anime.title,
-        englishTitle: anime.englishTitle || '',
-        japaneseTitle: anime.japaneseTitle || '',
-        synonyms: Array.isArray(anime.synonyms) ? anime.synonyms.join(', ') : anime.synonyms || '',
-        synopsis: anime.synopsis || '',
-        episodes: 1,
-        duration: anime.duration || undefined,
-        status: anime.status,
-        isAdult: anime.isAdult || false,
-        season: anime.season || undefined,
-        seasonYear: anime.seasonYear || undefined,
-        releaseDate: anime.releaseDate?.toISOString().split('T')[0] || undefined,
-        source: anime.source || undefined,
-        countryOfOrigin: anime.countryOfOrigin || undefined,
-        anilistAverageScore: anime.anilistAverageScore || undefined,
-        anilistPopularity: anime.anilistPopularity || undefined,
-        anilistId: anime.anilistId || undefined,
-        malId: anime.malId || undefined,
-        trailer: anime.trailer || '',
-        isMultiPart: false,
-      });
+    if (anime && isEdit) {
+              reset({
+          type: currentType,
+          title: anime.title,
+          englishTitle: anime.englishTitle || '',
+          japaneseTitle: anime.japaneseTitle || '',
+          synonyms: Array.isArray(anime.synonyms) ? anime.synonyms.join(', ') : anime.synonyms || '',
+          synopsis: anime.synopsis || '',
+          episodes: 1,
+          duration: anime.duration || undefined,
+          status: anime.status,
+          isAdult: anime.isAdult || false,
+          season: anime.season || undefined,
+          seasonYear: anime.seasonYear || undefined,
+          releaseDate: anime.releaseDate?.toISOString().split('T')[0] || undefined,
+          source: anime.source || undefined,
+          countryOfOrigin: anime.countryOfOrigin || undefined,
+          anilistAverageScore: anime.anilistAverageScore || undefined,
+          anilistPopularity: anime.anilistPopularity || undefined,
+          anilistId: anime.anilistId || undefined,
+          malId: anime.malId || undefined,
+          trailer: anime.trailer || '',
+          isMultiPart: false,
+        });
+        
+        // Genre, tag, studio seçimlerini ayarla (eğer anime verisinde varsa)
+        const animeWithRelations = anime as AnimeSeries & { genres?: Genre[]; tags?: Tag[]; studios?: Studio[] };
+        if (animeWithRelations.genres) {
+          setSelectedGenreIds(animeWithRelations.genres.map(g => g.id));
+        }
+        if (animeWithRelations.tags) {
+          setSelectedTagIds(animeWithRelations.tags.map(t => t.id));
+        }
+        if (animeWithRelations.studios) {
+          setSelectedStudioIds(animeWithRelations.studios.map(s => s.id));
+        }
       
-
     } else {
       reset({
         type: currentType,
@@ -124,7 +137,7 @@ export function SinglePartAnimeForm({
         isMultiPart: false,
       });
     }
-  }, [anime, reset, currentType]);
+  }, [anime, reset, currentType, isEdit]);  
 
   // Genre, tag, studio verilerini getir
   useEffect(() => {
