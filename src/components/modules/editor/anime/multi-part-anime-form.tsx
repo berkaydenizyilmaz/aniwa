@@ -78,8 +78,7 @@ export function MultiPartAnimeForm({
         japaneseTitle: anime.japaneseTitle || '',
         synonyms: anime.synonyms || [],
         synopsis: anime.synopsis || '',
-        episodes: anime.episodes || undefined,
-        duration: anime.duration || undefined,
+
         status: anime.status,
         isAdult: anime.isAdult || false,
         season: anime.season || undefined,
@@ -101,8 +100,7 @@ export function MultiPartAnimeForm({
         japaneseTitle: '',
         synonyms: [],
         synopsis: '',
-        episodes: undefined,
-        duration: undefined,
+
         status: AnimeStatus.RELEASING,
         isAdult: false,
         season: undefined,
