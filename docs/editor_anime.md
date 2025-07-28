@@ -68,8 +68,6 @@ Amaç: Editör, Aniwa'ya yeni bir anime serisi veya filmi ekleyecek. aniwaPublic
 
             trailer (String): Tanıtım videosu URL'si.
 
-            relatedAnimeIds (String[]): İlgili anime serilerinin ID'leri (dizi olarak, daha sonra farklı bir arayüz ile).
-
             Genre (Türler): Mevcut türler arasından seçim.
 
             Tag (Etiketler): Mevcut etiketler arasından seçim.
