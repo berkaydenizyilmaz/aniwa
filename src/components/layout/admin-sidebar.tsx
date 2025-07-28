@@ -92,7 +92,7 @@ export function AdminSidebar() {
                       ${isCollapsed ? 'justify-center p-2' : 'space-x-3 px-3 py-2'}
                       ${isActive 
                         ? 'bg-primary text-primary-foreground' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
                       }
                     `}
                   >
