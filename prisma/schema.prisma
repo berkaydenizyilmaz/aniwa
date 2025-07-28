@@ -72,7 +72,6 @@ enum AnimeType {
   SPECIAL   // Özel bölüm
   OVA       // Original Video Animation
   ONA       // Original Net Animation
-  MUSIC     // Müzik videosu
 }
 
 // Anime Başlık Dili Tercihleri
