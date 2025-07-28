@@ -44,12 +44,16 @@ export async function createAnimeSeriesBusiness(
   try {
     // Transaction ile tüm işlemleri yap
     const result = await prisma.$transaction(async (tx) => {
-      // Film türü için bölüm sayısını 1 yap, çok parçalı anime'lerde undefined bırak
-      const episodes = data.type === AnimeType.MOVIE ? 1 : (data.isMultiPart ? undefined : data.episodes);
+      // Film türü için episodes kontrolü
+      if (data.type === AnimeType.MOVIE && data.episodes !== 1) {
+        throw new BusinessError('Film türü için bölüm sayısı 1 olmalıdır');
+      }
+      
+      const episodes = data.episodes;
       
       // AniwaPublicId için son ID'yi bul ve 1 artır (güvenli şekilde)
       const lastAnime = await tx.animeSeries.findFirst({
-        where: { aniwaPublicId: { not: null } },
+        where: { aniwaPublicId: { not: undefined } },
         orderBy: { aniwaPublicId: 'desc' },
         select: { aniwaPublicId: true }
       });
@@ -106,14 +110,14 @@ export async function createAnimeSeriesBusiness(
           title: data.title,
           englishTitle: data.englishTitle,
           japaneseTitle: data.japaneseTitle,
-          synonyms: data.synonyms ? data.synonyms.split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
+          synonyms: data.synonyms || [],
           anilistId: data.anilistId,
-          idMal: data.idMal,
+          malId: data.malId,
           aniwaPublicId: nextPublicId,
           type: data.type as AnimeType,
           status: data.status as AnimeStatus,
           episodes: episodes,
-          duration: data.isMultiPart ? undefined : data.duration,
+          duration: data.duration,
           isAdult: data.isAdult,
           season: data.season as Season,
           seasonYear: data.seasonYear,
@@ -122,9 +126,10 @@ export async function createAnimeSeriesBusiness(
           countryOfOrigin: data.countryOfOrigin,
           coverImage: coverImageUrl,
           bannerImage: bannerImageUrl,
-          description: data.description,
+          synopsis: data.synopsis,
           trailer: data.trailer,
-          isMultiPart: data.isMultiPart,
+          anilistAverageScore: data.anilistAverageScore,
+          anilistPopularity: data.anilistPopularity,
         },
         tx
       );
@@ -339,8 +344,12 @@ export async function updateAnimeSeriesBusiness(
 
     // Transaction ile güncelleme
     const result = await prisma.$transaction(async (tx) => {
-      // Film türü için bölüm sayısını 1 yap, çok parçalı anime'lerde undefined bırak
-      const episodes = data.type === AnimeType.MOVIE ? 1 : (data.isMultiPart ? undefined : data.episodes);
+      // Film türü için episodes kontrolü
+      if (data.type === AnimeType.MOVIE && data.episodes !== 1) {
+        throw new BusinessError('Film türü için bölüm sayısı 1 olmalıdır');
+      }
+      
+      const episodes = data.episodes;
       
       // Resim işlemleri
       let coverImageUrl = data.coverImage;
@@ -417,13 +426,13 @@ export async function updateAnimeSeriesBusiness(
           title: data.title,
           englishTitle: data.englishTitle,
           japaneseTitle: data.japaneseTitle,
-          synonyms: data.synonyms ? data.synonyms.split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
+          synonyms: data.synonyms || [],
           anilistId: data.anilistId,
-          idMal: data.idMal,
+          malId: data.malId,
           type: data.type as AnimeType,
           status: data.status as AnimeStatus,
           episodes: episodes,
-          duration: data.isMultiPart ? undefined : data.duration,
+          duration: data.duration,
           isAdult: data.isAdult,
           season: data.season as Season,
           seasonYear: data.seasonYear,
@@ -432,8 +441,10 @@ export async function updateAnimeSeriesBusiness(
           countryOfOrigin: data.countryOfOrigin,
           coverImage: coverImageUrl,
           bannerImage: bannerImageUrl,
-          description: data.description,
+          synopsis: data.synopsis,
           trailer: data.trailer,
+          anilistAverageScore: data.anilistAverageScore,
+          anilistPopularity: data.anilistPopularity,
         },
         tx
       );
