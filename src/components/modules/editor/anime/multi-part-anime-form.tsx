@@ -22,6 +22,7 @@ import { AnimeSeries, AnimeType, AnimeStatus, Season, Source, Genre, Tag, Studio
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { MultiSelect } from '@/components/ui/multi-select';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
 
 interface MultiPartAnimeFormProps {
@@ -47,6 +48,8 @@ export function MultiPartAnimeForm({
   const [selectedGenreIds, setSelectedGenreIds] = useState<string[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [selectedStudioIds, setSelectedStudioIds] = useState<string[]>([]);
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
 
   const {
     register,
@@ -513,39 +516,25 @@ export function MultiPartAnimeForm({
 
       {/* Resim Yükleme */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="coverImage">Kapak Görseli</Label>
-          <Input
-            id="coverImage"
-            type="file"
-            accept={UPLOAD_CONFIGS.ANIME_COVER.accept}
-            {...register('coverImageFile')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-          />
-          <p className="text-xs text-muted-foreground">
-            Maksimum {UPLOAD_CONFIGS.ANIME_COVER.maxSize / (1024 * 1024)}MB
-          </p>
-          {errors.coverImageFile && (
-            <p className="text-sm text-destructive">{errors.coverImageFile.message}</p>
-          )}
-        </div>
+        <ImageUpload
+          id="coverImage"
+          label="Kapak Görseli"
+          accept={UPLOAD_CONFIGS.ANIME_COVER.accept}
+          maxSize={UPLOAD_CONFIGS.ANIME_COVER.maxSize}
+          value={coverImageFile}
+          onChange={setCoverImageFile}
+          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="bannerImage">Banner Görseli</Label>
-          <Input
-            id="bannerImage"
-            type="file"
-            accept={UPLOAD_CONFIGS.ANIME_BANNER.accept}
-            {...register('bannerImageFile')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-          />
-          <p className="text-xs text-muted-foreground">
-            Maksimum {UPLOAD_CONFIGS.ANIME_BANNER.maxSize / (1024 * 1024)}MB
-          </p>
-          {errors.bannerImageFile && (
-            <p className="text-sm text-destructive">{errors.bannerImageFile.message}</p>
-          )}
-        </div>
+        <ImageUpload
+          id="bannerImage"
+          label="Banner Görseli"
+          accept={UPLOAD_CONFIGS.ANIME_BANNER.accept}
+          maxSize={UPLOAD_CONFIGS.ANIME_BANNER.maxSize}
+          value={bannerImageFile}
+          onChange={setBannerImageFile}
+          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+        />
       </div>
 
       {/* Yetişkin İçerik */}
