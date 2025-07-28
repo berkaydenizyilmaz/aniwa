@@ -52,6 +52,8 @@ Amaç: Editör, Aniwa'ya yeni bir anime serisi veya filmi ekleyecek. aniwaPublic
 
             seasonYear (Int): Yayınlandığı yıl.
 
+            releaseDate : tam tarih
+
             source (Source Enum): Kaynak materyal (örn. MANGA, ORIGINAL).
 
             countryOfOrigin (String): Köken ülke.
@@ -66,7 +68,7 @@ Amaç: Editör, Aniwa'ya yeni bir anime serisi veya filmi ekleyecek. aniwaPublic
 
             trailer (String): Tanıtım videosu URL'si.
 
-            relatedAnimeIds (String[]): İlgili anime serilerinin ID'leri (dizi olarak, daha sonra eklenebilir veya ID'ler girilebilir).
+            relatedAnimeIds (String[]): İlgili anime serilerinin ID'leri (dizi olarak, daha sonra farklı bir arayüz ile).
 
             Genre (Türler): Mevcut türler arasından seçim.
 

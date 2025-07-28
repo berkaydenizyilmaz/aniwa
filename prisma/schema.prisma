@@ -390,7 +390,6 @@ model AnimeSeries {
   // Görsel İçerik
   coverImage        String?           // Kapak resmi
   bannerImage       String?           // Banner resmi
-  description       String?           @db.String // Açıklama
   trailer           String?           // Tanıtım videosu
 
   // İlişkiler (Explicit many-to-many)
