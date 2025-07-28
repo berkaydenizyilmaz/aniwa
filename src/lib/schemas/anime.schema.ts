@@ -31,17 +31,17 @@ export const createAnimeSeriesSchema = z.object({
   episodes: z.coerce.number().min(1, 'Bölüm sayısı en az 1 olmalı').optional(),
   duration: z.coerce.number().min(ANIME.DURATION.MIN, 'Süre en az 1 dakika olmalı').optional(),
   season: z.nativeEnum(Season).optional(),
-  seasonYear: z.coerce.number().min(ANIME.YEAR.MIN, 'Yıl 1900-2100 arasında olmalı').max(ANIME.YEAR.MAX, 'Yıl 1900-2100 arasında olmalı').optional(),
-  releaseDate: z.date().optional(),
+  seasonYear: z.coerce.number().min(ANIME.YEAR.MIN, 'Yıl 1900-2100 arasında olmalı').max(ANIME.YEAR.MAX, 'Yıl 1900-2100 arasında olmalı').optional().or(z.literal('')),
+  releaseDate: z.string().optional(),
   source: z.nativeEnum(Source).optional(),
   countryOfOrigin: z.string().optional(),
-  anilistAverageScore: z.coerce.number().min(0, 'Puan 0-100 arasında olmalı').max(100, 'Puan 0-100 arasında olmalı').optional(),
-  anilistPopularity: z.coerce.number().min(0, 'Popülerlik 0\'dan büyük olmalı').optional(),
+  anilistAverageScore: z.coerce.number().min(0, 'Puan 0-100 arasında olmalı').max(100, 'Puan 0-100 arasında olmalı').optional().or(z.literal('')),
+  anilistPopularity: z.coerce.number().min(0, 'Popülerlik 0\'dan büyük olmalı').optional().or(z.literal('')),
   coverImage: z.string().optional(),
   bannerImage: z.string().optional(),
   coverImageFile: z.string().optional(), // Base64 dosya
   bannerImageFile: z.string().optional(), // Base64 dosya
-  trailer: z.string().url('Geçerli bir URL girin').optional(),
+  trailer: z.string().url('Geçerli bir URL girin').optional().or(z.literal('')),
   
   // İlişkiler
   genreIds: z.array(z.string()).optional(),
@@ -52,10 +52,12 @@ export const createAnimeSeriesSchema = z.object({
   
   // MOVIE için zorunlu, diğerleri için opsiyonel
   anilistId: z.coerce.number().positive('AniList ID pozitif bir sayı olmalı').optional(),
-  malId: z.coerce.number().positive('MAL ID pozitif bir sayı olmalı').optional(),
+  malId: z.coerce.number().positive('MAL ID pozitif bir sayı olmalı').optional().or(z.literal('')),
 }).refine((data) => {
-  // MOVIE ise anilistId zorunlu
-  if (data.type === AnimeType.MOVIE && !data.anilistId) {
+  if (
+    data.type === AnimeType.MOVIE &&
+    (data.anilistId == null || Number.isNaN(data.anilistId))
+  ) {
     return false;
   }
   
@@ -71,7 +73,7 @@ export const createAnimeSeriesSchema = z.object({
 
   return true;
 }, {
-  message: "Film türü için AniList ID ve süre zorunludur",
+  message: "Film için AniList ID zorunlu!",
   path: ["anilistId"]
 });
 
@@ -95,19 +97,19 @@ export const updateAnimeSeriesSchema = z.object({
   episodes: z.coerce.number().min(1, 'Bölüm sayısı en az 1 olmalı').optional(),
   duration: z.coerce.number().min(ANIME.DURATION.MIN, 'Süre en az 1 dakika olmalı').optional(),
   season: z.nativeEnum(Season).optional(),
-  seasonYear: z.coerce.number().min(ANIME.YEAR.MIN, 'Yıl 1900-2100 arasında olmalı').max(ANIME.YEAR.MAX, 'Yıl 1900-2100 arasında olmalı').optional(),
-  releaseDate: z.date().optional(),
+  seasonYear: z.coerce.number().min(ANIME.YEAR.MIN, 'Yıl 1900-2100 arasında olmalı').max(ANIME.YEAR.MAX, 'Yıl 1900-2100 arasında olmalı').optional().or(z.literal('')),
+  releaseDate: z.string().optional(),
   source: z.nativeEnum(Source).optional(),
   countryOfOrigin: z.string().optional(),
-  anilistAverageScore: z.coerce.number().min(0, 'Puan 0-100 arasında olmalı').max(100, 'Puan 0-100 arasında olmalı').optional(),
-  anilistPopularity: z.coerce.number().min(0, 'Popülerlik 0\'dan büyük olmalı').optional(),
+  anilistAverageScore: z.coerce.number().min(0, 'Puan 0-100 arasında olmalı').max(100, 'Puan 0-100 arasında olmalı').optional().or(z.literal('')),
+  anilistPopularity: z.coerce.number().min(0, 'Popülerlik 0\'dan büyük olmalı').optional().or(z.literal('')),
   coverImage: z.string().optional(),
   bannerImage: z.string().optional(),
   coverImageFile: z.string().optional(), // Base64 dosya
   bannerImageFile: z.string().optional(), // Base64 dosya
   coverImageToDelete: z.boolean().optional(), // Mevcut resmi silmek için
   bannerImageToDelete: z.boolean().optional(), // Mevcut resmi silmek için
-  trailer: z.string().url('Geçerli bir URL girin').optional(),
+  trailer: z.string().url('Geçerli bir URL girin').optional().or(z.literal('')),
   
   // İlişkiler
   genreIds: z.array(z.string()).optional(),
@@ -118,7 +120,7 @@ export const updateAnimeSeriesSchema = z.object({
   
   // MOVIE için zorunlu, diğerleri için opsiyonel
   anilistId: z.coerce.number().positive('AniList ID pozitif bir sayı olmalı').optional(),
-  malId: z.coerce.number().positive('MAL ID pozitif bir sayı olmalı').optional(),
+  malId: z.coerce.number().positive('MAL ID pozitif bir sayı olmalı').optional().or(z.literal('')),
 }).refine((data) => {
   // MOVIE ise anilistId zorunlu
   if (data.type === AnimeType.MOVIE && !data.anilistId) {
