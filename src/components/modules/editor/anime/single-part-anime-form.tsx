@@ -152,12 +152,15 @@ export function SinglePartAnimeForm({
     setLoadingStore(LOADING_KEYS.FORMS.CREATE_ANIME, true);
 
     try {
+      // isMultiPart'ı type'a göre belirle
+      const isMultiPart = data.type !== AnimeType.MOVIE;
+      
       let result;
 
       if (isEdit && anime) {
-        result = await updateAnimeSeriesAction(anime.id, data);
+        result = await updateAnimeSeriesAction(anime.id, { ...data, isMultiPart });
       } else {
-        result = await createAnimeSeriesAction(data);
+        result = await createAnimeSeriesAction({ ...data, isMultiPart });
       }
 
       if (!result.success) {

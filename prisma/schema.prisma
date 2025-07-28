@@ -404,7 +404,7 @@ model AnimeSeries {
   trackedByUsers    UserAnimeTracking[] @relation("AnimeTrackedByUsers")
 
   // Çok Parçalı Kontrol
-  isMultiPart       Boolean?          @default(false) // Çok sezonlu mu?
+  isMultiPart       Boolean           @default(false) // Çok sezonlu mu?
 
   // İlişkiler
   sourceRelations   AnimeRelation[]   @relation("SourceRelations")

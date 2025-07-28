@@ -47,6 +47,8 @@ export const createAnimeSeriesSchema = z.object({
   genreIds: z.array(z.string()).optional(),
   tagIds: z.array(z.string()).optional(),
   studioIds: z.array(z.string()).optional(),
+
+  isMultiPart: z.boolean(),
   
   // MOVIE için zorunlu, diğerleri için opsiyonel
   anilistId: z.coerce.number().positive('AniList ID pozitif bir sayı olmalı').optional(),
@@ -100,6 +102,8 @@ export const updateAnimeSeriesSchema = z.object({
   genreIds: z.array(z.string()).optional(),
   tagIds: z.array(z.string()).optional(),
   studioIds: z.array(z.string()).optional(),
+
+  isMultiPart: z.boolean(),
   
   // MOVIE için zorunlu, diğerleri için opsiyonel
   anilistId: z.coerce.number().positive('AniList ID pozitif bir sayı olmalı').optional(),
