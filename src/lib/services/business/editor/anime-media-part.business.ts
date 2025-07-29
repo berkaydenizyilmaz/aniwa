@@ -1,18 +1,15 @@
 // Anime Media Part iş mantığı katmanı
 
 import { 
-  BusinessError, 
-  ConflictError, 
+  BusinessError,  
   NotFoundError,
   DatabaseError
 } from '@/lib/errors';
 import { 
   createAnimeMediaPartDB, 
   findAnimeMediaPartByIdDB, 
-  findAllAnimeMediaPartsDB, 
   updateAnimeMediaPartDB, 
   deleteAnimeMediaPartDB,
-  countAnimeMediaPartsDB,
 } from '@/lib/services/db/mediaPart.db';
 import { Prisma } from '@prisma/client';
 import { logger } from '@/lib/utils/logger';
@@ -21,12 +18,10 @@ import { ApiResponse } from '@/lib/types/api';
 import { 
   CreateAnimeMediaPartResponse, 
   GetAnimeMediaPartResponse, 
-  GetAnimeMediaPartsResponse, 
   UpdateAnimeMediaPartResponse,
   CreateAnimeMediaPartRequest,
   UpdateAnimeMediaPartRequest,
 } from '@/lib/types/api/anime.api';
-import { UploadService } from '@/lib/services/extends-api/cloudinary/upload.service';
 
 // =============================================================================
 // ANIME MEDIA PART CRUD FUNCTIONS
@@ -36,32 +31,24 @@ import { UploadService } from '@/lib/services/extends-api/cloudinary/upload.serv
 export async function createAnimeMediaPartBusiness(
   data: CreateAnimeMediaPartRequest,
   userId: string,
-  coverImage?: Buffer,
-  bannerImage?: Buffer
 ): Promise<ApiResponse<CreateAnimeMediaPartResponse>> {
   try {
-    // Resim yükleme işlemi
-    let uploadResult;
-    if (coverImage || bannerImage) {
-      uploadResult = await UploadService.uploadAnimeImages(coverImage, bannerImage, 'temp');
-    }
-
     // Anime media part oluştur
     const result = await createAnimeMediaPartDB({
-      seriesId: data.seriesId,
+      series: { connect: { id: data.seriesId } },
       title: data.title,
       englishTitle: data.englishTitle,
       japaneseTitle: data.japaneseTitle,
       notes: data.notes,
+      episodes: data.episodes,
+      duration: data.duration,
+      releaseDate: data.releaseDate,
       anilistId: data.anilistId,
       malId: data.malId,
       anilistAverageScore: data.anilistAverageScore,
       anilistPopularity: data.anilistPopularity,
       averageScore: data.averageScore,
       popularity: data.popularity,
-      // Resim URL'leri
-      coverImage: uploadResult?.coverImage?.secureUrl,
-      bannerImage: uploadResult?.bannerImage?.secureUrl,
     });
 
     // Başarılı oluşturma logu
@@ -74,8 +61,8 @@ export async function createAnimeMediaPartBusiness(
         title: result.title,
         anilistId: result.anilistId,
         malId: result.malId,
-        hasCoverImage: !!uploadResult?.coverImage,
-        hasBannerImage: !!uploadResult?.bannerImage
+        episodes: result.episodes,
+        duration: result.duration
       },
       userId
     );
@@ -149,20 +136,12 @@ export async function updateAnimeMediaPartBusiness(
   id: string, 
   data: UpdateAnimeMediaPartRequest,
   userId: string,
-  coverImage?: Buffer,
-  bannerImage?: Buffer
 ): Promise<ApiResponse<UpdateAnimeMediaPartResponse>> {
   try {
     // Anime media part mevcut mu kontrolü
     const existingMediaPart = await findAnimeMediaPartByIdDB(id);
     if (!existingMediaPart) {
       throw new NotFoundError('Anime media part bulunamadı');
-    }
-
-    // Resim yükleme işlemi
-    let uploadResult;
-    if (coverImage || bannerImage) {
-      uploadResult = await UploadService.uploadAnimeImages(coverImage, bannerImage, id);
     }
 
     // Güncelleme verilerini hazırla
@@ -172,20 +151,15 @@ export async function updateAnimeMediaPartBusiness(
     if (data.englishTitle !== undefined) updateData.englishTitle = data.englishTitle;
     if (data.japaneseTitle !== undefined) updateData.japaneseTitle = data.japaneseTitle;
     if (data.notes !== undefined) updateData.notes = data.notes;
+    if (data.episodes !== undefined) updateData.episodes = data.episodes;
+    if (data.duration !== undefined) updateData.duration = data.duration;
+    if (data.releaseDate !== undefined) updateData.releaseDate = data.releaseDate;
     if (data.anilistId !== undefined) updateData.anilistId = data.anilistId;
     if (data.malId !== undefined) updateData.malId = data.malId;
     if (data.anilistAverageScore !== undefined) updateData.anilistAverageScore = data.anilistAverageScore;
     if (data.anilistPopularity !== undefined) updateData.anilistPopularity = data.anilistPopularity;
     if (data.averageScore !== undefined) updateData.averageScore = data.averageScore;
     if (data.popularity !== undefined) updateData.popularity = data.popularity;
-
-    // Resim URL'leri güncelle
-    if (uploadResult?.coverImage) {
-      updateData.coverImage = uploadResult.coverImage.secureUrl;
-    }
-    if (uploadResult?.bannerImage) {
-      updateData.bannerImage = uploadResult.bannerImage.secureUrl;
-    }
 
     // Anime media part güncelle
     const result = await updateAnimeMediaPartDB({ id }, updateData);
@@ -198,8 +172,8 @@ export async function updateAnimeMediaPartBusiness(
         seriesId: result.seriesId,
         title: result.title,
         oldTitle: existingMediaPart.title,
-        hasNewCoverImage: !!uploadResult?.coverImage,
-        hasNewBannerImage: !!uploadResult?.bannerImage
+        episodes: result.episodes,
+        duration: result.duration
       },
       userId
     );
