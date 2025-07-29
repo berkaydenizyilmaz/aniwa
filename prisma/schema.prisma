@@ -429,7 +429,6 @@ model AnimeMediaPart {
   japaneseTitle     String?
   displayOrder      Int?              // İzleme sırası
   notes             String?           @db.String // Ek notlar
-  type              AnimeType         // Parça tipi
   episodes          Int?              // Bölüm sayısı
   duration          Int?              // Bölüm/film süresi
   releaseDate       DateTime?         // Yayın tarihi
@@ -453,7 +452,7 @@ model AnimeMediaPart {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
-  @@unique([seriesId, title, type])
+  @@unique([seriesId, title])
 }
 
 // Bölüm Modeli
