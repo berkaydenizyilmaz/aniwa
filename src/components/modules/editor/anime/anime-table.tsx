@@ -30,12 +30,12 @@ import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { type AnimeSeriesFilters } from '@/lib/schemas/anime.schema';
 
 interface AnimeTableProps {
-  onEdit?: (anime: AnimeSeries) => void;
+  onEdit?: (anime: AnimeSeries | GetAllAnimeSeriesResponse['animeSeries'][0]) => void;
   searchTerm?: string;
 }
 
 export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
-  const [animeSeries, setAnimeSeries] = useState<AnimeSeries[]>([]);
+  const [animeSeries, setAnimeSeries] = useState<GetAllAnimeSeriesResponse['animeSeries']>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedAnime, setSelectedAnime] = useState<AnimeSeries | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -79,7 +79,24 @@ export function AnimeTable({ onEdit, searchTerm = '' }: AnimeTableProps) {
   }, [searchTerm]);
 
   const handleEdit = (anime: AnimeSeries) => {
-    onEdit?.(anime);
+    console.log('handleEdit called with anime:', anime);
+    console.log('animeSeries array:', animeSeries);
+    console.log('animeSeries length:', animeSeries.length);
+    
+    // Table'dan gelen anime verisinde genres, tags, studios bilgileri var
+    const animeWithRelations = animeSeries.find(a => a.id === anime.id);
+    console.log('Found anime with relations:', animeWithRelations);
+    
+    if (animeWithRelations) {
+      console.log('Anime with relations found:', animeWithRelations);
+      console.log('Genres:', animeWithRelations.genres);
+      console.log('Tags:', animeWithRelations.tags);
+      console.log('Studios:', animeWithRelations.studios);
+      onEdit?.(animeWithRelations);
+    } else {
+      console.log('Anime with relations not found, using original anime');
+      onEdit?.(anime);
+    }
   };
 
   const handleDelete = (anime: AnimeSeries) => {

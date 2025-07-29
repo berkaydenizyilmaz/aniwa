@@ -272,6 +272,11 @@ export async function getAllAnimeSeriesBusiness(
           findAnimeStudiosBySeriesIdDB(anime.id),
         ]);
 
+        console.log(`Anime ${anime.title} (${anime.id}):`);
+        console.log('  - Genres found:', animeGenres.length);
+        console.log('  - Tags found:', animeTags.length);
+        console.log('  - Studios found:', animeStudios.length);
+
         return {
           ...anime,
           genres: animeGenres.map(ag => ag.genre),
