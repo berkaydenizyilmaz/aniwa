@@ -1,7 +1,7 @@
 // Anime validasyon şemaları
 
 import { z } from 'zod';
-import { AnimeType, AnimeStatus, Season, Source } from '@prisma/client';
+import { AnimeType, AnimeStatus, Season, Source, CountryOfOrigin } from '@prisma/client';
 import { ANIME } from '@/lib/constants/anime.constants';
 import { MASTER_DATA } from '@/lib/constants/masterData.constants';
 
@@ -18,6 +18,10 @@ export const createAnimeSeriesSchema = z.object({
   season: z.nativeEnum(Season).optional(),
   year: z.number().min(ANIME.YEAR.MIN).max(ANIME.YEAR.MAX).optional(),
   source: z.nativeEnum(Source).optional(),
+  countryOfOrigin: z.nativeEnum(CountryOfOrigin).optional(),
+  isAdult: z.boolean().default(false),
+  trailer: z.string().url('Geçerli bir URL girin').optional(),
+  synonyms: z.array(z.string()).optional(),
   genres: z.array(z.string()).optional(),
   studios: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
@@ -36,6 +40,10 @@ export const updateAnimeSeriesSchema = z.object({
   season: z.nativeEnum(Season).optional(),
   year: z.number().min(ANIME.YEAR.MIN).max(ANIME.YEAR.MAX).optional(),
   source: z.nativeEnum(Source).optional(),
+  countryOfOrigin: z.nativeEnum(CountryOfOrigin).optional(),
+  isAdult: z.boolean().optional(),
+  trailer: z.string().url('Geçerli bir URL girin').optional(),
+  synonyms: z.array(z.string()).optional(),
   genres: z.array(z.string()).optional(),
   studios: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),

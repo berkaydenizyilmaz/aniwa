@@ -1,7 +1,5 @@
 // Anime sabitleri
 
-import { AnimeType, AnimeStatus, Season, Source } from '@prisma/client';
-
 export const ANIME = {
   // Title kuralları
   TITLE: {
@@ -36,12 +34,6 @@ export const ANIME = {
     MIN: 1900,
     MAX: 2100,
   },
-  
-  // Prisma enum'ları
-  TYPE: AnimeType,
-  STATUS: AnimeStatus,
-  SEASON: Season,
-  SOURCE: Source,
   
   // Anime type etiketleri
   TYPE_LABELS: {
@@ -79,5 +71,12 @@ export const ANIME = {
     VIDEO_GAME: 'Video Oyunu',
     NOVEL: 'Roman',
     DOUJINSHI: 'Doujinshi',
+  } as const,
+  
+  // Country of origin etiketleri
+  COUNTRY_OF_ORIGIN_LABELS: {
+    JAPAN: 'Japonya',
+    SOUTH_KOREA: 'Güney Kore',
+    CHINA: 'Çin',
   } as const,
 } as const; 
