@@ -26,10 +26,9 @@ import { createAnimeSeriesAction, updateAnimeSeriesAction } from '@/lib/actions/
 import { createAnimeSeriesSchema, updateAnimeSeriesSchema, type CreateAnimeSeriesInput, type UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 import { toast } from 'sonner';
 import { AnimeSeries, AnimeType, AnimeStatus, Season, Source, CountryOfOrigin } from '@prisma/client';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { ANIME } from '@/lib/constants/anime.constants';
 import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface AnimeSeriesFormDialogProps {
   open: boolean;
@@ -39,7 +38,7 @@ interface AnimeSeriesFormDialogProps {
 }
 
 export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSuccess }: AnimeSeriesFormDialogProps) {
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -112,39 +111,46 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
     }
   }, [animeSeries, reset]);
 
-  const onSubmit = async (data: CreateAnimeSeriesInput | UpdateAnimeSeriesInput) => {
-    if (isLoading(animeSeries ? LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES : LOADING_KEYS.FORMS.CREATE_ANIME_SERIES)) return;
-
-    setLoadingStore(animeSeries ? LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES : LOADING_KEYS.FORMS.CREATE_ANIME_SERIES, true);
-
-    try {
-      let result;
-
-      if (animeSeries) {
-        // Güncelleme
-        result = await updateAnimeSeriesAction(animeSeries.id, data as UpdateAnimeSeriesInput);
-      } else {
-        // Oluşturma
-        result = await createAnimeSeriesAction(data as CreateAnimeSeriesInput);
-      }
-
-      if (!result.success) {
-        toast.error(result.error || `${animeSeries ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
-        return;
-      }
-
-      // Başarılı
-      toast.success(`Anime serisi başarıyla ${animeSeries ? 'güncellendi' : 'oluşturuldu'}!`);
-
-      // Dialog'u kapat ve callback çağır
+  // Create mutation
+  const createMutation = useMutation({
+    mutationFn: createAnimeSeriesAction,
+    onSuccess: () => {
+      toast.success('Anime serisi başarıyla oluşturuldu!');
       onOpenChange(false);
       onSuccess?.();
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['anime-series'] });
+    },
+    onError: (error) => {
+      console.error('Create anime series error:', error);
+      toast.error('Oluşturma başarısız oldu');
+    },
+  });
 
-    } catch (error) {
-      console.error('Anime series form error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(animeSeries ? LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES : LOADING_KEYS.FORMS.CREATE_ANIME_SERIES, false);
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateAnimeSeriesInput }) => 
+      updateAnimeSeriesAction(id, data),
+    onSuccess: () => {
+      toast.success('Anime serisi başarıyla güncellendi!');
+      onOpenChange(false);
+      onSuccess?.();
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['anime-series'] });
+    },
+    onError: (error) => {
+      console.error('Update anime series error:', error);
+      toast.error('Güncelleme başarısız oldu');
+    },
+  });
+
+  const onSubmit = async (data: CreateAnimeSeriesInput | UpdateAnimeSeriesInput) => {
+    if (animeSeries) {
+      // Güncelleme
+      updateMutation.mutate({ id: animeSeries.id, data: data as UpdateAnimeSeriesInput });
+    } else {
+      // Oluşturma
+      createMutation.mutate(data as CreateAnimeSeriesInput);
     }
   };
 
@@ -463,7 +469,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                   maxSize={UPLOAD_CONFIGS.ANIME_COVER.maxSize}
                   value={field.value}
                   onChange={field.onChange}
-                  disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME_SERIES) || isLoading(LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES)}
+                  disabled={createMutation.isPending || updateMutation.isPending}
                 />
               )}
             />
@@ -485,7 +491,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                   maxSize={UPLOAD_CONFIGS.ANIME_BANNER.maxSize}
                   value={field.value}
                   onChange={field.onChange}
-                  disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME_SERIES) || isLoading(LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES)}
+                  disabled={createMutation.isPending || updateMutation.isPending}
                 />
               )}
             />
@@ -581,13 +587,13 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME_SERIES) || isLoading(LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES)}
+              disabled={createMutation.isPending || updateMutation.isPending}
             >
               İptal
             </Button>
             <Button
               type="submit"
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME_SERIES) || isLoading(LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES)}
+              disabled={createMutation.isPending || updateMutation.isPending}
             >
               {animeSeries ? 'Güncelle' : 'Oluştur'}
             </Button>

@@ -100,7 +100,7 @@ export function AnimeSeriesFilters({ onSearch, onTypeChange, onStatusChange, onA
         </div>
 
         {/* Yeni Anime Ekle */}
-        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME) || isLoading(LOADING_KEYS.FORMS.CREATE_ANIME_SERIES)}>
+        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME)}>
           <Plus className="h-4 w-4" />
           Yeni Anime Ekle
         </Button>

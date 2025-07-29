@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { AnimeSeries, AnimeType, AnimeStatus } from '@prisma/client';
@@ -28,6 +28,7 @@ import {
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { type AnimeFilters } from '@/lib/schemas/anime.schema';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface AnimeSeriesTableProps {
   onEdit?: (animeSeries: AnimeSeries) => void;
@@ -38,20 +39,22 @@ interface AnimeSeriesTableProps {
 }
 
 export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', selectedStatus = '', refreshKey }: AnimeSeriesTableProps) {
-  const [animeSeries, setAnimeSeries] = useState<AnimeSeries[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedAnimeSeries, setSelectedAnimeSeries] = useState<AnimeSeries | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalAnimeSeries, setTotalAnimeSeries] = useState(0);
   const [limit] = useState(50);
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
-  // Anime serilerini getir (server-side filtreleme)
-  useEffect(() => {
-    const fetchAnimeSeries = async () => {
+  // Query key oluştur
+  const queryKey = ['anime-series', { searchTerm, selectedType, selectedStatus, currentPage, limit, refreshKey }];
+
+  // Anime serilerini getir
+  const { data, isLoading: isFetching, error } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      setLoadingStore(LOADING_KEYS.PAGES.EDITOR_ANIME, true);
       try {
-        setLoadingStore(LOADING_KEYS.PAGES.EDITOR_ANIME, true);
         const filters: AnimeFilters = {
           page: currentPage,
           limit: limit,
@@ -59,29 +62,40 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
         if (searchTerm) filters.search = searchTerm;
         if (selectedType) filters.type = selectedType as AnimeType;
         if (selectedStatus) filters.status = selectedStatus as AnimeStatus;
+        
         const result = await getAnimeSeriesListAction(filters);
         if (!result.success) {
-          toast.error(result.error || 'Anime serileri yüklenirken bir hata oluştu');
-          return;
+          throw new Error(result.error || 'Anime serileri yüklenirken bir hata oluştu');
         }
-        const data = result.data as GetAnimeSeriesListResponse;
-        setAnimeSeries(data.animeSeries);
-        setTotalPages(data.totalPages);
-        setTotalAnimeSeries(data.total);
-      } catch (error) {
-        console.error('Fetch anime series error:', error);
-        toast.error('Anime serileri yüklenirken bir hata oluştu');
+        return result.data as GetAnimeSeriesListResponse;
       } finally {
         setLoadingStore(LOADING_KEYS.PAGES.EDITOR_ANIME, false);
       }
-    };
-    fetchAnimeSeries();
-  }, [setLoadingStore, searchTerm, selectedType, selectedStatus, currentPage, limit, refreshKey]);
+    },
+    staleTime: 5 * 60 * 1000, // 5 dakika
+  });
+
+  // Silme mutation'ı
+  const deleteMutation = useMutation({
+    mutationFn: deleteAnimeSeriesAction,
+    onSuccess: () => {
+      toast.success('Anime serisi başarıyla silindi!');
+      setDeleteDialogOpen(false);
+      setSelectedAnimeSeries(null);
+      
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['anime-series'] });
+    },
+    onError: (error) => {
+      console.error('Delete anime series error:', error);
+      toast.error('Silme işlemi sırasında bir hata oluştu');
+    },
+  });
 
   // Filtreler değiştiğinde sayfa 1'e dön
-  useEffect(() => {
+  if (searchTerm || selectedType || selectedStatus) {
     setCurrentPage(1);
-  }, [searchTerm, selectedType, selectedStatus]);
+  }
 
   const handleEdit = (animeSeries: AnimeSeries) => {
     onEdit?.(animeSeries);
@@ -93,31 +107,8 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedAnimeSeries || isLoading(LOADING_KEYS.ACTIONS.DELETE_ANIME_SERIES)) return;
-
-    setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_ANIME_SERIES, true);
-
-    try {
-      const result = await deleteAnimeSeriesAction(selectedAnimeSeries.id);
-
-      if (!result.success) {
-        toast.error(result.error || 'Silme işlemi başarısız oldu');
-        return;
-      }
-
-      toast.success('Anime serisi başarıyla silindi!');
-      setDeleteDialogOpen(false);
-      setSelectedAnimeSeries(null);
-
-      // Tabloyu yenile
-      setCurrentPage(1);
-
-    } catch (error) {
-      console.error('Delete anime series error:', error);
-      toast.error('Silme işlemi sırasında bir hata oluştu');
-    } finally {
-      setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_ANIME_SERIES, false);
-    }
+    if (!selectedAnimeSeries) return;
+    deleteMutation.mutate(selectedAnimeSeries.id);
   };
 
   const handlePageChange = (page: number) => {
@@ -125,10 +116,12 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
   };
 
   const getPageNumbers = () => {
+    if (!data) return [];
+    
     const pages = [];
     const maxVisible = 5;
     let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    const end = Math.min(totalPages, start + maxVisible - 1);
+    const end = Math.min(data.totalPages, start + maxVisible - 1);
 
     if (end - start + 1 < maxVisible) {
       start = Math.max(1, end - maxVisible + 1);
@@ -140,7 +133,7 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
     return pages;
   };
 
-  if (isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME)) {
+  if (isFetching) {
     return (
       <div className="space-y-4">
         {Array.from({ length: 5 }).map((_, i) => (
@@ -158,6 +151,18 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
       </div>
     );
   }
+
+  if (error) {
+    return (
+      <div className="glass-card p-8 text-center">
+        <p className="text-destructive">Anime serileri yüklenirken bir hata oluştu</p>
+      </div>
+    );
+  }
+
+  const animeSeries = data?.animeSeries || [];
+  const totalPages = data?.totalPages || 1;
+  const totalAnimeSeries = data?.total || 0;
 
   return (
     <>
@@ -222,7 +227,7 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(animeSeries)}
-                        disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES)}
+                        disabled={false}
                         className="h-8 w-8 p-0"
                       >
                         <Edit className="h-4 w-4" />
@@ -231,7 +236,7 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
                         variant="ghost-destructive"
                         size="sm"
                         onClick={() => handleDelete(animeSeries)}
-                        disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_ANIME_SERIES)}
+                        disabled={deleteMutation.isPending}
                         className="h-8 w-8 p-0"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -313,7 +318,7 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
             <Button
               variant="destructive"
               onClick={handleDeleteConfirm}
-              disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_ANIME_SERIES)}
+              disabled={deleteMutation.isPending}
             >
               Sil
             </Button>
