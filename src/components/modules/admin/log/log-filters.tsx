@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/select';
 import { Search, RefreshCw, Filter, Calendar } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { LogLevel } from '@prisma/client';
 
 interface LogFiltersProps {

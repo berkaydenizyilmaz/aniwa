@@ -14,8 +14,6 @@ import {
 } from '@/components/ui/select';
 import { Search, Plus, Filter } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { MASTER_DATA } from '@/lib/constants/masterData.constants';
 
 interface TagFiltersProps {
@@ -32,7 +30,6 @@ export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoile
   const [selectedAdult, setSelectedAdult] = useState<boolean | null>(null);
   const [selectedSpoiler, setSelectedSpoiler] = useState<boolean | null>(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { isLoading } = useLoadingStore();
 
   // Debounced search term değiştiğinde onSearch'ü çağır
   useEffect(() => {
@@ -75,7 +72,7 @@ export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoile
         {/* Kategori Filtresi */}
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={selectedCategory} onValueChange={handleCategoryChange} disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}>
+          <Select value={selectedCategory} onValueChange={handleCategoryChange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Tüm Kategoriler" />
             </SelectTrigger>
@@ -98,7 +95,6 @@ export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoile
               id="adult-filter"
               checked={selectedAdult === true}
               onCheckedChange={(checked) => handleAdultChange(checked ? true : null)}
-              disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
             />
             <Label htmlFor="adult-filter" className="flex items-center gap-1 text-sm">
               Yetişkin İçerik
@@ -111,7 +107,6 @@ export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoile
               id="spoiler-filter"
               checked={selectedSpoiler === true}
               onCheckedChange={(checked) => handleSpoilerChange(checked ? true : null)}
-              disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
             />
             <Label htmlFor="spoiler-filter" className="flex items-center gap-1 text-sm">
               Spoiler İçerik
@@ -120,7 +115,7 @@ export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoile
         </div>
 
         {/* Yeni Etiket Ekle */}
-        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={isLoading(LOADING_KEYS.PAGES.TAGS) || isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}>
+        <Button onClick={onAddNew} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Yeni Etiket Ekle
         </Button>

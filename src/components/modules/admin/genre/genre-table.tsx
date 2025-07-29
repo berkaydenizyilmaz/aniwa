@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Genre } from '@prisma/client';
@@ -25,9 +25,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { type GenreFilters } from '@/lib/schemas/genre.schema';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface GenreTableProps {
   onEdit?: (genre: Genre) => void;
@@ -35,50 +34,56 @@ interface GenreTableProps {
 }
 
 export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
-  const [genres, setGenres] = useState<Genre[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalGenres, setTotalGenres] = useState(0);
   const [limit] = useState(50);
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
-  // Genre'leri getir (server-side filtreleme)
-  useEffect(() => {
-    const fetchGenres = async () => {
-      try {
-        setLoadingStore(LOADING_KEYS.PAGES.GENRES, true);
-        const filters: GenreFilters = {
-          page: currentPage,
-          limit: limit,
-        };
-        if (searchTerm) filters.search = searchTerm;
-        const result = await getGenresAction(filters);
-        if (!result.success) {
-          toast.error(result.error || 'Türler yüklenirken bir hata oluştu');
-          return;
-        }
-        const data = result.data as GetGenresResponse;
-        setGenres(data.genres);
-        setTotalPages(data.totalPages);
-        setTotalGenres(data.total);
-      } catch (error) {
-        console.error('Fetch genres error:', error);
-        toast.error('Türler yüklenirken bir hata oluştu');
-      } finally {
-        setLoadingStore(LOADING_KEYS.PAGES.GENRES, false);
+  // Query key oluştur
+  const queryKey = ['genres', { searchTerm, currentPage, limit }];
+
+  // Genre'leri getir
+  const { data, isLoading: isFetching, error } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const filters: GenreFilters = {
+        page: currentPage,
+        limit: limit,
+      };
+      if (searchTerm) filters.search = searchTerm;
+      
+      const result = await getGenresAction(filters);
+      if (!result.success) {
+        throw new Error(result.error || 'Türler yüklenirken bir hata oluştu');
       }
-    };
-    fetchGenres();
-  }, [setLoadingStore, searchTerm, currentPage, limit]);
+      return result.data as GetGenresResponse;
+    },
+    staleTime: 5 * 60 * 1000, // 5 dakika
+  });
+
+  // Silme mutation'ı
+  const deleteMutation = useMutation({
+    mutationFn: deleteGenreAction,
+    onSuccess: () => {
+      toast.success('Tür başarıyla silindi!');
+      setDeleteDialogOpen(false);
+      setSelectedGenre(null);
+      
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['genres'] });
+    },
+    onError: (error) => {
+      console.error('Delete genre error:', error);
+      toast.error('Silme işlemi sırasında bir hata oluştu');
+    },
+  });
 
   // Filtreler değiştiğinde sayfa 1'e dön
-  useEffect(() => {
+  if (searchTerm) {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }
 
-  // Client-side filtreleme kaldırıldı, direkt genres kullanılıyor
   const handleEdit = (genre: Genre) => {
     onEdit?.(genre);
   };
@@ -89,36 +94,8 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedGenre || isLoading(LOADING_KEYS.ACTIONS.DELETE_GENRE)) return;
-
-    setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_GENRE, true);
-
-    try {
-      const result = await deleteGenreAction(selectedGenre.id);
-
-      if (!result.success) {
-        toast.error(result.error || 'Silme işlemi başarısız oldu');
-        return;
-      }
-
-      toast.success('Tür başarıyla silindi!');
-      setDeleteDialogOpen(false);
-
-      // Tabloyu yenile
-      const fetchResult = await getGenresAction({ page: currentPage, limit });
-      if (fetchResult.success) {
-        const data = fetchResult.data as GetGenresResponse;
-        setGenres(data.genres);
-        setTotalPages(data.totalPages);
-        setTotalGenres(data.total);
-      }
-
-    } catch (error) {
-      console.error('Delete genre error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_GENRE, false);
-    }
+    if (!selectedGenre) return;
+    deleteMutation.mutate(selectedGenre.id);
   };
 
   const handlePageChange = (page: number) => {
@@ -126,11 +103,13 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
   };
 
   const getPageNumbers = () => {
+    if (!data) return [];
+    
     const pages = [];
     const maxVisiblePages = 5;
     
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
+    if (data.totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= data.totalPages; i++) {
         pages.push(i);
       }
     } else {
@@ -139,11 +118,11 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
           pages.push(i);
         }
         pages.push('...');
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
+        pages.push(data.totalPages);
+      } else if (currentPage >= data.totalPages - 2) {
         pages.push(1);
         pages.push('...');
-        for (let i = totalPages - 3; i <= totalPages; i++) {
+        for (let i = data.totalPages - 3; i <= data.totalPages; i++) {
           pages.push(i);
         }
       } else {
@@ -153,14 +132,14 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
           pages.push(i);
         }
         pages.push('...');
-        pages.push(totalPages);
+        pages.push(data.totalPages);
       }
     }
     
     return pages;
   };
 
-  if (isLoading(LOADING_KEYS.PAGES.GENRES)) {
+  if (isFetching) {
     return (
       <div className="glass-card">
         <div className="p-4">
@@ -179,21 +158,33 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
     );
   }
 
+  if (error) {
+    return (
+      <div className="glass-card p-8 text-center">
+        <p className="text-destructive">Türler yüklenirken bir hata oluştu</p>
+      </div>
+    );
+  }
+
+  const genres = data?.genres || [];
+  const totalPages = data?.totalPages || 1;
+  const totalGenres = data?.total || 0;
+
   return (
     <>
       <div className="glass-card">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-1/3">İsim</TableHead>
-              <TableHead className="w-1/3">Slug</TableHead>
-              <TableHead className="w-1/3">İşlemler</TableHead>
+              <TableHead>Ad</TableHead>
+              <TableHead>Açıklama</TableHead>
+              <TableHead>İşlemler</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {genres.map((genre) => (
               <TableRow key={genre.id}>
-                <TableCell>{genre.name}</TableCell>
+                <TableCell className="font-medium">{genre.name}</TableCell>
                 <TableCell className="text-muted-foreground">{genre.slug}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
@@ -209,6 +200,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
                       variant="ghost-destructive"
                       size="sm"
                       onClick={() => handleDelete(genre)}
+                      disabled={deleteMutation.isPending}
                       className="h-8 w-8 p-0"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -239,7 +231,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.GENRES)}
+                disabled={currentPage === 1}
               >
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
@@ -249,7 +241,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.GENRES)}
+                disabled={currentPage === 1}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -265,7 +257,6 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
                         variant={currentPage === page ? "default" : "outline"}
                         size="sm"
                         onClick={() => handlePageChange(page as number)}
-                        disabled={isLoading(LOADING_KEYS.PAGES.GENRES)}
                         className="w-8 h-8 p-0"
                       >
                         {page}
@@ -280,7 +271,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.GENRES)}
+                disabled={currentPage === totalPages}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -290,7 +281,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.GENRES)}
+                disabled={currentPage === totalPages}
               >
                 <ChevronsRight className="h-4 w-4" />
               </Button>
@@ -310,10 +301,10 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_GENRE)}>İptal</AlertDialogCancel>
+            <AlertDialogCancel>İptal</AlertDialogCancel>
             <Button
               onClick={handleDeleteConfirm}
-              disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_GENRE)}
+              disabled={deleteMutation.isPending}
               variant="destructive"
             >
               Sil

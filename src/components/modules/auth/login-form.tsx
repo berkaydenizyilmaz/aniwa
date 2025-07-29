@@ -9,8 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { loginSchema, type LoginInput } from '@/lib/schemas/auth.schema';
 import { toast } from 'sonner';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { useMutation } from '@tanstack/react-query';
+
 import { ROUTES } from '@/lib/constants/routes.constants';
 
 export function LoginForm() {

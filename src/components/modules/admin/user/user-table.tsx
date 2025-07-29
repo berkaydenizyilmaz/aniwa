@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { User, UserRole } from '@prisma/client';
@@ -25,9 +25,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { type UserFilters } from '@/lib/schemas/user.schema';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UserTableProps {
   onEdit?: (user: User) => void;
@@ -37,52 +36,58 @@ interface UserTableProps {
 }
 
 export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selectedBanned = null }: UserTableProps) {
-  const [users, setUsers] = useState<User[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalUsers, setTotalUsers] = useState(0);
   const [limit] = useState(50);
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
-  // User'ları getir (server-side filtreleme)
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoadingStore(LOADING_KEYS.PAGES.USERS, true);
-        const filters: UserFilters = {
-          page: currentPage,
-          limit: limit,
-        };
-        if (searchTerm) filters.search = searchTerm;
-        if (selectedRole) filters.role = selectedRole as UserRole;
-        if (selectedBanned !== null) filters.isBanned = selectedBanned;
-        const result = await getUsersAction(filters);
-        if (!result.success) {
-          toast.error(result.error || 'Kullanıcılar yüklenirken bir hata oluştu');
-          return;
-        }
-        const data = result.data as GetUsersResponse;
-        setUsers(data.users);
-        setTotalPages(data.totalPages);
-        setTotalUsers(data.total);
-      } catch (error) {
-        console.error('Fetch users error:', error);
-        toast.error('Kullanıcılar yüklenirken bir hata oluştu');
-      } finally {
-        setLoadingStore(LOADING_KEYS.PAGES.USERS, false);
+  // Query key oluştur
+  const queryKey = ['users', { searchTerm, selectedRole, selectedBanned, currentPage, limit }];
+
+  // User'ları getir
+  const { data, isLoading: isFetching, error } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const filters: UserFilters = {
+        page: currentPage,
+        limit: limit,
+      };
+      if (searchTerm) filters.search = searchTerm;
+      if (selectedRole) filters.role = selectedRole as UserRole;
+      if (selectedBanned !== null) filters.isBanned = selectedBanned;
+      
+      const result = await getUsersAction(filters);
+      if (!result.success) {
+        throw new Error(result.error || 'Kullanıcılar yüklenirken bir hata oluştu');
       }
-    };
-    fetchUsers();
-  }, [setLoadingStore, searchTerm, selectedRole, selectedBanned, currentPage, limit]);
+      return result.data as GetUsersResponse;
+    },
+    staleTime: 5 * 60 * 1000, // 5 dakika
+  });
+
+  // Silme mutation'ı
+  const deleteMutation = useMutation({
+    mutationFn: deleteUserAction,
+    onSuccess: () => {
+      toast.success('Kullanıcı başarıyla silindi!');
+      setDeleteDialogOpen(false);
+      setSelectedUser(null);
+      
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+    onError: (error) => {
+      console.error('Delete user error:', error);
+      toast.error('Silme işlemi sırasında bir hata oluştu');
+    },
+  });
 
   // Filtreler değiştiğinde sayfa 1'e dön
-  useEffect(() => {
+  if (searchTerm || selectedRole || selectedBanned !== null) {
     setCurrentPage(1);
-  }, [searchTerm, selectedRole, selectedBanned]);
+  }
 
-  // Client-side filtreleme kaldırıldı, direkt users kullanılıyor
   const handleEdit = (user: User) => {
     onEdit?.(user);
   };
@@ -93,36 +98,8 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedUser || isLoading(LOADING_KEYS.ACTIONS.DELETE_USER)) return;
-
-    setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_USER, true);
-
-    try {
-      const result = await deleteUserAction(selectedUser.id);
-
-      if (!result.success) {
-        toast.error(result.error || 'Silme işlemi başarısız oldu');
-        return;
-      }
-
-      toast.success('Kullanıcı başarıyla silindi!');
-      setDeleteDialogOpen(false);
-
-      // Tabloyu yenile
-      const fetchResult = await getUsersAction({ page: currentPage, limit });
-      if (fetchResult.success) {
-        const data = fetchResult.data as GetUsersResponse;
-        setUsers(data.users);
-        setTotalPages(data.totalPages);
-        setTotalUsers(data.total);
-      }
-
-    } catch (error) {
-      console.error('Delete user error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_USER, false);
-    }
+    if (!selectedUser) return;
+    deleteMutation.mutate(selectedUser.id);
   };
 
   const handlePageChange = (page: number) => {
@@ -130,11 +107,13 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
   };
 
   const getPageNumbers = () => {
+    if (!data) return [];
+    
     const pages = [];
     const maxVisiblePages = 5;
     
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
+    if (data.totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= data.totalPages; i++) {
         pages.push(i);
       }
     } else {
@@ -143,11 +122,11 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
           pages.push(i);
         }
         pages.push('...');
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
+        pages.push(data.totalPages);
+      } else if (currentPage >= data.totalPages - 2) {
         pages.push(1);
         pages.push('...');
-        for (let i = totalPages - 3; i <= totalPages; i++) {
+        for (let i = data.totalPages - 3; i <= data.totalPages; i++) {
           pages.push(i);
         }
       } else {
@@ -157,14 +136,14 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
           pages.push(i);
         }
         pages.push('...');
-        pages.push(totalPages);
+        pages.push(data.totalPages);
       }
     }
     
     return pages;
   };
 
-  if (isLoading(LOADING_KEYS.PAGES.USERS)) {
+  if (isFetching) {
     return (
       <div className="glass-card">
         <div className="p-4">
@@ -185,17 +164,29 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
     );
   }
 
+  if (error) {
+    return (
+      <div className="glass-card p-8 text-center">
+        <p className="text-destructive">Kullanıcılar yüklenirken bir hata oluştu</p>
+      </div>
+    );
+  }
+
+  const users = data?.users || [];
+  const totalPages = data?.totalPages || 1;
+  const totalUsers = data?.total || 0;
+
   return (
     <>
       <div className="glass-card">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-1/5">Kullanıcı Adı</TableHead>
-              <TableHead className="w-1/5">Email</TableHead>
-              <TableHead className="w-1/5">Roller</TableHead>
-              <TableHead className="w-1/5">Durum</TableHead>
-              <TableHead className="w-1/5">İşlemler</TableHead>
+              <TableHead>Kullanıcı Adı</TableHead>
+              <TableHead>E-posta</TableHead>
+              <TableHead>Roller</TableHead>
+              <TableHead>Durum</TableHead>
+              <TableHead>İşlemler</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -229,6 +220,7 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
                       variant="ghost-destructive"
                       size="sm"
                       onClick={() => handleDelete(user)}
+                      disabled={deleteMutation.isPending}
                       className="h-8 w-8 p-0"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -259,7 +251,7 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.USERS)}
+                disabled={currentPage === 1}
               >
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
@@ -269,7 +261,7 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.USERS)}
+                disabled={currentPage === 1}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -285,7 +277,6 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
                         variant={currentPage === page ? "default" : "outline"}
                         size="sm"
                         onClick={() => handlePageChange(page as number)}
-                        disabled={isLoading(LOADING_KEYS.PAGES.USERS)}
                         className="w-8 h-8 p-0"
                       >
                         {page}
@@ -300,7 +291,7 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.USERS)}
+                disabled={currentPage === totalPages}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -310,7 +301,7 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.USERS)}
+                disabled={currentPage === totalPages}
               >
                 <ChevronsRight className="h-4 w-4" />
               </Button>
@@ -319,22 +310,22 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
         )}
       </div>
 
-      {/* Delete Alert Dialog */}
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Kullanıcıyı Sil</AlertDialogTitle>
             <AlertDialogDescription>
-              <strong>{selectedUser?.username}</strong> kullanıcısını silmek istediğinizden emin misiniz?
+              &quot;{selectedUser?.username}&quot; kullanıcısını silmek istediğinizden emin misiniz? 
               Bu işlem geri alınamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_USER)}>İptal</AlertDialogCancel>
+            <AlertDialogCancel>İptal</AlertDialogCancel>
             <Button
-              onClick={handleDeleteConfirm}
-              disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_USER)}
               variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={deleteMutation.isPending}
             >
               Sil
             </Button>

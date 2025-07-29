@@ -25,8 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { type StudioFilters } from '@/lib/schemas/studio.schema';
 
 interface StudioTableProps {
@@ -43,7 +42,7 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
   const [totalPages, setTotalPages] = useState(1);
   const [totalStudios, setTotalStudios] = useState(0);
   const [limit] = useState(50);
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
   // Studio'ları getir (server-side filtreleme)
   useEffect(() => {

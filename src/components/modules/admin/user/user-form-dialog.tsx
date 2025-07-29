@@ -17,8 +17,7 @@ import { updateUserAction } from '@/lib/actions/admin/user.action';
 import { updateUserSchema, type UpdateUserInput } from '@/lib/schemas/user.schema';
 import { toast } from 'sonner';
 import { User, UserRole } from '@prisma/client';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UserFormDialogProps {
   open: boolean;
@@ -28,7 +27,7 @@ interface UserFormDialogProps {
 }
 
 export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserFormDialogProps) {
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -65,33 +64,26 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
     }
   }, [user, reset]);
 
-  const onSubmit = async (data: UpdateUserInput) => {
-    if (!user || isLoading(LOADING_KEYS.FORMS.UPDATE_USER)) return; // Prevent double submission
-
-    setLoadingStore(LOADING_KEYS.FORMS.UPDATE_USER, true);
-
-    try {
-      // Güncelleme
-      const result = await updateUserAction(user.id, data);
-
-      if (!result.success) {
-        toast.error(result.error || 'Güncelleme başarısız oldu');
-        return;
-      }
-
-      // Başarılı
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateUserInput }) => 
+      updateUserAction(id, data),
+    onSuccess: () => {
       toast.success('Kullanıcı başarıyla güncellendi!');
-
-      // Dialog'u kapat ve callback çağır
       onOpenChange(false);
       onSuccess?.();
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+    onError: (error) => {
+      console.error('Update user error:', error);
+      toast.error('Güncelleme başarısız oldu');
+    },
+  });
 
-    } catch (error) {
-      console.error('User form error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.FORMS.UPDATE_USER, false);
-    }
+  const onSubmit = async (data: UpdateUserInput) => {
+    if (!user) return;
+    updateMutation.mutate({ id: user.id, data });
   };
 
   return (
@@ -111,7 +103,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               id="username"
               {...register('username')}
               placeholder="Kullanıcı adını girin"
-              disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_USER)}
+              disabled={updateMutation.isPending}
             />
             {errors.username && (
               <p className="text-sm text-destructive">{errors.username.message}</p>
@@ -126,7 +118,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               type="email"
               {...register('email')}
               placeholder="E-posta adresini girin"
-              disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_USER)}
+              disabled={updateMutation.isPending}
             />
             {errors.email && (
               <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -156,7 +148,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
                               field.onChange(currentRoles.filter(r => r !== role));
                             }
                           }}
-                          disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_USER)}
+                          disabled={updateMutation.isPending}
                         />
                         <Label 
                           htmlFor={`role-${role}`} 
@@ -188,7 +180,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
                     id="isBanned"
                     checked={field.value}
                     onCheckedChange={(checked) => field.onChange(checked === true)}
-                    disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_USER)}
+                    disabled={updateMutation.isPending}
                   />
                   <Label htmlFor="isBanned" className="text-sm">
                     Yasaklı
@@ -207,13 +199,13 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_USER)}
+              disabled={updateMutation.isPending}
             >
               İptal
             </Button>
             <Button
               type="submit"
-              disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_USER)}
+              disabled={updateMutation.isPending}
             >
               Güncelle
             </Button>

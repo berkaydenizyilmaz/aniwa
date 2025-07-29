@@ -25,8 +25,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { type StreamingPlatformFilters } from '@/lib/schemas/streamingPlatform.schema';
 
 interface StreamingPlatformTableProps {

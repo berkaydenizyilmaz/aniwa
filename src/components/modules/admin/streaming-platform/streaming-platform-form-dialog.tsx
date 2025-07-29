@@ -17,8 +17,8 @@ import {
 import { createStreamingPlatformAction, updateStreamingPlatformAction } from '@/lib/actions/admin/streaming-platform.action';
 import { createStreamingPlatformSchema, updateStreamingPlatformSchema, type CreateStreamingPlatformInput, type UpdateStreamingPlatformInput } from '@/lib/schemas/streamingPlatform.schema';
 import { toast } from 'sonner';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { StreamingPlatform } from '@prisma/client';
 
 interface StreamingPlatformFormDialogProps {

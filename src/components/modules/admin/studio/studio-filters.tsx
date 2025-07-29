@@ -7,8 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Search, Plus } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+
 
 interface StudioFiltersProps {
   onSearch?: (search: string) => void;
@@ -20,7 +19,6 @@ export function StudioFilters({ onSearch, onStudioTypeChange, onAddNew }: Studio
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStudioType, setSelectedStudioType] = useState<boolean | null>(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { isLoading } = useLoadingStore();
 
   // Debounced search term değiştiğinde onSearch'ü çağır
   useEffect(() => {
@@ -57,7 +55,7 @@ export function StudioFilters({ onSearch, onStudioTypeChange, onAddNew }: Studio
               id="animation-studio-filter"
               checked={selectedStudioType === true}
               onCheckedChange={(checked) => handleStudioTypeChange(checked ? true : null)}
-              disabled={isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+
             />
             <Label htmlFor="animation-studio-filter" className="flex items-center gap-1 text-sm">
               Animasyon Stüdyosu
@@ -66,7 +64,7 @@ export function StudioFilters({ onSearch, onStudioTypeChange, onAddNew }: Studio
         </div>
 
         {/* Yeni Stüdyo Ekle */}
-        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={isLoading(LOADING_KEYS.PAGES.STUDIOS) || isLoading(LOADING_KEYS.FORMS.CREATE_STUDIO)}>
+        <Button onClick={onAddNew} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Yeni Stüdyo Ekle
         </Button>

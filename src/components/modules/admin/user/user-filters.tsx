@@ -7,8 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Search, Plus, Filter } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+
 import { USER } from '@/lib/constants/user.constants';
 import {
   Select,
@@ -30,7 +29,6 @@ export function UserFilters({ onSearch, onRoleChange, onBannedChange, onAddNew }
   const [selectedRole, setSelectedRole] = useState('all');
   const [selectedBanned, setSelectedBanned] = useState<boolean | null>(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { isLoading } = useLoadingStore();
 
   // Debounced search term değiştiğinde onSearch'ü çağır
   useEffect(() => {
@@ -63,14 +61,14 @@ export function UserFilters({ onSearch, onRoleChange, onBannedChange, onAddNew }
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-10"
-            disabled={isLoading(LOADING_KEYS.PAGES.USERS)}
+
           />
         </div>
 
         {/* Rol Filtresi */}
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={selectedRole} onValueChange={handleRoleChange} disabled={isLoading(LOADING_KEYS.PAGES.USERS)}>
+          <Select value={selectedRole} onValueChange={handleRoleChange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Tüm Roller" />
             </SelectTrigger>
@@ -91,7 +89,6 @@ export function UserFilters({ onSearch, onRoleChange, onBannedChange, onAddNew }
             id="banned-filter"
             checked={selectedBanned === true}
             onCheckedChange={handleBannedChange}
-            disabled={isLoading(LOADING_KEYS.PAGES.USERS)}
           />
           <Label htmlFor="banned-filter" className="flex items-center gap-1 text-sm">
             Banlı Kullanıcılar
@@ -99,7 +96,7 @@ export function UserFilters({ onSearch, onRoleChange, onBannedChange, onAddNew }
         </div>
 
         {/* Yeni Kullanıcı Ekle */}
-        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={isLoading(LOADING_KEYS.PAGES.USERS) || isLoading(LOADING_KEYS.FORMS.CREATE_USER)}>
+        <Button onClick={onAddNew} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Yeni Kullanıcı Ekle
         </Button>

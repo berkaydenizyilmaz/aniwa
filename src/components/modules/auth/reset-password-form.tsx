@@ -12,8 +12,8 @@ import { resetPasswordSchema, type ResetPasswordInput } from '@/lib/schemas/auth
 import { resetPassword } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
 import { ROUTES } from '@/lib/constants/routes.constants';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { useMutation } from '@tanstack/react-query';
+
 
 export function ResetPasswordForm() {
   const [token, setToken] = useState<string>('');

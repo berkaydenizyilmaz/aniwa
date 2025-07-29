@@ -11,8 +11,8 @@ import { registerSchema, type RegisterInput } from '@/lib/schemas/auth.schema';
 import { registerUser } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
 import { ROUTES } from '@/lib/constants/routes.constants';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { useMutation } from '@tanstack/react-query';
+
 
 export function RegisterForm() {
   const router = useRouter();

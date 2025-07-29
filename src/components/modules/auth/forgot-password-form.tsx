@@ -10,8 +10,8 @@ import { Label } from '@/components/ui/label';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '@/lib/schemas/auth.schema';
 import { forgotPassword } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { useMutation } from '@tanstack/react-query';
+
 
 export function ForgotPasswordForm() {
   const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
