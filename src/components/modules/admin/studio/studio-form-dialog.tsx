@@ -18,7 +18,7 @@ import { createStudioAction, updateStudioAction } from '@/lib/actions/admin/stud
 import { createStudioSchema, updateStudioSchema, type CreateStudioInput, type UpdateStudioInput } from '@/lib/schemas/studio.schema';
 import { toast } from 'sonner';
 import { Studio } from '@prisma/client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 
 interface StudioFormDialogProps {
@@ -30,7 +30,7 @@ interface StudioFormDialogProps {
 
 export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: StudioFormDialogProps) {
   const isEdit = !!studio;
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -61,37 +61,30 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
     }
   }, [studio, reset]);
 
-  const onSubmit = async (data: CreateStudioInput | UpdateStudioInput) => {
-    if (isLoading(LOADING_KEYS.FORMS.CREATE_STUDIO)) return; // Prevent double submission
-    
-    setLoadingStore(LOADING_KEYS.FORMS.CREATE_STUDIO, true);
-
-    try {
-      let result;
-      
+  // Create/Update mutation
+  const mutation = useMutation({
+    mutationFn: async (data: CreateStudioInput | UpdateStudioInput) => {
       if (isEdit && studio) {
-        // Güncelleme
-        result = await updateStudioAction(studio.id, data as UpdateStudioInput);
+        return updateStudioAction(studio.id, data as UpdateStudioInput);
       } else {
-        // Yeni oluşturma
-        result = await createStudioAction(data as CreateStudioInput);
+        return createStudioAction(data as CreateStudioInput);
       }
-
-      if (!result.success) {
-        toast.error(result.error || `${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
-        return;
-      }
-
+    },
+    onSuccess: () => {
       toast.success(`Stüdyo başarıyla ${isEdit ? 'güncellendi' : 'oluşturuldu'}!`);
       onOpenChange(false);
       onSuccess?.();
-
-    } catch (error) {
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['studios'] });
+    },
+    onError: (error) => {
       console.error('Studio form error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.FORMS.CREATE_STUDIO, false);
-    }
+      toast.error(`${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
+    },
+  });
+
+  const onSubmit = async (data: CreateStudioInput | UpdateStudioInput) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -111,7 +104,7 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
               id="name"
               {...register('name')}
               placeholder="Stüdyo adını girin"
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_STUDIO)}
+              disabled={mutation.isPending}
             />
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -129,7 +122,7 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
                     id="isAnimationStudio"
                     checked={field.value}
                     onCheckedChange={(checked) => field.onChange(checked === true)}
-                    disabled={isLoading(LOADING_KEYS.FORMS.CREATE_STUDIO)}
+                    disabled={mutation.isPending}
                   />
                   <Label htmlFor="isAnimationStudio" className="text-sm">
                     Animasyon Stüdyosu
@@ -148,13 +141,13 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_STUDIO)}
+              disabled={mutation.isPending}
             >
               İptal
             </Button>
             <Button
               type="submit"
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_STUDIO)}
+              disabled={mutation.isPending}
             >
               {isEdit ? 'Güncelle' : 'Oluştur'}
             </Button>

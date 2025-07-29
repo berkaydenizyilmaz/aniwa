@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Studio } from '@prisma/client';
@@ -35,51 +35,35 @@ interface StudioTableProps {
 }
 
 export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null }: StudioTableProps) {
-  const [studios, setStudios] = useState<Studio[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedStudio, setSelectedStudio] = useState<Studio | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalStudios, setTotalStudios] = useState(0);
   const [limit] = useState(50);
   const queryClient = useQueryClient();
 
-  // Studio'ları getir (server-side filtreleme)
-  useEffect(() => {
-    const fetchStudios = async () => {
-      try {
-        setLoadingStore(LOADING_KEYS.PAGES.STUDIOS, true);
-        const filters: StudioFilters = {
-          page: currentPage,
-          limit: limit,
-        };
-        if (searchTerm) filters.search = searchTerm;
-        if (selectedStudioType !== null) filters.isAnimationStudio = selectedStudioType;
-        const result = await getStudiosAction(filters);
-        if (!result.success) {
-          toast.error(result.error || 'Stüdyolar yüklenirken bir hata oluştu');
-          return;
-        }
-        const data = result.data as GetStudiosResponse;
-        setStudios(data.studios);
-        setTotalPages(data.totalPages);
-        setTotalStudios(data.total);
-      } catch (error) {
-        console.error('Fetch studios error:', error);
-        toast.error('Stüdyolar yüklenirken bir hata oluştu');
-      } finally {
-        setLoadingStore(LOADING_KEYS.PAGES.STUDIOS, false);
+  // Studio'ları getir (React Query ile)
+  const { data: studiosData, isLoading } = useQuery({
+    queryKey: ['studios', searchTerm, selectedStudioType, currentPage, limit],
+    queryFn: async () => {
+      const filters: StudioFilters = {
+        page: currentPage,
+        limit: limit,
+      };
+      if (searchTerm) filters.search = searchTerm;
+      if (selectedStudioType !== null) filters.isAnimationStudio = selectedStudioType;
+      const result = await getStudiosAction(filters);
+      if (!result.success) {
+        throw new Error(result.error || 'Stüdyolar yüklenirken bir hata oluştu');
       }
-    };
-    fetchStudios();
-  }, [setLoadingStore, searchTerm, selectedStudioType, currentPage, limit]);
+      return result.data as GetStudiosResponse;
+    },
+  });
 
   // Filtreler değiştiğinde sayfa 1'e dön
-  useEffect(() => {
+  if ((searchTerm || selectedStudioType !== null) && currentPage !== 1) {
     setCurrentPage(1);
-  }, [searchTerm, selectedStudioType]);
+  }
 
-  // Client-side filtreleme kaldırıldı, direkt studios kullanılıyor
   const handleEdit = (studio: Studio) => {
     onEdit?.(studio);
   };
@@ -89,37 +73,25 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
     setDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
-    if (!selectedStudio || isLoading(LOADING_KEYS.ACTIONS.DELETE_STUDIO)) return;
-
-    setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_STUDIO, true);
-
-    try {
-      const result = await deleteStudioAction(selectedStudio.id);
-
-      if (!result.success) {
-        toast.error(result.error || 'Silme işlemi başarısız oldu');
-        return;
-      }
-
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteStudioAction(id),
+    onSuccess: () => {
       toast.success('Stüdyo başarıyla silindi!');
       setDeleteDialogOpen(false);
-
-      // Tabloyu yenile
-      const fetchResult = await getStudiosAction({ page: currentPage, limit });
-      if (fetchResult.success) {
-        const data = fetchResult.data as GetStudiosResponse;
-        setStudios(data.studios);
-        setTotalPages(data.totalPages);
-        setTotalStudios(data.total);
-      }
-
-    } catch (error) {
+      setSelectedStudio(null);
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['studios'] });
+    },
+    onError: (error) => {
       console.error('Delete studio error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_STUDIO, false);
-    }
+      toast.error('Silme işlemi başarısız oldu');
+    },
+  });
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedStudio) return;
+    deleteMutation.mutate(selectedStudio.id);
   };
 
   const handlePageChange = (page: number) => {
@@ -129,6 +101,7 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
+    const totalPages = studiosData?.totalPages || 1;
     
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
@@ -161,7 +134,7 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
     return pages;
   };
 
-  if (isLoading(LOADING_KEYS.PAGES.STUDIOS)) {
+  if (isLoading) {
     return (
       <div className="glass-card">
         <div className="p-4">
@@ -187,19 +160,25 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-1/4">İsim</TableHead>
-              <TableHead className="w-1/4">Slug</TableHead>
-              <TableHead className="w-1/4">Tür</TableHead>
-              <TableHead className="w-1/4">İşlemler</TableHead>
+              <TableHead className="w-1/3">İsim</TableHead>
+              <TableHead className="w-1/3">Slug</TableHead>
+              <TableHead className="w-1/6">Tür</TableHead>
+              <TableHead className="w-1/6">İşlemler</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {studios.map((studio) => (
+            {studiosData?.studios.map((studio) => (
               <TableRow key={studio.id}>
                 <TableCell>{studio.name}</TableCell>
                 <TableCell className="text-muted-foreground">{studio.slug}</TableCell>
-                <TableCell className="text-muted-foreground">
-                  {studio.isAnimationStudio ? 'Animasyon Stüdyosu' : 'Diğer'}
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    studio.isAnimationStudio 
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
+                      : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                  }`}>
+                    {studio.isAnimationStudio ? 'Animasyon' : 'Üretim'}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
@@ -226,17 +205,17 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
           </TableBody>
         </Table>
 
-        {studios.length === 0 && (
+        {(!studiosData?.studios || studiosData.studios.length === 0) && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun stüdyo bulunamadı.' : 'Henüz stüdyo bulunmuyor.'}
           </div>
         )}
 
         {/* Sayfalama */}
-        {totalPages > 1 && (
+        {studiosData && studiosData.totalPages > 1 && (
           <div className="flex items-center justify-between p-4 border-t border-border/50">
             <div className="text-sm text-muted-foreground">
-              Toplam {totalStudios} stüdyo, {currentPage}. sayfa / {totalPages} sayfa
+              Toplam {studiosData.total} stüdyo, {currentPage}. sayfa / {studiosData.totalPages} sayfa
             </div>
             
             <div className="flex items-center gap-2">
@@ -245,7 +224,7 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+                disabled={currentPage === 1 || isLoading}
               >
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
@@ -255,7 +234,7 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+                disabled={currentPage === 1 || isLoading}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -271,7 +250,7 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
                         variant={currentPage === page ? "default" : "outline"}
                         size="sm"
                         onClick={() => handlePageChange(page as number)}
-                        disabled={isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+                        disabled={isLoading}
                         className="w-8 h-8 p-0"
                       >
                         {page}
@@ -286,7 +265,7 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+                disabled={currentPage === studiosData.totalPages || isLoading}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -295,8 +274,8 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.STUDIOS)}
+                onClick={() => handlePageChange(studiosData.totalPages)}
+                disabled={currentPage === studiosData.totalPages || isLoading}
               >
                 <ChevronsRight className="h-4 w-4" />
               </Button>
@@ -316,10 +295,10 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_STUDIO)}>İptal</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>İptal</AlertDialogCancel>
             <Button
               onClick={handleDeleteConfirm}
-              disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_STUDIO)}
+              disabled={deleteMutation.isPending}
               variant="destructive"
             >
               Sil

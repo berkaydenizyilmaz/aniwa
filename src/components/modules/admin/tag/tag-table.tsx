@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Tag, TagCategory } from '@prisma/client';
@@ -39,53 +39,37 @@ interface TagTableProps {
 }
 
 export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selectedAdult = null, selectedSpoiler = null }: TagTableProps) {
-  const [tags, setTags] = useState<Tag[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalTags, setTotalTags] = useState(0);
   const [limit] = useState(50);
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
-  // Tag'leri getir (server-side filtreleme)
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        setLoadingStore(LOADING_KEYS.PAGES.TAGS, true);
-        const filters: TagFilters = {
-          page: currentPage,
-          limit: limit,
-        };
-        if (searchTerm) filters.search = searchTerm;
-        if (selectedCategory && selectedCategory !== 'all') filters.category = selectedCategory as TagCategory;
-        if (selectedAdult !== null) filters.isAdult = selectedAdult;
-        if (selectedSpoiler !== null) filters.isSpoiler = selectedSpoiler;
-        const result = await getTagsAction(filters);
-        if (!result.success) {
-          toast.error(result.error || 'Etiketler yüklenirken bir hata oluştu');
-          return;
-        }
-        const data = result.data as GetTagsResponse;
-        setTags(data.tags);
-        setTotalPages(data.totalPages);
-        setTotalTags(data.total);
-      } catch (error) {
-        console.error('Fetch tags error:', error);
-        toast.error('Etiketler yüklenirken bir hata oluştu');
-      } finally {
-        setLoadingStore(LOADING_KEYS.PAGES.TAGS, false);
+  // Tag'leri getir (React Query ile)
+  const { data: tagsData, isLoading } = useQuery({
+    queryKey: ['tags', searchTerm, selectedCategory, selectedAdult, selectedSpoiler, currentPage, limit],
+    queryFn: async () => {
+      const filters: TagFilters = {
+        page: currentPage,
+        limit: limit,
+      };
+      if (searchTerm) filters.search = searchTerm;
+      if (selectedCategory && selectedCategory !== 'all') filters.category = selectedCategory as TagCategory;
+      if (selectedAdult !== null) filters.isAdult = selectedAdult;
+      if (selectedSpoiler !== null) filters.isSpoiler = selectedSpoiler;
+      const result = await getTagsAction(filters);
+      if (!result.success) {
+        throw new Error(result.error || 'Etiketler yüklenirken bir hata oluştu');
       }
-    };
-    fetchTags();
-  }, [setLoadingStore, searchTerm, selectedCategory, selectedAdult, selectedSpoiler, currentPage, limit]);
+      return result.data as GetTagsResponse;
+    },
+  });
 
   // Filtreler değiştiğinde sayfa 1'e dön
-  useEffect(() => {
+  if ((searchTerm || selectedCategory !== 'all' || selectedAdult !== null || selectedSpoiler !== null) && currentPage !== 1) {
     setCurrentPage(1);
-  }, [searchTerm, selectedCategory, selectedAdult, selectedSpoiler]);
+  }
 
-  // Client-side filtreleme kaldırıldı, direkt tags kullanılıyor
   const handleEdit = (tag: Tag) => {
     onEdit?.(tag);
   };
@@ -95,37 +79,25 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
     setDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
-    if (!selectedTag || isLoading(LOADING_KEYS.ACTIONS.DELETE_TAG)) return;
-
-    setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_TAG, true);
-
-    try {
-      const result = await deleteTagAction(selectedTag.id);
-
-      if (!result.success) {
-        toast.error(result.error || 'Silme işlemi başarısız oldu');
-        return;
-      }
-
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteTagAction(id),
+    onSuccess: () => {
       toast.success('Etiket başarıyla silindi!');
       setDeleteDialogOpen(false);
-
-      // Tabloyu yenile
-      const fetchResult = await getTagsAction({ page: currentPage, limit });
-      if (fetchResult.success) {
-        const data = fetchResult.data as GetTagsResponse;
-        setTags(data.tags);
-        setTotalPages(data.totalPages);
-        setTotalTags(data.total);
-      }
-
-    } catch (error) {
+      setSelectedTag(null);
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+    },
+    onError: (error) => {
       console.error('Delete tag error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_TAG, false);
-    }
+      toast.error('Silme işlemi başarısız oldu');
+    },
+  });
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedTag) return;
+    deleteMutation.mutate(selectedTag.id);
   };
 
   const handlePageChange = (page: number) => {
@@ -135,6 +107,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
+    const totalPages = tagsData?.totalPages || 1;
     
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
@@ -167,12 +140,13 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
     return pages;
   };
 
-  if (isLoading(LOADING_KEYS.PAGES.TAGS)) {
+  if (isLoading) {
     return (
       <div className="glass-card">
         <div className="p-4">
           {[...Array(5)].map((_, index) => (
             <div key={index} className="flex items-center gap-4 py-3 border-b border-border/50 last:border-b-0">
+              <Skeleton className="h-4 flex-1" />
               <Skeleton className="h-4 flex-1" />
               <Skeleton className="h-4 flex-1" />
               <Skeleton className="h-4 flex-1" />
@@ -195,17 +169,34 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
             <TableRow>
               <TableHead className="w-1/4">İsim</TableHead>
               <TableHead className="w-1/4">Slug</TableHead>
-              <TableHead className="w-1/4">Kategori</TableHead>
-              <TableHead className="w-1/4">İşlemler</TableHead>
+              <TableHead className="w-1/6">Kategori</TableHead>
+              <TableHead className="w-1/6">Özellikler</TableHead>
+              <TableHead className="w-1/6">İşlemler</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tags.map((tag) => (
+            {tagsData?.tags.map((tag) => (
               <TableRow key={tag.id}>
                 <TableCell>{tag.name}</TableCell>
                 <TableCell className="text-muted-foreground">{tag.slug}</TableCell>
-                <TableCell className="text-muted-foreground">
-                  {tag.category ? MASTER_DATA.TAG_CATEGORY_LABELS[tag.category] || tag.category : '-'}
+                <TableCell>
+                  <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    {tag.category ? MASTER_DATA.TAG_CATEGORY_LABELS[tag.category] || tag.category : '-'}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    {tag.isAdult && (
+                      <span className="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                        Yetişkin
+                      </span>
+                    )}
+                    {tag.isSpoiler && (
+                      <span className="px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                        Spoiler
+                      </span>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
@@ -232,17 +223,17 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
           </TableBody>
         </Table>
 
-        {tags.length === 0 && (
+        {(!tagsData?.tags || tagsData.tags.length === 0) && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun etiket bulunamadı.' : 'Henüz etiket bulunmuyor.'}
           </div>
         )}
 
         {/* Sayfalama */}
-        {totalPages > 1 && (
+        {tagsData && tagsData.totalPages > 1 && (
           <div className="flex items-center justify-between p-4 border-t border-border/50">
             <div className="text-sm text-muted-foreground">
-              Toplam {totalTags} etiket, {currentPage}. sayfa / {totalPages} sayfa
+              Toplam {tagsData.total} etiket, {currentPage}. sayfa / {tagsData.totalPages} sayfa
             </div>
             
             <div className="flex items-center gap-2">
@@ -251,7 +242,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.TAGS)}
+                disabled={currentPage === 1 || isLoading}
               >
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
@@ -261,7 +252,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.TAGS)}
+                disabled={currentPage === 1 || isLoading}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -277,7 +268,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
                         variant={currentPage === page ? "default" : "outline"}
                         size="sm"
                         onClick={() => handlePageChange(page as number)}
-                        disabled={isLoading(LOADING_KEYS.PAGES.TAGS)}
+                        disabled={isLoading}
                         className="w-8 h-8 p-0"
                       >
                         {page}
@@ -292,7 +283,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.TAGS)}
+                disabled={currentPage === tagsData.totalPages || isLoading}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -301,8 +292,8 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.TAGS)}
+                onClick={() => handlePageChange(tagsData.totalPages)}
+                disabled={currentPage === tagsData.totalPages || isLoading}
               >
                 <ChevronsRight className="h-4 w-4" />
               </Button>
@@ -322,10 +313,10 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_TAG)}>İptal</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>İptal</AlertDialogCancel>
             <Button
               onClick={handleDeleteConfirm}
-              disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_TAG)}
+              disabled={deleteMutation.isPending}
               variant="destructive"
             >
               Sil

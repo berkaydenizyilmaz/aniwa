@@ -5,13 +5,14 @@ import { StudioFilters } from "@/components/modules/admin/studio/studio-filters"
 import { StudioTable } from "@/components/modules/admin/studio/studio-table";
 import { StudioFormDialog } from "@/components/modules/admin/studio/studio-form-dialog";
 import { Studio } from '@prisma/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function StudiosPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [selectedStudio, setSelectedStudio] = useState<Studio | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStudioType, setSelectedStudioType] = useState<boolean | null>(null);
+  const queryClient = useQueryClient();
 
   const handleAddNew = () => {
     setSelectedStudio(null);
@@ -24,7 +25,8 @@ export default function StudiosPage() {
   };
 
   const handleSuccess = () => {
-    setRefreshKey(prev => prev + 1);
+    // Query'yi invalidate et
+    queryClient.invalidateQueries({ queryKey: ['studios'] });
   };
 
   const handleSearch = (search: string) => {
@@ -50,7 +52,6 @@ export default function StudiosPage() {
 
       {/* Tablo */}
       <StudioTable 
-        key={refreshKey}
         onEdit={handleEdit}
         searchTerm={searchTerm}
         selectedStudioType={selectedStudioType}

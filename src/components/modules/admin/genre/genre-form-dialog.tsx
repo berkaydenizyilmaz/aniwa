@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect } from 'react';  
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -41,39 +41,6 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
     },
   });
 
-  // Create mutation
-  const createMutation = useMutation({
-    mutationFn: createGenreAction,
-    onSuccess: () => {
-      toast.success('Tür başarıyla oluşturuldu!');
-      onOpenChange(false);
-      onSuccess?.();
-      // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['genres'] });
-    },
-    onError: (error) => {
-      console.error('Create genre error:', error);
-      toast.error('Oluşturma başarısız oldu');
-    },
-  });
-
-  // Update mutation
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateGenreInput }) => 
-      updateGenreAction(id, data),
-    onSuccess: () => {
-      toast.success('Tür başarıyla güncellendi!');
-      onOpenChange(false);
-      onSuccess?.();
-      // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['genres'] });
-    },
-    onError: (error) => {
-      console.error('Update genre error:', error);
-      toast.error('Güncelleme başarısız oldu');
-    },
-  });
-
   // Form'u genre verisi ile doldur (edit mode)
   useEffect(() => {
     if (genre) {
@@ -87,15 +54,31 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
     }
   }, [genre, reset]);
 
-  const onSubmit = async (data: CreateGenreInput | UpdateGenreInput) => {
-    if (isEdit && genre) {
-      updateMutation.mutate({ id: genre.id, data: data as UpdateGenreInput });
-    } else {
-      createMutation.mutate(data as CreateGenreInput);
-    }
-  };
+  // Create/Update mutation
+  const mutation = useMutation({
+    mutationFn: async (data: CreateGenreInput | UpdateGenreInput) => {
+      if (isEdit && genre) {
+        return updateGenreAction(genre.id, data);
+      } else {
+        return createGenreAction(data);
+      }
+    },
+    onSuccess: () => {
+      toast.success(`Tür başarıyla ${isEdit ? 'güncellendi' : 'oluşturuldu'}!`);
+      onOpenChange(false);
+      onSuccess?.();
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['genres'] });
+    },
+    onError: (error) => {
+      console.error('Genre form error:', error);
+      toast.error(`${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
+    },
+  });
 
-  const isLoading = createMutation.isPending || updateMutation.isPending;
+  const onSubmit = async (data: CreateGenreInput | UpdateGenreInput) => {
+    mutation.mutate(data);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -115,7 +98,7 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
               type="text"
               placeholder="Tür adını girin"
               {...register('name')}
-              disabled={isLoading}
+              disabled={mutation.isPending}
             />
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -128,13 +111,13 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={mutation.isPending}
             >
               İptal
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={mutation.isPending}
             >
               {isEdit ? 'Güncelle' : 'Oluştur'}
             </Button>

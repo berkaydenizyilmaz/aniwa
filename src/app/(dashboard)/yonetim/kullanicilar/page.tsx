@@ -5,14 +5,15 @@ import { UserFilters } from "@/components/modules/admin/user/user-filters";
 import { UserTable } from "@/components/modules/admin/user/user-table";
 import { UserFormDialog } from "@/components/modules/admin/user/user-form-dialog";
 import { User } from '@prisma/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function UsersPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedBanned, setSelectedBanned] = useState<boolean | null>(null);
+  const queryClient = useQueryClient();
 
   const handleAddNew = () => {
     setSelectedUser(null);
@@ -25,7 +26,8 @@ export default function UsersPage() {
   };
 
   const handleSuccess = () => {
-    setRefreshKey(prev => prev + 1);
+    // Query'yi invalidate et
+    queryClient.invalidateQueries({ queryKey: ['users'] });
   };
 
   const handleSearch = (search: string) => {
@@ -60,7 +62,6 @@ export default function UsersPage() {
 
       {/* Tablo */}
       <UserTable 
-        key={refreshKey}
         onEdit={handleEdit}
         searchTerm={searchTerm}
         selectedRole={selectedRole}

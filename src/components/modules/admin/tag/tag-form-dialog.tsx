@@ -26,7 +26,7 @@ import { createTagSchema, updateTagSchema, type CreateTagInput, type UpdateTagIn
 import { toast } from 'sonner';
 import { Tag, TagCategory } from '@prisma/client';
 import { MASTER_DATA } from '@/lib/constants/masterData.constants';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 
 interface TagFormDialogProps {
@@ -38,7 +38,7 @@ interface TagFormDialogProps {
 
 export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDialogProps) {
   const isEdit = !!tag;
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -79,40 +79,30 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
     }
   }, [tag, reset]);
 
-  const onSubmit = async (data: CreateTagInput | UpdateTagInput) => {
-    if (isLoading(LOADING_KEYS.FORMS.CREATE_TAG)) return; // Prevent double submission
-    
-    setLoadingStore(LOADING_KEYS.FORMS.CREATE_TAG, true);
-
-    try {
-      let result;
-      
+  // Create/Update mutation
+  const mutation = useMutation({
+    mutationFn: async (data: CreateTagInput | UpdateTagInput) => {
       if (isEdit && tag) {
-        // Güncelleme
-        result = await updateTagAction(tag.id, data as UpdateTagInput);
+        return updateTagAction(tag.id, data as UpdateTagInput);
       } else {
-        // Yeni oluşturma
-        result = await createTagAction(data as CreateTagInput);
+        return createTagAction(data as CreateTagInput);
       }
-
-      if (!result.success) {
-        toast.error(result.error || `${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
-        return;
-      }
-
-      // Başarılı
+    },
+    onSuccess: () => {
       toast.success(`Etiket başarıyla ${isEdit ? 'güncellendi' : 'oluşturuldu'}!`);
-      
-      // Dialog'u kapat ve callback çağır
       onOpenChange(false);
       onSuccess?.();
-
-    } catch (error) {
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+    },
+    onError: (error) => {
       console.error('Tag form error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.FORMS.CREATE_TAG, false);
-    }
+      toast.error(`${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
+    },
+  });
+
+  const onSubmit = async (data: CreateTagInput | UpdateTagInput) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -133,7 +123,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
               type="text"
               placeholder="Etiket adını girin"
               {...register('name')}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
+              disabled={mutation.isPending}
             />
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -147,7 +137,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
               id="description"
               placeholder="Etiket açıklaması (isteğe bağlı)"
               {...register('description')}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
+              disabled={mutation.isPending}
               rows={3}
             />
             {errors.description && (
@@ -161,7 +151,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
             <Select
               onValueChange={(value: string) => setValue('category', value as TagCategory)}
               defaultValue={tag?.category || undefined}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
+              disabled={mutation.isPending}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Kategori seçin" />
@@ -188,7 +178,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
                   id="isAdult"
                   checked={watch('isAdult')}
                   onCheckedChange={(checked) => setValue('isAdult', checked === true)}
-                  disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
+                  disabled={mutation.isPending}
                 />
                 <Label htmlFor="isAdult" className="text-sm">Yetişkin İçerik</Label>
               </div>
@@ -197,7 +187,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
                   id="isSpoiler"
                   checked={watch('isSpoiler')}
                   onCheckedChange={(checked) => setValue('isSpoiler', checked === true)}
-                  disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
+                  disabled={mutation.isPending}
                 />
                 <Label htmlFor="isSpoiler" className="text-sm">Spoiler İçerir</Label>
               </div>
@@ -210,13 +200,13 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
+              disabled={mutation.isPending}
             >
               İptal
             </Button>
             <Button
               type="submit"
-              disabled={isLoading(LOADING_KEYS.FORMS.CREATE_TAG)}
+              disabled={mutation.isPending}
             >
               {isEdit ? 'Güncelle' : 'Oluştur'}
             </Button>

@@ -57,14 +57,14 @@ export function AnimeSeriesFilters({ onSearch, onTypeChange, onStatusChange, onA
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-10"
-
+            disabled={false}
           />
         </div>
 
         {/* Tip Filtresi */}
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={selectedType} onValueChange={handleTypeChange}>
+          <Select value={selectedType} onValueChange={handleTypeChange} disabled={false}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Tüm Tipler" />
             </SelectTrigger>
@@ -97,7 +97,7 @@ export function AnimeSeriesFilters({ onSearch, onTypeChange, onStatusChange, onA
         </div>
 
         {/* Yeni Anime Ekle */}
-        <Button onClick={onAddNew} className="flex items-center gap-2">
+        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={false}>
           <Plus className="h-4 w-4" />
           Yeni Anime Ekle
         </Button>

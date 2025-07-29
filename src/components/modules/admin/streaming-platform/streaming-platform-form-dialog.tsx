@@ -17,7 +17,7 @@ import {
 import { createStreamingPlatformAction, updateStreamingPlatformAction } from '@/lib/actions/admin/streaming-platform.action';
 import { createStreamingPlatformSchema, updateStreamingPlatformSchema, type CreateStreamingPlatformInput, type UpdateStreamingPlatformInput } from '@/lib/schemas/streamingPlatform.schema';
 import { toast } from 'sonner';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { StreamingPlatform } from '@prisma/client';
 
@@ -29,10 +29,9 @@ interface StreamingPlatformFormDialogProps {
 }
 
 export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSuccess }: StreamingPlatformFormDialogProps) {
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
   const isEditing = !!platform;
-  const loadingKey = isEditing ? LOADING_KEYS.FORMS.UPDATE_STREAMING_PLATFORM : LOADING_KEYS.FORMS.CREATE_STREAMING_PLATFORM;
 
   const {
     register,
@@ -62,36 +61,31 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
     }
   }, [platform, reset]);
 
-  const onSubmit = async (data: CreateStreamingPlatformInput | UpdateStreamingPlatformInput) => {
-    if (isLoading(loadingKey)) return;
-
-    setLoadingStore(loadingKey, true);
-
-    try {
-      let result;
-
+  // Create/Update mutation
+  const mutation = useMutation({
+    mutationFn: async (data: CreateStreamingPlatformInput | UpdateStreamingPlatformInput) => {
       if (isEditing && platform) {
-        result = await updateStreamingPlatformAction(platform.id, data as UpdateStreamingPlatformInput);
+        return updateStreamingPlatformAction(platform.id, data as UpdateStreamingPlatformInput);
       } else {
-        result = await createStreamingPlatformAction(data as CreateStreamingPlatformInput);
+        return createStreamingPlatformAction(data as CreateStreamingPlatformInput);
       }
-
-      if (!result.success) {
-        toast.error(result.error || 'İşlem başarısız oldu');
-        return;
-      }
-
+    },
+    onSuccess: () => {
       toast.success(isEditing ? 'Platform başarıyla güncellendi!' : 'Platform başarıyla oluşturuldu!');
       onSuccess?.();
       onOpenChange(false);
       reset();
-
-    } catch (error) {
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['streaming-platforms'] });
+    },
+    onError: (error) => {
       console.error('Form submission error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(loadingKey, false);
-    }
+      toast.error('İşlem başarısız oldu');
+    },
+  });
+
+  const onSubmit = async (data: CreateStreamingPlatformInput | UpdateStreamingPlatformInput) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -114,7 +108,7 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
               id="name"
               {...register('name')}
               placeholder="Örn: Netflix, Crunchyroll"
-              disabled={isLoading(loadingKey)}
+              disabled={mutation.isPending}
             />
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -128,7 +122,7 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
               id="baseUrl"
               {...register('baseUrl')}
               placeholder="https://www.example.com"
-              disabled={isLoading(loadingKey)}
+              disabled={mutation.isPending}
             />
             {errors.baseUrl && (
               <p className="text-sm text-destructive">{errors.baseUrl.message}</p>
@@ -140,13 +134,13 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading(loadingKey)}
+              disabled={mutation.isPending}
             >
               İptal
             </Button>
             <Button
               type="submit"
-              disabled={isLoading(loadingKey)}
+              disabled={mutation.isPending}
             >
               {isEditing ? 'Güncelle' : 'Oluştur'}
             </Button>

@@ -5,12 +5,13 @@ import { GenreFilters } from "@/components/modules/admin/genre/genre-filters";
 import { GenreTable } from "@/components/modules/admin/genre/genre-table";
 import { GenreFormDialog } from "@/components/modules/admin/genre/genre-form-dialog";
 import { Genre } from '@prisma/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function GenresPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const queryClient = useQueryClient();
 
   const handleAddNew = () => {
     setSelectedGenre(null);
@@ -23,7 +24,8 @@ export default function GenresPage() {
   };
 
   const handleSuccess = () => {
-    setRefreshKey(prev => prev + 1);
+    // Query'yi invalidate et
+    queryClient.invalidateQueries({ queryKey: ['genres'] });
   };
 
   const handleSearch = (search: string) => {
@@ -45,7 +47,6 @@ export default function GenresPage() {
 
       {/* Tablo */}
       <GenreTable 
-        key={refreshKey}
         onEdit={handleEdit}
         searchTerm={searchTerm}
       />

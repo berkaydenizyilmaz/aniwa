@@ -5,12 +5,13 @@ import { StreamingPlatformFilters } from "@/components/modules/admin/streaming-p
 import { StreamingPlatformTable } from "@/components/modules/admin/streaming-platform/streaming-platform-table";
 import { StreamingPlatformFormDialog } from "@/components/modules/admin/streaming-platform/streaming-platform-form-dialog";
 import { StreamingPlatform } from '@prisma/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function StreamingPlatformsPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<StreamingPlatform | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const queryClient = useQueryClient();
 
   const handleAddNew = () => {
     setSelectedPlatform(null);
@@ -23,7 +24,8 @@ export default function StreamingPlatformsPage() {
   };
 
   const handleSuccess = () => {
-    setRefreshKey(prev => prev + 1);
+    // Query'yi invalidate et
+    queryClient.invalidateQueries({ queryKey: ['streaming-platforms'] });
   };
 
   const handleSearch = (search: string) => {
@@ -45,7 +47,6 @@ export default function StreamingPlatformsPage() {
 
       {/* Tablo */}
       <StreamingPlatformTable 
-        key={refreshKey}
         onEdit={handleEdit}
         searchTerm={searchTerm}
       />

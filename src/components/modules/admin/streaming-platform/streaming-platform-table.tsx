@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { StreamingPlatform } from '@prisma/client';
@@ -35,48 +35,33 @@ interface StreamingPlatformTableProps {
 }
 
 export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPlatformTableProps) {
-  const [streamingPlatforms, setStreamingPlatforms] = useState<StreamingPlatform[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedStreamingPlatform, setSelectedStreamingPlatform] = useState<StreamingPlatform | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalStreamingPlatforms, setTotalStreamingPlatforms] = useState(0);
   const [limit] = useState(50);
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
-  // Streaming Platform'ları getir (server-side filtreleme)
-  useEffect(() => {
-    const fetchStreamingPlatforms = async () => {
-      try {
-        setLoadingStore(LOADING_KEYS.PAGES.STREAMING_PLATFORMS, true);
-        const filters: StreamingPlatformFilters = {
-          page: currentPage,
-          limit: limit,
-        };
-        if (searchTerm) filters.search = searchTerm;
-        const result = await getStreamingPlatformsAction(filters);
-        if (!result.success) {
-          toast.error(result.error || 'Yayın platformları yüklenirken bir hata oluştu');
-          return;
-        }
-        const data = result.data as GetStreamingPlatformsResponse;
-        setStreamingPlatforms(data.platforms);
-        setTotalPages(data.totalPages);
-        setTotalStreamingPlatforms(data.total);
-      } catch (error) {
-        console.error('Fetch streaming platforms error:', error);
-        toast.error('Yayın platformları yüklenirken bir hata oluştu');
-      } finally {
-        setLoadingStore(LOADING_KEYS.PAGES.STREAMING_PLATFORMS, false);
+  // Streaming Platform'ları getir (React Query ile)
+  const { data: platformsData, isLoading } = useQuery({
+    queryKey: ['streaming-platforms', searchTerm, currentPage, limit],
+    queryFn: async () => {
+      const filters: StreamingPlatformFilters = {
+        page: currentPage,
+        limit: limit,
+      };
+      if (searchTerm) filters.search = searchTerm;
+      const result = await getStreamingPlatformsAction(filters);
+      if (!result.success) {
+        throw new Error(result.error || 'Yayın platformları yüklenirken bir hata oluştu');
       }
-    };
-    fetchStreamingPlatforms();
-  }, [setLoadingStore, searchTerm, currentPage, limit]);
+      return result.data as GetStreamingPlatformsResponse;
+    },
+  });
 
   // Filtreler değiştiğinde sayfa 1'e dön
-  useEffect(() => {
+  if (searchTerm && currentPage !== 1) {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }
 
   // Client-side filtreleme kaldırıldı, direkt streamingPlatforms kullanılıyor
   const handleEdit = (streamingPlatform: StreamingPlatform) => {
@@ -88,37 +73,25 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
     setDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
-    if (!selectedStreamingPlatform || isLoading(LOADING_KEYS.ACTIONS.DELETE_STREAMING_PLATFORM)) return;
-
-    setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_STREAMING_PLATFORM, true);
-
-    try {
-      const result = await deleteStreamingPlatformAction(selectedStreamingPlatform.id);
-
-      if (!result.success) {
-        toast.error(result.error || 'Silme işlemi başarısız oldu');
-        return;
-      }
-
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteStreamingPlatformAction(id),
+    onSuccess: () => {
       toast.success('Yayın platformu başarıyla silindi!');
       setDeleteDialogOpen(false);
-
-      // Tabloyu yenile
-      const fetchResult = await getStreamingPlatformsAction({ page: currentPage, limit });
-      if (fetchResult.success) {
-        const data = fetchResult.data as GetStreamingPlatformsResponse;
-        setStreamingPlatforms(data.platforms);
-        setTotalPages(data.totalPages);
-        setTotalStreamingPlatforms(data.total);
-      }
-
-    } catch (error) {
+      setSelectedStreamingPlatform(null);
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: ['streaming-platforms'] });
+    },
+    onError: (error) => {
       console.error('Delete streaming platform error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.ACTIONS.DELETE_STREAMING_PLATFORM, false);
-    }
+      toast.error('Silme işlemi başarısız oldu');
+    },
+  });
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedStreamingPlatform) return;
+    deleteMutation.mutate(selectedStreamingPlatform.id);
   };
 
   const handlePageChange = (page: number) => {
@@ -128,6 +101,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
+    const totalPages = platformsData?.totalPages || 1;
     
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
@@ -160,7 +134,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
     return pages;
   };
 
-  if (isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)) {
+  if (isLoading) {
     return (
       <div className="glass-card">
         <div className="p-4">
@@ -191,7 +165,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
             </TableRow>
           </TableHeader>
           <TableBody>
-            {streamingPlatforms.map((streamingPlatform) => (
+            {platformsData?.platforms.map((streamingPlatform) => (
               <TableRow key={streamingPlatform.id}>
                 <TableCell>{streamingPlatform.name}</TableCell>
                 <TableCell className="text-muted-foreground">{streamingPlatform.baseUrl}</TableCell>
@@ -220,17 +194,17 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
           </TableBody>
         </Table>
 
-        {streamingPlatforms.length === 0 && (
+        {(!platformsData?.platforms || platformsData.platforms.length === 0) && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun yayın platformu bulunamadı.' : 'Henüz yayın platformu bulunmuyor.'}
           </div>
         )}
 
         {/* Sayfalama */}
-        {totalPages > 1 && (
+        {platformsData && platformsData.totalPages > 1 && (
           <div className="flex items-center justify-between p-4 border-t border-border/50">
             <div className="text-sm text-muted-foreground">
-              Toplam {totalStreamingPlatforms} yayın platformu, {currentPage}. sayfa / {totalPages} sayfa
+              Toplam {platformsData.total} yayın platformu, {currentPage}. sayfa / {platformsData.totalPages} sayfa
             </div>
             
             <div className="flex items-center gap-2">
@@ -239,7 +213,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)}
+                disabled={currentPage === 1 || isLoading}
               >
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
@@ -249,7 +223,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)}
+                disabled={currentPage === 1 || isLoading}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -265,7 +239,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
                         variant={currentPage === page ? "default" : "outline"}
                         size="sm"
                         onClick={() => handlePageChange(page as number)}
-                        disabled={isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)}
+                        disabled={isLoading}
                         className="w-8 h-8 p-0"
                       >
                         {page}
@@ -280,7 +254,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)}
+                disabled={currentPage === platformsData.totalPages || isLoading}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -289,8 +263,8 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.STREAMING_PLATFORMS)}
+                onClick={() => handlePageChange(platformsData.totalPages)}
+                disabled={currentPage === platformsData.totalPages || isLoading}
               >
                 <ChevronsRight className="h-4 w-4" />
               </Button>
@@ -310,10 +284,10 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_STREAMING_PLATFORM)}>İptal</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>İptal</AlertDialogCancel>
             <Button
               onClick={handleDeleteConfirm}
-              disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_STREAMING_PLATFORM)}
+              disabled={deleteMutation.isPending}
               variant="destructive"
             >
               Sil

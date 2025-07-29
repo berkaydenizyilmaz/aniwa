@@ -5,15 +5,16 @@ import { TagFilters } from "@/components/modules/admin/tag/tag-filters";
 import { TagTable } from "@/components/modules/admin/tag/tag-table";
 import { TagFormDialog } from "@/components/modules/admin/tag/tag-form-dialog";
 import { Tag } from '@prisma/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function TagsPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedAdult, setSelectedAdult] = useState<boolean | null>(null);
   const [selectedSpoiler, setSelectedSpoiler] = useState<boolean | null>(null);
+  const queryClient = useQueryClient();
 
   const handleAddNew = () => {
     setSelectedTag(null);
@@ -26,7 +27,8 @@ export default function TagsPage() {
   };
 
   const handleSuccess = () => {
-    setRefreshKey(prev => prev + 1);
+    // Query'yi invalidate et
+    queryClient.invalidateQueries({ queryKey: ['tags'] });
   };
 
   const handleSearch = (search: string) => {
@@ -66,7 +68,6 @@ export default function TagsPage() {
 
       {/* Tablo */}
       <TagTable 
-        key={refreshKey}
         onEdit={handleEdit}
         searchTerm={searchTerm}
         selectedCategory={selectedCategory}

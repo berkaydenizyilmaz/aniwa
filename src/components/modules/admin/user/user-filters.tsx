@@ -7,7 +7,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Search, Plus, Filter } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
-
 import { USER } from '@/lib/constants/user.constants';
 import {
   Select,
@@ -61,7 +60,6 @@ export function UserFilters({ onSearch, onRoleChange, onBannedChange, onAddNew }
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-10"
-
           />
         </div>
 
@@ -96,7 +94,7 @@ export function UserFilters({ onSearch, onRoleChange, onBannedChange, onAddNew }
         </div>
 
         {/* Yeni Kullanıcı Ekle */}
-        <Button onClick={onAddNew} className="flex items-center gap-2">
+        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={false}>
           <Plus className="h-4 w-4" />
           Yeni Kullanıcı Ekle
         </Button>

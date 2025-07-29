@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Search, Plus } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 
-
 interface GenreFiltersProps {
   onSearch?: (search: string) => void;
   onAddNew?: () => void;
