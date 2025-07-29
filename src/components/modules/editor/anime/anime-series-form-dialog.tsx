@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { MultiSelect } from '@/components/ui/multi-select';
 import {
   Dialog,
   DialogContent,
@@ -411,6 +412,87 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
             />
             {errors.synonyms && (
               <p className="text-sm text-destructive">{errors.synonyms.message}</p>
+            )}
+          </div>
+
+          {/* Türler */}
+          <div className="space-y-2">
+            <Label>Türler</Label>
+            <Controller
+              name="genres"
+              control={control}
+              render={({ field }) => (
+                <MultiSelect
+                  options={[
+                    { id: '1', name: 'Action' },
+                    { id: '2', name: 'Adventure' },
+                    { id: '3', name: 'Comedy' },
+                    { id: '4', name: 'Drama' },
+                    { id: '5', name: 'Fantasy' },
+                  ]}
+                  selectedIds={field.value || []}
+                  onSelectionChange={field.onChange}
+                  placeholder="Tür seçin"
+                  searchPlaceholder="Tür ara..."
+                />
+              )}
+            />
+            {errors.genres && (
+              <p className="text-sm text-destructive">{errors.genres.message}</p>
+            )}
+          </div>
+
+          {/* Stüdyolar */}
+          <div className="space-y-2">
+            <Label>Stüdyolar</Label>
+            <Controller
+              name="studios"
+              control={control}
+              render={({ field }) => (
+                <MultiSelect
+                  options={[
+                    { id: '1', name: 'MAPPA' },
+                    { id: '2', name: 'A-1 Pictures' },
+                    { id: '3', name: 'Madhouse' },
+                    { id: '4', name: 'Studio Ghibli' },
+                    { id: '5', name: 'Bones' },
+                  ]}
+                  selectedIds={field.value || []}
+                  onSelectionChange={field.onChange}
+                  placeholder="Stüdyo seçin"
+                  searchPlaceholder="Stüdyo ara..."
+                />
+              )}
+            />
+            {errors.studios && (
+              <p className="text-sm text-destructive">{errors.studios.message}</p>
+            )}
+          </div>
+
+          {/* Etiketler */}
+          <div className="space-y-2">
+            <Label>Etiketler</Label>
+            <Controller
+              name="tags"
+              control={control}
+              render={({ field }) => (
+                <MultiSelect
+                  options={[
+                    { id: '1', name: 'Shounen' },
+                    { id: '2', name: 'Shoujo' },
+                    { id: '3', name: 'Seinen' },
+                    { id: '4', name: 'Josei' },
+                    { id: '5', name: 'Isekai' },
+                  ]}
+                  selectedIds={field.value || []}
+                  onSelectionChange={field.onChange}
+                  placeholder="Etiket seçin"
+                  searchPlaceholder="Etiket ara..."
+                />
+              )}
+            />
+            {errors.tags && (
+              <p className="text-sm text-destructive">{errors.tags.message}</p>
             )}
           </div>
 
