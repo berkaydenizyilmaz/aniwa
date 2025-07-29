@@ -23,9 +23,10 @@ import {
 import { createAnimeSeriesAction, updateAnimeSeriesAction } from '@/lib/actions/editor/anime-series.action';
 import { createAnimeSeriesSchema, updateAnimeSeriesSchema, type CreateAnimeSeriesInput, type UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 import { toast } from 'sonner';
-import { AnimeSeries, AnimeType, AnimeStatus, Season, Source } from '@prisma/client';
+import { AnimeSeries, AnimeType, AnimeStatus, Season, Source, CountryOfOrigin } from '@prisma/client';
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { ANIME } from '@/lib/constants/anime.constants';
 
 interface AnimeSeriesFormDialogProps {
   open: boolean;
@@ -69,26 +70,26 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
   // Form'u anime series verisi ile doldur (edit mode)
   useEffect(() => {
     if (animeSeries) {
-             reset({
-         title: animeSeries.title,
-         englishTitle: animeSeries.englishTitle || '',
-         japaneseTitle: animeSeries.japaneseTitle || '',
-         synopsis: animeSeries.synopsis || '',
-         type: animeSeries.type,
-         status: animeSeries.status,
-         startDate: animeSeries.releaseDate || undefined,
-         endDate: undefined, // AnimeSeries'de endDate yok
-         season: animeSeries.season || undefined,
-         year: animeSeries.seasonYear || undefined,
-         source: animeSeries.source || undefined,
-         countryOfOrigin: animeSeries.countryOfOrigin || undefined,
-         isAdult: animeSeries.isAdult || false,
-         trailer: animeSeries.trailer || '',
-         synonyms: animeSeries.synonyms || [],
-         genres: [],
-         studios: [],
-         tags: [],
-       });
+      reset({
+        title: animeSeries.title,
+        englishTitle: animeSeries.englishTitle || '',
+        japaneseTitle: animeSeries.japaneseTitle || '',
+        synopsis: animeSeries.synopsis || '',
+        type: animeSeries.type,
+        status: animeSeries.status,
+        startDate: animeSeries.releaseDate || undefined,
+        endDate: undefined, // AnimeSeries'de endDate yok
+        season: animeSeries.season || undefined,
+        year: animeSeries.seasonYear || undefined,
+        source: animeSeries.source || undefined,
+        countryOfOrigin: animeSeries.countryOfOrigin || undefined,
+        isAdult: animeSeries.isAdult || false,
+        trailer: animeSeries.trailer || '',
+        synonyms: animeSeries.synonyms || [],
+        genres: [],
+        studios: [],
+        tags: [],
+      });
     } else {
       reset({
         title: '',
@@ -221,7 +222,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                     <SelectContent>
                       {Object.values(AnimeType).map((type) => (
                         <SelectItem key={type} value={type}>
-                          {type}
+                          {ANIME.TYPE_LABELS[type]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -246,7 +247,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                     <SelectContent>
                       {Object.values(AnimeStatus).map((status) => (
                         <SelectItem key={status} value={status}>
-                          {status}
+                          {ANIME.STATUS_LABELS[status]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -275,7 +276,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                       <SelectItem value="none">Sezon yok</SelectItem>
                       {Object.values(Season).map((season) => (
                         <SelectItem key={season} value={season}>
-                          {season}
+                          {ANIME.SEASON_LABELS[season]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -303,113 +304,115 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
             </div>
           </div>
 
-                     {/* Kaynak */}
-           <div className="space-y-2">
-             <Label htmlFor="source">Kaynak</Label>
-             <Controller
-               name="source"
-               control={control}
-               render={({ field }) => (
-                 <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)}>
-                   <SelectTrigger>
-                     <SelectValue placeholder="Kaynak seçin" />
-                   </SelectTrigger>
-                   <SelectContent>
-                     <SelectItem value="none">Kaynak yok</SelectItem>
-                     {Object.values(Source).map((source) => (
-                       <SelectItem key={source} value={source}>
-                         {source}
-                       </SelectItem>
-                     ))}
-                   </SelectContent>
-                 </Select>
-               )}
-             />
-             {errors.source && (
-               <p className="text-sm text-destructive">{errors.source.message}</p>
-             )}
-           </div>
+          {/* Kaynak */}
+          <div className="space-y-2">
+            <Label htmlFor="source">Kaynak</Label>
+            <Controller
+              name="source"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kaynak seçin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Kaynak yok</SelectItem>
+                    {Object.values(Source).map((source) => (
+                      <SelectItem key={source} value={source}>
+                        {ANIME.SOURCE_LABELS[source]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.source && (
+              <p className="text-sm text-destructive">{errors.source.message}</p>
+            )}
+          </div>
 
-           {/* Ülke ve Yetişkin İçerik */}
-           <div className="grid grid-cols-2 gap-4">
-             <div className="space-y-2">
-               <Label htmlFor="countryOfOrigin">Köken Ülke</Label>
-               <Controller
-                 name="countryOfOrigin"
-                 control={control}
-                 render={({ field }) => (
-                   <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)}>
-                     <SelectTrigger>
-                       <SelectValue placeholder="Ülke seçin" />
-                     </SelectTrigger>
-                     <SelectContent>
-                       <SelectItem value="none">Ülke yok</SelectItem>
-                       <SelectItem value="JAPAN">Japonya</SelectItem>
-                       <SelectItem value="SOUTH_KOREA">Güney Kore</SelectItem>
-                       <SelectItem value="CHINA">Çin</SelectItem>
-                     </SelectContent>
-                   </Select>
-                 )}
-               />
-               {errors.countryOfOrigin && (
-                 <p className="text-sm text-destructive">{errors.countryOfOrigin.message}</p>
-               )}
-             </div>
+          {/* Ülke ve Yetişkin İçerik */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="countryOfOrigin">Köken Ülke</Label>
+              <Controller
+                name="countryOfOrigin"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Ülke seçin" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Ülke yok</SelectItem>
+                      {Object.values(CountryOfOrigin).map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {ANIME.COUNTRY_OF_ORIGIN_LABELS[country]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.countryOfOrigin && (
+                <p className="text-sm text-destructive">{errors.countryOfOrigin.message}</p>
+              )}
+            </div>
 
-             <div className="space-y-2">
-               <Label htmlFor="isAdult">Yetişkin İçerik</Label>
-               <Controller
-                 name="isAdult"
-                 control={control}
-                 render={({ field }) => (
-                   <div className="flex items-center space-x-2">
-                     <input
-                       type="checkbox"
-                       id="isAdult"
-                       checked={field.value || false}
-                       onChange={(e) => field.onChange(e.target.checked)}
-                       className="h-4 w-4"
-                     />
-                     <Label htmlFor="isAdult" className="text-sm">18+ içerik</Label>
-                   </div>
-                 )}
-               />
-               {errors.isAdult && (
-                 <p className="text-sm text-destructive">{errors.isAdult.message}</p>
-               )}
-             </div>
-           </div>
+            <div className="space-y-2">
+              <Label htmlFor="isAdult">Yetişkin İçerik</Label>
+              <Controller
+                name="isAdult"
+                control={control}
+                render={({ field }) => (
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="isAdult"
+                      checked={field.value || false}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="isAdult" className="text-sm">18+ içerik</Label>
+                  </div>
+                )}
+              />
+              {errors.isAdult && (
+                <p className="text-sm text-destructive">{errors.isAdult.message}</p>
+              )}
+            </div>
+          </div>
 
-           {/* Trailer URL */}
-           <div className="space-y-2">
-             <Label htmlFor="trailer">Trailer URL</Label>
-             <Input
-               id="trailer"
-               {...register('trailer')}
-               placeholder="https://www.youtube.com/watch?v=..."
-             />
-             {errors.trailer && (
-               <p className="text-sm text-destructive">{errors.trailer.message}</p>
-             )}
-           </div>
+          {/* Trailer URL */}
+          <div className="space-y-2">
+            <Label htmlFor="trailer">Trailer URL</Label>
+            <Input
+              id="trailer"
+              {...register('trailer')}
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
+            {errors.trailer && (
+              <p className="text-sm text-destructive">{errors.trailer.message}</p>
+            )}
+          </div>
 
-           {/* Alternatif Başlıklar */}
-           <div className="space-y-2">
-             <Label htmlFor="synonyms">Alternatif Başlıklar</Label>
-             <Textarea
-               id="synonyms"
-               {...register('synonyms')}
-               placeholder="Her satıra bir başlık yazın..."
-               rows={3}
-               onChange={(e) => {
-                 const lines = e.target.value.split('\n').filter(line => line.trim() !== '');
-                 setValue('synonyms', lines);
-               }}
-             />
-             {errors.synonyms && (
-               <p className="text-sm text-destructive">{errors.synonyms.message}</p>
-             )}
-           </div>
+          {/* Alternatif Başlıklar */}
+          <div className="space-y-2">
+            <Label htmlFor="synonyms">Alternatif Başlıklar</Label>
+            <Textarea
+              id="synonyms"
+              {...register('synonyms')}
+              placeholder="Her satıra bir başlık yazın..."
+              rows={3}
+              onChange={(e) => {
+                const lines = e.target.value.split('\n').filter(line => line.trim() !== '');
+                setValue('synonyms', lines);
+              }}
+            />
+            {errors.synonyms && (
+              <p className="text-sm text-destructive">{errors.synonyms.message}</p>
+            )}
+          </div>
 
           {/* Butonlar */}
           <div className="flex justify-end gap-2">

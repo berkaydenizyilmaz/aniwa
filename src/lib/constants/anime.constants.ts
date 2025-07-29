@@ -71,6 +71,13 @@ export const ANIME = {
     VIDEO_GAME: 'Video Oyunu',
     NOVEL: 'Roman',
     DOUJINSHI: 'Doujinshi',
+    WEB_NOVEL: 'Web Roman',
+    LIVE_ACTION: 'Live Action',
+    GAME: 'Oyun',
+    COMIC: 'Çizgi Roman',
+    MULTIMEDIA_PROJECT: 'Multimedya Projesi',
+    PICTURE_BOOK: 'Resimli Kitap',
+    OTHER: 'Diğer',
   } as const,
   
   // Country of origin etiketleri
