@@ -1,49 +1,39 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { createAnimeSeriesSchema, updateAnimeSeriesSchema } from '@/lib/schemas/anime.schema';
+import type { CreateAnimeSeriesRequest } from '@/lib/types/api/anime.api';
+import type { UpdateAnimeSeriesRequest } from '@/lib/schemas/anime.schema';
+import { AnimeType, AnimeStatus, Season, Source, CountryOfOrigin } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { createAnimeSeriesAction, updateAnimeSeriesAction, getAllGenresAction, getAllTagsAction, getAllStudiosAction } from '@/lib/actions/editor/anime.action';
-import { createAnimeSeriesSchema, updateAnimeSeriesSchema } from '@/lib/schemas/anime.schema';
-import { z } from 'zod';
-import { toast } from 'sonner';
-import { AnimeSeries, AnimeStatus, Season, Source, Genre, Tag, Studio, AnimeType, CountryOfOrigin } from '@prisma/client';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { ImageUpload } from '@/components/ui/image-upload';
+import { toast } from 'sonner';
+import { useLoadingStore } from '@/lib/stores/loading.store';
+import { LOADING_KEYS } from '@/lib/constants/loading.constants';
+import { createAnimeSeriesAction } from '@/lib/actions/editor/anime.action';
+import { getGenresAction } from '@/lib/actions/admin/genre.action';
+import { getTagsAction } from '@/lib/actions/admin/tag.action';
+import { getStudiosAction } from '@/lib/actions/admin/studio.action';
+import { Genre, Tag, Studio } from '@prisma/client';
 import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
 
 interface SinglePartAnimeFormProps {
-  anime?: AnimeSeries | null;
-  selectedType?: AnimeType;
-  onSuccess?: () => void;
-  onCancel?: () => void;
+  selectedType: AnimeType;
+  anime?: CreateAnimeSeriesRequest & { id: string };
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
-export function SinglePartAnimeForm({
-  anime,
-  selectedType,
-  onSuccess,
-  onCancel
-}: SinglePartAnimeFormProps) {
-  const isEdit = !!anime;
-  const currentType = selectedType || anime?.type || AnimeType.MOVIE;
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
-
-  // State'ler
+export function SinglePartAnimeForm({ selectedType, anime, onSuccess, onCancel }: SinglePartAnimeFormProps) {
+  const { isLoading } = useLoadingStore();
   const [genres, setGenres] = useState<Genre[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [studios, setStudios] = useState<Studio[]>([]);
@@ -53,227 +43,274 @@ export function SinglePartAnimeForm({
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    setValue,
-    formState: { errors }
-  } = useForm({
+  const isEdit = !!anime;
+
+  const form = useForm<CreateAnimeSeriesRequest | UpdateAnimeSeriesRequest>({
     resolver: zodResolver(isEdit ? updateAnimeSeriesSchema : createAnimeSeriesSchema),
-    defaultValues: isEdit && anime ? {
-      type: currentType,
-      title: anime.title,
-      englishTitle: anime.englishTitle || '',
-      japaneseTitle: anime.japaneseTitle || '',
-      synonyms: Array.isArray(anime.synonyms) ? anime.synonyms.join(', ') : anime.synonyms || '',
-      synopsis: anime.synopsis || '',
-      episodes: 1,
-      duration: anime.duration || undefined,
-      status: anime.status,
-      isAdult: anime.isAdult || false,
-      season: anime.season || undefined,
-      seasonYear: anime.seasonYear || undefined,
-      releaseDate: anime.releaseDate?.toISOString().split('T')[0] || undefined,
-      source: anime.source || undefined,
-      countryOfOrigin: anime.countryOfOrigin || undefined,
-      anilistAverageScore: anime.anilistAverageScore || undefined,
-      anilistPopularity: anime.anilistPopularity || undefined,
-      anilistId: anime.anilistId || undefined,
-      malId: anime.malId || undefined,
-      trailer: anime.trailer || '',
-      isMultiPart: false,
-    } : {
-      type: currentType,
+    defaultValues: {
       title: '',
+      englishTitle: '',
+      japaneseTitle: '',
+      synonyms: [],
+      synopsis: '',
+      type: selectedType,
       status: undefined,
       isAdult: false,
-      episodes: 1,
+      isMultiPart: false,
+      episodes: 1, // Tek parçalı için sabit
+      duration: undefined,
+      season: undefined,
+      seasonYear: undefined,
+      releaseDate: undefined,
+      source: undefined,
+      countryOfOrigin: undefined,
+      anilistId: undefined,
+      malId: undefined,
+      anilistAverageScore: undefined,
+      anilistPopularity: undefined,
+      trailer: '',
+      coverImage: '',
+      bannerImage: '',
+      coverImageFile: '',
+      bannerImageFile: '',
+      genreIds: [],
+      tagIds: [],
+      studioIds: [],
     },
   });
 
-  // Genre, tag, studio seçimlerini ayarla (edit mode)
+  // Form reset (edit mode için)
   useEffect(() => {
     if (anime && isEdit) {
-      const animeWithRelations = anime as AnimeSeries & { genres?: Genre[]; tags?: Tag[]; studios?: Studio[] };
-      console.log('Anime with relations:', animeWithRelations);
-      if (animeWithRelations.genres) {
-        console.log('Setting genres:', animeWithRelations.genres.map(g => g.id));
-        setSelectedGenreIds(animeWithRelations.genres.map(g => g.id));
-      }
-      if (animeWithRelations.tags) {
-        console.log('Setting tags:', animeWithRelations.tags.map(t => t.id));
-        setSelectedTagIds(animeWithRelations.tags.map(t => t.id));
-      }
-      if (animeWithRelations.studios) {
-        console.log('Setting studios:', animeWithRelations.studios.map(s => s.id));
-        setSelectedStudioIds(animeWithRelations.studios.map(s => s.id));
-      }
+      form.reset({
+        title: anime.title,
+        englishTitle: anime.englishTitle || '',
+        japaneseTitle: anime.japaneseTitle || '',
+        synonyms: anime.synonyms || [],
+        synopsis: anime.synopsis || '',
+        type: anime.type,
+        status: anime.status,
+        isAdult: anime.isAdult,
+        isMultiPart: anime.isMultiPart,
+        episodes: 1,
+        duration: anime.duration,
+        season: anime.season,
+        seasonYear: anime.seasonYear,
+        releaseDate: anime.releaseDate,
+        source: anime.source,
+        countryOfOrigin: anime.countryOfOrigin,
+        anilistId: anime.anilistId,
+        malId: anime.malId,
+        anilistAverageScore: anime.anilistAverageScore,
+        anilistPopularity: anime.anilistPopularity,
+        trailer: anime.trailer || '',
+        coverImage: anime.coverImage || '',
+        bannerImage: anime.bannerImage || '',
+        coverImageFile: '',
+        bannerImageFile: '',
+        genreIds: [],
+        tagIds: [],
+        studioIds: [],
+      });
     }
-  }, [anime, isEdit]);
+  }, [anime, isEdit, form]);
 
-  // Genre, tag, studio verilerini getir
+  // Genres, tags, studios yükle
   useEffect(() => {
-    const fetchData = async () => {
+    const loadData = async () => {
       try {
-        const [genresResult, tagsResult, studiosResult] = await Promise.all([
-          getAllGenresAction(),
-          getAllTagsAction(),
-          getAllStudiosAction()
+        const [genresRes, tagsRes, studiosRes] = await Promise.all([
+          getGenresAction(),
+          getTagsAction(),
+          getStudiosAction(),
         ]);
 
-        if (genresResult.success && genresResult.data) {
-          setGenres(genresResult.data.genres || []);
-        }
-        if (tagsResult.success && tagsResult.data) {
-          setTags(tagsResult.data.tags || []);
-        }
-        if (studiosResult.success && studiosResult.data) {
-          setStudios(studiosResult.data.studios || []);
-        }
+        if (genresRes.success) setGenres((genresRes.data as { genres: Genre[] }).genres);
+        if (tagsRes.success) setTags((tagsRes.data as { tags: Tag[] }).tags);
+        if (studiosRes.success) setStudios((studiosRes.data as { studios: Studio[] }).studios);
       } catch (error) {
-        console.error('Fetch data error:', error);
-        toast.error('Veriler yüklenirken bir hata oluştu');
+        console.error('Veri yükleme hatası:', error);
       }
     };
 
-    fetchData();
+    loadData();
   }, []);
 
-  const onSubmit = async (data: z.infer<typeof createAnimeSeriesSchema> | z.infer<typeof updateAnimeSeriesSchema>) => {
-    if (isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)) return;
+  // Edit mode'da seçili değerleri ayarla
+  useEffect(() => {
+    if (anime && isEdit) {
+      setSelectedGenreIds((anime.genreIds || []).map(String));
+      setSelectedTagIds((anime.tagIds || []).map(String));
+      setSelectedStudioIds((anime.studioIds || []).map(String));
+    }
+  }, [anime, isEdit]);
 
-    setLoadingStore(LOADING_KEYS.FORMS.CREATE_ANIME, true);
-
+  const onSubmit = async (data: CreateAnimeSeriesRequest | UpdateAnimeSeriesRequest) => {
     try {
-      // isMultiPart'ı type'a göre belirle
-      const isMultiPart = false; // Single part form için her zaman false
+      const formData = {
+        ...data,
+        type: selectedType,
+        isMultiPart: false,
+        episodes: 1,
+        coverImageFile,
+        bannerImageFile,
+        genreIds: selectedGenreIds,
+        tagIds: selectedTagIds,
+        studioIds: selectedStudioIds,
+      };
 
-      let result;
-
-      if (isEdit && anime) {
-        result = await updateAnimeSeriesAction(anime.id, { ...data, isMultiPart });
+      const result = await createAnimeSeriesAction(formData);
+      
+      if (result.success) {
+        toast.success(isEdit ? 'Anime güncellendi' : 'Anime oluşturuldu');
+        onSuccess();
       } else {
-        result = await createAnimeSeriesAction({ ...data, isMultiPart });
+        toast.error(result && 'message' in result ? result.message as string : 'Bir hata oluştu');
       }
-
-      if (!result.success) {
-        toast.error('error' in result ? result.error : `${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
-        return;
-      }
-
-      toast.success(`Film başarıyla ${isEdit ? 'güncellendi' : 'oluşturuldu'}!`);
-      onSuccess?.();
-
     } catch (error) {
-      console.error('Film form error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.FORMS.CREATE_ANIME, false);
+      console.error('Form gönderme hatası:', error);
+      toast.error('Bir hata oluştu');
     }
   };
 
+  const isSubmitting = isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME_PAGE);
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full max-w-4xl">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-4xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Temel Bilgiler */}
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="title">Başlık *</Label>
+            <Input
+              id="title"
+              {...form.register('title')}
+              placeholder="Anime başlığı"
+            />
+            {form.formState.errors.title && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.title.message}</p>
+            )}
+          </div>
 
-      {/* Temel Bilgiler */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Durum */}
-        <div className="space-y-2">
-          <Label htmlFor="status">Durum *</Label>
-          <Select
-            value={watch('status') || undefined}
-            onValueChange={(value) => setValue('status', value as AnimeStatus)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Durum seçin" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.values(AnimeStatus).map((status) => (
-                <SelectItem key={status} value={status}>
-                  {status}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.status && (
-            <p className="text-sm text-destructive">{errors.status.message}</p>
-          )}
+          <div>
+            <Label htmlFor="englishTitle">İngilizce Başlık</Label>
+            <Input
+              id="englishTitle"
+              {...form.register('englishTitle')}
+              placeholder="English title"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="japaneseTitle">Japonca Başlık</Label>
+            <Input
+              id="japaneseTitle"
+              {...form.register('japaneseTitle')}
+              placeholder="日本語タイトル"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="synonyms">Alternatif Başlıklar</Label>
+            <Input
+              id="synonyms"
+              {...form.register('synonyms')}
+              placeholder="Alternatif başlıklar (virgülle ayırın)"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="synopsis">Açıklama</Label>
+            <Textarea
+              id="synopsis"
+              {...form.register('synopsis')}
+              placeholder="Anime açıklaması"
+              rows={4}
+            />
+          </div>
         </div>
 
-        {/* Süre */}
-        <div className="space-y-2">
-          <Label htmlFor="duration">Süre (dakika) *</Label>
-          <Input
-            id="duration"
-            type="number"
-            placeholder="Film süresi"
-            {...register('duration')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-          />
-          {errors.duration && (
-            <p className="text-sm text-destructive">{errors.duration.message}</p>
-          )}
+        {/* Durum ve Tip Bilgileri */}
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="status">Yayın Durumu *</Label>
+            <Select
+              value={form.watch('status')}
+              onValueChange={(value) => form.setValue('status', value as AnimeStatus)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Durum seçiniz" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(AnimeStatus).map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {status}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {form.formState.errors.status && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.status.message}</p>
+            )}
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="isAdult"
+              checked={form.watch('isAdult')}
+              onCheckedChange={(checked) => form.setValue('isAdult', checked as boolean)}
+            />
+            <Label htmlFor="isAdult">Yetişkin İçerik</Label>
+          </div>
+
+          <div>
+            <Label htmlFor="duration">Süre (dakika) *</Label>
+            <Input
+              id="duration"
+              type="number"
+              {...form.register('duration', { valueAsNumber: true })}
+              placeholder="Süre"
+            />
+            {form.formState.errors.duration && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.duration.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="anilistId">Anilist ID *</Label>
+            <Input
+              id="anilistId"
+              type="number"
+              {...form.register('anilistId', { valueAsNumber: true })}
+              placeholder="Anilist ID"
+            />
+            {form.formState.errors.anilistId && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.anilistId.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="malId">MAL ID</Label>
+            <Input
+              id="malId"
+              type="number"
+              {...form.register('malId', { valueAsNumber: true })}
+              placeholder="MyAnimeList ID"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Başlık */}
-      <div className="space-y-2">
-        <Label htmlFor="title">Başlık *</Label>
-        <Input
-          id="title"
-          type="text"
-          placeholder="Film başlığını girin"
-          {...register('title')}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
-        {errors.title && (
-          <p className="text-sm text-destructive">{errors.title.message}</p>
-        )}
-      </div>
-
-      {/* İngilizce ve Japonca Başlık */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="englishTitle">İngilizce Başlık</Label>
-          <Input
-            id="englishTitle"
-            type="text"
-            placeholder="İngilizce başlık"
-            {...register('englishTitle')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-          />
-          {errors.englishTitle && (
-            <p className="text-sm text-destructive">{errors.englishTitle.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="japaneseTitle">Japonca Başlık</Label>
-          <Input
-            id="japaneseTitle"
-            type="text"
-            placeholder="Japonca başlık"
-            {...register('japaneseTitle')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-          />
-          {errors.japaneseTitle && (
-            <p className="text-sm text-destructive">{errors.japaneseTitle.message}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Sezon ve Yıl */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
+      {/* Sezon Bilgileri */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
           <Label htmlFor="season">Sezon</Label>
           <Select
-            value={watch('season')}
-            onValueChange={(value) => setValue('season', value as Season)}
+            value={form.watch('season')}
+            onValueChange={(value) => form.setValue('season', value as Season)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Sezon seçin" />
+              <SelectValue placeholder="Sezon seçiniz" />
             </SelectTrigger>
             <SelectContent>
               {Object.values(Season).map((season) => (
@@ -283,283 +320,172 @@ export function SinglePartAnimeForm({
               ))}
             </SelectContent>
           </Select>
-          {errors.season && (
-            <p className="text-sm text-destructive">{errors.season.message}</p>
-          )}
         </div>
 
-        <div className="space-y-2">
+        <div>
           <Label htmlFor="seasonYear">Yıl</Label>
           <Input
             id="seasonYear"
             type="number"
+            {...form.register('seasonYear', { valueAsNumber: true })}
             placeholder="Yıl"
-            {...register('seasonYear')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
           />
-          {errors.seasonYear && (
-            <p className="text-sm text-destructive">{errors.seasonYear.message}</p>
-          )}
+        </div>
+
+        <div>
+          <Label htmlFor="releaseDate">Yayın Tarihi</Label>
+          <Input
+            id="releaseDate"
+            type="date"
+            {...form.register('releaseDate')}
+          />
         </div>
       </div>
 
-      {/* Synonyms */}
-      <div className="space-y-2">
-        <Label htmlFor="synonyms">Alternatif Başlıklar</Label>
-        <Input
-          id="synonyms"
-          type="text"
-          placeholder="Virgülle ayrılmış alternatif başlıklar"
-          {...register('synonyms')}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
-        {errors.synonyms && (
-          <p className="text-sm text-destructive">{errors.synonyms.message}</p>
-        )}
-      </div>
-
-      {/* Synopsis */}
-      <div className="space-y-2">
-        <Label htmlFor="synopsis">Özet</Label>
-        <Textarea
-          id="synopsis"
-          placeholder="Film özetini girin"
-          {...register('synopsis')}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-          rows={3}
-        />
-        {errors.synopsis && (
-          <p className="text-sm text-destructive">{errors.synopsis.message}</p>
-        )}
-      </div>
-
-      {/* Release Date */}
-      <div className="space-y-2">
-        <Label htmlFor="releaseDate">Yayın Tarihi</Label>
-        <Input
-          id="releaseDate"
-          type="date"
-          {...register('releaseDate')}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
-        {errors.releaseDate && (
-          <p className="text-sm text-destructive">{errors.releaseDate.message}</p>
-        )}
-      </div>
-
-      {/* Source */}
-      <div className="space-y-2">
-        <Label htmlFor="source">Kaynak Materyal</Label>
-        <Select
-          value={watch('source')}
-          onValueChange={(value) => setValue('source', value as Source)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Kaynak seçin" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.values(Source).map((source) => (
-              <SelectItem key={source} value={source}>
-                {source}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {errors.source && (
-          <p className="text-sm text-destructive">{errors.source.message}</p>
-        )}
-      </div>
-
-      {/* Country of Origin */}
-      <div className="space-y-2">
-        <Label htmlFor="countryOfOrigin">Köken Ülke</Label>
-        <Select
-          value={watch('countryOfOrigin')}
-          onValueChange={(value) => setValue('countryOfOrigin', value as CountryOfOrigin)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Köken ülke seçin" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.values(CountryOfOrigin).map((country) => (
-              <SelectItem key={country} value={country}>
-                {country}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {errors.countryOfOrigin && (
-          <p className="text-sm text-destructive">{errors.countryOfOrigin.message}</p>
-        )}
-      </div>
-
-      {/* AniList Scores */}
+      {/* Kaynak ve Ülke */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="anilistAverageScore">AniList Ortalama Puan</Label>
+        <div>
+          <Label htmlFor="source">Kaynak Materyal</Label>
+          <Select
+            value={form.watch('source')}
+            onValueChange={(value) => form.setValue('source', value as Source)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Kaynak seçiniz" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(Source).map((source) => (
+                <SelectItem key={source} value={source}>
+                  {source}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label htmlFor="countryOfOrigin">Köken Ülke</Label>
+          <Select
+            value={form.watch('countryOfOrigin')}
+            onValueChange={(value) => form.setValue('countryOfOrigin', value as CountryOfOrigin)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Ülke seçiniz" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(CountryOfOrigin).map((country) => (
+                <SelectItem key={country} value={country}>
+                  {country}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Puanlama */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="anilistAverageScore">Anilist Ortalama Puan</Label>
           <Input
             id="anilistAverageScore"
             type="number"
-            step="0.01"
-            placeholder="Ortalama puan"
-            {...register('anilistAverageScore')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+            step="0.1"
+            {...form.register('anilistAverageScore', { valueAsNumber: true })}
+            placeholder="0-100"
           />
-          {errors.anilistAverageScore && (
-            <p className="text-sm text-destructive">{errors.anilistAverageScore.message}</p>
-          )}
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="anilistPopularity">AniList Popülerlik</Label>
+        <div>
+          <Label htmlFor="anilistPopularity">Anilist Popülerlik</Label>
           <Input
             id="anilistPopularity"
             type="number"
+            {...form.register('anilistPopularity', { valueAsNumber: true })}
             placeholder="Popülerlik"
-            {...register('anilistPopularity')}
-            disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
           />
-          {errors.anilistPopularity && (
-            <p className="text-sm text-destructive">{errors.anilistPopularity.message}</p>
-          )}
         </div>
       </div>
 
       {/* Trailer */}
-      <div className="space-y-2">
-        <Label htmlFor="trailer">Tanıtım Videosu URL</Label>
+      <div>
+        <Label htmlFor="trailer">Trailer URL</Label>
         <Input
           id="trailer"
-          type="url"
-          placeholder="Trailer URL'si"
-          {...register('trailer')}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
-        {errors.trailer && (
-          <p className="text-sm text-destructive">{errors.trailer.message}</p>
-        )}
-      </div>
-
-      {/* AniList ID (Zorunlu) */}
-      <div className="space-y-2">
-        <Label htmlFor="anilistId">AniList ID *</Label>
-        <Input
-          id="anilistId"
-          type="number"
-          placeholder="AniList ID"
-          {...register('anilistId')}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
-        {errors.anilistId && (
-          <p className="text-sm text-destructive">{errors.anilistId.message}</p>
-        )}
-      </div>
-
-      {/* MyAnimeList ID (Opsiyonel) */}
-      <div className="space-y-2">
-        <Label htmlFor="malId">MyAnimeList ID</Label>
-        <Input
-          id="malId"
-          type="number"
-          placeholder="MyAnimeList ID"
-          {...register('malId')}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
-        {errors.malId && (
-          <p className="text-sm text-destructive">{errors.malId.message}</p>
-        )}
-      </div>
-
-      {/* Genre Seçimi */}
-      <div className="space-y-2">
-        <Label>Türler</Label>
-        <MultiSelect
-          options={genres.map(genre => ({ id: genre.id, name: genre.name }))}
-          selectedIds={selectedGenreIds}
-          onSelectionChange={setSelectedGenreIds}
-          placeholder="Tür seçin"
-          searchPlaceholder="Tür ara..."
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
+          {...form.register('trailer')}
+          placeholder="https://..."
         />
       </div>
 
-      {/* Tag Seçimi */}
-      <div className="space-y-2">
-        <Label>Etiketler</Label>
-        <MultiSelect
-          options={tags.map(tag => ({ id: tag.id, name: tag.name }))}
-          selectedIds={selectedTagIds}
-          onSelectionChange={setSelectedTagIds}
-          placeholder="Etiket seçin"
-          searchPlaceholder="Etiket ara..."
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
+      {/* İlişkili Veriler */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <Label>Türler</Label>
+          <MultiSelect
+            options={genres.map(genre => ({ id: genre.id, name: genre.name }))}
+            selectedIds={selectedGenreIds}
+            onSelectionChange={setSelectedGenreIds}
+            placeholder="Tür seçiniz"
+            searchPlaceholder="Tür ara..."
+          />
+        </div>
+
+        <div>
+          <Label>Etiketler</Label>
+          <MultiSelect
+            options={tags.map(tag => ({ id: tag.id, name: tag.name }))}
+            selectedIds={selectedTagIds}
+            onSelectionChange={setSelectedTagIds}
+            placeholder="Etiket seçiniz"
+            searchPlaceholder="Etiket ara..."
+          />
+        </div>
+
+        <div>
+          <Label>Stüdyolar</Label>
+          <MultiSelect
+            options={studios.map(studio => ({ id: studio.id, name: studio.name }))}
+            selectedIds={selectedStudioIds}
+            onSelectionChange={setSelectedStudioIds}
+            placeholder="Stüdyo seçiniz"
+            searchPlaceholder="Stüdyo ara..."
+          />
+        </div>
       </div>
 
-      {/* Studio Seçimi */}
-      <div className="space-y-2">
-        <Label>Stüdyolar</Label>
-        <MultiSelect
-          options={studios.map(studio => ({ id: studio.id, name: studio.name }))}
-          selectedIds={selectedStudioIds}
-          onSelectionChange={setSelectedStudioIds}
-          placeholder="Stüdyo seçin"
-          searchPlaceholder="Stüdyo ara..."
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
-      </div>
-
-      {/* Resim Yükleme */}
+      {/* Görseller */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ImageUpload
-          id="coverImage"
-          label="Kapak Görseli"
-          accept={UPLOAD_CONFIGS.ANIME_COVER.accept}
-          maxSize={UPLOAD_CONFIGS.ANIME_COVER.maxSize}
-          value={coverImageFile}
-          onChange={setCoverImageFile}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
+        <div>
+          <Label>Kapak Görseli</Label>
+          <ImageUpload
+            id="coverImageFile"
+            label="Kapak Görseli"
+            accept="image/*"
+            maxSize={UPLOAD_CONFIGS.ANIME_COVER.maxSize}
+            value={coverImageFile}
+            onChange={setCoverImageFile}
+          />
+        </div>
 
-        <ImageUpload
-          id="bannerImage"
-          label="Banner Görseli"
-          accept={UPLOAD_CONFIGS.ANIME_BANNER.accept}
-          maxSize={UPLOAD_CONFIGS.ANIME_BANNER.maxSize}
-          value={bannerImageFile}
-          onChange={setBannerImageFile}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
-      </div>
-
-      {/* Yetişkin İçerik */}
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="isAdult"
-          checked={watch('isAdult')}
-          onCheckedChange={(checked) => setValue('isAdult', checked as boolean)}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        />
-        <Label htmlFor="isAdult">Yetişkin İçerik</Label>
-        {errors.isAdult && (
-          <p className="text-sm text-destructive">{errors.isAdult.message}</p>
-        )}
+        <div>
+          <Label>Banner Görseli</Label>
+          <ImageUpload
+            id="bannerImageFile"
+            label="Banner Görseli"
+            accept="image/*"
+            maxSize={UPLOAD_CONFIGS.ANIME_BANNER.maxSize}
+            value={bannerImageFile}
+            onChange={setBannerImageFile}
+          />
+        </div>
       </div>
 
       {/* Butonlar */}
-      <div className="flex justify-end gap-2 pt-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        >
+      <div className="flex justify-end space-x-2">
+        <Button type="button" variant="outline" onClick={onCancel}>
           İptal
         </Button>
-        <Button
-          type="submit"
-          disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME)}
-        >
+        <Button type="submit" disabled={isSubmitting}>
           {isEdit ? 'Güncelle' : 'Oluştur'}
         </Button>
       </div>
