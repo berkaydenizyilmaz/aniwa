@@ -456,7 +456,6 @@ export function SinglePartAnimeForm({ selectedType, anime, onSuccess, onCancel }
       {/* Görseller */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label>Kapak Görseli</Label>
           <ImageUpload
             id="coverImageFile"
             label="Kapak Görseli"
@@ -468,7 +467,6 @@ export function SinglePartAnimeForm({ selectedType, anime, onSuccess, onCancel }
         </div>
 
         <div>
-          <Label>Banner Görseli</Label>
           <ImageUpload
             id="bannerImageFile"
             label="Banner Görseli"
