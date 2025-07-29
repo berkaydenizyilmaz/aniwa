@@ -16,12 +16,12 @@ import { authConfig } from '@/lib/auth/auth.config';
 
 // Genre oluşturma
 export async function createGenreAction(data: CreateGenreInput): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
     // Zod validation
     const validatedData = createGenreSchema.parse(data);
-
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await createGenreBusiness(validatedData, session!.user.id);
@@ -37,19 +37,19 @@ export async function createGenreAction(data: CreateGenreInput): Promise<ServerA
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'createGenreAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Genre listesi getirme
 export async function getGenresAction(filters?: GenreFilters): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
     // Zod validation
     const validatedFilters = filters ? genreFiltersSchema.parse(filters) : undefined;
-
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await getGenresBusiness(session!.user.id, validatedFilters);
@@ -62,17 +62,17 @@ export async function getGenresAction(filters?: GenreFilters): Promise<ServerAct
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getGenresAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Tek genre getirme
 export async function getGenreAction(id: string): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
-
     // Business logic'i kullan
     const result = await getGenreBusiness(id, session!.user.id);
 
@@ -84,19 +84,19 @@ export async function getGenreAction(id: string): Promise<ServerActionResponse> 
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getGenreAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Genre güncelleme
 export async function updateGenreAction(id: string, data: UpdateGenreInput): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
     // Zod validation
     const validatedData = updateGenreSchema.parse(data);
-
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await updateGenreBusiness(id, validatedData, session!.user.id);
@@ -112,17 +112,17 @@ export async function updateGenreAction(id: string, data: UpdateGenreInput): Pro
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'updateGenreAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Genre silme
 export async function deleteGenreAction(id: string): Promise<ServerActionResponse> {
-  try {
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
 
+  try {
     // Business logic'i kullan
     await deleteGenreBusiness(id, session!.user.id);
 
@@ -137,7 +137,7 @@ export async function deleteGenreAction(id: string): Promise<ServerActionRespons
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'deleteGenreAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 } 

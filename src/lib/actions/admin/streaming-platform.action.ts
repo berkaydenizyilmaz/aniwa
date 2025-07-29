@@ -16,12 +16,12 @@ import { authConfig } from '@/lib/auth/auth.config';
 
 // Streaming platform oluşturma
 export async function createStreamingPlatformAction(data: CreateStreamingPlatformInput): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
     // Zod validation
     const validatedData = createStreamingPlatformSchema.parse(data);
-
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await createStreamingPlatformBusiness(validatedData, session!.user.id);
@@ -37,19 +37,19 @@ export async function createStreamingPlatformAction(data: CreateStreamingPlatfor
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'createStreamingPlatformAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Streaming platform listesi getirme
 export async function getStreamingPlatformsAction(filters?: StreamingPlatformFilters): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
     // Zod validation
     const validatedFilters = filters ? streamingPlatformFiltersSchema.parse(filters) : undefined;
-
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await getStreamingPlatformsBusiness(session!.user.id, validatedFilters);
@@ -62,17 +62,17 @@ export async function getStreamingPlatformsAction(filters?: StreamingPlatformFil
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getStreamingPlatformsAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Tek streaming platform getirme
 export async function getStreamingPlatformAction(id: string): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
-
     // Business logic'i kullan
     const result = await getStreamingPlatformBusiness(id, session!.user.id);
 
@@ -84,19 +84,19 @@ export async function getStreamingPlatformAction(id: string): Promise<ServerActi
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getStreamingPlatformAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Streaming platform güncelleme
 export async function updateStreamingPlatformAction(id: string, data: UpdateStreamingPlatformInput): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
     // Zod validation
     const validatedData = updateStreamingPlatformSchema.parse(data);
-
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await updateStreamingPlatformBusiness(id, validatedData, session!.user.id);
@@ -112,17 +112,17 @@ export async function updateStreamingPlatformAction(id: string, data: UpdateStre
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'updateStreamingPlatformAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Streaming platform silme
 export async function deleteStreamingPlatformAction(id: string): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
-
     // Business logic'i kullan
     const result = await deleteStreamingPlatformBusiness(id, session!.user.id);
 
@@ -137,7 +137,7 @@ export async function deleteStreamingPlatformAction(id: string): Promise<ServerA
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'deleteStreamingPlatformAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 } 

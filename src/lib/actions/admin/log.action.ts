@@ -11,13 +11,13 @@ import { authConfig } from '@/lib/auth/auth.config';
 
 // Log listesi getirme
 export async function getLogsAction(filters?: LogFilters): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
     // Zod validation
     const validatedFilters = filters ? logFiltersSchema.parse(filters) : undefined;
-
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
-
+  
     // Business logic'i kullan
     const result = await getLogsBusiness(session!.user.id, validatedFilters);
 
@@ -29,17 +29,17 @@ export async function getLogsAction(filters?: LogFilters): Promise<ServerActionR
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getLogsAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Tek log getirme
 export async function getLogAction(id: string): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
-
     // Business logic'i kullan
     const result = await getLogBusiness(id, session!.user.id);
 
@@ -51,7 +51,7 @@ export async function getLogAction(id: string): Promise<ServerActionResponse> {
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getLogAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 } 

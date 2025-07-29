@@ -2,14 +2,12 @@
 
 import { 
   BusinessError, 
-  ConflictError, 
   NotFoundError,
   DatabaseError
 } from '@/lib/errors';
 import { 
   createAnimeSeriesDB, 
   findAnimeSeriesByIdDB, 
-  findAnimeSeriesByPublicIdDB, 
   findAllAnimeSeriesDB, 
   updateAnimeSeriesDB, 
   deleteAnimeSeriesDB,

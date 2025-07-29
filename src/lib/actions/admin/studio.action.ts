@@ -16,12 +16,12 @@ import { authConfig } from '@/lib/auth/auth.config';
 
 // Studio oluşturma
 export async function createStudioAction(data: CreateStudioInput): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
     // Zod validation
     const validatedData = createStudioSchema.parse(data);
-
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await createStudioBusiness(validatedData, session!.user.id);
@@ -37,19 +37,19 @@ export async function createStudioAction(data: CreateStudioInput): Promise<Serve
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'createStudioAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Studio listesi getirme
 export async function getStudiosAction(filters?: StudioFilters): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
     // Zod validation
     const validatedFilters = filters ? studioFiltersSchema.parse(filters) : undefined;
-
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await getStudiosBusiness(session!.user.id, validatedFilters);
@@ -62,17 +62,17 @@ export async function getStudiosAction(filters?: StudioFilters): Promise<ServerA
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getStudiosAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Tek studio getirme
 export async function getStudioAction(id: string): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
-
     // Business logic'i kullan
     const result = await getStudioBusiness(id, session!.user.id);
 
@@ -84,19 +84,19 @@ export async function getStudioAction(id: string): Promise<ServerActionResponse>
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'getStudioAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Studio güncelleme
 export async function updateStudioAction(id: string, data: UpdateStudioInput): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
     // Zod validation
     const validatedData = updateStudioSchema.parse(data);
-
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
 
     // Business logic'i kullan
     const result = await updateStudioBusiness(id, validatedData, session!.user.id);
@@ -112,17 +112,17 @@ export async function updateStudioAction(id: string, data: UpdateStudioInput): P
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'updateStudioAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 }
 
 // Studio silme
 export async function deleteStudioAction(id: string): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
   try {
-    // Session'dan user bilgisini al
-    const session = await getServerSession(authConfig);
-
     // Business logic'i kullan
     await deleteStudioBusiness(id, session!.user.id);
 
@@ -137,7 +137,7 @@ export async function deleteStudioAction(id: string): Promise<ServerActionRespon
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'deleteStudioAction',
-      userId: (await getServerSession(authConfig))?.user.id
+      userId: session?.user.id
     });
   }
 } 
