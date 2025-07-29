@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
-import { unbanUserBusiness } from '@/lib/services/business/user.business';
+import { unbanUserBusiness } from '@/lib/services/business/admin/user.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Kullanıcı ban kaldır (POST)

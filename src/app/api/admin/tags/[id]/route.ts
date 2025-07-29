@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { updateTagSchema } from '@/lib/schemas/tag.schema';
-import { getTagBusiness, updateTagBusiness, deleteTagBusiness } from '@/lib/services/business/tag.business';
+import { getTagBusiness, updateTagBusiness, deleteTagBusiness } from '@/lib/services/business/admin/tag.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tek tag detayı (GET)

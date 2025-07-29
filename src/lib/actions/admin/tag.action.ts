@@ -7,7 +7,7 @@ import {
   getTagBusiness,
   updateTagBusiness, 
   deleteTagBusiness 
-} from '@/lib/services/business/tag.business';
+} from '@/lib/services/business/admin/tag.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
 import { ROUTES } from '@/lib/constants/routes.constants';

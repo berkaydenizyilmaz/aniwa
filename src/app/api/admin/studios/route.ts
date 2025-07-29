@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { createStudioSchema, studioFiltersSchema } from '@/lib/schemas/studio.schema';
-import { createStudioBusiness, getStudiosBusiness } from '@/lib/services/business/studio.business';
+import { createStudioBusiness, getStudiosBusiness } from '@/lib/services/business/admin/studio.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tüm studio'ları listele (GET)

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { updateUserSchema } from '@/lib/schemas/user.schema';
-import { getUserBusiness, updateUserBusiness, deleteUserBusiness } from '@/lib/services/business/user.business';
+import { getUserBusiness, updateUserBusiness, deleteUserBusiness } from '@/lib/services/business/admin/user.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tek kullanıcı detayı (GET)

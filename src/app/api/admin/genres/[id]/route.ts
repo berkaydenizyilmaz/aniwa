@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { updateGenreSchema } from '@/lib/schemas/genre.schema';
-import { getGenreBusiness, updateGenreBusiness, deleteGenreBusiness } from '@/lib/services/business/genre.business';
+import { getGenreBusiness, updateGenreBusiness, deleteGenreBusiness } from '@/lib/services/business/admin/genre.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tek genre detayı (GET)

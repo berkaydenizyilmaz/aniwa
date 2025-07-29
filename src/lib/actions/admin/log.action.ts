@@ -4,7 +4,7 @@ import { logFiltersSchema, type LogFilters } from '@/lib/schemas/log.schema';
 import { 
   getLogsBusiness, 
   getLogBusiness
-} from '@/lib/services/business/log.business';
+} from '@/lib/services/business/admin/log.business';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';

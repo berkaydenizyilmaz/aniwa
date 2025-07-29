@@ -48,7 +48,7 @@ class Logger {
       });
 
       // Business layer üzerinden log oluştur
-      const { createLogBusiness } = await import('@/lib/services/business/log.business');
+      const { createLogBusiness } = await import('@/lib/services/business/admin/log.business');
       await createLogBusiness(logData);
     } catch (error) {
       // Database'e kaydedilemezse sadece console'a yaz

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { createStreamingPlatformSchema, streamingPlatformFiltersSchema } from '@/lib/schemas/streamingPlatform.schema';
-import { createStreamingPlatformBusiness, getStreamingPlatformsBusiness } from '@/lib/services/business/streaming.business';
+import { createStreamingPlatformBusiness, getStreamingPlatformsBusiness } from '@/lib/services/business/admin/streaming.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tüm streaming platformları listele (GET)

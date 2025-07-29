@@ -8,7 +8,7 @@ import {
   banUserBusiness,
   unbanUserBusiness,
   deleteUserBusiness 
-} from '@/lib/services/business/user.business';
+} from '@/lib/services/business/admin/user.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
 import { ROUTES } from '@/lib/constants/routes.constants';

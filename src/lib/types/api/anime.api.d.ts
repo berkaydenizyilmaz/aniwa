@@ -20,7 +20,7 @@ export type GetAnimeMediaPartResponse = AnimeMediaPart;
 export type UpdateAnimeMediaPartResponse = AnimeMediaPart;
 
 // Anime Series listesi response tipi
-export interface GetAnimeSeriesResponse {
+export interface GetAnimeSeriesListResponse {
   animeSeries: AnimeSeries[];
   total: number;
   page: number;

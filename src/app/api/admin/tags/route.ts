@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { createTagSchema, tagFiltersSchema } from '@/lib/schemas/tag.schema';
-import { createTagBusiness, getTagsBusiness } from '@/lib/services/business/tag.business';
+import { createTagBusiness, getTagsBusiness } from '@/lib/services/business/admin/tag.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tüm tag'leri listele (GET)

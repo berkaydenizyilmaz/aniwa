@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { createGenreSchema, genreFiltersSchema } from '@/lib/schemas/genre.schema';
-import { createGenreBusiness, getGenresBusiness } from '@/lib/services/business/genre.business';
+import { createGenreBusiness, getGenresBusiness } from '@/lib/services/business/admin/genre.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tüm genre'leri listele (GET)

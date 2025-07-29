@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 import { updateStudioSchema } from '@/lib/schemas/studio.schema';
-import { getStudioBusiness, updateStudioBusiness, deleteStudioBusiness } from '@/lib/services/business/studio.business';
+import { getStudioBusiness, updateStudioBusiness, deleteStudioBusiness } from '@/lib/services/business/admin/studio.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 // Tek studio detayı (GET)

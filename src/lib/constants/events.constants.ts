@@ -91,6 +91,20 @@ export const EVENTS = {
   // Editor Events
   EDITOR: {
     STREAMING_LINKS_UPDATED: 'editor_streaming_links_updated',
+    
+    // Anime Series Management
+    ANIME_SERIES_CREATED: 'editor_anime_series_created',
+    ANIME_SERIES_RETRIEVED: 'editor_anime_series_retrieved',
+    ANIME_SERIES_LIST_RETRIEVED: 'editor_anime_series_list_retrieved',
+    ANIME_SERIES_UPDATED: 'editor_anime_series_updated',
+    ANIME_SERIES_DELETED: 'editor_anime_series_deleted',
+    
+    // Anime Media Part Management
+    ANIME_MEDIA_PART_CREATED: 'editor_anime_media_part_created',
+    ANIME_MEDIA_PART_RETRIEVED: 'editor_anime_media_part_retrieved',
+    ANIME_MEDIA_PARTS_RETRIEVED: 'editor_anime_media_parts_retrieved',
+    ANIME_MEDIA_PART_UPDATED: 'editor_anime_media_part_updated',
+    ANIME_MEDIA_PART_DELETED: 'editor_anime_media_part_deleted',
   },
   
   // System Events - Katmanlara göre organize

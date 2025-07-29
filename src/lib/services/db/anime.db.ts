@@ -5,13 +5,49 @@ import { prisma } from '@/lib/prisma';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
+// Son AniwaPublicId'yi getir
+export async function getLastAniwaPublicIdDB(
+  client: PrismaClientOrTransaction = prisma
+): Promise<number> {
+  try {
+    const lastAnime = await client.animeSeries.findFirst({
+      orderBy: { aniwaPublicId: 'desc' },
+      select: { aniwaPublicId: true }
+    });
+    
+    return lastAnime?.aniwaPublicId || 0;
+  } catch (error) {
+    handleDatabaseError(error, 'Son AniwaPublicId getirme', {});
+  }
+}
+
+// Yeni AniwaPublicId oluştur
+export async function generateNextAniwaPublicIdDB(
+  client: PrismaClientOrTransaction = prisma
+): Promise<number> {
+  try {
+    const lastId = await getLastAniwaPublicIdDB(client);
+    return lastId + 1;
+  } catch (error) {
+    handleDatabaseError(error, 'Yeni AniwaPublicId oluşturma', {});
+  }
+}
+
 // Anime serisi oluşturma
 export async function createAnimeSeriesDB(
-  data: Prisma.AnimeSeriesCreateInput,
+  data: Omit<Prisma.AnimeSeriesCreateInput, 'aniwaPublicId'>,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries> {
   try {
-    return await client.animeSeries.create({ data });
+    // Yeni AniwaPublicId oluştur
+    const nextId = await generateNextAniwaPublicIdDB(client);
+    
+    return await client.animeSeries.create({ 
+      data: {
+        ...data,
+        aniwaPublicId: nextId
+      }
+    });
   } catch (error) {
     handleDatabaseError(error, 'Anime serisi oluşturma', { data });
   }
