@@ -7,7 +7,7 @@ export const LOADING_KEYS = {
     USERS: 'users-page',
     LOGS: 'logs-page',
     STREAMING_PLATFORMS: 'streaming-platforms-page',
-    EDITOR_ANIME_PAGE: 'editor-anime-page',
+    EDITOR_ANIME: 'editor-anime-page',
   },
   
   // Form loading'leri
@@ -22,8 +22,8 @@ export const LOADING_KEYS = {
     UPDATE_USER: 'update-user-form',
     CREATE_STREAMING_PLATFORM: 'create-streaming-platform-form',
     UPDATE_STREAMING_PLATFORM: 'update-streaming-platform-form',
-    CREATE_ANIME: 'create-anime-form',
-    UPDATE_ANIME: 'update-anime-form',
+    CREATE_ANIME_SERIES: 'create-anime-series-form',
+    UPDATE_ANIME_SERIES: 'update-anime-series-form',
   },
   
   // Auth loading'leri
@@ -48,6 +48,7 @@ export const LOADING_KEYS = {
     SEARCH_STUDIOS: 'search-studios',
     DELETE_STREAMING_PLATFORM: 'delete-streaming-platform',
     DELETE_ANIME: 'delete-anime',
+    DELETE_ANIME_SERIES: 'delete-anime-series',
   },
 } as const;
 
