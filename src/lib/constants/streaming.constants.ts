@@ -12,13 +12,6 @@ export const STREAMING = {
     },
   },
   
-  // Link kuralları
-  LINK: {
-    URL: {
-      MAX_LENGTH: 500,
-    },
-  },
-  
   // Pagination kuralları
   PAGINATION: {
     MIN_PAGE: 1,

@@ -45,13 +45,13 @@ export async function findAnimeSeriesByAnilistIdDB(
 
 // Anime serisi getirme (MAL ID ile)
 export async function findAnimeSeriesByMalIdDB(
-  idMal: number,
+  malId: number,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries | null> {
   try {
-    return await client.animeSeries.findUnique({ where: { idMal } });
+    return await client.animeSeries.findUnique({ where: { malId } });
   } catch (error) {
-    handleDatabaseError(error, 'Anime serisi MAL ID ile bulma', { idMal });
+    handleDatabaseError(error, 'Anime serisi MAL ID ile bulma', { malId });
   }
 }
 
