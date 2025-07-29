@@ -83,7 +83,6 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
         type: animeSeries.type,
         status: animeSeries.status,
         startDate: animeSeries.releaseDate || undefined,
-        endDate: undefined, // AnimeSeries'de endDate yok
         season: animeSeries.season || undefined,
         year: animeSeries.seasonYear || undefined,
         source: animeSeries.source || undefined,
@@ -298,7 +297,9 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
               <Input
                 id="year"
                 type="number"
-                {...register('year', { valueAsNumber: true })}
+                {...register('year', { 
+                  setValueAs: (value) => value === '' ? undefined : Number(value)
+                })}
                 placeholder="2024"
                 min={1900}
                 max={2100}
@@ -421,7 +422,6 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
             <Label htmlFor="synonyms">Alternatif Başlıklar</Label>
             <Textarea
               id="synonyms"
-              {...register('synonyms')}
               placeholder="Her satıra bir başlık yazın..."
               rows={3}
               onChange={(e) => {

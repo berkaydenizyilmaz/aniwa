@@ -59,6 +59,10 @@ export async function createAnimeSeriesBusiness(
       season: data.season,
       seasonYear: data.year,
       source: data.source,
+      countryOfOrigin: data.countryOfOrigin,
+      isAdult: data.isAdult,
+      trailer: data.trailer || null,
+      synonyms: data.synonyms || [],
       // Resim URL'leri
       coverImage: uploadResult?.coverImage?.secureUrl,
       bannerImage: uploadResult?.bannerImage?.secureUrl,
@@ -270,10 +274,14 @@ export async function updateAnimeSeriesBusiness(
     if (data.type !== undefined) updateData.type = data.type;
     if (data.status !== undefined) updateData.status = data.status;
     if (data.startDate !== undefined) updateData.releaseDate = data.startDate;
-    if (data.endDate !== undefined) updateData.releaseDate = data.endDate; // Tek tarih alanı var
+    if (data.startDate !== undefined) updateData.releaseDate = data.startDate; // Tek tarih alanı var
     if (data.season !== undefined) updateData.season = data.season;
     if (data.year !== undefined) updateData.seasonYear = data.year;
     if (data.source !== undefined) updateData.source = data.source;
+    if (data.countryOfOrigin !== undefined) updateData.countryOfOrigin = data.countryOfOrigin;
+    if (data.isAdult !== undefined) updateData.isAdult = data.isAdult;
+    if (data.trailer !== undefined) updateData.trailer = data.trailer || null;
+    if (data.synonyms !== undefined) updateData.synonyms = data.synonyms || [];
 
     // Resim URL'leri güncelle
     if (uploadResult?.coverImage) {
