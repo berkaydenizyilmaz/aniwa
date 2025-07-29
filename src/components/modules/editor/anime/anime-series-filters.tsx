@@ -5,8 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Plus, Filter } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { AnimeType, AnimeStatus } from '@prisma/client';
 import {
   Select,
@@ -28,7 +26,6 @@ export function AnimeSeriesFilters({ onSearch, onTypeChange, onStatusChange, onA
   const [selectedType, setSelectedType] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { isLoading } = useLoadingStore();
 
   // Debounced search term değiştiğinde onSearch'ü çağır
   useEffect(() => {
@@ -60,14 +57,14 @@ export function AnimeSeriesFilters({ onSearch, onTypeChange, onStatusChange, onA
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-10"
-            disabled={isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME)}
+            disabled={false}
           />
         </div>
 
         {/* Tip Filtresi */}
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={selectedType} onValueChange={handleTypeChange} disabled={isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME)}>
+          <Select value={selectedType} onValueChange={handleTypeChange} disabled={false}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Tüm Tipler" />
             </SelectTrigger>
@@ -84,7 +81,7 @@ export function AnimeSeriesFilters({ onSearch, onTypeChange, onStatusChange, onA
 
         {/* Durum Filtresi */}
         <div className="flex items-center gap-2">
-          <Select value={selectedStatus} onValueChange={handleStatusChange} disabled={isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME)}>
+          <Select value={selectedStatus} onValueChange={handleStatusChange} disabled={false}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Tüm Durumlar" />
             </SelectTrigger>
@@ -100,7 +97,7 @@ export function AnimeSeriesFilters({ onSearch, onTypeChange, onStatusChange, onA
         </div>
 
         {/* Yeni Anime Ekle */}
-        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={isLoading(LOADING_KEYS.PAGES.EDITOR_ANIME)}>
+        <Button onClick={onAddNew} className="flex items-center gap-2" disabled={false}>
           <Plus className="h-4 w-4" />
           Yeni Anime Ekle
         </Button>

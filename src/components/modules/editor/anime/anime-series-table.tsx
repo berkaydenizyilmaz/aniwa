@@ -25,8 +25,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useLoadingStore } from '@/lib/stores/loading.store';
-import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { type AnimeFilters } from '@/lib/schemas/anime.schema';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -43,7 +41,6 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
   const [selectedAnimeSeries, setSelectedAnimeSeries] = useState<AnimeSeries | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(50);
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
   const queryClient = useQueryClient();
 
   // Query key oluştur
@@ -53,24 +50,19 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
   const { data, isLoading: isFetching, error } = useQuery({
     queryKey,
     queryFn: async () => {
-      setLoadingStore(LOADING_KEYS.PAGES.EDITOR_ANIME, true);
-      try {
-        const filters: AnimeFilters = {
-          page: currentPage,
-          limit: limit,
-        };
-        if (searchTerm) filters.search = searchTerm;
-        if (selectedType) filters.type = selectedType as AnimeType;
-        if (selectedStatus) filters.status = selectedStatus as AnimeStatus;
-        
-        const result = await getAnimeSeriesListAction(filters);
-        if (!result.success) {
-          throw new Error(result.error || 'Anime serileri yüklenirken bir hata oluştu');
-        }
-        return result.data as GetAnimeSeriesListResponse;
-      } finally {
-        setLoadingStore(LOADING_KEYS.PAGES.EDITOR_ANIME, false);
+      const filters: AnimeFilters = {
+        page: currentPage,
+        limit: limit,
+      };
+      if (searchTerm) filters.search = searchTerm;
+      if (selectedType) filters.type = selectedType as AnimeType;
+      if (selectedStatus) filters.status = selectedStatus as AnimeStatus;
+      
+      const result = await getAnimeSeriesListAction(filters);
+      if (!result.success) {
+        throw new Error(result.error || 'Anime serileri yüklenirken bir hata oluştu');
       }
+      return result.data as GetAnimeSeriesListResponse;
     },
     staleTime: 5 * 60 * 1000, // 5 dakika
   });
