@@ -55,8 +55,8 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
       englishTitle: '',
       japaneseTitle: '',
       synopsis: '',
-      type: AnimeType.TV,
-      status: AnimeStatus.RELEASING,
+      type: undefined,
+      status: undefined,
       season: undefined,
       year: undefined,
       source: undefined,
@@ -100,8 +100,8 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
         englishTitle: '',
         japaneseTitle: '',
         synopsis: '',
-        type: AnimeType.TV,
-        status: AnimeStatus.RELEASING,
+        type: undefined,
+        status: undefined,
         season: undefined,
         year: undefined,
         source: undefined,
@@ -219,7 +219,15 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                 name="type"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onOpenChange={(open) => {
+                      if (!open && !field.value) {
+                        field.onBlur();
+                      }
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Tip seçin" />
                     </SelectTrigger>
@@ -234,7 +242,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                 )}
               />
               {errors.type && (
-                <p className="text-sm text-destructive">{errors.type.message}</p>
+                <p className="text-sm text-destructive">Tip seçin</p>
               )}
             </div>
 
@@ -244,7 +252,15 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                 name="status"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onOpenChange={(open) => {
+                      if (!open && !field.value) {
+                        field.onBlur();
+                      }
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Durum seçin" />
                     </SelectTrigger>
@@ -259,7 +275,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                 )}
               />
               {errors.status && (
-                <p className="text-sm text-destructive">{errors.status.message}</p>
+                <p className="text-sm text-destructive">Durum seçin</p>
               )}
             </div>
           </div>
@@ -297,7 +313,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
               <Input
                 id="year"
                 type="number"
-                {...register('year', { 
+                {...register('year', {
                   setValueAs: (value) => value === '' ? undefined : Number(value)
                 })}
                 placeholder="2024"
