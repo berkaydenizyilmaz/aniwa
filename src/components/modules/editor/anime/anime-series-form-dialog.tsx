@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';  
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -105,7 +105,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
 
     try {
       let result;
-      
+
       if (animeSeries) {
         // Güncelleme
         result = await updateAnimeSeriesAction(animeSeries.id, data as UpdateAnimeSeriesInput);
@@ -258,12 +258,12 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                 name="season"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value || ''} onValueChange={field.onChange}>
+                  <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Sezon seçin" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Sezon yok</SelectItem>
+                      <SelectItem value="none">Sezon yok</SelectItem>
                       {Object.values(Season).map((season) => (
                         <SelectItem key={season} value={season}>
                           {season}
@@ -301,12 +301,12 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
               name="source"
               control={control}
               render={({ field }) => (
-                <Select value={field.value || ''} onValueChange={field.onChange}>
+                <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Kaynak seçin" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Kaynak yok</SelectItem>
+                    <SelectItem value="none">Kaynak yok</SelectItem>
                     {Object.values(Source).map((source) => (
                       <SelectItem key={source} value={source}>
                         {source}
