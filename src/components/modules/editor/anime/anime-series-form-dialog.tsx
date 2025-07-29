@@ -29,6 +29,7 @@ import { AnimeSeries, AnimeType, AnimeStatus, Season, Source, CountryOfOrigin } 
 import { useLoadingStore } from '@/lib/stores/loading.store';
 import { LOADING_KEYS } from '@/lib/constants/loading.constants';
 import { ANIME } from '@/lib/constants/anime.constants';
+import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
 
 interface AnimeSeriesFormDialogProps {
   open: boolean;
@@ -442,8 +443,8 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                 <ImageUpload
                   id="coverImage"
                   label="Kapak Görseli"
-                  accept="image/*"
-                  maxSize={5 * 1024 * 1024}
+                  accept={UPLOAD_CONFIGS.ANIME_COVER.accept}
+                  maxSize={UPLOAD_CONFIGS.ANIME_COVER.maxSize}
                   value={field.value}
                   onChange={field.onChange}
                   disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME_SERIES) || isLoading(LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES)}
@@ -464,8 +465,8 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
                 <ImageUpload
                   id="bannerImage"
                   label="Banner Görseli"
-                  accept="image/*"
-                  maxSize={5 * 1024 * 1024}
+                  accept={UPLOAD_CONFIGS.ANIME_BANNER.accept}
+                  maxSize={UPLOAD_CONFIGS.ANIME_BANNER.maxSize}
                   value={field.value}
                   onChange={field.onChange}
                   disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME_SERIES) || isLoading(LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES)}
