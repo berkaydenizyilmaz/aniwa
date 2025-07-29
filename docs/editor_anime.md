@@ -43,7 +43,7 @@ Editör Hareketi: Önceki adımlardaki seçimlere göre şekillenen form karşı
 **Opsiyonel Alanlar:**
 - englishTitle (String): İngilizce başlık
 - japaneseTitle (String): Japonca başlık
-- synonyms (String): Alternatif başlıklar (virgülle ayrılarak)
+- synonyms (String[]): Alternatif başlıklar (array olarak)
 - synopsis (String): Anime'nin genel özeti/açıklaması
 - season (Season): Yayınlandığı sezon (örn. WINTER)
 - seasonYear (Int): Yayınlandığı yıl
@@ -79,7 +79,7 @@ Editör Hareketi: Önceki adımlardaki seçimlere göre şekillenen form karşı
 **Opsiyonel Alanlar:**
 - englishTitle (String): İngilizce başlık
 - japaneseTitle (String): Japonca başlık
-- synonyms (String): Alternatif başlıklar (virgülle ayrılarak)
+- synonyms (String[]): Alternatif başlıklar (array olarak)
 - synopsis (String): Anime'nin genel özeti/açıklaması
 - season (Season): Yayınlandığı sezon (örn. WINTER)
 - seasonYear (Int): Yayınlandığı yıl
