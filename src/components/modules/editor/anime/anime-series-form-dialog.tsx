@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MultiSelect } from '@/components/ui/multi-select';
+import { ImageUpload } from '@/components/ui/image-upload';
 import {
   Dialog,
   DialogContent,
@@ -62,6 +63,8 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
       isAdult: false,
       trailer: '',
       synonyms: [],
+      coverImageFile: undefined,
+      bannerImageFile: undefined,
       genres: [],
       studios: [],
       tags: [],
@@ -305,6 +308,21 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
             </div>
           </div>
 
+          {/* Yayın Tarihi */}
+          <div className="space-y-2">
+            <Label htmlFor="releaseDate">Yayın Tarihi</Label>
+            <Input
+              id="releaseDate"
+              type="date"
+              {...register('startDate', {
+                setValueAs: (value) => value ? new Date(value) : undefined
+              })}
+            />
+            {errors.startDate && (
+              <p className="text-sm text-destructive">{errors.startDate.message}</p>
+            )}
+          </div>
+
           {/* Kaynak */}
           <div className="space-y-2">
             <Label htmlFor="source">Kaynak</Label>
@@ -412,6 +430,50 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
             />
             {errors.synonyms && (
               <p className="text-sm text-destructive">{errors.synonyms.message}</p>
+            )}
+          </div>
+
+          {/* Kapak Görseli */}
+          <div className="space-y-2">
+            <Controller
+              name="coverImageFile"
+              control={control}
+              render={({ field }) => (
+                <ImageUpload
+                  id="coverImage"
+                  label="Kapak Görseli"
+                  accept="image/*"
+                  maxSize={5 * 1024 * 1024}
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME_SERIES) || isLoading(LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES)}
+                />
+              )}
+            />
+            {errors.coverImageFile && (
+              <p className="text-sm text-destructive">{errors.coverImageFile.message}</p>
+            )}
+          </div>
+
+          {/* Banner Görseli */}
+          <div className="space-y-2">
+            <Controller
+              name="bannerImageFile"
+              control={control}
+              render={({ field }) => (
+                <ImageUpload
+                  id="bannerImage"
+                  label="Banner Görseli"
+                  accept="image/*"
+                  maxSize={5 * 1024 * 1024}
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={isLoading(LOADING_KEYS.FORMS.CREATE_ANIME_SERIES) || isLoading(LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES)}
+                />
+              )}
+            />
+            {errors.bannerImageFile && (
+              <p className="text-sm text-destructive">{errors.bannerImageFile.message}</p>
             )}
           </div>
 
