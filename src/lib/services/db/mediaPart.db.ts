@@ -41,6 +41,18 @@ export async function findAnimeMediaPartByAnilistIdDB(
   }
 }
 
+// Anime medya parçası getirme (MAL ID ile)
+export async function findAnimeMediaPartByMalIdDB(
+  malId: number,
+  client: PrismaClientOrTransaction = prisma
+): Promise<AnimeMediaPart | null> {
+  try {
+    return await client.animeMediaPart.findUnique({ where: { malId } });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime medya parçası MAL ID ile bulma', { malId });
+  }
+}
+
 // Anime serisi için medya parçalarını getirme
 export async function findAnimeMediaPartsBySeriesIdDB(
   seriesId: string,

@@ -5,8 +5,6 @@ import { prisma } from '@/lib/prisma';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
-// Anime Serisi CRUD İşlemleri
-
 // Anime serisi oluşturma
 export async function createAnimeSeriesDB(
   data: Prisma.AnimeSeriesCreateInput,
@@ -28,30 +26,6 @@ export async function findAnimeSeriesByIdDB(
     return await client.animeSeries.findUnique({ where: { id } });
   } catch (error) {
     handleDatabaseError(error, 'Anime serisi ID ile bulma', { id });
-  }
-}
-
-// Anime serisi getirme (Anilist ID ile)
-export async function findAnimeSeriesByAnilistIdDB(
-  anilistId: number,
-  client: PrismaClientOrTransaction = prisma
-): Promise<AnimeSeries | null> {
-  try {
-    return await client.animeSeries.findUnique({ where: { anilistId } });
-  } catch (error) {
-    handleDatabaseError(error, 'Anime serisi Anilist ID ile bulma', { anilistId });
-  }
-}
-
-// Anime serisi getirme (MAL ID ile)
-export async function findAnimeSeriesByMalIdDB(
-  malId: number,
-  client: PrismaClientOrTransaction = prisma
-): Promise<AnimeSeries | null> {
-  try {
-    return await client.animeSeries.findUnique({ where: { malId } });
-  } catch (error) {
-    handleDatabaseError(error, 'Anime serisi MAL ID ile bulma', { malId });
   }
 }
 
