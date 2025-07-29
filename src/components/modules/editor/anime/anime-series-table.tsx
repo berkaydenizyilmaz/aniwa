@@ -34,9 +34,10 @@ interface AnimeSeriesTableProps {
   searchTerm?: string;
   selectedType?: string;
   selectedStatus?: string;
+  refreshKey?: number;
 }
 
-export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', selectedStatus = '' }: AnimeSeriesTableProps) {
+export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', selectedStatus = '', refreshKey }: AnimeSeriesTableProps) {
   const [animeSeries, setAnimeSeries] = useState<AnimeSeries[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedAnimeSeries, setSelectedAnimeSeries] = useState<AnimeSeries | null>(null);
@@ -75,7 +76,7 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
       }
     };
     fetchAnimeSeries();
-  }, [setLoadingStore, searchTerm, selectedType, selectedStatus, currentPage, limit]);
+  }, [setLoadingStore, searchTerm, selectedType, selectedStatus, currentPage, limit, refreshKey]);
 
   // Filtreler değiştiğinde sayfa 1'e dön
   useEffect(() => {
@@ -216,20 +217,22 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
                     {animeSeries.averageScore ? animeSeries.averageScore.toFixed(1) : '-'}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
+                    <div className="flex gap-2">
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(animeSeries)}
                         disabled={isLoading(LOADING_KEYS.FORMS.UPDATE_ANIME_SERIES)}
+                        className="h-8 w-8 p-0"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button
-                        variant="outline"
+                        variant="ghost-destructive"
                         size="sm"
                         onClick={() => handleDelete(animeSeries)}
                         disabled={isLoading(LOADING_KEYS.ACTIONS.DELETE_ANIME_SERIES)}
+                        className="h-8 w-8 p-0"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

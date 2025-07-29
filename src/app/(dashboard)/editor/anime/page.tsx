@@ -60,7 +60,7 @@ export default function EditorAnimePage() {
 
       {/* Tablo */}
       <AnimeSeriesTable 
-        key={refreshKey}
+        refreshKey={refreshKey}
         onEdit={handleEdit}
         searchTerm={searchTerm}
         selectedType={selectedType}
