@@ -23,7 +23,22 @@ export const createAnimeSeriesSchema = z.object({
   
   // Bölüm bilgileri (tek parçalı için)
   episodes: z.number().min(1, 'Bölüm sayısı en az 1 olmalı').optional(),
-  duration: z.number().min(1, 'Süre en az 1 dakika olmalı').optional(),
+  
+  // duration ve anilistId alanları için preprocess kullan
+  duration: z.preprocess(
+    (val) => (val === '' ? undefined : Number(val)),
+    z.number()
+      .int("Süre tam sayı olmalı.")
+      .min(1, 'Süre en az 1 dakika olmalı.')
+      .optional()
+  ),
+  anilistId: z.preprocess(
+    (val) => (val === '' ? undefined : Number(val)),
+    z.number()
+      .int("Anilist ID tam sayı olmalı.")
+      .positive('Anilist ID pozitif bir sayı olmalı.')
+      .optional()
+  ),
   
   // Sezon bilgileri
   season: z.nativeEnum(Season, { message: 'Sezon seçiniz' }).optional(),
@@ -34,8 +49,7 @@ export const createAnimeSeriesSchema = z.object({
   source: z.nativeEnum(Source, { message: 'Kaynak materyal seçiniz' }).optional(),
   countryOfOrigin: z.nativeEnum(CountryOfOrigin, { message: 'Köken ülke seçiniz' }).optional(),
   
-  // Harici ID'ler
-  anilistId: z.number().positive('Anilist ID pozitif bir sayı olmalı').optional(),
+  // MAL ID
   malId: z.number().positive('MAL ID pozitif bir sayı olmalı').optional(),
   
   // Puanlama
@@ -46,40 +60,39 @@ export const createAnimeSeriesSchema = z.object({
   trailer: z.string().url('Geçerli bir URL girin').optional(),
   coverImage: z.string().optional(), // Mevcut resim URL'i
   bannerImage: z.string().optional(), // Mevcut resim URL'i
-  coverImageFile: z.string().optional(), // Base64 dosya
-  bannerImageFile: z.string().optional(), // Base64 dosya
+  coverImageFile: z.any().optional(), // File objesi
+  bannerImageFile: z.any().optional(), // File objesi
   
-  // İlişkili veriler
-  genreIds: z.array(z.number()).optional(),
-  tagIds: z.array(z.number()).optional(),
-  studioIds: z.array(z.number()).optional(),
-}).refine((data) => {
-  // Tek parçalı için anilistId zorunlu
-  if (!data.isMultiPart && !data.anilistId) {
-    return false;
+  // İlişkili veriler - Formdan string array olarak gelir
+  genreIds: z.array(z.string()).optional(),
+  tagIds: z.array(z.string()).optional(),
+  studioIds: z.array(z.string()).optional(),
+}).superRefine((data, ctx) => {
+  // isMultiPart false (yani tek parçalı) ise duration zorunlu
+  if (!data.isMultiPart) {
+    if (data.duration === null || data.duration === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Tek parçalı anime için süre zorunludur.',
+        path: ['duration'],
+      });
+    }
+    if (data.anilistId === null || data.anilistId === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Tek parçalı anime için Anilist ID zorunludur.',
+        path: ['anilistId'],
+      });
+    }
   }
-  return true;
-}, {
-  message: 'Tek parçalı anime için Anilist ID zorunludur',
-  path: ['anilistId'],
-}).refine((data) => {
-  // Tek parçalı için duration zorunlu
-  if (!data.isMultiPart && !data.duration) {
-    return false;
-  }
-  return true;
-}, {
-  message: 'Tek parçalı anime için süre zorunludur',
-  path: ['duration'],
-}).refine((data) => {
   // Çok parçalı ise episodes ve duration undefined olmalı
   if (data.isMultiPart && (data.episodes !== undefined || data.duration !== undefined)) {
-    return false;
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Çok parçalı anime için bölüm sayısı ve süre otomatik hesaplanır.',
+      path: ['episodes'],
+    });
   }
-  return true;
-}, {
-  message: 'Çok parçalı anime için bölüm sayısı ve süre otomatik hesaplanır',
-  path: ['episodes'],
 });
 
 // Anime serisi güncelleme şeması

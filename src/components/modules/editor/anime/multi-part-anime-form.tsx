@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createAnimeSeriesSchema, updateAnimeSeriesSchema } from '@/lib/schemas/anime.schema';
-import type { CreateAnimeSeriesRequest } from '@/lib/types/api/anime.api';
-import type { UpdateAnimeSeriesRequest } from '@/lib/schemas/anime.schema';
+import type { CreateAnimeSeriesRequest } from '@/lib/schemas/anime.schema';
+import { z } from 'zod';
 import { AnimeType, AnimeStatus, Season, Source, CountryOfOrigin } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,7 +45,7 @@ export function MultiPartAnimeForm({ selectedType, anime, onSuccess, onCancel }:
 
   const isEdit = !!anime;
 
-  const form = useForm<CreateAnimeSeriesRequest | UpdateAnimeSeriesRequest>({
+  const form = useForm({
     resolver: zodResolver(isEdit ? updateAnimeSeriesSchema : createAnimeSeriesSchema),
     defaultValues: {
       title: '',
@@ -145,7 +145,7 @@ export function MultiPartAnimeForm({ selectedType, anime, onSuccess, onCancel }:
     }
   }, [anime, isEdit]);
 
-  const onSubmit = async (data: CreateAnimeSeriesRequest | UpdateAnimeSeriesRequest) => {
+  const onSubmit = async (data: z.infer<typeof createAnimeSeriesSchema> | z.infer<typeof updateAnimeSeriesSchema>) => {
     try {
       const formData = {
         ...data,
@@ -155,13 +155,13 @@ export function MultiPartAnimeForm({ selectedType, anime, onSuccess, onCancel }:
         duration: undefined, // Çok parçalı için otomatik hesaplanır
         coverImageFile,
         bannerImageFile,
-        genreIds: selectedGenreIds,
-        tagIds: selectedTagIds,
-        studioIds: selectedStudioIds,
+        genreIds: selectedGenreIds.map(id => Number(id)),
+        tagIds: selectedTagIds.map(id => Number(id)),
+        studioIds: selectedStudioIds.map(id => Number(id)),
       };
 
       const result = await createAnimeSeriesAction(formData);
-      
+
       if (result.success) {
         toast.success(isEdit ? 'Anime güncellendi' : 'Anime oluşturuldu');
         onSuccess();
@@ -269,7 +269,7 @@ export function MultiPartAnimeForm({ selectedType, anime, onSuccess, onCancel }:
             <Input
               id="anilistId"
               type="number"
-              {...form.register('anilistId', { valueAsNumber: true })}
+              {...form.register('anilistId')}
               placeholder="Anilist ID"
             />
           </div>
@@ -279,7 +279,7 @@ export function MultiPartAnimeForm({ selectedType, anime, onSuccess, onCancel }:
             <Input
               id="malId"
               type="number"
-              {...form.register('malId', { valueAsNumber: true })}
+              {...form.register('malId')}
               placeholder="MyAnimeList ID"
             />
           </div>
@@ -312,7 +312,7 @@ export function MultiPartAnimeForm({ selectedType, anime, onSuccess, onCancel }:
           <Input
             id="seasonYear"
             type="number"
-            {...form.register('seasonYear', { valueAsNumber: true })}
+            {...form.register('seasonYear')}
             placeholder="Yıl"
           />
         </div>
@@ -376,7 +376,7 @@ export function MultiPartAnimeForm({ selectedType, anime, onSuccess, onCancel }:
             id="anilistAverageScore"
             type="number"
             step="0.1"
-            {...form.register('anilistAverageScore', { valueAsNumber: true })}
+            {...form.register('anilistAverageScore')}
             placeholder="0-100"
           />
         </div>
@@ -386,7 +386,7 @@ export function MultiPartAnimeForm({ selectedType, anime, onSuccess, onCancel }:
           <Input
             id="anilistPopularity"
             type="number"
-            {...form.register('anilistPopularity', { valueAsNumber: true })}
+            {...form.register('anilistPopularity')}
             placeholder="Popülerlik"
           />
         </div>
