@@ -24,7 +24,7 @@ import {
 import { UploadService } from "@/lib/services/extends-api/cloudinary/upload.service";
 import { CloudinaryService } from "@/lib/services/extends-api/cloudinary/cloudinary.service";
 import { UPLOAD_CONFIGS } from "@/lib/constants/cloudinary.constants";
-import { Prisma, AnimeType, AnimeStatus, Season, Source, CountryOfOrigin } from "@prisma/client";
+import { Prisma, AnimeType, AnimeStatus, Season, Source } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/utils/logger";
 import { EVENTS } from "@/lib/constants/events.constants";
@@ -112,24 +112,24 @@ export async function createAnimeSeriesBusiness(
           japaneseTitle: data.japaneseTitle,
           synonyms: data.synonyms || [],
           anilistId: data.anilistId,
-          malId: data.malId === '' ? null : data.malId,
+          malId: data.malId,
           aniwaPublicId: nextPublicId,
-          type: data.type as AnimeType,
-          status: data.status as AnimeStatus,
+          type: data.type,
+          status: data.status,
           episodes: episodes,
           duration: data.duration,
           isAdult: data.isAdult,
-          season: data.season as Season,
-          seasonYear: data.seasonYear === '' ? null : data.seasonYear,
-          releaseDate: data.releaseDate && data.releaseDate !== '' ? new Date(data.releaseDate) : null,
-          source: data.source as Source,
-          countryOfOrigin: data.countryOfOrigin as CountryOfOrigin,
+          season: data.season,
+          seasonYear: data.seasonYear,
+          releaseDate: data.releaseDate,
+          source: data.source,
+          countryOfOrigin: data.countryOfOrigin,
           coverImage: coverImageUrl,
           bannerImage: bannerImageUrl,
           synopsis: data.synopsis,
           trailer: data.trailer,
-          anilistAverageScore: data.anilistAverageScore === '' ? null : data.anilistAverageScore,
-          anilistPopularity: data.anilistPopularity === '' ? null : data.anilistPopularity,
+          anilistAverageScore: data.anilistAverageScore,
+          anilistPopularity: data.anilistPopularity,
           isMultiPart: data.isMultiPart,
         },
         tx
@@ -137,17 +137,17 @@ export async function createAnimeSeriesBusiness(
 
       // Genre ilişkilerini oluştur
       if (data.genreIds && data.genreIds.length > 0) {
-        await createAnimeGenresDB(animeSeries.id, data.genreIds, tx);
+        await createAnimeGenresDB(animeSeries.id, data.genreIds.map(String), tx);
       }
 
       // Tag ilişkilerini oluştur
       if (data.tagIds && data.tagIds.length > 0) {
-        await createAnimeTagsDB(animeSeries.id, data.tagIds, tx);
+        await createAnimeTagsDB(animeSeries.id, data.tagIds.map(String), tx);
       }
 
       // Studio ilişkilerini oluştur
       if (data.studioIds && data.studioIds.length > 0) {
-        await createAnimeStudiosDB(animeSeries.id, data.studioIds, tx);
+        await createAnimeStudiosDB(animeSeries.id, data.studioIds.map(String), tx);
       }
 
       return animeSeries;
@@ -434,23 +434,23 @@ export async function updateAnimeSeriesBusiness(
           japaneseTitle: data.japaneseTitle,
           synonyms: data.synonyms || [],
           anilistId: data.anilistId,
-          malId: data.malId === '' ? null : data.malId,
-          type: data.type as AnimeType,
-          status: data.status as AnimeStatus,
+          malId: data.malId,
+          type: data.type,
+          status: data.status,
           episodes: episodes,
           duration: data.duration,
           isAdult: data.isAdult,
-          season: data.season as Season,
-          seasonYear: data.seasonYear === '' ? null : data.seasonYear,
-          releaseDate: data.releaseDate && data.releaseDate !== '' ? new Date(data.releaseDate) : null,
-          source: data.source as Source,
-          countryOfOrigin: data.countryOfOrigin as CountryOfOrigin,
+          season: data.season,
+          seasonYear: data.seasonYear,
+          releaseDate: data.releaseDate,
+          source: data.source,
+          countryOfOrigin: data.countryOfOrigin,
           coverImage: coverImageUrl,
           bannerImage: bannerImageUrl,
           synopsis: data.synopsis,
           trailer: data.trailer,
-          anilistAverageScore: data.anilistAverageScore === '' ? null : data.anilistAverageScore,
-          anilistPopularity: data.anilistPopularity === '' ? null : data.anilistPopularity,
+          anilistAverageScore: data.anilistAverageScore,
+          anilistPopularity: data.anilistPopularity,
           isMultiPart: data.isMultiPart,
         },
         tx
@@ -460,7 +460,7 @@ export async function updateAnimeSeriesBusiness(
       if (data.genreIds) {
         await tx.animeGenre.deleteMany({ where: { animeSeriesId: id } });
         if (data.genreIds.length > 0) {
-          await createAnimeGenresDB(id, data.genreIds, tx);
+          await createAnimeGenresDB(id, data.genreIds.map(String), tx);
         }
       }
 
@@ -468,7 +468,7 @@ export async function updateAnimeSeriesBusiness(
       if (data.tagIds) {
         await tx.animeTag.deleteMany({ where: { animeSeriesId: id } });
         if (data.tagIds.length > 0) {
-          await createAnimeTagsDB(id, data.tagIds, tx);
+          await createAnimeTagsDB(id, data.tagIds.map(String), tx);
         }
       }
 
@@ -476,7 +476,7 @@ export async function updateAnimeSeriesBusiness(
       if (data.studioIds) {
         await tx.animeStudio.deleteMany({ where: { animeSeriesId: id } });
         if (data.studioIds.length > 0) {
-          await createAnimeStudiosDB(id, data.studioIds, tx);
+          await createAnimeStudiosDB(id, data.studioIds.map(String), tx);
         }
       }
 

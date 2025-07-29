@@ -1,7 +1,7 @@
 // Anime API response tipleri
 
 import { AnimeSeries, AnimeMediaPart, Episode, Genre, Tag, Studio, Comment, AnimeRelation, RelationType } from '@prisma/client';
-import { CreateAnimeSeriesInput, AnimeSeriesFilters } from '@/lib/schemas/anime.schema';
+import { CreateAnimeSeriesRequest as SchemaCreateAnimeSeriesRequest, GetAnimeSeriesRequest as SchemaGetAnimeSeriesRequest } from '@/lib/schemas/anime.schema';
 
 // Prisma tiplerini direkt kullan (küçük model)
 export type CreateAnimeSeriesResponse = AnimeSeries;
@@ -39,14 +39,12 @@ export interface GetAllAnimeSeriesResponse {
 }
 
 // Anime API istek tipleri - Base64 dosya alanları eklenmiş
-export interface CreateAnimeSeriesRequest extends CreateAnimeSeriesInput {
-  coverImageFile?: string; // Base64 dosya
-  bannerImageFile?: string; // Base64 dosya
+export interface CreateAnimeSeriesRequest extends SchemaCreateAnimeSeriesRequest {
   coverImageToDelete?: boolean; // Mevcut resmi silmek için
   bannerImageToDelete?: boolean; // Mevcut resmi silmek için
 }
 
-export type GetAnimeSeriesRequest = AnimeSeriesFilters; 
+export type GetAnimeSeriesRequest = SchemaGetAnimeSeriesRequest; 
 
 // İlişki API tipleri
 export interface CreateAnimeRelationRequest {

@@ -44,8 +44,10 @@ export const createAnimeSeriesSchema = z.object({
   
   // Görsel içerik
   trailer: z.string().url('Geçerli bir URL girin').optional(),
-  coverImageUrl: z.string().url('Geçerli bir URL girin').optional(),
-  bannerImageUrl: z.string().url('Geçerli bir URL girin').optional(),
+  coverImage: z.string().optional(), // Mevcut resim URL'i
+  bannerImage: z.string().optional(), // Mevcut resim URL'i
+  coverImageFile: z.string().optional(), // Base64 dosya
+  bannerImageFile: z.string().optional(), // Base64 dosya
   
   // İlişkili veriler
   genreIds: z.array(z.number()).optional(),
@@ -93,6 +95,7 @@ export const getAnimeSeriesSchema = z.object({
   type: z.nativeEnum(AnimeType).optional(),
   status: z.nativeEnum(AnimeStatus).optional(),
   season: z.nativeEnum(Season).optional(),
+  seasonYear: z.number().optional(),
   source: z.nativeEnum(Source).optional(),
   countryOfOrigin: z.nativeEnum(CountryOfOrigin).optional(),
 });
