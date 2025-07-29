@@ -364,8 +364,6 @@ model AnimeRelation {
 // Ana Anime Serisi Modeli
 model AnimeSeries {
   id                String            @id @default(auto()) @map("_id") @db.ObjectId
-  anilistId         Int?              @unique // Anilist API ID'si
-  malId             Int?              @unique // MyAnimeList ID'si
   aniwaPublicId     Int               @unique // Aniwa'ya özel public ID
   
   // Başlık Bilgileri
@@ -378,8 +376,8 @@ model AnimeSeries {
   synopsis          String?           @db.String // Açıklama/Özet
   type              AnimeType         // Medya tipi
   status            AnimeStatus       @default(RELEASING) // Yayın durumu
-  episodes          Int?              // Toplam bölüm sayısı
-  duration          Int?              // Bölüm süresi (dakika)
+  episodes          Int?              // Toplam bölüm sayısı (MediaPart'lardan hesaplanır)
+  duration          Int?              // Ortalama bölüm süresi (MediaPart'lardan hesaplanır)
   isAdult           Boolean?          // Yetişkin içeriği
   season            Season?           // Çıkış sezonu
   seasonYear        Int?              // Çıkış yılı
@@ -387,11 +385,13 @@ model AnimeSeries {
   source            Source?           // Kaynak materyal
   countryOfOrigin   CountryOfOrigin?  // Köken ülke
 
-  // Puanlama ve Popülerlik
-  anilistAverageScore Float?
-  anilistPopularity   Int?
-  averageScore        Float?          // Aniwa puanı
+  // Puanlama ve Popülerlik (Aniwa)
+  averageScore        Float?          // Aniwa puanı (kullanıcıların verdiği)
   popularity          Int?            // Aniwa popülerlik
+
+  // Puanlama ve Popülerlik (Anilist - MediaPart'lardan hesaplanır)
+  anilistAverageScore Float?          // MediaPart'ların ağırlıklı ortalaması
+  anilistPopularity   Int?            // En yüksek MediaPart popülerliği
 
   // Görsel İçerik
   coverImage        String?           // Kapak resmi
@@ -408,9 +408,6 @@ model AnimeSeries {
   comments          Comment[]         @relation("AnimeSeriesComments")
   favouritedBy      FavouriteAnimeSeries[]
   trackedByUsers    UserAnimeTracking[] @relation("AnimeTrackedByUsers")
-
-  // Çok Parçalı Kontrol
-  isMultiPart       Boolean           @default(false) // Çok sezonlu mu?
 
   // İlişkiler
   sourceRelations   AnimeRelation[]   @relation("SourceRelations")
@@ -437,11 +434,13 @@ model AnimeMediaPart {
   duration          Int?              // Bölüm/film süresi
   releaseDate       DateTime?         // Yayın tarihi
 
-  // Puanlama
-  anilistAverageScore Float?
-  anilistPopularity   Int?
-  averageScore        Float?
-  popularity          Int?              
+  // Puanlama ve Popülerlik (Aniwa)
+  averageScore        Float?          // Aniwa puanı (kullanıcıların verdiği)
+  popularity          Int?            // Aniwa popülerlik
+
+  // Puanlama ve Popülerlik (Anilist)
+  anilistAverageScore Float?          // Anilist'ten gelen ortalama puan
+  anilistPopularity   Int?            // Anilist'ten gelen popülerlik
 
   // İlişkiler
   seriesId          String            @db.ObjectId
