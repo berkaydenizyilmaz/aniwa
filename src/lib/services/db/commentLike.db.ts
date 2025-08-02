@@ -95,7 +95,6 @@ export async function findCommentLikesByUserIdDB(
                             select: {
                                 id: true,
                                 title: true,
-                                type: true,
                             },
                         },
                     },
