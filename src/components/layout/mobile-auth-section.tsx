@@ -15,12 +15,20 @@ import { useSession, signOut } from 'next-auth/react'
 import { ROUTES } from '@/lib/constants/routes.constants'
 import { ADMIN_MENU_ITEMS, AUTH_MENU_ITEMS } from '@/lib/constants/menu.constants'
 import { USER } from '@/lib/constants/user.constants'
-import { useLoadingStore } from '@/lib/stores/loading.store'
-import { LOADING_KEYS } from '@/lib/constants/loading.constants'
+import { useMutation } from '@tanstack/react-query'
 
 export function MobileAuthSection() {
   const { data: session, status } = useSession()
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore()
+  
+  // Sign out mutation
+  const signOutMutation = useMutation({
+    mutationFn: async () => {
+      await signOut({ callbackUrl: ROUTES.PAGES.HOME });
+    },
+    onError: (error) => {
+      console.error('Çıkış yapılırken bir hata oluştu:', error);
+    },
+  });
   
   if (status === 'loading') {
     return (
@@ -60,18 +68,8 @@ export function MobileAuthSection() {
     )
   }
 
-  const handleSignOut = async () => {
-    if (isLoading(LOADING_KEYS.AUTH.SIGNOUT)) return;
-    
-    setLoadingStore(LOADING_KEYS.AUTH.SIGNOUT, true);
-    
-    try {
-      await signOut({ callbackUrl: ROUTES.PAGES.HOME });
-    } catch (error) {
-      console.error('Sign out error:', error);
-    } finally {
-      setLoadingStore(LOADING_KEYS.AUTH.SIGNOUT, false);
-    }
+  const handleSignOut = () => {
+    signOutMutation.mutate();
   }
 
   return (
@@ -118,8 +116,8 @@ export function MobileAuthSection() {
         <DropdownMenuSeparator />
         <DropdownMenuItem 
           className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive group"
-                      onClick={handleSignOut}
-            disabled={isLoading(LOADING_KEYS.AUTH.SIGNOUT)}
+          onClick={handleSignOut}
+          disabled={signOutMutation.isPending}
         >
           <LogOut className="mr-2 h-4 w-4 group-hover:text-destructive" />
           <span>Çıkış Yap</span>

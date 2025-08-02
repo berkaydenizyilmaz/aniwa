@@ -14,6 +14,7 @@ export type ServerActionErrorResponse = {
 export type ServerActionSuccessResponse<T = unknown> = {
   success: true;
   data: T;
+  error?: never; // Success durumunda error yok
 };
 
 // Server Action response type

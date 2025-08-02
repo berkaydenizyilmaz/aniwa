@@ -20,9 +20,7 @@ import { authConfig } from '@/lib/auth/auth.config';
 
 // Anime media part oluşturma
 export async function createAnimeMediaPartAction(
-  data: CreateAnimeMediaPartInput,
-  coverImage?: Buffer,
-  bannerImage?: Buffer
+  data: CreateAnimeMediaPartInput
 ): Promise<ServerActionResponse> {
   // Session'dan user bilgisini al
   const session = await getServerSession(authConfig);
@@ -32,7 +30,7 @@ export async function createAnimeMediaPartAction(
     const validatedData = createAnimeMediaPartSchema.parse(data);
 
     // Business logic'i kullan
-    const result = await createAnimeMediaPartBusiness(validatedData, session!.user.id, coverImage, bannerImage);
+    const result = await createAnimeMediaPartBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
@@ -75,9 +73,7 @@ export async function getAnimeMediaPartAction(id: string): Promise<ServerActionR
 // Anime media part güncelleme
 export async function updateAnimeMediaPartAction(
   id: string, 
-  data: UpdateAnimeMediaPartInput,
-  coverImage?: Buffer,
-  bannerImage?: Buffer
+  data: UpdateAnimeMediaPartInput
 ): Promise<ServerActionResponse> {
   // Session'dan user bilgisini al
   const session = await getServerSession(authConfig);
@@ -87,7 +83,7 @@ export async function updateAnimeMediaPartAction(
     const validatedData = updateAnimeMediaPartSchema.parse(data);
 
     // Business logic'i kullan
-    const result = await updateAnimeMediaPartBusiness(id, validatedData, session!.user.id, coverImage, bannerImage);
+    const result = await updateAnimeMediaPartBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.EDITOR.ANIME);

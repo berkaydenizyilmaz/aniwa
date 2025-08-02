@@ -12,8 +12,7 @@ import {
 } from '@/components/ui/select';
 import { Search, RefreshCw, Filter, Calendar } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
+import { useQueryClient } from '@tanstack/react-query';
 import { LogLevel } from '@prisma/client';
 
 interface LogFiltersProps {
@@ -21,16 +20,15 @@ interface LogFiltersProps {
   onLevelChange?: (level: string) => void;
   onStartDateChange?: (date: string) => void;
   onEndDateChange?: (date: string) => void;
-  onRefresh?: () => void;
 }
 
-export function LogFilters({ onSearch, onLevelChange, onStartDateChange, onEndDateChange, onRefresh }: LogFiltersProps) {
+export function LogFilters({ onSearch, onLevelChange, onStartDateChange, onEndDateChange }: LogFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<string>('all');
   const [selectedStartDate, setSelectedStartDate] = useState<string>('');
   const [selectedEndDate, setSelectedEndDate] = useState<string>('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { isLoading } = useLoadingStore();
+  const queryClient = useQueryClient();
 
   // Debounced search term değiştiğinde onSearch'ü çağır
   useEffect(() => {
@@ -56,6 +54,10 @@ export function LogFilters({ onSearch, onLevelChange, onStartDateChange, onEndDa
     onEndDateChange?.(date);
   };
 
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['logs'] });
+  };
+
   return (
     <div className="glass-card p-4">
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
@@ -67,14 +69,13 @@ export function LogFilters({ onSearch, onLevelChange, onStartDateChange, onEndDa
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-10"
-            disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}
           />
         </div>
 
         {/* Seviye Filtresi */}
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={selectedLevel} onValueChange={handleLevelChange} disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}>
+          <Select value={selectedLevel} onValueChange={handleLevelChange}>
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Tüm Seviyeler" />
             </SelectTrigger>
@@ -98,7 +99,6 @@ export function LogFilters({ onSearch, onLevelChange, onStartDateChange, onEndDa
             onChange={(e) => handleStartDateChange(e.target.value)}
             className="w-[130px]"
             placeholder="Başlangıç"
-            disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}
           />
           <span className="text-muted-foreground">-</span>
           <Input
@@ -107,17 +107,15 @@ export function LogFilters({ onSearch, onLevelChange, onStartDateChange, onEndDa
             onChange={(e) => handleEndDateChange(e.target.value)}
             className="w-[130px]"
             placeholder="Bitiş"
-            disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}
           />
         </div>
 
         {/* Refresh Butonu */}
         <Button 
-          onClick={onRefresh} 
-          disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}
+          onClick={handleRefresh} 
           className="flex items-center gap-2"
         >
-          <RefreshCw className={`h-4 w-4 ${isLoading(LOADING_KEYS.PAGES.LOGS) ? 'animate-spin' : ''}`} />
+          <RefreshCw className="h-4 w-4" />
           Yenile
         </Button>
       </div>

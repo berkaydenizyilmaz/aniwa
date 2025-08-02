@@ -1,6 +1,5 @@
 'use client';
 
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -13,10 +12,8 @@ import { toast } from 'sonner';
 import { ROUTES } from '@/lib/constants/routes.constants';
 import { useMutation } from '@tanstack/react-query';
 
-
 export function RegisterForm() {
   const router = useRouter();
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   const {
     register,
@@ -32,31 +29,29 @@ export function RegisterForm() {
     },
   });
 
-  const onSubmit = async (data: RegisterInput) => {
-    if (isLoading(LOADING_KEYS.AUTH.REGISTER)) return; // Prevent double submission
-    
-    setLoadingStore(LOADING_KEYS.AUTH.REGISTER, true);
-
-    try {
-      // Server Action ile kayıt
+  // Register mutation
+  const registerMutation = useMutation({
+    mutationFn: async (data: RegisterInput) => {
       const result = await registerUser(data);
 
       if (!result.success) {
-        toast.error(result.error || 'Kayıt işlemi başarısız oldu');
-        return;
+        throw new Error(result.error || 'Kayıt işlemi başarısız oldu');
       }
 
-      // Başarılı kayıt - giriş sayfasına yönlendir
+      return result;
+    },
+    onSuccess: () => {
       toast.success('Hesabınız oluşturuldu! Giriş yapabilirsiniz.');
-      
       router.push(ROUTES.PAGES.AUTH.LOGIN);
-
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error('Register error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.AUTH.REGISTER, false);
-    }
+      toast.error(error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+    },
+  });
+
+  const onSubmit = async (data: RegisterInput) => {
+    registerMutation.mutate(data);
   };
 
   return (
@@ -69,7 +64,7 @@ export function RegisterForm() {
           type="text"
           placeholder="Kullanıcı adınızı girin"
           {...register('username')}
-          disabled={isLoading(LOADING_KEYS.AUTH.REGISTER)}
+          disabled={registerMutation.isPending}
         />
         {errors.username && (
           <p className="text-sm text-destructive">{errors.username.message}</p>
@@ -84,7 +79,7 @@ export function RegisterForm() {
           type="email"
           placeholder="E-posta adresinizi girin"
           {...register('email')}
-          disabled={isLoading(LOADING_KEYS.AUTH.REGISTER)}
+          disabled={registerMutation.isPending}
         />
         {errors.email && (
           <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -99,7 +94,7 @@ export function RegisterForm() {
           type="password"
           placeholder="Şifrenizi girin"
           {...register('password')}
-          disabled={isLoading(LOADING_KEYS.AUTH.REGISTER)}
+          disabled={registerMutation.isPending}
         />
         {errors.password && (
           <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -114,7 +109,7 @@ export function RegisterForm() {
           type="password"
           placeholder="Şifrenizi tekrar girin"
           {...register('confirmPassword')}
-          disabled={isLoading(LOADING_KEYS.AUTH.REGISTER)}
+          disabled={registerMutation.isPending}
         />
         {errors.confirmPassword && (
           <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
@@ -125,11 +120,11 @@ export function RegisterForm() {
         <Button
           type="submit"
           className="w-full"
-        disabled={isLoading(LOADING_KEYS.AUTH.REGISTER)}
+          disabled={registerMutation.isPending}
         >
           Kayıt Ol
         </Button>
 
     </form>
   );
-} 
+}

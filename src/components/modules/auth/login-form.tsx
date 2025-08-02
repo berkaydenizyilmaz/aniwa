@@ -10,12 +10,10 @@ import { Label } from '@/components/ui/label';
 import { loginSchema, type LoginInput } from '@/lib/schemas/auth.schema';
 import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
-
 import { ROUTES } from '@/lib/constants/routes.constants';
 
 export function LoginForm() {
   const router = useRouter();
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   const {
     register,
@@ -29,12 +27,9 @@ export function LoginForm() {
     },
   });
 
-  const onSubmit = async (data: LoginInput) => {
-    if (isLoading(LOADING_KEYS.AUTH.LOGIN)) return; // Prevent double submission
-    
-    setLoadingStore(LOADING_KEYS.AUTH.LOGIN, true);
-
-    try {
+  // Login mutation
+  const loginMutation = useMutation({
+    mutationFn: async (data: LoginInput) => {
       const result = await signIn('credentials', {
         username: data.username,
         password: data.password,
@@ -42,22 +37,24 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        toast.error('Kullanıcı adı veya şifre yanlış');
-        return;
+        throw new Error('Kullanıcı adı veya şifre yanlış');
       }
 
-      // Başarılı giriş
+      return result;
+    },
+    onSuccess: () => {
       toast.success('Başarıyla giriş yaptınız!');
-      
       router.push(ROUTES.PAGES.HOME);
       router.refresh();
-
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error('Login error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.AUTH.LOGIN, false);
-    }
+      toast.error(error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+    },
+  });
+
+  const onSubmit = async (data: LoginInput) => {
+    loginMutation.mutate(data);
   };
 
   return (
@@ -70,7 +67,7 @@ export function LoginForm() {
           type="text"
           placeholder="Kullanıcı adınızı girin"
           {...register('username')}
-          disabled={isLoading(LOADING_KEYS.AUTH.LOGIN)}
+          disabled={loginMutation.isPending}
         />
         {errors.username && (
           <p className="text-sm text-destructive">{errors.username.message}</p>
@@ -85,7 +82,7 @@ export function LoginForm() {
           type="password"
           placeholder="Şifrenizi girin"
           {...register('password')}
-          disabled={isLoading(LOADING_KEYS.AUTH.LOGIN)}
+          disabled={loginMutation.isPending}
         />
         {errors.password && (
           <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -96,11 +93,11 @@ export function LoginForm() {
         <Button
           type="submit"
           className="w-full"
-          disabled={isLoading(LOADING_KEYS.AUTH.LOGIN)}
+          disabled={loginMutation.isPending}
         >
           Giriş Yap
         </Button>
 
     </form>
   );
-} 
+}

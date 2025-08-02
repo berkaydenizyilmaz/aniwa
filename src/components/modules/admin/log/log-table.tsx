@@ -23,8 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
+import { useQuery } from '@tanstack/react-query';
 
 interface LogTableProps {
   searchTerm?: string;
@@ -34,68 +33,55 @@ interface LogTableProps {
 }
 
 export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStartDate = '', selectedEndDate = '' }: LogTableProps) {
-  const [logs, setLogs] = useState<(Log & { user?: { id: string; username: string; email: string } | null })[]>([]);
   const [metadataDialogOpen, setMetadataDialogOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<(Log & { user?: { id: string; username: string; email: string } | null }) | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalLogs, setTotalLogs] = useState(0);
   const [limit] = useState(50);
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
-
-  // Log'ları getir
-  useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        setLoadingStore(LOADING_KEYS.PAGES.LOGS, true);
-        
-        // Filtreleri hazırla
-        const filters: LogFilters = {
-          page: currentPage,
-          limit: limit
-        };
-        if (selectedLevel !== 'all') {
-          filters.level = selectedLevel as LogLevel;
-        }
-        if (selectedStartDate) {
-          filters.startDate = selectedStartDate;
-        }
-        if (selectedEndDate) {
-          filters.endDate = selectedEndDate;
-        }
-        if (searchTerm) {
-          filters.search = searchTerm;
-        }
-        
-        const result = await getLogsAction(filters);
-
-        if (!result.success) {
-          toast.error(result.error || 'Loglar yüklenirken bir hata oluştu');
-          return;
-        }
-
-        const data = result.data as GetLogsResponse;
-        setLogs(data.logs);
-        setTotalPages(data.totalPages);
-        setTotalLogs(data.total);
-      } catch (error) {
-        console.error('Fetch logs error:', error);
-        toast.error('Loglar yüklenirken bir hata oluştu');
-      } finally {
-        setLoadingStore(LOADING_KEYS.PAGES.LOGS, false);
-      }
-    };
-
-    fetchLogs();
-  }, [setLoadingStore, searchTerm, selectedLevel, selectedStartDate, selectedEndDate, currentPage, limit]);
 
   // Filtreler değiştiğinde sayfa 1'e dön
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedLevel, selectedStartDate, selectedEndDate]);
 
-  // Server-side filtreleme kullanıldığı için client-side filtreleme gerekmez
-  const filteredLogs = logs;
+  // Filtreleri hazırla
+  const filters: LogFilters = {
+    page: currentPage,
+    limit: limit
+  };
+  if (selectedLevel !== 'all') {
+    filters.level = selectedLevel as LogLevel;
+  }
+  if (selectedStartDate) {
+    filters.startDate = selectedStartDate;
+  }
+  if (selectedEndDate) {
+    filters.endDate = selectedEndDate;
+  }
+  if (searchTerm) {
+    filters.search = searchTerm;
+  }
+
+  // Log'ları getir
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['logs', filters],
+    queryFn: async () => {
+      const result = await getLogsAction(filters);
+      if (!result.success) {
+        throw new Error(result.error || 'Loglar yüklenirken bir hata oluştu');
+      }
+      return result.data as GetLogsResponse;
+    },
+    staleTime: 30000, // 30 saniye
+  });
+
+  // Hata durumu
+  if (error) {
+    toast.error(error.message || 'Loglar yüklenirken bir hata oluştu');
+  }
+
+  const logs = data?.logs || [];
+  const totalPages = data?.totalPages || 1;
+  const totalLogs = data?.total || 0;
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString('tr-TR');
@@ -160,7 +146,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
     return pages;
   };
 
-  if (isLoading(LOADING_KEYS.PAGES.LOGS)) {
+  if (isLoading) {
     return (
       <div className="glass-card">
         <div className="p-4">
@@ -193,7 +179,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredLogs.map((log) => (
+            {logs.map((log) => (
               <TableRow key={log.id}>
                 <TableCell>
                   <span className={`font-mono text-sm ${getLevelColor(log.level)}`}>
@@ -228,7 +214,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
           </TableBody>
         </Table>
 
-        {filteredLogs.length === 0 && (
+        {logs.length === 0 && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun log bulunamadı.' : 'Henüz log bulunmuyor.'}
           </div>
@@ -247,7 +233,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.LOGS)}
+                disabled={currentPage === 1 || isLoading}
               >
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
@@ -257,7 +243,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1 || isLoading(LOADING_KEYS.PAGES.LOGS)}
+                disabled={currentPage === 1 || isLoading}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -273,7 +259,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
                         variant={currentPage === page ? "default" : "outline"}
                         size="sm"
                         onClick={() => handlePageChange(page as number)}
-                        disabled={isLoading(LOADING_KEYS.PAGES.LOGS)}
+                        disabled={isLoading}
                         className="w-8 h-8 p-0"
                       >
                         {page}
@@ -288,7 +274,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.LOGS)}
+                disabled={currentPage === totalPages || isLoading}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -298,7 +284,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages || isLoading(LOADING_KEYS.PAGES.LOGS)}
+                disabled={currentPage === totalPages || isLoading}
               >
                 <ChevronsRight className="h-4 w-4" />
               </Button>

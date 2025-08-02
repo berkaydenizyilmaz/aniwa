@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter, useSearchParams } from 'next/navigation';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,12 +13,10 @@ import { toast } from 'sonner';
 import { ROUTES } from '@/lib/constants/routes.constants';
 import { useMutation } from '@tanstack/react-query';
 
-
 export function ResetPasswordForm() {
   const [token, setToken] = useState<string>('');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
 
   const {
     register,
@@ -45,37 +42,35 @@ export function ResetPasswordForm() {
     }
   }, [searchParams, router]);
 
-  const onSubmit = async (data: ResetPasswordInput) => {
-    if (isLoading(LOADING_KEYS.AUTH.RESET_PASSWORD)) return; // Prevent double submission
-    
-    setLoadingStore(LOADING_KEYS.AUTH.RESET_PASSWORD, true);
-
-    try {
+  // Reset password mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: async (data: ResetPasswordInput) => {
       // Token'ı form data'ya ekle
       const formData = {
         ...data,
         token: token
       };
 
-      // Server Action ile şifre sıfırlama
       const result = await resetPassword(formData);
 
       if (!result.success) {
-        toast.error(result.error || 'Şifre sıfırlama işlemi başarısız oldu');
-        return;
+        throw new Error(result.error || 'Şifre sıfırlama işlemi başarısız oldu');
       }
 
-      // Başarılı şifre sıfırlama
+      return result;
+    },
+    onSuccess: () => {
       toast.success('Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.');
-      
       router.push(ROUTES.PAGES.AUTH.LOGIN);
-
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error('Reset password error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.AUTH.RESET_PASSWORD, false);
-    }
+      toast.error(error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+    },
+  });
+
+  const onSubmit = async (data: ResetPasswordInput) => {
+    resetPasswordMutation.mutate(data);
   };
 
   // Token yoksa form'u gösterme
@@ -93,7 +88,7 @@ export function ResetPasswordForm() {
           type="password"
           placeholder="Yeni şifrenizi girin"
           {...register('password')}
-          disabled={isLoading(LOADING_KEYS.AUTH.RESET_PASSWORD)}
+          disabled={resetPasswordMutation.isPending}
         />
         {errors.password && (
           <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -108,7 +103,7 @@ export function ResetPasswordForm() {
           type="password"
           placeholder="Şifrenizi tekrar girin"
           {...register('confirmPassword')}
-          disabled={isLoading(LOADING_KEYS.AUTH.RESET_PASSWORD)}
+          disabled={resetPasswordMutation.isPending}
         />
         {errors.confirmPassword && (
           <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
@@ -119,11 +114,11 @@ export function ResetPasswordForm() {
       <Button
         type="submit"
         className="w-full"
-        disabled={isLoading(LOADING_KEYS.AUTH.RESET_PASSWORD)}
+        disabled={resetPasswordMutation.isPending}
       >
         Şifreyi Sıfırla
       </Button>
 
     </form>
   );
-} 
+}

@@ -1,9 +1,7 @@
 'use client';
 
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,10 +10,7 @@ import { forgotPassword } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
 
-
 export function ForgotPasswordForm() {
-  const { setLoading: setLoadingStore, isLoading } = useLoadingStore();
-
   const {
     register,
     handleSubmit,
@@ -27,29 +22,28 @@ export function ForgotPasswordForm() {
     },
   });
 
-  const onSubmit = async (data: ForgotPasswordInput) => {
-    if (isLoading(LOADING_KEYS.AUTH.FORGOT_PASSWORD)) return; // Prevent double submission
-    
-    setLoadingStore(LOADING_KEYS.AUTH.FORGOT_PASSWORD, true);
-
-    try {
-      // Server Action ile şifre sıfırlama isteği
+  // Forgot password mutation
+  const forgotPasswordMutation = useMutation({
+    mutationFn: async (data: ForgotPasswordInput) => {
       const result = await forgotPassword(data);
 
       if (!result.success) {
-        toast.error(result.error || 'Şifre sıfırlama isteği başarısız oldu');
-        return;
+        throw new Error(result.error || 'Şifre sıfırlama isteği başarısız oldu');
       }
 
-      // Başarılı istek
+      return result;
+    },
+    onSuccess: () => {
       toast.success('Şifre sıfırlama linki e-posta adresinize gönderildi.');
-
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error('Forgot password error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setLoadingStore(LOADING_KEYS.AUTH.FORGOT_PASSWORD, false);
-    }
+      toast.error(error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+    },
+  });
+
+  const onSubmit = async (data: ForgotPasswordInput) => {
+    forgotPasswordMutation.mutate(data);
   };
 
   return (
@@ -62,7 +56,7 @@ export function ForgotPasswordForm() {
           type="email"
           placeholder="E-posta adresinizi girin"
           {...register('email')}
-          disabled={isLoading(LOADING_KEYS.AUTH.FORGOT_PASSWORD)}
+          disabled={forgotPasswordMutation.isPending}
         />
         {errors.email && (
           <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -73,11 +67,11 @@ export function ForgotPasswordForm() {
       <Button
         type="submit"
         className="w-full"
-        disabled={isLoading(LOADING_KEYS.AUTH.FORGOT_PASSWORD)}
+        disabled={forgotPasswordMutation.isPending}
       >
         Gönder
       </Button>
 
     </form>
   );
-} 
+}
