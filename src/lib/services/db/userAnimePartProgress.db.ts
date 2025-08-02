@@ -50,7 +50,6 @@ export async function findUserAnimePartProgressByIdDB(
                     select: {
                         id: true,
                         title: true,
-                        type: true,
                         episodes: true,
                     },
                 },
