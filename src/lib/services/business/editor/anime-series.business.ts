@@ -14,6 +14,18 @@ import {
   countAnimeSeriesDB,
 } from '@/lib/services/db/anime.db';
 import { 
+  createAnimeGenreDB,
+  deleteAnimeGenresBySeriesIdDB,
+} from '@/lib/services/db/animeGenre.db';
+import { 
+  createAnimeTagDB,
+  deleteAnimeTagsBySeriesIdDB,
+} from '@/lib/services/db/animeTag.db';
+import { 
+  createAnimeStudioDB,
+  deleteAnimeStudiosBySeriesIdDB,
+} from '@/lib/services/db/animeStudio.db';
+import { 
   findAllGenresDB,
 } from '@/lib/services/db/genre.db';
 import { 
@@ -78,6 +90,31 @@ export async function createAnimeSeriesBusiness(
       coverImage: uploadResult?.coverImage?.secureUrl,
       bannerImage: uploadResult?.bannerImage?.secureUrl,
     });
+
+    // İlişkileri oluştur
+    if (data.genres && data.genres.length > 0) {
+      await Promise.all(
+        data.genres.map(genreId => 
+          createAnimeGenreDB(result.id, genreId)
+        )
+      );
+    }
+
+    if (data.studios && data.studios.length > 0) {
+      await Promise.all(
+        data.studios.map(studioId => 
+          createAnimeStudioDB(result.id, studioId)
+        )
+      );
+    }
+
+    if (data.tags && data.tags.length > 0) {
+      await Promise.all(
+        data.tags.map(tagId => 
+          createAnimeTagDB(result.id, tagId)
+        )
+      );
+    }
 
     // Başarılı oluşturma logu
     await logger.info(
@@ -303,6 +340,46 @@ export async function updateAnimeSeriesBusiness(
 
     // Anime serisi güncelle
     const result = await updateAnimeSeriesDB({ id }, updateData);
+
+    // İlişkileri güncelle
+    if (data.genres !== undefined) {
+      // Mevcut ilişkileri sil
+      await deleteAnimeGenresBySeriesIdDB(id);
+      // Yeni ilişkileri oluştur
+      if (data.genres.length > 0) {
+        await Promise.all(
+          data.genres.map(genreId => 
+            createAnimeGenreDB(id, genreId)
+          )
+        );
+      }
+    }
+
+    if (data.studios !== undefined) {
+      // Mevcut ilişkileri sil
+      await deleteAnimeStudiosBySeriesIdDB(id);
+      // Yeni ilişkileri oluştur
+      if (data.studios.length > 0) {
+        await Promise.all(
+          data.studios.map(studioId => 
+            createAnimeStudioDB(id, studioId)
+          )
+        );
+      }
+    }
+
+    if (data.tags !== undefined) {
+      // Mevcut ilişkileri sil
+      await deleteAnimeTagsBySeriesIdDB(id);
+      // Yeni ilişkileri oluştur
+      if (data.tags.length > 0) {
+        await Promise.all(
+          data.tags.map(tagId => 
+            createAnimeTagDB(id, tagId)
+          )
+        );
+      }
+    }
 
     // Başarılı güncelleme logu
     await logger.info(
