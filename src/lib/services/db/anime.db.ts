@@ -56,10 +56,14 @@ export async function createAnimeSeriesDB(
 // Anime serisi getirme (ID ile)
 export async function findAnimeSeriesByIdDB(
   id: string,
+  include?: Prisma.AnimeSeriesInclude,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries | null> {
   try {
-    return await client.animeSeries.findUnique({ where: { id } });
+    return await client.animeSeries.findUnique({ 
+      where: { id },
+      include
+    });
   } catch (error) {
     handleDatabaseError(error, 'Anime serisi ID ile bulma', { id });
   }

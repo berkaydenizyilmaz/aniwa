@@ -1,6 +1,6 @@
 // Anime API response tipleri
 
-import { AnimeSeries, AnimeMediaPart } from '@prisma/client';
+import { AnimeSeries, AnimeMediaPart, Genre, Studio, Tag } from '@prisma/client';
 import { 
   CreateAnimeSeriesInput, 
   UpdateAnimeSeriesInput, 
@@ -13,6 +13,26 @@ import {
 export type CreateAnimeSeriesResponse = AnimeSeries;
 export type GetAnimeSeriesResponse = AnimeSeries;
 export type UpdateAnimeSeriesResponse = AnimeSeries;
+
+// Anime Series ilişkilerle birlikte response tipi
+export interface GetAnimeSeriesWithRelationsResponse extends AnimeSeries {
+  animeGenres: Array<{
+    genre: Genre;
+  }>;
+  animeTags: Array<{
+    tag: Tag;
+  }>;
+  animeStudios: Array<{
+    studio: Studio;
+  }>;
+}
+
+// Anime Series ilişkileri response tipi
+export interface GetAnimeSeriesRelationsResponse {
+  genres: Genre[];
+  studios: Studio[];
+  tags: Tag[];
+}
 
 // Anime Media Part API response tipleri
 export type CreateAnimeMediaPartResponse = AnimeMediaPart;

@@ -22,13 +22,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { createAnimeSeriesAction, updateAnimeSeriesAction } from '@/lib/actions/editor/anime-series.action';
+import { createAnimeSeriesAction, updateAnimeSeriesAction, getAnimeSeriesRelationsAction, getAnimeSeriesWithRelationsAction } from '@/lib/actions/editor/anime-series.action';
 import { createAnimeSeriesSchema, updateAnimeSeriesSchema, type CreateAnimeSeriesInput, type UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 import { toast } from 'sonner';
 import { AnimeSeries, AnimeType, AnimeStatus, Season, Source, CountryOfOrigin } from '@prisma/client';
 import { ANIME } from '@/lib/constants/anime.constants';
 import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 
 interface AnimeSeriesFormDialogProps {
   open: boolean;
@@ -39,6 +39,57 @@ interface AnimeSeriesFormDialogProps {
 
 export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSuccess }: AnimeSeriesFormDialogProps) {
   const queryClient = useQueryClient();
+
+  // İlişkileri getir (genres, studios, tags)
+  const { data: relations } = useQuery({
+    queryKey: ['anime-series-relations'],
+    queryFn: async () => {
+      const result = await getAnimeSeriesRelationsAction();
+      if (!result.success) {
+        throw new Error(result.error || 'İlişkiler yüklenirken bir hata oluştu');
+      }
+      return result.data as {
+        genres: Array<{ id: string; name: string }>;
+        studios: Array<{ id: string; name: string }>;
+        tags: Array<{ id: string; name: string }>;
+      };
+    },
+    staleTime: 5 * 60 * 1000, // 5 dakika
+  });
+
+  // Edit mode'da anime detaylarını getir
+  const { data: animeSeriesWithRelations } = useQuery({
+    queryKey: ['anime-series-with-relations', animeSeries?.id],
+    queryFn: async () => {
+      if (!animeSeries?.id) return null;
+      const result = await getAnimeSeriesWithRelationsAction(animeSeries.id);
+      if (!result.success) {
+        throw new Error(result.error || 'Anime detayları yüklenirken bir hata oluştu');
+      }
+      return result.data as {
+        id: string;
+        title: string;
+        englishTitle?: string;
+        japaneseTitle?: string;
+        synopsis?: string;
+        type: AnimeType;
+        status: AnimeStatus;
+        releaseDate?: Date;
+        season?: Season;
+        seasonYear?: number;
+        source?: Source;
+        countryOfOrigin?: CountryOfOrigin;
+        isAdult?: boolean;
+        trailer?: string;
+        synonyms: string[];
+        animeGenres?: Array<{ genre: { id: string } }>;
+        animeStudios?: Array<{ studio: { id: string } }>;
+        animeTags?: Array<{ tag: { id: string } }>;
+      };
+    },
+    enabled: !!animeSeries?.id,
+    staleTime: 5 * 60 * 1000, // 5 dakika
+  });
 
   const {
     register,
@@ -73,27 +124,28 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
 
   // Form'u anime series verisi ile doldur (edit mode)
   useEffect(() => {
-    if (animeSeries) {
+    if (animeSeriesWithRelations) {
       reset({
-        title: animeSeries.title,
-        englishTitle: animeSeries.englishTitle || '',
-        japaneseTitle: animeSeries.japaneseTitle || '',
-        synopsis: animeSeries.synopsis || '',
-        type: animeSeries.type,
-        status: animeSeries.status,
-        releaseDate: animeSeries.releaseDate || undefined,
-        season: animeSeries.season || undefined,
-        year: animeSeries.seasonYear || undefined,
-        source: animeSeries.source || undefined,
-        countryOfOrigin: animeSeries.countryOfOrigin || undefined,
-        isAdult: animeSeries.isAdult || false,
-        trailer: animeSeries.trailer || '',
-        synonyms: animeSeries.synonyms || [],
-        genres: [],
-        studios: [],
-        tags: [],
+        title: animeSeriesWithRelations.title,
+        englishTitle: animeSeriesWithRelations.englishTitle || '',
+        japaneseTitle: animeSeriesWithRelations.japaneseTitle || '',
+        synopsis: animeSeriesWithRelations.synopsis || '',
+        type: animeSeriesWithRelations.type,
+        status: animeSeriesWithRelations.status,
+        releaseDate: animeSeriesWithRelations.releaseDate || undefined,
+        season: animeSeriesWithRelations.season || undefined,
+        year: animeSeriesWithRelations.seasonYear || undefined,
+        source: animeSeriesWithRelations.source || undefined,
+        countryOfOrigin: animeSeriesWithRelations.countryOfOrigin || undefined,
+        isAdult: animeSeriesWithRelations.isAdult || false,
+        trailer: animeSeriesWithRelations.trailer || '',
+        synonyms: animeSeriesWithRelations.synonyms || [],
+        // İlişkileri doldur
+        genres: animeSeriesWithRelations.animeGenres?.map(ag => ag.genre.id) || [],
+        studios: animeSeriesWithRelations.animeStudios?.map(as => as.studio.id) || [],
+        tags: animeSeriesWithRelations.animeTags?.map(at => at.tag.id) || [],
       });
-    } else {
+    } else if (!animeSeries) {
       reset({
         title: '',
         englishTitle: '',
@@ -116,7 +168,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
         tags: [],
       });
     }
-  }, [animeSeries, reset]);
+  }, [animeSeriesWithRelations, animeSeries, reset]);
 
   // Create mutation
   const createMutation = useMutation({
@@ -515,13 +567,10 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
               control={control}
               render={({ field }) => (
                 <MultiSelect
-                  options={[
-                    { id: '1', name: 'Action' },
-                    { id: '2', name: 'Adventure' },
-                    { id: '3', name: 'Comedy' },
-                    { id: '4', name: 'Drama' },
-                    { id: '5', name: 'Fantasy' },
-                  ]}
+                  options={relations?.genres?.map(genre => ({
+                    id: genre.id,
+                    name: genre.name
+                  })) || []}
                   selectedIds={field.value || []}
                   onSelectionChange={field.onChange}
                   placeholder="Tür seçin"
@@ -542,13 +591,10 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
               control={control}
               render={({ field }) => (
                 <MultiSelect
-                  options={[
-                    { id: '1', name: 'MAPPA' },
-                    { id: '2', name: 'A-1 Pictures' },
-                    { id: '3', name: 'Madhouse' },
-                    { id: '4', name: 'Studio Ghibli' },
-                    { id: '5', name: 'Bones' },
-                  ]}
+                  options={relations?.studios?.map(studio => ({
+                    id: studio.id,
+                    name: studio.name
+                  })) || []}
                   selectedIds={field.value || []}
                   onSelectionChange={field.onChange}
                   placeholder="Stüdyo seçin"
@@ -569,13 +615,10 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
               control={control}
               render={({ field }) => (
                 <MultiSelect
-                  options={[
-                    { id: '1', name: 'Shounen' },
-                    { id: '2', name: 'Shoujo' },
-                    { id: '3', name: 'Seinen' },
-                    { id: '4', name: 'Josei' },
-                    { id: '5', name: 'Isekai' },
-                  ]}
+                  options={relations?.tags?.map(tag => ({
+                    id: tag.id,
+                    name: tag.name
+                  })) || []}
                   selectedIds={field.value || []}
                   onSelectionChange={field.onChange}
                   placeholder="Etiket seçin"

@@ -13,6 +13,15 @@ import {
   deleteAnimeSeriesDB,
   countAnimeSeriesDB,
 } from '@/lib/services/db/anime.db';
+import { 
+  findAllGenresDB,
+} from '@/lib/services/db/genre.db';
+import { 
+  findAllStudiosDB,
+} from '@/lib/services/db/studio.db';
+import { 
+  findAllTagsDB,
+} from '@/lib/services/db/tag.db';
 import { Prisma } from '@prisma/client';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
@@ -25,6 +34,8 @@ import {
   CreateAnimeSeriesRequest,
   UpdateAnimeSeriesRequest,
   GetAnimeSeriesRequest,
+  GetAnimeSeriesRelationsResponse,
+  GetAnimeSeriesWithRelationsResponse,
 } from '@/lib/types/api/anime.api';
 import { UploadService } from '@/lib/services/extends-api/cloudinary/upload.service';
 
@@ -377,5 +388,120 @@ export async function deleteAnimeSeriesBusiness(
     );
     
     throw new BusinessError('Anime serisi silme başarısız');
+  }
+}
+
+// Anime serisi ilişkilerini getirme (genres, studios, tags)
+export async function getAnimeSeriesRelationsBusiness(
+  userId: string
+): Promise<ApiResponse<GetAnimeSeriesRelationsResponse>> {
+  try {
+    // Paralel olarak tüm ilişkileri getir
+    const [genres, studios, tags] = await Promise.all([
+      findAllGenresDB(),
+      findAllStudiosDB(),
+      findAllTagsDB()
+    ]);
+
+    // Başarılı getirme logu
+    await logger.info(
+      EVENTS.EDITOR.ANIME_SERIES_RELATIONS_RETRIEVED,
+      'Anime serisi ilişkileri başarıyla getirildi',
+      { 
+        genresCount: genres.length,
+        studiosCount: studios.length,
+        tagsCount: tags.length
+      },
+      userId
+    );
+
+    return {
+      success: true,
+      data: {
+        genres,
+        studios,
+        tags
+      }
+    };
+  } catch (error) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Anime serisi ilişkileri getirme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata' },
+      userId
+    );
+    
+    throw new BusinessError('Anime serisi ilişkileri getirme başarısız');
+  }
+}
+
+// Anime serisi getirme (ID ile) - İlişkilerle birlikte
+export async function getAnimeSeriesWithRelationsBusiness(
+  id: string,
+  userId: string
+): Promise<ApiResponse<GetAnimeSeriesWithRelationsResponse>> {
+  try {
+    const animeSeries = await findAnimeSeriesByIdDB(id, {
+      animeGenres: {
+        include: {
+          genre: true
+        }
+      },
+      animeTags: {
+        include: {
+          tag: true
+        }
+      },
+      animeStudios: {
+        include: {
+          studio: true
+        }
+      },
+    });
+    
+    if (!animeSeries) {
+      throw new NotFoundError('Anime serisi bulunamadı');
+    }
+
+    // Başarılı getirme logu
+    await logger.info(
+      EVENTS.EDITOR.ANIME_SERIES_WITH_RELATIONS_RETRIEVED,
+      'Anime serisi ilişkilerle birlikte başarıyla getirildi',
+      { 
+        animeSeriesId: animeSeries.id, 
+        aniwaPublicId: animeSeries.aniwaPublicId,
+        title: animeSeries.title,
+        genresCount: (animeSeries as GetAnimeSeriesWithRelationsResponse).animeGenres?.length || 0,
+        studiosCount: (animeSeries as GetAnimeSeriesWithRelationsResponse).animeStudios?.length || 0,
+        tagsCount: (animeSeries as GetAnimeSeriesWithRelationsResponse).animeTags?.length || 0
+      },
+      userId
+    );
+
+    return {
+      success: true,
+      data: animeSeries as GetAnimeSeriesWithRelationsResponse
+    };
+  } catch (error) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Anime serisi ilişkilerle getirme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', animeSeriesId: id },
+      userId
+    );
+    
+    throw new BusinessError('Anime serisi ilişkilerle getirme başarısız');
   }
 } 

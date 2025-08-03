@@ -13,7 +13,9 @@ import {
   getAnimeSeriesListBusiness, 
   getAnimeSeriesBusiness,
   updateAnimeSeriesBusiness, 
-  deleteAnimeSeriesBusiness 
+  deleteAnimeSeriesBusiness,
+  getAnimeSeriesRelationsBusiness,
+  getAnimeSeriesWithRelationsBusiness
 } from '@/lib/services/business/editor/anime-series.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
@@ -153,6 +155,50 @@ export async function deleteAnimeSeriesAction(id: string): Promise<ServerActionR
   } catch (error) {
     return handleServerActionError(error, {
       actionName: 'deleteAnimeSeriesAction',
+      userId: session?.user.id
+    });
+  }
+}
+
+// Anime serisi ilişkilerini getirme (genres, studios, tags)
+export async function getAnimeSeriesRelationsAction(): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
+  try {
+    // Business logic'i kullan
+    const result = await getAnimeSeriesRelationsBusiness(session!.user.id);
+
+    return {
+      success: true,
+      data: result.data
+    };
+
+  } catch (error) {
+    return handleServerActionError(error, {
+      actionName: 'getAnimeSeriesRelationsAction',
+      userId: session?.user.id
+    });
+  }
+}
+
+// Anime serisi getirme (ID ile) - İlişkilerle birlikte
+export async function getAnimeSeriesWithRelationsAction(id: string): Promise<ServerActionResponse> {
+  // Session'dan user bilgisini al
+  const session = await getServerSession(authConfig);
+  
+  try {
+    // Business logic'i kullan
+    const result = await getAnimeSeriesWithRelationsBusiness(id, session!.user.id);
+
+    return {
+      success: true,
+      data: result.data
+    };
+
+  } catch (error) {
+    return handleServerActionError(error, {
+      actionName: 'getAnimeSeriesWithRelationsAction',
       userId: session?.user.id
     });
   }

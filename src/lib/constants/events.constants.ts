@@ -98,11 +98,12 @@ export const EVENTS = {
     ANIME_SERIES_LIST_RETRIEVED: 'editor_anime_series_list_retrieved',
     ANIME_SERIES_UPDATED: 'editor_anime_series_updated',
     ANIME_SERIES_DELETED: 'editor_anime_series_deleted',
+    ANIME_SERIES_RELATIONS_RETRIEVED: 'editor_anime_series_relations_retrieved',
+    ANIME_SERIES_WITH_RELATIONS_RETRIEVED: 'editor_anime_series_with_relations_retrieved',
     
     // Anime Media Part Management
     ANIME_MEDIA_PART_CREATED: 'editor_anime_media_part_created',
     ANIME_MEDIA_PART_RETRIEVED: 'editor_anime_media_part_retrieved',
-    ANIME_MEDIA_PARTS_RETRIEVED: 'editor_anime_media_parts_retrieved',
     ANIME_MEDIA_PART_UPDATED: 'editor_anime_media_part_updated',
     ANIME_MEDIA_PART_DELETED: 'editor_anime_media_part_deleted',
   },
