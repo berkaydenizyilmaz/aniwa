@@ -25,19 +25,17 @@ import { authConfig } from '@/lib/auth/auth.config';
 
 // Anime serisi oluşturma
 export async function createAnimeSeriesAction(
-  data: CreateAnimeSeriesInput,
-  coverImage?: Buffer,
-  bannerImage?: Buffer
+  data: CreateAnimeSeriesInput
 ): Promise<ServerActionResponse> {
   // Session'dan user bilgisini al
   const session = await getServerSession(authConfig);
   
-  try {
+  try {    
     // Zod validation
     const validatedData = createAnimeSeriesSchema.parse(data);
 
     // Business logic'i kullan
-    const result = await createAnimeSeriesBusiness(validatedData, session!.user.id, coverImage, bannerImage);
+    const result = await createAnimeSeriesBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
@@ -105,19 +103,17 @@ export async function getAnimeSeriesAction(id: string): Promise<ServerActionResp
 // Anime serisi güncelleme
 export async function updateAnimeSeriesAction(
   id: string, 
-  data: UpdateAnimeSeriesInput,
-  coverImage?: Buffer,
-  bannerImage?: Buffer
+  data: UpdateAnimeSeriesInput
 ): Promise<ServerActionResponse> {
   // Session'dan user bilgisini al
   const session = await getServerSession(authConfig);
-  
+
   try {
     // Zod validation
     const validatedData = updateAnimeSeriesSchema.parse(data);
 
     // Business logic'i kullan
-    const result = await updateAnimeSeriesBusiness(id, validatedData, session!.user.id, coverImage, bannerImage);
+    const result = await updateAnimeSeriesBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
     revalidatePath(ROUTES.PAGES.EDITOR.ANIME);

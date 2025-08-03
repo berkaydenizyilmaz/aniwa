@@ -174,15 +174,14 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
   const createMutation = useMutation({
     mutationFn: createAnimeSeriesAction,
     onSuccess: () => {
-      toast.success('Anime serisi başarıyla oluşturuldu!');
+      toast.success('Anime serisi başarıyla oluşturuldu');
       onOpenChange(false);
       onSuccess?.();
-      // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['anime-series'] });
+      // Cache'i temizle
+      queryClient.invalidateQueries({ queryKey: ['anime-series-list'] });
     },
     onError: (error) => {
-      console.error('Create anime series error:', error);
-      toast.error('Oluşturma başarısız oldu');
+      toast.error(error.message || 'Anime serisi oluşturulurken bir hata oluştu');
     },
   });
 

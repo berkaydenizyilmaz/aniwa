@@ -16,8 +16,8 @@ export class UploadService {
    * Anime resimlerini yükle
    */
   static async uploadAnimeImages(
-    coverFile?: Buffer,
-    bannerFile?: Buffer,
+    coverFile?: File,
+    bannerFile?: File,
     animeId: string = 'temp'
   ): Promise<UploadAnimeImagesResult> {
     const result: UploadAnimeImagesResult = {};
@@ -25,12 +25,14 @@ export class UploadService {
     try {
       // Kapak resmi yükle
       if (coverFile) {
-        result.coverImage = await CloudinaryService.uploadAnimeCover(coverFile, animeId);
+        const buffer = Buffer.from(await coverFile.arrayBuffer());
+        result.coverImage = await CloudinaryService.uploadAnimeCover(buffer, animeId);
       }
 
       // Banner resmi yükle
       if (bannerFile) {
-        result.bannerImage = await CloudinaryService.uploadAnimeBanner(bannerFile, animeId);
+        const buffer = Buffer.from(await bannerFile.arrayBuffer());
+        result.bannerImage = await CloudinaryService.uploadAnimeBanner(buffer, animeId);
       }
 
       return result;

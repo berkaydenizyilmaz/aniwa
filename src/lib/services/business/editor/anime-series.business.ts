@@ -57,35 +57,36 @@ import { UploadService } from '@/lib/services/extends-api/cloudinary/upload.serv
 
 // Anime serisi oluşturma
 export async function createAnimeSeriesBusiness(
-  data: CreateAnimeSeriesRequest,
-  userId: string,
-  coverImage?: Buffer,
-  bannerImage?: Buffer
+  data: CreateAnimeSeriesRequest & { coverImageFile?: File; bannerImageFile?: File },
+  userId: string
 ): Promise<ApiResponse<CreateAnimeSeriesResponse>> {
   try {
+    // Image'ları data'dan çıkar
+    const { coverImageFile, bannerImageFile, ...formData } = data;
+    
     // Resim yükleme işlemi
     let uploadResult;
-    if (coverImage || bannerImage) {
+    if (coverImageFile || bannerImageFile) {
       // Geçici ID ile resim yükle
-      uploadResult = await UploadService.uploadAnimeImages(coverImage, bannerImage, 'temp');
+      uploadResult = await UploadService.uploadAnimeImages(coverImageFile, bannerImageFile, 'temp');
     }
 
     // Anime serisi oluştur
     const result = await createAnimeSeriesDB({
-      title: data.title,
-      englishTitle: data.englishTitle,
-      japaneseTitle: data.japaneseTitle,
-      synopsis: data.synopsis,
-      type: data.type,
-      status: data.status,
-      releaseDate: data.releaseDate,
-      season: data.season,
-      seasonYear: data.year,
-      source: data.source,
-      countryOfOrigin: data.countryOfOrigin,
-      isAdult: data.isAdult,
-      trailer: data.trailer || null,
-      synonyms: data.synonyms || [],
+      title: formData.title,
+      englishTitle: formData.englishTitle,
+      japaneseTitle: formData.japaneseTitle,
+      synopsis: formData.synopsis,
+      type: formData.type,
+      status: formData.status,
+      releaseDate: formData.releaseDate,
+      season: formData.season,
+      seasonYear: formData.year,
+      source: formData.source,
+      countryOfOrigin: formData.countryOfOrigin,
+      isAdult: formData.isAdult,
+      trailer: formData.trailer || null,
+      synonyms: formData.synonyms || [],
       // Resim URL'leri
       coverImage: uploadResult?.coverImage?.secureUrl,
       bannerImage: uploadResult?.bannerImage?.secureUrl,
@@ -302,52 +303,43 @@ export async function getAnimeSeriesListBusiness(
 // Anime serisi güncelleme
 export async function updateAnimeSeriesBusiness(
   id: string, 
-  data: UpdateAnimeSeriesRequest,
-  userId: string,
-  coverImage?: Buffer,
-  bannerImage?: Buffer
+  data: UpdateAnimeSeriesRequest & { coverImageFile?: File; bannerImageFile?: File },
+  userId: string
 ): Promise<ApiResponse<UpdateAnimeSeriesResponse>> {
   try {
-    // Anime serisi mevcut mu kontrolü
-    const existingAnimeSeries = await findAnimeSeriesByIdDB(id);
-    if (!existingAnimeSeries) {
+    // Mevcut anime serisini getir
+    const existingAnime = await findAnimeSeriesByIdDB(id);
+    if (!existingAnime) {
       throw new NotFoundError('Anime serisi bulunamadı');
     }
 
     // Resim yükleme işlemi
     let uploadResult;
-    if (coverImage || bannerImage) {
-      uploadResult = await UploadService.uploadAnimeImages(coverImage, bannerImage, id);
-    }
-
-    // Güncelleme verilerini hazırla
-    const updateData: Prisma.AnimeSeriesUpdateInput = {};
-    
-    if (data.title !== undefined) updateData.title = data.title;
-    if (data.englishTitle !== undefined) updateData.englishTitle = data.englishTitle;
-    if (data.japaneseTitle !== undefined) updateData.japaneseTitle = data.japaneseTitle;
-    if (data.synopsis !== undefined) updateData.synopsis = data.synopsis;
-    if (data.type !== undefined) updateData.type = data.type;
-    if (data.status !== undefined) updateData.status = data.status;
-    if (data.releaseDate !== undefined) updateData.releaseDate = data.releaseDate;
-    if (data.season !== undefined) updateData.season = data.season;
-    if (data.year !== undefined) updateData.seasonYear = data.year;
-    if (data.source !== undefined) updateData.source = data.source;
-    if (data.countryOfOrigin !== undefined) updateData.countryOfOrigin = data.countryOfOrigin;
-    if (data.isAdult !== undefined) updateData.isAdult = data.isAdult;
-    if (data.trailer !== undefined) updateData.trailer = data.trailer || null;
-    if (data.synonyms !== undefined) updateData.synonyms = data.synonyms || [];
-
-    // Resim URL'leri güncelle
-    if (uploadResult?.coverImage) {
-      updateData.coverImage = uploadResult.coverImage.secureUrl;
-    }
-    if (uploadResult?.bannerImage) {
-      updateData.bannerImage = uploadResult.bannerImage.secureUrl;
+    if (data.coverImageFile || data.bannerImageFile) {
+      // Geçici ID ile resim yükle
+      uploadResult = await UploadService.uploadAnimeImages(data.coverImageFile, data.bannerImageFile, id);
     }
 
     // Anime serisi güncelle
-    const result = await updateAnimeSeriesDB({ id }, updateData);
+    const result = await updateAnimeSeriesDB({ id }, {
+      title: data.title,
+      englishTitle: data.englishTitle,
+      japaneseTitle: data.japaneseTitle,
+      synopsis: data.synopsis,
+      type: data.type,
+      status: data.status,
+      releaseDate: data.releaseDate,
+      season: data.season,
+      seasonYear: data.year,
+      source: data.source,
+      countryOfOrigin: data.countryOfOrigin,
+      isAdult: data.isAdult,
+      trailer: data.trailer || null,
+      synonyms: data.synonyms || [],
+      // Resim URL'leri (sadece yeni yüklenen varsa güncelle)
+      ...(uploadResult?.coverImage && { coverImage: uploadResult.coverImage.secureUrl }),
+      ...(uploadResult?.bannerImage && { bannerImage: uploadResult.bannerImage.secureUrl }),
+    });
 
     // İlişkileri güncelle
     if (data.genres !== undefined) {
@@ -399,7 +391,7 @@ export async function updateAnimeSeriesBusiness(
         title: result.title,
         type: result.type,
         status: result.status,
-        oldTitle: existingAnimeSeries.title,
+        oldTitle: existingAnime.title,
         hasNewCoverImage: !!uploadResult?.coverImage,
         hasNewBannerImage: !!uploadResult?.bannerImage
       },

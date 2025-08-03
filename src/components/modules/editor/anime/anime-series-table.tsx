@@ -139,19 +139,47 @@ export function AnimeSeriesTable({ onEdit, onMediaParts, searchTerm = '', select
 
   if (isFetching) {
     return (
-      <div className="space-y-4">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="glass-card p-4">
-            <div className="flex items-center space-x-4">
-              <Skeleton className="h-12 w-12 rounded" />
-              <div className="space-y-2 flex-1">
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
-              </div>
-              <Skeleton className="h-8 w-20" />
-            </div>
-          </div>
-        ))}
+      <div className="glass-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Kapak</TableHead>
+              <TableHead>ID</TableHead>
+              <TableHead>Başlık</TableHead>
+              <TableHead>Tip</TableHead>
+              <TableHead>Durum</TableHead>
+              <TableHead>İşlemler</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <TableRow key={i}>
+                <TableCell>
+                  <Skeleton className="h-16 w-12 rounded" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-12" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-[200px]" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Skeleton className="h-8 w-8 rounded" />
+                    <Skeleton className="h-8 w-8 rounded" />
+                    <Skeleton className="h-8 w-8 rounded" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     );
   }
@@ -200,6 +228,10 @@ export function AnimeSeriesTable({ onEdit, onMediaParts, searchTerm = '', select
                         width={48}
                         height={64}
                         className="rounded object-cover"
+                        unoptimized
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                     ) : (
                       <div className="w-12 h-16 bg-muted rounded flex items-center justify-center">
