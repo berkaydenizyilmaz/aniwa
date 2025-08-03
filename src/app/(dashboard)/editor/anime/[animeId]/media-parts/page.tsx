@@ -5,8 +5,8 @@ import { use } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { MediaPartTable } from '@/components/modules/editor/anime/media-part-table';
-import { MediaPartFormDialog } from '@/components/modules/editor/anime/media-part-form-dialog';
+import { MediaPartTable } from '@/components/modules/editor/anime/media-part/media-part-table';
+import { MediaPartFormDialog } from '@/components/modules/editor/anime/media-part/media-part-form-dialog';
 import { AnimeMediaPart } from '@prisma/client';
 import { ROUTES } from '@/lib/constants/routes.constants';
 

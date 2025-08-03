@@ -18,6 +18,7 @@ import { createAnimeMediaPartSchema, updateAnimeMediaPartSchema, type CreateAnim
 import { toast } from 'sonner';
 import { AnimeMediaPart } from '@prisma/client';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface MediaPartFormDialogProps {
   open: boolean;
@@ -31,7 +32,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
   const queryClient = useQueryClient();
 
   // Edit mode'da media part detaylarını getir
-  const { data: mediaPartData } = useQuery({
+  const { data: mediaPartData, isLoading: isLoadingMediaPart } = useQuery({
     queryKey: ['anime-media-part', mediaPart?.id],
     queryFn: async () => {
       if (!mediaPart?.id) return null;
@@ -145,7 +146,15 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {mediaPart && isLoadingMediaPart ? (
+          <div className="space-y-6">
+            <div className="text-center py-8">
+              <Skeleton className="h-4 w-32 mx-auto mb-2" />
+              <Skeleton className="h-4 w-48 mx-auto" />
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Başlık */}
           <div className="space-y-2">
             <Label htmlFor="title">Başlık *</Label>
@@ -282,6 +291,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
             </Button>
           </div>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );

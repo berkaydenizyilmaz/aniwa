@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { ImageUpload } from '@/components/ui/image-upload';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
   DialogContent,
@@ -58,7 +59,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
   });
 
   // Edit mode'da anime detaylarını getir
-  const { data: animeSeriesWithRelations } = useQuery({
+  const { data: animeSeriesWithRelations, isLoading: isLoadingAnimeSeries } = useQuery({
     queryKey: ['anime-series-with-relations', animeSeries?.id],
     queryFn: async () => {
       if (!animeSeries?.id) return null;
@@ -222,433 +223,442 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Başlık */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Başlık *</Label>
-            <Input
-              id="title"
-              {...register('title')}
-              placeholder="Anime başlığı"
-            />
-            {errors.title && (
-              <p className="text-sm text-destructive">{errors.title.message}</p>
-            )}
-          </div>
-
-          {/* İngilizce Başlık */}
-          <div className="space-y-2">
-            <Label htmlFor="englishTitle">İngilizce Başlık</Label>
-            <Input
-              id="englishTitle"
-              {...register('englishTitle')}
-              placeholder="English title"
-            />
-            {errors.englishTitle && (
-              <p className="text-sm text-destructive">{errors.englishTitle.message}</p>
-            )}
-          </div>
-
-          {/* Japonca Başlık */}
-          <div className="space-y-2">
-            <Label htmlFor="japaneseTitle">Japonca Başlık</Label>
-            <Input
-              id="japaneseTitle"
-              {...register('japaneseTitle')}
-              placeholder="日本語タイトル"
-            />
-            {errors.japaneseTitle && (
-              <p className="text-sm text-destructive">{errors.japaneseTitle.message}</p>
-            )}
-          </div>
-
-          {/* Özet */}
-          <div className="space-y-2">
-            <Label htmlFor="synopsis">Özet</Label>
-            <Textarea
-              id="synopsis"
-              {...register('synopsis')}
-              placeholder="Anime özeti..."
-              rows={4}
-            />
-            {errors.synopsis && (
-              <p className="text-sm text-destructive">{errors.synopsis.message}</p>
-            )}
-          </div>
-
-          {/* Tip ve Durum */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="type">Tip *</Label>
-              <Controller
-                name="type"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    onOpenChange={(open) => {
-                      if (!open && !field.value) {
-                        field.onBlur();
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Tip seçin" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(AnimeType).map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {ANIME.TYPE_LABELS[type]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.type && (
-                <p className="text-sm text-destructive">Tip seçin</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="status">Durum *</Label>
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    onOpenChange={(open) => {
-                      if (!open && !field.value) {
-                        field.onBlur();
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Durum seçin" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(AnimeStatus).map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {ANIME.STATUS_LABELS[status]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.status && (
-                <p className="text-sm text-destructive">Durum seçin</p>
-              )}
+        {animeSeries && isLoadingAnimeSeries ? (
+          <div className="space-y-6">
+            <div className="text-center py-8">
+              <Skeleton className="h-4 w-32 mx-auto mb-2" />
+              <Skeleton className="h-4 w-48 mx-auto" />
             </div>
           </div>
-
-          {/* Sezon ve Yıl */}
-          <div className="grid grid-cols-2 gap-4">
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Başlık */}
             <div className="space-y-2">
-              <Label htmlFor="season">Sezon</Label>
-              <Controller
-                name="season"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sezon seçin" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Sezon yok</SelectItem>
-                      {Object.values(Season).map((season) => (
-                        <SelectItem key={season} value={season}>
-                          {ANIME.SEASON_LABELS[season]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.season && (
-                <p className="text-sm text-destructive">{errors.season.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="year">Yıl</Label>
+              <Label htmlFor="title">Başlık *</Label>
               <Input
-                id="year"
-                type="number"
-                {...register('year', {
-                  setValueAs: (value) => value === '' ? undefined : Number(value)
-                })}
-                placeholder="2024"
-                min={1900}
-                max={2100}
+                id="title"
+                {...register('title')}
+                placeholder="Anime başlığı"
               />
-              {errors.year && (
-                <p className="text-sm text-destructive">{errors.year.message}</p>
+              {errors.title && (
+                <p className="text-sm text-destructive">{errors.title.message}</p>
               )}
             </div>
-          </div>
 
-          {/* Yayın Tarihi */}
-          <div className="space-y-2">
-            <Label htmlFor="releaseDate">Yayın Tarihi</Label>
-            <Input
-              id="releaseDate"
-              type="date"
-              {...register('releaseDate', {
-                setValueAs: (value) => value ? new Date(value) : undefined
-              })}
-            />
-            {errors.releaseDate && (
-              <p className="text-sm text-destructive">{errors.releaseDate.message}</p>
-            )}
-          </div>
-
-          {/* Kaynak */}
-          <div className="space-y-2">
-            <Label htmlFor="source">Kaynak</Label>
-            <Controller
-              name="source"
-              control={control}
-              render={({ field }) => (
-                <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Kaynak seçin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Kaynak yok</SelectItem>
-                    {Object.values(Source).map((source) => (
-                      <SelectItem key={source} value={source}>
-                        {ANIME.SOURCE_LABELS[source]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.source && (
-              <p className="text-sm text-destructive">{errors.source.message}</p>
-            )}
-          </div>
-
-          {/* Ülke ve Yetişkin İçerik */}
-          <div className="grid grid-cols-2 gap-4">
+            {/* İngilizce Başlık */}
             <div className="space-y-2">
-              <Label htmlFor="countryOfOrigin">Köken Ülke</Label>
+              <Label htmlFor="englishTitle">İngilizce Başlık</Label>
+              <Input
+                id="englishTitle"
+                {...register('englishTitle')}
+                placeholder="English title"
+              />
+              {errors.englishTitle && (
+                <p className="text-sm text-destructive">{errors.englishTitle.message}</p>
+              )}
+            </div>
+
+            {/* Japonca Başlık */}
+            <div className="space-y-2">
+              <Label htmlFor="japaneseTitle">Japonca Başlık</Label>
+              <Input
+                id="japaneseTitle"
+                {...register('japaneseTitle')}
+                placeholder="日本語タイトル"
+              />
+              {errors.japaneseTitle && (
+                <p className="text-sm text-destructive">{errors.japaneseTitle.message}</p>
+              )}
+            </div>
+
+            {/* Özet */}
+            <div className="space-y-2">
+              <Label htmlFor="synopsis">Özet</Label>
+              <Textarea
+                id="synopsis"
+                {...register('synopsis')}
+                placeholder="Anime özeti..."
+                rows={4}
+              />
+              {errors.synopsis && (
+                <p className="text-sm text-destructive">{errors.synopsis.message}</p>
+              )}
+            </div>
+
+            {/* Tip ve Durum */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="type">Tip *</Label>
+                <Controller
+                  name="type"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      onOpenChange={(open) => {
+                        if (!open && !field.value) {
+                          field.onBlur();
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Tip seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(AnimeType).map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {ANIME.TYPE_LABELS[type]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.type && (
+                  <p className="text-sm text-destructive">Tip seçin</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status">Durum *</Label>
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      onOpenChange={(open) => {
+                        if (!open && !field.value) {
+                          field.onBlur();
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Durum seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(AnimeStatus).map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {ANIME.STATUS_LABELS[status]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.status && (
+                  <p className="text-sm text-destructive">Durum seçin</p>
+                )}
+              </div>
+            </div>
+
+            {/* Sezon ve Yıl */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="season">Sezon</Label>
+                <Controller
+                  name="season"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sezon seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Sezon yok</SelectItem>
+                        {Object.values(Season).map((season) => (
+                          <SelectItem key={season} value={season}>
+                            {ANIME.SEASON_LABELS[season]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.season && (
+                  <p className="text-sm text-destructive">{errors.season.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="year">Yıl</Label>
+                <Input
+                  id="year"
+                  type="number"
+                  {...register('year', {
+                    setValueAs: (value) => value === '' ? undefined : Number(value)
+                  })}
+                  placeholder="2024"
+                  min={1900}
+                  max={2100}
+                />
+                {errors.year && (
+                  <p className="text-sm text-destructive">{errors.year.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Yayın Tarihi */}
+            <div className="space-y-2">
+              <Label htmlFor="releaseDate">Yayın Tarihi</Label>
+              <Input
+                id="releaseDate"
+                type="date"
+                {...register('releaseDate', {
+                  setValueAs: (value) => value ? new Date(value) : undefined
+                })}
+              />
+              {errors.releaseDate && (
+                <p className="text-sm text-destructive">{errors.releaseDate.message}</p>
+              )}
+            </div>
+
+            {/* Kaynak */}
+            <div className="space-y-2">
+              <Label htmlFor="source">Kaynak</Label>
               <Controller
-                name="countryOfOrigin"
+                name="source"
                 control={control}
                 render={({ field }) => (
                   <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Ülke seçin" />
+                      <SelectValue placeholder="Kaynak seçin" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">Ülke yok</SelectItem>
-                      {Object.values(CountryOfOrigin).map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {ANIME.COUNTRY_OF_ORIGIN_LABELS[country]}
+                      <SelectItem value="none">Kaynak yok</SelectItem>
+                      {Object.values(Source).map((source) => (
+                        <SelectItem key={source} value={source}>
+                          {ANIME.SOURCE_LABELS[source]}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 )}
               />
-              {errors.countryOfOrigin && (
-                <p className="text-sm text-destructive">{errors.countryOfOrigin.message}</p>
+              {errors.source && (
+                <p className="text-sm text-destructive">{errors.source.message}</p>
               )}
             </div>
 
+            {/* Ülke ve Yetişkin İçerik */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="countryOfOrigin">Köken Ülke</Label>
+                <Controller
+                  name="countryOfOrigin"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Ülke seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Ülke yok</SelectItem>
+                        {Object.values(CountryOfOrigin).map((country) => (
+                          <SelectItem key={country} value={country}>
+                            {ANIME.COUNTRY_OF_ORIGIN_LABELS[country]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.countryOfOrigin && (
+                  <p className="text-sm text-destructive">{errors.countryOfOrigin.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="isAdult">Yetişkin İçerik</Label>
+                <Controller
+                  name="isAdult"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="isAdult"
+                        checked={field.value || false}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                        className="h-4 w-4"
+                      />
+                      <Label htmlFor="isAdult" className="text-sm">18+ içerik</Label>
+                    </div>
+                  )}
+                />
+                {errors.isAdult && (
+                  <p className="text-sm text-destructive">{errors.isAdult.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Trailer URL */}
             <div className="space-y-2">
-              <Label htmlFor="isAdult">Yetişkin İçerik</Label>
+              <Label htmlFor="trailer">Trailer URL</Label>
+              <Input
+                id="trailer"
+                {...register('trailer')}
+                placeholder="https://www.youtube.com/watch?v=..."
+              />
+              {errors.trailer && (
+                <p className="text-sm text-destructive">{errors.trailer.message}</p>
+              )}
+            </div>
+
+            {/* Alternatif Başlıklar */}
+            <div className="space-y-2">
+              <Label htmlFor="synonyms">Alternatif Başlıklar</Label>
+              <Textarea
+                id="synonyms"
+                placeholder="Her satıra bir başlık yazın..."
+                rows={3}
+                onChange={(e) => {
+                  const lines = e.target.value.split('\n').filter(line => line.trim() !== '');
+                  setValue('synonyms', lines);
+                }}
+              />
+              {errors.synonyms && (
+                <p className="text-sm text-destructive">{errors.synonyms.message}</p>
+              )}
+            </div>
+
+            {/* Kapak Görseli */}
+            <div className="space-y-2">
               <Controller
-                name="isAdult"
+                name="coverImageFile"
                 control={control}
                 render={({ field }) => (
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="isAdult"
-                      checked={field.value || false}
-                      onChange={(e) => field.onChange(e.target.checked)}
-                      className="h-4 w-4"
-                    />
-                    <Label htmlFor="isAdult" className="text-sm">18+ içerik</Label>
-                  </div>
+                  <ImageUpload
+                    id="coverImage"
+                    label="Kapak Görseli"
+                    accept={UPLOAD_CONFIGS.ANIME_COVER.accept}
+                    maxSize={UPLOAD_CONFIGS.ANIME_COVER.maxSize}
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabled={createMutation.isPending || updateMutation.isPending}
+                  />
                 )}
               />
-              {errors.isAdult && (
-                <p className="text-sm text-destructive">{errors.isAdult.message}</p>
+              {errors.coverImageFile && (
+                <p className="text-sm text-destructive">{errors.coverImageFile.message}</p>
               )}
             </div>
-          </div>
 
-          {/* Trailer URL */}
-          <div className="space-y-2">
-            <Label htmlFor="trailer">Trailer URL</Label>
-            <Input
-              id="trailer"
-              {...register('trailer')}
-              placeholder="https://www.youtube.com/watch?v=..."
-            />
-            {errors.trailer && (
-              <p className="text-sm text-destructive">{errors.trailer.message}</p>
-            )}
-          </div>
-
-          {/* Alternatif Başlıklar */}
-          <div className="space-y-2">
-            <Label htmlFor="synonyms">Alternatif Başlıklar</Label>
-            <Textarea
-              id="synonyms"
-              placeholder="Her satıra bir başlık yazın..."
-              rows={3}
-              onChange={(e) => {
-                const lines = e.target.value.split('\n').filter(line => line.trim() !== '');
-                setValue('synonyms', lines);
-              }}
-            />
-            {errors.synonyms && (
-              <p className="text-sm text-destructive">{errors.synonyms.message}</p>
-            )}
-          </div>
-
-          {/* Kapak Görseli */}
-          <div className="space-y-2">
-            <Controller
-              name="coverImageFile"
-              control={control}
-              render={({ field }) => (
-                <ImageUpload
-                  id="coverImage"
-                  label="Kapak Görseli"
-                  accept={UPLOAD_CONFIGS.ANIME_COVER.accept}
-                  maxSize={UPLOAD_CONFIGS.ANIME_COVER.maxSize}
-                  value={field.value}
-                  onChange={field.onChange}
-                  disabled={createMutation.isPending || updateMutation.isPending}
-                />
+            {/* Banner Görseli */}
+            <div className="space-y-2">
+              <Controller
+                name="bannerImageFile"
+                control={control}
+                render={({ field }) => (
+                  <ImageUpload
+                    id="bannerImage"
+                    label="Banner Görseli"
+                    accept={UPLOAD_CONFIGS.ANIME_BANNER.accept}
+                    maxSize={UPLOAD_CONFIGS.ANIME_BANNER.maxSize}
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabled={createMutation.isPending || updateMutation.isPending}
+                  />
+                )}
+              />
+              {errors.bannerImageFile && (
+                <p className="text-sm text-destructive">{errors.bannerImageFile.message}</p>
               )}
-            />
-            {errors.coverImageFile && (
-              <p className="text-sm text-destructive">{errors.coverImageFile.message}</p>
-            )}
-          </div>
+            </div>
 
-          {/* Banner Görseli */}
-          <div className="space-y-2">
-            <Controller
-              name="bannerImageFile"
-              control={control}
-              render={({ field }) => (
-                <ImageUpload
-                  id="bannerImage"
-                  label="Banner Görseli"
-                  accept={UPLOAD_CONFIGS.ANIME_BANNER.accept}
-                  maxSize={UPLOAD_CONFIGS.ANIME_BANNER.maxSize}
-                  value={field.value}
-                  onChange={field.onChange}
-                  disabled={createMutation.isPending || updateMutation.isPending}
-                />
+            {/* Türler */}
+            <div className="space-y-2">
+              <Label>Türler</Label>
+              <Controller
+                name="genres"
+                control={control}
+                render={({ field }) => (
+                  <MultiSelect
+                    options={relations?.genres?.map(genre => ({
+                      id: genre.id,
+                      name: genre.name
+                    })) || []}
+                    selectedIds={field.value || []}
+                    onSelectionChange={field.onChange}
+                    placeholder="Tür seçin"
+                    searchPlaceholder="Tür ara..."
+                  />
+                )}
+              />
+              {errors.genres && (
+                <p className="text-sm text-destructive">{errors.genres.message}</p>
               )}
-            />
-            {errors.bannerImageFile && (
-              <p className="text-sm text-destructive">{errors.bannerImageFile.message}</p>
-            )}
-          </div>
+            </div>
 
-          {/* Türler */}
-          <div className="space-y-2">
-            <Label>Türler</Label>
-            <Controller
-              name="genres"
-              control={control}
-              render={({ field }) => (
-                <MultiSelect
-                  options={relations?.genres?.map(genre => ({
-                    id: genre.id,
-                    name: genre.name
-                  })) || []}
-                  selectedIds={field.value || []}
-                  onSelectionChange={field.onChange}
-                  placeholder="Tür seçin"
-                  searchPlaceholder="Tür ara..."
-                />
+            {/* Stüdyolar */}
+            <div className="space-y-2">
+              <Label>Stüdyolar</Label>
+              <Controller
+                name="studios"
+                control={control}
+                render={({ field }) => (
+                  <MultiSelect
+                    options={relations?.studios?.map(studio => ({
+                      id: studio.id,
+                      name: studio.name
+                    })) || []}
+                    selectedIds={field.value || []}
+                    onSelectionChange={field.onChange}
+                    placeholder="Stüdyo seçin"
+                    searchPlaceholder="Stüdyo ara..."
+                  />
+                )}
+              />
+              {errors.studios && (
+                <p className="text-sm text-destructive">{errors.studios.message}</p>
               )}
-            />
-            {errors.genres && (
-              <p className="text-sm text-destructive">{errors.genres.message}</p>
-            )}
-          </div>
+            </div>
 
-          {/* Stüdyolar */}
-          <div className="space-y-2">
-            <Label>Stüdyolar</Label>
-            <Controller
-              name="studios"
-              control={control}
-              render={({ field }) => (
-                <MultiSelect
-                  options={relations?.studios?.map(studio => ({
-                    id: studio.id,
-                    name: studio.name
-                  })) || []}
-                  selectedIds={field.value || []}
-                  onSelectionChange={field.onChange}
-                  placeholder="Stüdyo seçin"
-                  searchPlaceholder="Stüdyo ara..."
-                />
+            {/* Etiketler */}
+            <div className="space-y-2">
+              <Label>Etiketler</Label>
+              <Controller
+                name="tags"
+                control={control}
+                render={({ field }) => (
+                  <MultiSelect
+                    options={relations?.tags?.map(tag => ({
+                      id: tag.id,
+                      name: tag.name
+                    })) || []}
+                    selectedIds={field.value || []}
+                    onSelectionChange={field.onChange}
+                    placeholder="Etiket seçin"
+                    searchPlaceholder="Etiket ara..."
+                  />
+                )}
+              />
+              {errors.tags && (
+                <p className="text-sm text-destructive">{errors.tags.message}</p>
               )}
-            />
-            {errors.studios && (
-              <p className="text-sm text-destructive">{errors.studios.message}</p>
-            )}
-          </div>
+            </div>
 
-          {/* Etiketler */}
-          <div className="space-y-2">
-            <Label>Etiketler</Label>
-            <Controller
-              name="tags"
-              control={control}
-              render={({ field }) => (
-                <MultiSelect
-                  options={relations?.tags?.map(tag => ({
-                    id: tag.id,
-                    name: tag.name
-                  })) || []}
-                  selectedIds={field.value || []}
-                  onSelectionChange={field.onChange}
-                  placeholder="Etiket seçin"
-                  searchPlaceholder="Etiket ara..."
-                />
-              )}
-            />
-            {errors.tags && (
-              <p className="text-sm text-destructive">{errors.tags.message}</p>
-            )}
-          </div>
-
-          {/* Butonlar */}
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={createMutation.isPending || updateMutation.isPending}
-            >
-              İptal
-            </Button>
-            <Button
-              type="submit"
-              disabled={createMutation.isPending || updateMutation.isPending}
-            >
-              {animeSeries ? 'Güncelle' : 'Oluştur'}
-            </Button>
-          </div>
-        </form>
+            {/* Butonlar */}
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={createMutation.isPending || updateMutation.isPending}
+              >
+                İptal
+              </Button>
+              <Button
+                type="submit"
+                disabled={createMutation.isPending || updateMutation.isPending}
+              >
+                {animeSeries ? 'Güncelle' : 'Oluştur'}
+              </Button>
+            </div>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

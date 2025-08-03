@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { Episode } from '@prisma/client';
 import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface EpisodeFormDialogProps {
   open: boolean;
@@ -34,7 +35,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
   const queryClient = useQueryClient();
 
   // Edit mode'da episode detaylarını getir
-  const { data: episodeData } = useQuery({
+  const { data: episodeData, isLoading: isLoadingEpisode } = useQuery({
     queryKey: ['episode', episode?.id],
     queryFn: async () => {
       if (!episode?.id) return null;
@@ -146,7 +147,15 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {episode && isLoadingEpisode ? (
+          <div className="space-y-6">
+            <div className="text-center py-8">
+              <Skeleton className="h-4 w-32 mx-auto mb-2" />
+              <Skeleton className="h-4 w-48 mx-auto" />
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Bölüm Numarası */}
           <div className="space-y-2">
             <Label htmlFor="episodeNumber">Bölüm Numarası *</Label>
@@ -289,6 +298,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
             </Button>
           </div>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );
