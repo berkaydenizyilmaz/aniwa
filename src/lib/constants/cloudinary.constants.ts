@@ -6,6 +6,9 @@ export const CLOUDINARY = {
       COVERS: 'aniwa/anime/covers',
       BANNERS: 'aniwa/anime/banners'
     },
+    EPISODES: {
+      THUMBNAILS: 'aniwa/episodes/thumbnails'
+    },
     USERS: {
       AVATARS: 'aniwa/users/avatars',
       BANNERS: 'aniwa/users/banners'
@@ -29,6 +32,14 @@ export const UPLOAD_CONFIGS = {
     quality: 85,
     width: 1200,
     height: 400
+  },
+  EPISODE_THUMBNAIL: {
+    folder: CLOUDINARY.FOLDERS.EPISODES.THUMBNAILS,
+    maxSize: 5 * 1024 * 1024, // 5MB
+    accept: 'image/*',
+    quality: 80,
+    width: 400,
+    height: 225
   },
   USER_AVATAR: {
     folder: CLOUDINARY.FOLDERS.USERS.AVATARS,
