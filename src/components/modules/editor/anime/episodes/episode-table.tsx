@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Link } from 'lucide-react';
 import { Episode } from '@prisma/client';
 import { getEpisodeListAction, deleteEpisodeAction } from '@/lib/actions/editor/episode.action';
 import { toast } from 'sonner';
@@ -34,10 +34,11 @@ type EpisodeTableItem = GetEpisodeListResponse['episodes'][0];
 interface EpisodeTableProps {
   mediaPartId: string;
   onEdit?: (episode: Episode) => void;
+  onStreamingLinks?: (episode: Episode) => void;
   refreshKey?: number;
 }
 
-export function EpisodeTable({ mediaPartId, onEdit, refreshKey }: EpisodeTableProps) {
+export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey }: EpisodeTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEpisode, setSelectedEpisode] = useState<EpisodeTableItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -67,7 +68,7 @@ export function EpisodeTable({ mediaPartId, onEdit, refreshKey }: EpisodeTablePr
       toast.success('Episode başarıyla silindi!');
       setDeleteDialogOpen(false);
       setSelectedEpisode(null);
-      
+
       // Query'yi invalidate et
       queryClient.invalidateQueries({ queryKey: ['episodes'] });
     },
@@ -80,6 +81,11 @@ export function EpisodeTable({ mediaPartId, onEdit, refreshKey }: EpisodeTablePr
   const handleEdit = (episode: EpisodeTableItem) => {
     // Sadece id'yi geçir, form kendi verilerini yükleyecek
     onEdit?.({ id: episode.id } as Episode);
+  };
+
+  const handleStreamingLinks = (episode: EpisodeTableItem) => {
+    // Sadece id'yi geçir, streaming links sayfası kendi verilerini yükleyecek
+    onStreamingLinks?.({ id: episode.id } as Episode);
   };
 
   const handleDelete = (episode: EpisodeTableItem) => {
@@ -99,34 +105,34 @@ export function EpisodeTable({ mediaPartId, onEdit, refreshKey }: EpisodeTablePr
 
   const getPageNumbers = () => {
     if (!data) return [];
-    
+
     const totalPages = data.totalPages;
     const current = currentPage;
     const pages = [];
-    
+
     // İlk sayfa
     if (current > 1) {
       pages.push(1);
     }
-    
+
     // Önceki sayfalar
     for (let i = Math.max(2, current - 2); i < current; i++) {
       pages.push(i);
     }
-    
+
     // Mevcut sayfa
     pages.push(current);
-    
+
     // Sonraki sayfalar
     for (let i = current + 1; i <= Math.min(totalPages - 1, current + 2); i++) {
       pages.push(i);
     }
-    
+
     // Son sayfa
     if (current < totalPages) {
       pages.push(totalPages);
     }
-    
+
     return pages;
   };
 
@@ -262,6 +268,15 @@ export function EpisodeTable({ mediaPartId, onEdit, refreshKey }: EpisodeTablePr
                       title="Düzenle"
                     >
                       <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleStreamingLinks(episode)}
+                      className="h-8 w-8 p-0"
+                      title="Streaming Link'leri"
+                    >
+                      <Link className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost-destructive"
