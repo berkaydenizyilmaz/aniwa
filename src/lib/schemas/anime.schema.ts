@@ -86,6 +86,37 @@ export const updateAnimeMediaPartSchema = z.object({
   anilistPopularity: z.number().min(ANIME.POPULARITY.MIN).optional(),
 });
 
+// Episode oluşturma şeması
+export const createEpisodeSchema = z.object({
+  mediaPartId: z.string().min(1, 'Media part ID gerekli'),
+  episodeNumber: z.number().min(1, 'Bölüm numarası en az 1 olmalı').max(9999, 'Bölüm numarası çok yüksek'),
+  title: z.string().max(ANIME.TITLE.MAX_LENGTH, 'Bölüm başlığı çok uzun').optional(),
+  englishTitle: z.string().max(ANIME.TITLE.MAX_LENGTH, 'İngilizce başlık çok uzun').optional(),
+  japaneseTitle: z.string().max(ANIME.TITLE.MAX_LENGTH, 'Japonca başlık çok uzun').optional(),
+  description: z.string().max(ANIME.SYNOPSIS.MAX_LENGTH, 'Açıklama çok uzun').optional(),
+  thumbnailImageFile: z.instanceof(File).optional(),
+  airDate: z.date().optional(),
+  duration: z.number().min(1, 'Süre en az 1 dakika olmalı').max(1000, 'Süre çok yüksek').optional(),
+  isFiller: z.boolean().default(false),
+  fillerNotes: z.string().max(ANIME.SYNOPSIS.MAX_LENGTH, 'Filler notları çok uzun').optional(),
+  averageScore: z.number().min(ANIME.SCORE.MIN).max(ANIME.SCORE.MAX).optional(),
+});
+
+// Episode güncelleme şeması
+export const updateEpisodeSchema = z.object({
+  episodeNumber: z.number().min(1, 'Bölüm numarası en az 1 olmalı').max(9999, 'Bölüm numarası çok yüksek').optional(),
+  title: z.string().max(ANIME.TITLE.MAX_LENGTH, 'Bölüm başlığı çok uzun').optional(),
+  englishTitle: z.string().max(ANIME.TITLE.MAX_LENGTH, 'İngilizce başlık çok uzun').optional(),
+  japaneseTitle: z.string().max(ANIME.TITLE.MAX_LENGTH, 'Japonca başlık çok uzun').optional(),
+  description: z.string().max(ANIME.SYNOPSIS.MAX_LENGTH, 'Açıklama çok uzun').optional(),
+  thumbnailImageFile: z.instanceof(File).optional(),
+  airDate: z.date().optional(),
+  duration: z.number().min(1, 'Süre en az 1 dakika olmalı').max(1000, 'Süre çok yüksek').optional(),
+  isFiller: z.boolean().optional(),
+  fillerNotes: z.string().max(ANIME.SYNOPSIS.MAX_LENGTH, 'Filler notları çok uzun').optional(),
+  averageScore: z.number().min(ANIME.SCORE.MIN).max(ANIME.SCORE.MAX).optional(),
+});
+
 // Anime filtreleme şeması
 export const animeFiltersSchema = z.object({
   search: z.string().optional(),
@@ -106,4 +137,6 @@ export type CreateAnimeSeriesInput = z.infer<typeof createAnimeSeriesSchema>;
 export type UpdateAnimeSeriesInput = z.infer<typeof updateAnimeSeriesSchema>;
 export type CreateAnimeMediaPartInput = z.infer<typeof createAnimeMediaPartSchema>;
 export type UpdateAnimeMediaPartInput = z.infer<typeof updateAnimeMediaPartSchema>;
+export type CreateEpisodeInput = z.infer<typeof createEpisodeSchema>;
+export type UpdateEpisodeInput = z.infer<typeof updateEpisodeSchema>;
 export type AnimeFilters = z.infer<typeof animeFiltersSchema>; 

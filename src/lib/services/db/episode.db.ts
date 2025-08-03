@@ -20,10 +20,14 @@ export async function createEpisodeDB(
 // Episode getirme (ID ile)
 export async function findEpisodeByIdDB(
   id: string,
+  include?: Prisma.EpisodeInclude,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode | null> {
   try {
-    return await client.episode.findUnique({ where: { id } });
+    return await client.episode.findUnique({ 
+      where: { id },
+      include
+    });
   } catch (error) {
     handleDatabaseError(error, 'Episode ID ile bulma', { id });
   }
@@ -33,6 +37,7 @@ export async function findEpisodeByIdDB(
 export async function findEpisodeByNumberDB(
   mediaPartId: string,
   episodeNumber: number,
+  include?: Prisma.EpisodeInclude,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode | null> {
   try {
@@ -43,13 +48,7 @@ export async function findEpisodeByNumberDB(
           episodeNumber,
         },
       },
-      include: {
-        mediaPart: {
-          include: {
-            series: { select: { id: true, title: true, englishTitle: true } },
-          },
-        },
-      },
+      include,
     });
   } catch (error) {
     handleDatabaseError(error, 'Episode numara ile bulma', { mediaPartId, episodeNumber });
@@ -60,19 +59,14 @@ export async function findEpisodeByNumberDB(
 export async function findEpisodesByMediaPartIdDB(
   mediaPartId: string,
   orderBy?: Prisma.EpisodeOrderByWithRelationInput,
+  include?: Prisma.EpisodeInclude,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode[]> {
   try {
     return await client.episode.findMany({
       where: { mediaPartId },
       orderBy: orderBy || { episodeNumber: 'asc' },
-      include: {
-        mediaPart: {
-          include: {
-            series: { select: { id: true, title: true, englishTitle: true } },
-          },
-        },
-      },
+      include,
     });
   } catch (error) {
     handleDatabaseError(error, 'Episode medya parçası ID ile bulma', { mediaPartId, orderBy });
@@ -85,6 +79,7 @@ export async function findAllEpisodesDB(
   skip?: number,
   take?: number,
   orderBy?: Prisma.EpisodeOrderByWithRelationInput,
+  include?: Prisma.EpisodeInclude,
   client: PrismaClientOrTransaction = prisma
 ): Promise<Episode[]> {
   try {
@@ -93,13 +88,7 @@ export async function findAllEpisodesDB(
       skip,
       take,
       orderBy,
-      include: {
-        mediaPart: {
-          include: {
-            series: { select: { id: true, title: true, englishTitle: true } },
-          },
-        },
-      },
+      include,
     });
   } catch (error) {
     handleDatabaseError(error, 'Tüm episode\'ları listeleme', { where, skip, take, orderBy });

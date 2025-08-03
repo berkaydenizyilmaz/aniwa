@@ -106,6 +106,18 @@ export const EVENTS = {
     ANIME_MEDIA_PART_RETRIEVED: 'editor_anime_media_part_retrieved',
     ANIME_MEDIA_PART_UPDATED: 'editor_anime_media_part_updated',
     ANIME_MEDIA_PART_DELETED: 'editor_anime_media_part_deleted',
+    
+    // Episode Management
+    EPISODE_CREATED: 'editor_episode_created',
+    EPISODE_RETRIEVED: 'editor_episode_retrieved',
+    EPISODE_LIST_RETRIEVED: 'editor_episode_list_retrieved',
+    EPISODE_UPDATED: 'editor_episode_updated',
+    EPISODE_DELETED: 'editor_episode_deleted',
+    EPISODE_CREATE_FAILED: 'editor_episode_create_failed',
+    EPISODE_RETRIEVE_FAILED: 'editor_episode_retrieve_failed',
+    EPISODE_LIST_RETRIEVE_FAILED: 'editor_episode_list_retrieve_failed',
+    EPISODE_UPDATE_FAILED: 'editor_episode_update_failed',
+    EPISODE_DELETE_FAILED: 'editor_episode_delete_failed',
   },
   
   // System Events - Katmanlara göre organize

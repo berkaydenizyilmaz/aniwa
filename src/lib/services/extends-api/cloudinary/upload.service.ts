@@ -6,6 +6,10 @@ export interface UploadAnimeImagesResult {
   bannerImage?: CloudinaryUploadResult;
 }
 
+export interface UploadEpisodeThumbnailResult {
+  thumbnailImage?: CloudinaryUploadResult;
+}
+
 export interface UploadUserImagesResult {
   avatar?: CloudinaryUploadResult;
   banner?: CloudinaryUploadResult;
@@ -77,6 +81,29 @@ export class UploadService {
       }
       if (result.banner) {
         await CloudinaryService.deleteFile(result.banner.publicId);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Episode thumbnail yükle
+   */
+  static async uploadEpisodeThumbnail(
+    thumbnailFile: File,
+    mediaPartId: string
+  ): Promise<UploadEpisodeThumbnailResult> {
+    const result: UploadEpisodeThumbnailResult = {};
+
+    try {
+      const buffer = Buffer.from(await thumbnailFile.arrayBuffer());
+      result.thumbnailImage = await CloudinaryService.uploadEpisodeThumbnail(buffer, mediaPartId);
+
+      return result;
+    } catch (error) {
+      // Hata durumunda yüklenen dosyaları temizle
+      if (result.thumbnailImage) {
+        await CloudinaryService.deleteFile(result.thumbnailImage.publicId);
       }
       throw error;
     }

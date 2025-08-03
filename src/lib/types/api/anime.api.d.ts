@@ -1,11 +1,13 @@
 // Anime API response tipleri
 
-import { AnimeSeries, AnimeMediaPart, Genre, Studio, Tag, AnimeType, AnimeStatus } from '@prisma/client';
+import { AnimeSeries, AnimeMediaPart, Genre, Studio, Tag, AnimeType, AnimeStatus, Episode } from '@prisma/client';
 import { 
   CreateAnimeSeriesInput, 
   UpdateAnimeSeriesInput, 
   CreateAnimeMediaPartInput, 
   UpdateAnimeMediaPartInput, 
+  CreateEpisodeInput,
+  UpdateEpisodeInput,
   AnimeFilters 
 } from '@/lib/schemas/anime.schema';
 
@@ -38,6 +40,20 @@ export interface GetAnimeSeriesRelationsResponse {
 export type CreateAnimeMediaPartResponse = AnimeMediaPart;
 export type GetAnimeMediaPartResponse = AnimeMediaPart;
 export type UpdateAnimeMediaPartResponse = AnimeMediaPart;
+
+// Episode API response tipleri
+export type CreateEpisodeResponse = Episode;
+export type GetEpisodeResponse = Episode;
+export type UpdateEpisodeResponse = Episode;
+
+// Episode listesi response tipi
+export interface GetEpisodeListResponse {
+  episodes: Episode[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
 // Anime Series listesi response tipi
 export interface GetAnimeSeriesListResponse {
@@ -74,5 +90,8 @@ export type CreateAnimeSeriesRequest = CreateAnimeSeriesInput;
 export type UpdateAnimeSeriesRequest = UpdateAnimeSeriesInput;
 export type CreateAnimeMediaPartRequest = CreateAnimeMediaPartInput;
 export type UpdateAnimeMediaPartRequest = UpdateAnimeMediaPartInput;
+export type CreateEpisodeRequest = CreateEpisodeInput;
+export type UpdateEpisodeRequest = UpdateEpisodeInput;
 export type GetAnimeSeriesRequest = AnimeFilters;
-export type GetAnimeMediaPartsRequest = AnimeFilters; 
+export type GetAnimeMediaPartsRequest = AnimeFilters;
+export type GetEpisodeListRequest = AnimeFilters; 

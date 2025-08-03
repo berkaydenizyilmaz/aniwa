@@ -141,16 +141,36 @@ export class CloudinaryService {
     animeId: string,
     timestamp: number = Date.now()
   ): Promise<CloudinaryUploadResult> {
-    const publicId = `aniwa/anime/banners/${animeId}_${timestamp}`;
-    
     return this.uploadFile(file, {
-      folder: 'aniwa/anime/banners',
-      publicId,
+      folder: 'anime/banners',
+      publicId: `anime_banner_${animeId}_${timestamp}`,
       transformation: {
         width: 1200,
         height: 400,
         crop: 'fill',
         quality: 'auto',
+        format: 'webp',
+      },
+    });
+  }
+
+  /**
+   * Episode thumbnail yükleme
+   */
+  static async uploadEpisodeThumbnail(
+    file: Buffer,
+    mediaPartId: string,
+    timestamp: number = Date.now()
+  ): Promise<CloudinaryUploadResult> {
+    return this.uploadFile(file, {
+      folder: 'episodes/thumbnails',
+      publicId: `episode_thumbnail_${mediaPartId}_${timestamp}`,
+      transformation: {
+        width: 400,
+        height: 225,
+        crop: 'fill',
+        quality: 'auto',
+        format: 'webp',
       },
     });
   }

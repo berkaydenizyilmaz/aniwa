@@ -1,0 +1,303 @@
+// Episode business logic
+
+import { 
+  createEpisodeDB, 
+  findEpisodeByIdDB, 
+  findEpisodesByMediaPartIdDB, 
+  updateEpisodeDB, 
+  deleteEpisodeDB,
+  findEpisodeByNumberDB,
+  countEpisodesDB
+} from '@/lib/services/db/episode.db';
+import { findAnimeMediaPartByIdDB } from '@/lib/services/db/mediaPart.db';
+import { UploadService } from '@/lib/services/extends-api/cloudinary/upload.service';
+import { 
+  CreateEpisodeRequest, 
+  UpdateEpisodeRequest,
+  GetEpisodeListResponse,
+  GetEpisodeResponse,
+  CreateEpisodeResponse,
+  UpdateEpisodeResponse
+} from '@/lib/types/api/anime.api';
+import { ApiResponse } from '@/lib/types/api/index';
+import { BusinessError, NotFoundError } from '@/lib/errors';
+import { logger } from '@/lib/utils/logger';
+import { EVENTS } from '@/lib/constants/events.constants';
+
+// Episode oluşturma
+export async function createEpisodeBusiness(
+  data: CreateEpisodeRequest & { thumbnailImageFile?: File },
+  userId: string
+): Promise<ApiResponse<CreateEpisodeResponse>> {
+  try {
+    // Media part'ın var olduğunu kontrol et
+    const mediaPart = await findAnimeMediaPartByIdDB(data.mediaPartId);
+    if (!mediaPart) {
+      throw new NotFoundError('Media part bulunamadı');
+    }
+
+    // Episode numarasının benzersiz olduğunu kontrol et
+    const existingEpisode = await findEpisodeByNumberDB(data.mediaPartId, data.episodeNumber);
+    if (existingEpisode) {
+      throw new BusinessError('Bu episode numarası zaten kullanılıyor');
+    }
+
+    const { thumbnailImageFile, ...formData } = data;
+    let uploadResult;
+    
+    if (thumbnailImageFile) {
+      uploadResult = await UploadService.uploadEpisodeThumbnail(thumbnailImageFile, data.mediaPartId);
+    }
+
+    const result = await createEpisodeDB({
+      mediaPart: { connect: { id: formData.mediaPartId } },
+      episodeNumber: formData.episodeNumber,
+      title: formData.title,
+      englishTitle: formData.englishTitle,
+      japaneseTitle: formData.japaneseTitle,
+      description: formData.description,
+      thumbnailImage: uploadResult?.thumbnailImage?.secureUrl,
+      airDate: formData.airDate,
+      duration: formData.duration,
+      isFiller: formData.isFiller,
+      fillerNotes: formData.fillerNotes,
+      averageScore: formData.averageScore,
+    });
+
+    // Başarılı oluşturma logu
+    await logger.info(
+      EVENTS.EDITOR.EPISODE_CREATED,
+      'Episode başarıyla oluşturuldu',
+      { 
+        episodeId: result.id,
+        mediaPartId: result.mediaPartId,
+        episodeNumber: result.episodeNumber,
+        hasThumbnail: !!uploadResult?.thumbnailImage
+      },
+      userId
+    );
+
+    return { success: true, data: result };
+  } catch (error) {
+    await logger.error(
+      EVENTS.EDITOR.EPISODE_CREATE_FAILED,
+      'Episode oluşturma hatası',
+      { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        mediaPartId: data.mediaPartId,
+        episodeNumber: data.episodeNumber
+      },
+      userId
+    );
+    throw error;
+  }
+}
+
+// Episode getirme
+export async function getEpisodeBusiness(
+  id: string,
+  userId: string
+): Promise<ApiResponse<GetEpisodeResponse>> {
+  try {
+    const episode = await findEpisodeByIdDB(id);
+    if (!episode) {
+      throw new NotFoundError('Episode bulunamadı');
+    }
+
+    await logger.info(
+      EVENTS.EDITOR.EPISODE_RETRIEVED,
+      'Episode başarıyla getirildi',
+      { 
+        episodeId: episode.id,
+        mediaPartId: episode.mediaPartId
+      },
+      userId
+    );
+
+    return { success: true, data: episode };
+  } catch (error) {
+    await logger.error(
+      EVENTS.EDITOR.EPISODE_RETRIEVE_FAILED,
+      'Episode getirme hatası',
+      { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        episodeId: id
+      },
+      userId
+    );
+    throw error;
+  }
+}
+
+// Episode listesi getirme
+export async function getEpisodeListBusiness(
+  mediaPartId: string,
+  page: number = 1,
+  limit: number = 10,
+  userId: string
+): Promise<ApiResponse<GetEpisodeListResponse>> {
+  try {
+    // Media part'ın var olduğunu kontrol et
+    const mediaPart = await findAnimeMediaPartByIdDB(mediaPartId);
+    if (!mediaPart) {
+      throw new NotFoundError('Media part bulunamadı');
+    }
+    
+    const [episodes, total] = await Promise.all([
+      findEpisodesByMediaPartIdDB(mediaPartId, { episodeNumber: 'asc' }),
+      countEpisodesDB({ mediaPartId }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    await logger.info(
+      EVENTS.EDITOR.EPISODE_LIST_RETRIEVED,
+      'Episode listesi başarıyla getirildi',
+      { 
+        mediaPartId,
+        count: episodes.length,
+        total,
+        page,
+        limit
+      },
+      userId
+    );
+
+    return {
+      success: true,
+      data: {
+        episodes,
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
+  } catch (error) {
+    await logger.error(
+      EVENTS.EDITOR.EPISODE_LIST_RETRIEVE_FAILED,
+      'Episode listesi getirme hatası',
+      { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        mediaPartId,
+        page,
+        limit
+      },
+      userId
+    );
+    throw error;
+  }
+}
+
+// Episode güncelleme
+export async function updateEpisodeBusiness(
+  id: string,
+  data: UpdateEpisodeRequest & { thumbnailImageFile?: File },
+  userId: string
+): Promise<ApiResponse<UpdateEpisodeResponse>> {
+  try {
+    const existingEpisode = await findEpisodeByIdDB(id);
+    if (!existingEpisode) {
+      throw new NotFoundError('Episode bulunamadı');
+    }
+
+    // Episode numarası değişiyorsa benzersizlik kontrolü yap
+    if (data.episodeNumber && data.episodeNumber !== existingEpisode.episodeNumber) {
+      const existingEpisodeWithNumber = await findEpisodeByNumberDB(
+        existingEpisode.mediaPartId,
+        data.episodeNumber
+      );
+      if (existingEpisodeWithNumber) {
+        throw new BusinessError('Bu episode numarası zaten kullanılıyor');
+      }
+    }
+
+    const { thumbnailImageFile, ...formData } = data;
+    let uploadResult;
+    
+    if (thumbnailImageFile) {
+      uploadResult = await UploadService.uploadEpisodeThumbnail(thumbnailImageFile, existingEpisode.mediaPartId);
+    }
+
+    const result = await updateEpisodeDB(
+      { id },
+      {
+        ...(formData.episodeNumber && { episodeNumber: formData.episodeNumber }),
+        ...(formData.title && { title: formData.title }),
+        ...(formData.englishTitle !== undefined && { englishTitle: formData.englishTitle }),
+        ...(formData.japaneseTitle !== undefined && { japaneseTitle: formData.japaneseTitle }),
+        ...(formData.description !== undefined && { description: formData.description }),
+        ...(uploadResult?.thumbnailImage && { thumbnailImage: uploadResult.thumbnailImage.secureUrl }),
+        ...(formData.airDate && { airDate: formData.airDate }),
+        ...(formData.duration && { duration: formData.duration }),
+        ...(formData.isFiller !== undefined && { isFiller: formData.isFiller }),
+        ...(formData.fillerNotes !== undefined && { fillerNotes: formData.fillerNotes }),
+        ...(formData.averageScore && { averageScore: formData.averageScore }),
+      }
+    );
+
+    await logger.info(
+      EVENTS.EDITOR.EPISODE_UPDATED,
+      'Episode başarıyla güncellendi',
+      { 
+        episodeId: result.id,
+        mediaPartId: result.mediaPartId,
+        episodeNumber: result.episodeNumber,
+        hasThumbnail: !!uploadResult?.thumbnailImage
+      },
+      userId
+    );
+
+    return { success: true, data: result };
+  } catch (error) {
+    await logger.error(
+      EVENTS.EDITOR.EPISODE_UPDATE_FAILED,
+      'Episode güncelleme hatası',
+      { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        episodeId: id
+      },
+      userId
+    );
+    throw error;
+  }
+}
+
+// Episode silme
+export async function deleteEpisodeBusiness(
+  id: string,
+  userId: string
+): Promise<ApiResponse<{ success: boolean }>> {
+  try {
+    const existingEpisode = await findEpisodeByIdDB(id);
+    if (!existingEpisode) {
+      throw new NotFoundError('Episode bulunamadı');
+    }
+
+    await deleteEpisodeDB({ id });
+
+    await logger.info(
+      EVENTS.EDITOR.EPISODE_DELETED,
+      'Episode başarıyla silindi',
+      { 
+        episodeId: id,
+        mediaPartId: existingEpisode.mediaPartId,
+        episodeNumber: existingEpisode.episodeNumber
+      },
+      userId
+    );
+
+    return { success: true, data: { success: true } };
+  } catch (error) {
+    await logger.error(
+      EVENTS.EDITOR.EPISODE_DELETE_FAILED,
+      'Episode silme hatası',
+      { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        episodeId: id
+      },
+      userId
+    );
+    throw error;
+  }
+} 
