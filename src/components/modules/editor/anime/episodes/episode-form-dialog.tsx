@@ -61,14 +61,11 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
       mediaPartId: mediaPartId,
       episodeNumber: undefined,
       title: '',
-      englishTitle: '',
-      japaneseTitle: '',
       description: '',
       airDate: undefined,
       duration: undefined,
       isFiller: false,
       fillerNotes: '',
-      averageScore: undefined,
     }
   });
 
@@ -77,28 +74,22 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
     if (episodeData && episode) {
       setValue('episodeNumber', episodeData.episodeNumber);
       setValue('title', episodeData.title || '');
-      setValue('englishTitle', episodeData.englishTitle || '');
-      setValue('japaneseTitle', episodeData.japaneseTitle || '');
       setValue('description', episodeData.description || '');
       setValue('airDate', episodeData.airDate || undefined);
       setValue('duration', episodeData.duration || undefined);
       setValue('isFiller', episodeData.isFiller);
       setValue('fillerNotes', episodeData.fillerNotes || '');
-      setValue('averageScore', episodeData.averageScore || undefined);
     } else {
       // Create mode'da form'u temizle
       reset({
         mediaPartId: mediaPartId,
         episodeNumber: undefined,
         title: '',
-        englishTitle: '',
-        japaneseTitle: '',
         description: '',
         airDate: undefined,
         duration: undefined,
         isFiller: false,
         fillerNotes: '',
-        averageScore: undefined,
       });
     }
   }, [episodeData, episode, setValue, reset, mediaPartId]);
@@ -181,32 +172,6 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
             />
             {errors.title && (
               <p className="text-sm text-destructive">{errors.title.message}</p>
-            )}
-          </div>
-
-          {/* İngilizce Başlık */}
-          <div className="space-y-2">
-            <Label htmlFor="englishTitle">İngilizce Başlık</Label>
-            <Input
-              id="englishTitle"
-              {...register('englishTitle')}
-              placeholder="English title"
-            />
-            {errors.englishTitle && (
-              <p className="text-sm text-destructive">{errors.englishTitle.message}</p>
-            )}
-          </div>
-
-          {/* Japonca Başlık */}
-          <div className="space-y-2">
-            <Label htmlFor="japaneseTitle">Japonca Başlık</Label>
-            <Input
-              id="japaneseTitle"
-              {...register('japaneseTitle')}
-              placeholder="日本語タイトル"
-            />
-            {errors.japaneseTitle && (
-              <p className="text-sm text-destructive">{errors.japaneseTitle.message}</p>
             )}
           </div>
 
@@ -304,23 +269,6 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
             />
             {errors.fillerNotes && (
               <p className="text-sm text-destructive">{errors.fillerNotes.message}</p>
-            )}
-          </div>
-
-          {/* Puan */}
-          <div className="space-y-2">
-            <Label htmlFor="averageScore">Puan</Label>
-            <Input
-              id="averageScore"
-              type="number"
-              step="0.1"
-              {...register('averageScore', { valueAsNumber: true })}
-              placeholder="8.5"
-              min="0"
-              max="10"
-            />
-            {errors.averageScore && (
-              <p className="text-sm text-destructive">{errors.averageScore.message}</p>
             )}
           </div>
 

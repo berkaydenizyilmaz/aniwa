@@ -56,17 +56,11 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
     defaultValues: {
       seriesId: seriesId,
       title: '',
-      englishTitle: '',
-      japaneseTitle: '',
       displayOrder: undefined,
       notes: '',
       episodes: undefined,
-      duration: undefined,
-      releaseDate: undefined,
       anilistId: undefined,
       malId: undefined,
-      averageScore: undefined,
-      popularity: undefined,
       anilistAverageScore: undefined,
       anilistPopularity: undefined,
     }
@@ -76,38 +70,26 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
   useEffect(() => {
     if (mediaPartData && mediaPart) {
       setValue('title', mediaPartData.title);
-      setValue('englishTitle', mediaPartData.englishTitle || '');
-      setValue('japaneseTitle', mediaPartData.japaneseTitle || '');
       setValue('displayOrder', mediaPartData.displayOrder || undefined);
       setValue('notes', mediaPartData.notes || '');
       setValue('episodes', mediaPartData.episodes || undefined);
-      setValue('duration', mediaPartData.duration || undefined);
-      setValue('releaseDate', mediaPartData.releaseDate || undefined);
       setValue('anilistId', mediaPartData.anilistId || undefined);
       setValue('malId', mediaPartData.malId || undefined);
-      setValue('averageScore', mediaPartData.averageScore || undefined);
-      setValue('popularity', mediaPartData.popularity || undefined);
       setValue('anilistAverageScore', mediaPartData.anilistAverageScore || undefined);
       setValue('anilistPopularity', mediaPartData.anilistPopularity || undefined);
     } else {
-      // Create mode'da form'u temizle
-      reset({
-        seriesId: seriesId,
-        title: '',
-        englishTitle: '',
-        japaneseTitle: '',
-        displayOrder: undefined,
-        notes: '',
-        episodes: undefined,
-        duration: undefined,
-        releaseDate: undefined,
-        anilistId: undefined,
-        malId: undefined,
-        averageScore: undefined,
-        popularity: undefined,
-        anilistAverageScore: undefined,
-        anilistPopularity: undefined,
-      });
+             // Create mode'da form'u temizle
+       reset({
+         seriesId: seriesId,
+         title: '',
+         displayOrder: undefined,
+         notes: '',
+         episodes: undefined,
+         anilistId: undefined,
+         malId: undefined,
+         anilistAverageScore: undefined,
+         anilistPopularity: undefined,
+       });
     }
   }, [mediaPartData, mediaPart, setValue, reset, seriesId]);
 
@@ -177,32 +159,6 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
             )}
           </div>
 
-          {/* İngilizce Başlık */}
-          <div className="space-y-2">
-            <Label htmlFor="englishTitle">İngilizce Başlık</Label>
-            <Input
-              id="englishTitle"
-              {...register('englishTitle')}
-              placeholder="English title"
-            />
-            {errors.englishTitle && (
-              <p className="text-sm text-destructive">{errors.englishTitle.message}</p>
-            )}
-          </div>
-
-          {/* Japonca Başlık */}
-          <div className="space-y-2">
-            <Label htmlFor="japaneseTitle">Japonca Başlık</Label>
-            <Input
-              id="japaneseTitle"
-              {...register('japaneseTitle')}
-              placeholder="日本語タイトル"
-            />
-            {errors.japaneseTitle && (
-              <p className="text-sm text-destructive">{errors.japaneseTitle.message}</p>
-            )}
-          </div>
-
           {/* İzleme Sırası */}
           <div className="space-y-2">
             <Label htmlFor="displayOrder">İzleme Sırası</Label>
@@ -232,47 +188,18 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
             )}
           </div>
 
-          {/* Bölüm Sayısı ve Süre */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="episodes">Bölüm Sayısı</Label>
-              <Input
-                id="episodes"
-                type="number"
-                {...register('episodes', { valueAsNumber: true })}
-                placeholder="12"
-                min="1"
-              />
-              {errors.episodes && (
-                <p className="text-sm text-destructive">{errors.episodes.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="duration">Süre (dakika)</Label>
-              <Input
-                id="duration"
-                type="number"
-                {...register('duration', { valueAsNumber: true })}
-                placeholder="24"
-                min="1"
-              />
-              {errors.duration && (
-                <p className="text-sm text-destructive">{errors.duration.message}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Yayın Tarihi */}
+          {/* Bölüm Sayısı */}
           <div className="space-y-2">
-            <Label htmlFor="releaseDate">Yayın Tarihi</Label>
+            <Label htmlFor="episodes">Bölüm Sayısı</Label>
             <Input
-              id="releaseDate"
-              type="date"
-              {...register('releaseDate', { valueAsDate: true })}
+              id="episodes"
+              type="number"
+              {...register('episodes', { valueAsNumber: true })}
+              placeholder="12"
+              min="1"
             />
-            {errors.releaseDate && (
-              <p className="text-sm text-destructive">{errors.releaseDate.message}</p>
+            {errors.episodes && (
+              <p className="text-sm text-destructive">{errors.episodes.message}</p>
             )}
           </div>
 
@@ -301,39 +228,6 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
               />
               {errors.malId && (
                 <p className="text-sm text-destructive">{errors.malId.message}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Puanlar */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="averageScore">Aniwa Puanı</Label>
-              <Input
-                id="averageScore"
-                type="number"
-                step="0.1"
-                {...register('averageScore', { valueAsNumber: true })}
-                placeholder="8.5"
-                min="0"
-                max="10"
-              />
-              {errors.averageScore && (
-                <p className="text-sm text-destructive">{errors.averageScore.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="popularity">Aniwa Popülerlik</Label>
-              <Input
-                id="popularity"
-                type="number"
-                {...register('popularity', { valueAsNumber: true })}
-                placeholder="1000"
-                min="0"
-              />
-              {errors.popularity && (
-                <p className="text-sm text-destructive">{errors.popularity.message}</p>
               )}
             </div>
           </div>

@@ -55,17 +55,11 @@ export async function createAnimeMediaPartBusiness(
     // Anime medya parçası oluştur
     const result = await createAnimeMediaPartDB({
       title: data.title,
-      englishTitle: data.englishTitle,
-      japaneseTitle: data.japaneseTitle,
       displayOrder: data.displayOrder,
       notes: data.notes,
       episodes: data.episodes,
-      duration: data.duration,
-      releaseDate: data.releaseDate,
       anilistId: data.anilistId,
       malId: data.malId,
-      averageScore: data.averageScore,
-      popularity: data.popularity,
       anilistAverageScore: data.anilistAverageScore,
       anilistPopularity: data.anilistPopularity,
       // İlişki
@@ -81,7 +75,6 @@ export async function createAnimeMediaPartBusiness(
         seriesId: result.seriesId,
         title: result.title,
         episodes: result.episodes,
-        duration: result.duration,
         hasCoverImage: !!uploadResult?.coverImage,
         hasBannerImage: !!uploadResult?.bannerImage
       },
@@ -130,7 +123,6 @@ export async function getAnimeMediaPartBusiness(
         seriesId: mediaPart.seriesId,
         title: mediaPart.title,
         episodes: mediaPart.episodes,
-        duration: mediaPart.duration
       },
       userId
     );
@@ -182,8 +174,6 @@ export async function getAnimeMediaPartListBusiness(
     if (filters?.search) {
       where.OR = [
         { title: { contains: filters.search, mode: 'insensitive' } },
-        { englishTitle: { contains: filters.search, mode: 'insensitive' } },
-        { japaneseTitle: { contains: filters.search, mode: 'insensitive' } },
       ];
     }
 
@@ -260,17 +250,11 @@ export async function updateAnimeMediaPartBusiness(
     // Anime medya parçası güncelle
     const result = await updateAnimeMediaPartDB({ id }, {
       title: data.title,
-      englishTitle: data.englishTitle,
-      japaneseTitle: data.japaneseTitle,
       displayOrder: data.displayOrder,
       notes: data.notes,
       episodes: data.episodes,
-      duration: data.duration,
-      releaseDate: data.releaseDate,
       anilistId: data.anilistId,
       malId: data.malId,
-      averageScore: data.averageScore,
-      popularity: data.popularity,
       anilistAverageScore: data.anilistAverageScore,
       anilistPopularity: data.anilistPopularity,
     });
@@ -284,7 +268,6 @@ export async function updateAnimeMediaPartBusiness(
         seriesId: result.seriesId,
         title: result.title,
         episodes: result.episodes,
-        duration: result.duration,
         oldTitle: existingMediaPart.title,
         hasNewCoverImage: !!uploadResult?.coverImage,
         hasNewBannerImage: !!uploadResult?.bannerImage
@@ -337,8 +320,7 @@ export async function deleteAnimeMediaPartBusiness(
         mediaPartId: existingMediaPart.id, 
         seriesId: existingMediaPart.seriesId,
         title: existingMediaPart.title,
-        episodes: existingMediaPart.episodes,
-        duration: existingMediaPart.duration
+        episodes: existingMediaPart.episodes
       },
       userId
     );

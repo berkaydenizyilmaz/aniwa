@@ -53,15 +53,12 @@ export async function createEpisodeBusiness(
       mediaPart: { connect: { id: formData.mediaPartId } },
       episodeNumber: formData.episodeNumber,
       title: formData.title,
-      englishTitle: formData.englishTitle,
-      japaneseTitle: formData.japaneseTitle,
       description: formData.description,
       thumbnailImage: uploadResult?.thumbnailImage?.secureUrl,
       airDate: formData.airDate,
       duration: formData.duration,
       isFiller: formData.isFiller,
       fillerNotes: formData.fillerNotes,
-      averageScore: formData.averageScore,
     });
 
     // Başarılı oluşturma logu
@@ -224,15 +221,12 @@ export async function updateEpisodeBusiness(
       {
         ...(formData.episodeNumber && { episodeNumber: formData.episodeNumber }),
         ...(formData.title && { title: formData.title }),
-        ...(formData.englishTitle !== undefined && { englishTitle: formData.englishTitle }),
-        ...(formData.japaneseTitle !== undefined && { japaneseTitle: formData.japaneseTitle }),
         ...(formData.description !== undefined && { description: formData.description }),
         ...(uploadResult?.thumbnailImage && { thumbnailImage: uploadResult.thumbnailImage.secureUrl }),
         ...(formData.airDate && { airDate: formData.airDate }),
         ...(formData.duration && { duration: formData.duration }),
         ...(formData.isFiller !== undefined && { isFiller: formData.isFiller }),
         ...(formData.fillerNotes !== undefined && { fillerNotes: formData.fillerNotes }),
-        ...(formData.averageScore && { averageScore: formData.averageScore }),
       }
     );
 

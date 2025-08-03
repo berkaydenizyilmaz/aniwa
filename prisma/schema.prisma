@@ -425,8 +425,6 @@ model AnimeMediaPart {
   
   // Temel Bilgiler
   title             String            // Parçanın başlığı
-  englishTitle      String?
-  japaneseTitle     String?
   displayOrder      Int?              // İzleme sırası
   notes             String?           @db.String // Ek notlar
   episodes          Int?              // Bölüm sayısı
@@ -464,8 +462,6 @@ model Episode {
   // Bölüm Bilgileri
   episodeNumber     Int             // Bölüm numarası
   title             String?         // Bölüm başlığı
-  englishTitle      String?
-  japaneseTitle     String?
   description       String?         // Bölüm açıklaması
   thumbnailImage    String?         // Bölüm görseli
   airDate           DateTime?       // Yayın tarihi
