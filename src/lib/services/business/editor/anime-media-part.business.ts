@@ -1,16 +1,19 @@
 // Anime Media Part iş mantığı katmanı
 
 import { 
-  BusinessError,  
+  BusinessError, 
   NotFoundError,
   DatabaseError
 } from '@/lib/errors';
 import { 
   createAnimeMediaPartDB, 
   findAnimeMediaPartByIdDB, 
+  findAllAnimeMediaPartsDB,
   updateAnimeMediaPartDB, 
   deleteAnimeMediaPartDB,
+  countAnimeMediaPartsDB,
 } from '@/lib/services/db/mediaPart.db';
+import { findAnimeSeriesByIdDB } from '@/lib/services/db/anime.db';
 import { Prisma } from '@prisma/client';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
@@ -18,24 +21,39 @@ import { ApiResponse } from '@/lib/types/api';
 import { 
   CreateAnimeMediaPartResponse, 
   GetAnimeMediaPartResponse, 
+  GetAnimeMediaPartsResponse, 
   UpdateAnimeMediaPartResponse,
   CreateAnimeMediaPartRequest,
   UpdateAnimeMediaPartRequest,
+  GetAnimeMediaPartsRequest,
 } from '@/lib/types/api/anime.api';
+import { UploadService } from '@/lib/services/extends-api/cloudinary/upload.service';
 
 // =============================================================================
 // ANIME MEDIA PART CRUD FUNCTIONS
 // =============================================================================
 
-// Anime media part oluşturma
+// Anime medya parçası oluşturma
 export async function createAnimeMediaPartBusiness(
-  data: CreateAnimeMediaPartRequest,
-  userId: string,
+  data: CreateAnimeMediaPartRequest & { coverImageFile?: File; bannerImageFile?: File },
+  userId: string
 ): Promise<ApiResponse<CreateAnimeMediaPartResponse>> {
   try {
-    // Anime media part oluştur
+    // Anime serisi mevcut mu kontrolü
+    const animeSeries = await findAnimeSeriesByIdDB(data.seriesId);
+    if (!animeSeries) {
+      throw new NotFoundError('Anime serisi bulunamadı');
+    }
+    
+    // Resim yükleme işlemi
+    let uploadResult;
+    if (data.coverImageFile || data.bannerImageFile) {
+      // Geçici ID ile resim yükle
+      uploadResult = await UploadService.uploadAnimeImages(data.coverImageFile, data.bannerImageFile, 'temp');
+    }
+
+    // Anime medya parçası oluştur
     const result = await createAnimeMediaPartDB({
-      series: { connect: { id: data.seriesId } },
       title: data.title,
       englishTitle: data.englishTitle,
       japaneseTitle: data.japaneseTitle,
@@ -45,24 +63,26 @@ export async function createAnimeMediaPartBusiness(
       releaseDate: data.releaseDate,
       anilistId: data.anilistId,
       malId: data.malId,
-      anilistAverageScore: data.anilistAverageScore,
-      anilistPopularity: data.anilistPopularity,
       averageScore: data.averageScore,
       popularity: data.popularity,
+      anilistAverageScore: data.anilistAverageScore,
+      anilistPopularity: data.anilistPopularity,
+      // İlişki
+      series: { connect: { id: data.seriesId } },
     });
 
     // Başarılı oluşturma logu
     await logger.info(
       EVENTS.EDITOR.ANIME_MEDIA_PART_CREATED,
-      'Anime media part başarıyla oluşturuldu',
+      'Anime medya parçası başarıyla oluşturuldu',
       { 
         mediaPartId: result.id, 
         seriesId: result.seriesId,
         title: result.title,
-        anilistId: result.anilistId,
-        malId: result.malId,
         episodes: result.episodes,
-        duration: result.duration
+        duration: result.duration,
+        hasCoverImage: !!uploadResult?.coverImage,
+        hasBannerImage: !!uploadResult?.bannerImage
       },
       userId
     );
@@ -73,21 +93,23 @@ export async function createAnimeMediaPartBusiness(
     };
   } catch (error) {
     if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
+    // Beklenmedik hata logu
     await logger.error(
       EVENTS.SYSTEM.BUSINESS_ERROR,
-      'Anime media part oluşturma sırasında beklenmedik hata',
+      'Anime medya parçası oluşturma sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', title: data.title },
       userId
     );
     
-    throw new BusinessError('Anime media part oluşturma başarısız');
+    throw new BusinessError('Anime medya parçası oluşturma başarısız');
   }
 }
 
-// Anime media part getirme (ID ile)
+// Anime medya parçası getirme (ID ile)
 export async function getAnimeMediaPartBusiness(
   id: string,
   userId: string
@@ -95,18 +117,19 @@ export async function getAnimeMediaPartBusiness(
   try {
     const mediaPart = await findAnimeMediaPartByIdDB(id);
     if (!mediaPart) {
-      throw new NotFoundError('Anime media part bulunamadı');
+      throw new NotFoundError('Anime medya parçası bulunamadı');
     }
 
+    // Başarılı getirme logu
     await logger.info(
       EVENTS.EDITOR.ANIME_MEDIA_PART_RETRIEVED,
-      'Anime media part başarıyla getirildi',
+      'Anime medya parçası başarıyla getirildi',
       { 
         mediaPartId: mediaPart.id, 
         seriesId: mediaPart.seriesId,
         title: mediaPart.title,
-        anilistId: mediaPart.anilistId,
-        malId: mediaPart.malId
+        episodes: mediaPart.episodes,
+        duration: mediaPart.duration
       },
       userId
     );
@@ -117,63 +140,152 @@ export async function getAnimeMediaPartBusiness(
     };
   } catch (error) {
     if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
 
+    // Beklenmedik hata logu
     await logger.error(
       EVENTS.SYSTEM.BUSINESS_ERROR,
-      'Anime media part getirme sırasında beklenmedik hata',
+      'Anime medya parçası getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', mediaPartId: id },
       userId
     );
     
-    throw new BusinessError('Anime media part getirme başarısız');
+    throw new BusinessError('Anime medya parçası getirme başarısız');
   }
 }
 
-// Anime media part güncelleme
-export async function updateAnimeMediaPartBusiness(
-  id: string, 
-  data: UpdateAnimeMediaPartRequest,
+// Anime medya parçaları listesi (seri ID ile)
+export async function getAnimeMediaPartListBusiness(
+  seriesId: string,
   userId: string,
-): Promise<ApiResponse<UpdateAnimeMediaPartResponse>> {
+  filters?: GetAnimeMediaPartsRequest
+): Promise<ApiResponse<GetAnimeMediaPartsResponse>> {
   try {
-    // Anime media part mevcut mu kontrolü
-    const existingMediaPart = await findAnimeMediaPartByIdDB(id);
-    if (!existingMediaPart) {
-      throw new NotFoundError('Anime media part bulunamadı');
+    // Anime serisi mevcut mu kontrolü
+    const animeSeries = await findAnimeSeriesByIdDB(seriesId);
+    if (!animeSeries) {
+      throw new NotFoundError('Anime serisi bulunamadı');
     }
 
-    // Güncelleme verilerini hazırla
-    const updateData: Prisma.AnimeMediaPartUpdateInput = {};
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 50;
+    const skip = (page - 1) * limit;
+
+    // Filtreleme koşulları
+    const where: Prisma.AnimeMediaPartWhereInput = {
+      seriesId: seriesId
+    };
     
-    if (data.title !== undefined) updateData.title = data.title;
-    if (data.englishTitle !== undefined) updateData.englishTitle = data.englishTitle;
-    if (data.japaneseTitle !== undefined) updateData.japaneseTitle = data.japaneseTitle;
-    if (data.notes !== undefined) updateData.notes = data.notes;
-    if (data.episodes !== undefined) updateData.episodes = data.episodes;
-    if (data.duration !== undefined) updateData.duration = data.duration;
-    if (data.releaseDate !== undefined) updateData.releaseDate = data.releaseDate;
-    if (data.anilistId !== undefined) updateData.anilistId = data.anilistId;
-    if (data.malId !== undefined) updateData.malId = data.malId;
-    if (data.anilistAverageScore !== undefined) updateData.anilistAverageScore = data.anilistAverageScore;
-    if (data.anilistPopularity !== undefined) updateData.anilistPopularity = data.anilistPopularity;
-    if (data.averageScore !== undefined) updateData.averageScore = data.averageScore;
-    if (data.popularity !== undefined) updateData.popularity = data.popularity;
+    if (filters?.search) {
+      where.OR = [
+        { title: { contains: filters.search, mode: 'insensitive' } },
+        { englishTitle: { contains: filters.search, mode: 'insensitive' } },
+        { japaneseTitle: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
 
-    // Anime media part güncelle
-    const result = await updateAnimeMediaPartDB({ id }, updateData);
+    // Anime medya parçalarını getir
+    const [mediaParts, total] = await Promise.all([
+      findAllAnimeMediaPartsDB(where, skip, limit, { displayOrder: 'asc' }),
+      countAnimeMediaPartsDB(where)
+    ]);
+    
+    const totalPages = Math.ceil(total / limit);
 
+    // Başarılı listeleme logu
+    await logger.info(
+      EVENTS.EDITOR.ANIME_MEDIA_PART_RETRIEVED,
+      'Anime medya parçaları listelendi',
+      { 
+        seriesId,
+        filters,
+        total,
+        page,
+        limit
+      },
+      userId
+    );
+
+    return {
+      success: true,
+      data: {
+        mediaParts,
+        total,
+        page,
+        limit,
+        totalPages
+      }
+    };
+  } catch (error) {
+    if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
+      throw error;
+    }
+    
+    // Beklenmedik hata logu
+    await logger.error(
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Anime medya parçaları listeleme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', seriesId, filters },
+      userId
+    );
+    
+    throw new BusinessError('Anime medya parçaları listeleme başarısız');
+  }
+}
+
+// Anime medya parçası güncelleme
+export async function updateAnimeMediaPartBusiness(
+  id: string, 
+  data: UpdateAnimeMediaPartRequest & { coverImageFile?: File; bannerImageFile?: File },
+  userId: string
+): Promise<ApiResponse<UpdateAnimeMediaPartResponse>> {
+  try {
+    // Mevcut anime medya parçasını getir
+    const existingMediaPart = await findAnimeMediaPartByIdDB(id);
+    if (!existingMediaPart) {
+      throw new NotFoundError('Anime medya parçası bulunamadı');
+    }
+
+    // Resim yükleme işlemi
+    let uploadResult;
+    if (data.coverImageFile || data.bannerImageFile) {
+      // Geçici ID ile resim yükle
+      uploadResult = await UploadService.uploadAnimeImages(data.coverImageFile, data.bannerImageFile, id);
+    }
+
+    // Anime medya parçası güncelle
+    const result = await updateAnimeMediaPartDB({ id }, {
+      title: data.title,
+      englishTitle: data.englishTitle,
+      japaneseTitle: data.japaneseTitle,
+      notes: data.notes,
+      episodes: data.episodes,
+      duration: data.duration,
+      releaseDate: data.releaseDate,
+      anilistId: data.anilistId,
+      malId: data.malId,
+      averageScore: data.averageScore,
+      popularity: data.popularity,
+      anilistAverageScore: data.anilistAverageScore,
+      anilistPopularity: data.anilistPopularity,
+    });
+
+    // Başarılı güncelleme logu
     await logger.info(
       EVENTS.EDITOR.ANIME_MEDIA_PART_UPDATED,
-      'Anime media part başarıyla güncellendi',
+      'Anime medya parçası başarıyla güncellendi',
       { 
         mediaPartId: result.id, 
         seriesId: result.seriesId,
         title: result.title,
-        oldTitle: existingMediaPart.title,
         episodes: result.episodes,
-        duration: result.duration
+        duration: result.duration,
+        oldTitle: existingMediaPart.title,
+        hasNewCoverImage: !!uploadResult?.coverImage,
+        hasNewBannerImage: !!uploadResult?.bannerImage
       },
       userId
     );
@@ -184,44 +296,47 @@ export async function updateAnimeMediaPartBusiness(
     };
   } catch (error) {
     if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
+    // Beklenmedik hata logu
     await logger.error(
       EVENTS.SYSTEM.BUSINESS_ERROR,
-      'Anime media part güncelleme sırasında beklenmedik hata',
+      'Anime medya parçası güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', mediaPartId: id, data },
       userId
     );
     
-    throw new BusinessError('Anime media part güncelleme başarısız');
+    throw new BusinessError('Anime medya parçası güncelleme başarısız');
   }
 }
 
-// Anime media part silme
+// Anime medya parçası silme
 export async function deleteAnimeMediaPartBusiness(
   id: string,
   userId: string
 ): Promise<ApiResponse<void>> {
   try {
-    // Anime media part mevcut mu kontrolü
+    // Anime medya parçası mevcut mu kontrolü
     const existingMediaPart = await findAnimeMediaPartByIdDB(id);
     if (!existingMediaPart) {
-      throw new NotFoundError('Anime media part bulunamadı');
+      throw new NotFoundError('Anime medya parçası bulunamadı');
     }
 
-    // Anime media part sil
+    // Anime medya parçası sil
     await deleteAnimeMediaPartDB({ id });
 
+    // Başarılı silme logu
     await logger.info(
       EVENTS.EDITOR.ANIME_MEDIA_PART_DELETED,
-      'Anime media part başarıyla silindi',
+      'Anime medya parçası başarıyla silindi',
       { 
         mediaPartId: existingMediaPart.id, 
         seriesId: existingMediaPart.seriesId,
         title: existingMediaPart.title,
-        anilistId: existingMediaPart.anilistId,
-        malId: existingMediaPart.malId
+        episodes: existingMediaPart.episodes,
+        duration: existingMediaPart.duration
       },
       userId
     );
@@ -229,16 +344,18 @@ export async function deleteAnimeMediaPartBusiness(
     return { success: true };
   } catch (error) {
     if (error instanceof DatabaseError) {
+      // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
     
+    // Beklenmedik hata logu
     await logger.error(
       EVENTS.SYSTEM.BUSINESS_ERROR,
-      'Anime media part silme sırasında beklenmedik hata',
+      'Anime medya parçası silme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', mediaPartId: id },
       userId
     );
     
-    throw new BusinessError('Anime media part silme başarısız');
+    throw new BusinessError('Anime medya parçası silme başarısız');
   }
 }
