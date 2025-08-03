@@ -41,6 +41,8 @@ export const ROUTES = {
       ANIME: '/editor/anime',
       MEDIA_PARTS: '/editor/anime/:animeId/media-parts',
       EPISODES: '/editor/anime/:animeId/media-parts/:mediaPartId/episodes',
+      STREAMING_LINKS: (animeId: string, mediaPartId: string, episodeId: string) => 
+        `/editor/anime/${animeId}/media-parts/${mediaPartId}/episodes/${episodeId}/streaming-links`,
     },
   },
   

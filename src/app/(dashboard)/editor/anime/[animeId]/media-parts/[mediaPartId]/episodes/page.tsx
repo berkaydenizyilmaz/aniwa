@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { EpisodeTable } from '@/components/modules/editor/anime/episodes/episode-table';
 import { EpisodeFormDialog } from '@/components/modules/editor/anime/episodes/episode-form-dialog';
 import { Episode } from '@prisma/client';
+import { ROUTES } from '@/lib/constants/routes.constants';
 
 interface EpisodesPageProps {
   params: Promise<{
@@ -17,7 +18,7 @@ interface EpisodesPageProps {
 }
 
 export default function EpisodesPage({ params }: EpisodesPageProps) {
-  const { mediaPartId } = use(params);
+  const { animeId, mediaPartId } = use(params);
   const router = useRouter();
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
@@ -26,6 +27,11 @@ export default function EpisodesPage({ params }: EpisodesPageProps) {
   const handleEdit = (episode: Episode) => {
     setSelectedEpisode(episode);
     setFormDialogOpen(true);
+  };
+
+  const handleStreamingLinks = (episode: Episode) => {
+    // Streaming link sayfasına yönlendir
+    router.push(ROUTES.PAGES.EDITOR.ANIME.STREAMING_LINKS(animeId, mediaPartId, episode.id));
   };
 
   const handleFormSuccess = () => {
@@ -69,6 +75,7 @@ export default function EpisodesPage({ params }: EpisodesPageProps) {
       <EpisodeTable
         mediaPartId={mediaPartId}
         onEdit={handleEdit}
+        onStreamingLinks={handleStreamingLinks}
         refreshKey={refreshKey}
       />
 
