@@ -58,6 +58,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
       title: '',
       englishTitle: '',
       japaneseTitle: '',
+      displayOrder: undefined,
       notes: '',
       episodes: undefined,
       duration: undefined,
@@ -77,6 +78,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
       setValue('title', mediaPartData.title);
       setValue('englishTitle', mediaPartData.englishTitle || '');
       setValue('japaneseTitle', mediaPartData.japaneseTitle || '');
+      setValue('displayOrder', mediaPartData.displayOrder || undefined);
       setValue('notes', mediaPartData.notes || '');
       setValue('episodes', mediaPartData.episodes || undefined);
       setValue('duration', mediaPartData.duration || undefined);
@@ -94,6 +96,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
         title: '',
         englishTitle: '',
         japaneseTitle: '',
+        displayOrder: undefined,
         notes: '',
         episodes: undefined,
         duration: undefined,
@@ -197,6 +200,21 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
             />
             {errors.japaneseTitle && (
               <p className="text-sm text-destructive">{errors.japaneseTitle.message}</p>
+            )}
+          </div>
+
+          {/* İzleme Sırası */}
+          <div className="space-y-2">
+            <Label htmlFor="displayOrder">İzleme Sırası</Label>
+            <Input
+              id="displayOrder"
+              type="number"
+              {...register('displayOrder', { valueAsNumber: true })}
+              placeholder="1"
+              min="1"
+            />
+            {errors.displayOrder && (
+              <p className="text-sm text-destructive">{errors.displayOrder.message}</p>
             )}
           </div>
 
