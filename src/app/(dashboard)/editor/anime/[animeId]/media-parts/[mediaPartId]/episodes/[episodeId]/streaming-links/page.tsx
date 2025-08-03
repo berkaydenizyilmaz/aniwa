@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Plus } from 'lucide-react';
@@ -42,10 +44,11 @@ export default function StreamingLinksPage({ params }: StreamingLinksPageProps) 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href={`/editor/anime/${animeId}/media-parts/${mediaPartId}/episodes`}>
+          <Link href={ROUTES.PAGES.EDITOR.EPISODES.replace(':animeId', animeId)
+            .replace(':mediaPartId', mediaPartId)}>
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Episode'lara Dön
+              Geri
             </Button>
           </Link>
           <div>

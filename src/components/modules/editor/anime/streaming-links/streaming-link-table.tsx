@@ -177,10 +177,6 @@ export function StreamingLinkTable({ episodeId, onEdit, onCreateNew, refreshKey 
     return (
       <div className="glass-card p-6 text-center">
         <p className="text-muted-foreground mb-4">Henüz streaming link bulunmuyor</p>
-        <Button onClick={onCreateNew} variant="outline">
-          <Plus className="h-4 w-4 mr-2" />
-          Yeni Streaming Link Ekle
-        </Button>
       </div>
     );
   }

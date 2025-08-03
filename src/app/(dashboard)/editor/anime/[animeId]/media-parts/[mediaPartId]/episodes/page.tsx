@@ -31,7 +31,10 @@ export default function EpisodesPage({ params }: EpisodesPageProps) {
 
   const handleStreamingLinks = (episode: Episode) => {
     // Streaming link sayfasına yönlendir
-    router.push(ROUTES.PAGES.EDITOR.ANIME.STREAMING_LINKS(animeId, mediaPartId, episode.id));
+    router.push(ROUTES.PAGES.EDITOR.STREAMING_LINKS
+      .replace(':animeId', animeId)
+      .replace(':mediaPartId', mediaPartId)
+      .replace(':episodeId', episode.id));
   };
 
   const handleFormSuccess = () => {

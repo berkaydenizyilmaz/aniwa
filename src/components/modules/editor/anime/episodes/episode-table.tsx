@@ -234,9 +234,6 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
                 </TableCell>
                 <TableCell>
                   <div className="font-medium">{episode.title || `Episode ${episode.episodeNumber}`}</div>
-                  {episode.englishTitle && (
-                    <div className="text-sm text-muted-foreground">{episode.englishTitle}</div>
-                  )}
                 </TableCell>
                 <TableCell>
                   {episode.duration ? `${episode.duration} dk` : '-'}

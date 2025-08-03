@@ -6,6 +6,7 @@ import { AnimeSeriesFilters } from "@/components/modules/editor/anime/anime-seri
 import { AnimeSeriesTable } from "@/components/modules/editor/anime/anime-series-table";
 import { AnimeSeriesFormDialog } from "@/components/modules/editor/anime/anime-series-form-dialog";
 import { AnimeSeries } from '@prisma/client';
+import { ROUTES } from '@/lib/constants/routes.constants';
 
 export default function EditorAnimePage() {
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function EditorAnimePage() {
 
   const handleMediaParts = (animeSeries: AnimeSeries) => {
     // Media parts sayfasına yönlendir
-    router.push(`/editor/anime/${animeSeries.id}/media-parts`);
+    router.push(ROUTES.PAGES.EDITOR.MEDIA_PARTS.replace(':animeId', animeSeries.id));
   };
 
   const handleSuccess = () => {
