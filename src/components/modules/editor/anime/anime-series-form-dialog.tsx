@@ -81,7 +81,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
         synopsis: animeSeries.synopsis || '',
         type: animeSeries.type,
         status: animeSeries.status,
-        startDate: animeSeries.releaseDate || undefined,
+        releaseDate: animeSeries.releaseDate || undefined,
         season: animeSeries.season || undefined,
         year: animeSeries.seasonYear || undefined,
         source: animeSeries.source || undefined,
@@ -101,9 +101,16 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
         synopsis: '',
         type: undefined,
         status: undefined,
+        releaseDate: undefined,
         season: undefined,
         year: undefined,
         source: undefined,
+        countryOfOrigin: undefined,
+        isAdult: false,
+        trailer: '',
+        synonyms: [],
+        coverImageFile: undefined,
+        bannerImageFile: undefined,
         genres: [],
         studios: [],
         tags: [],
@@ -338,12 +345,12 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
             <Input
               id="releaseDate"
               type="date"
-              {...register('startDate', {
+              {...register('releaseDate', {
                 setValueAs: (value) => value ? new Date(value) : undefined
               })}
             />
-            {errors.startDate && (
-              <p className="text-sm text-destructive">{errors.startDate.message}</p>
+            {errors.releaseDate && (
+              <p className="text-sm text-destructive">{errors.releaseDate.message}</p>
             )}
           </div>
 

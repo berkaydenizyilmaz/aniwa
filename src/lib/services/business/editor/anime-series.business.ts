@@ -55,7 +55,7 @@ export async function createAnimeSeriesBusiness(
       synopsis: data.synopsis,
       type: data.type,
       status: data.status,
-      releaseDate: data.startDate,
+      releaseDate: data.releaseDate,
       season: data.season,
       seasonYear: data.year,
       source: data.source,
@@ -273,8 +273,7 @@ export async function updateAnimeSeriesBusiness(
     if (data.synopsis !== undefined) updateData.synopsis = data.synopsis;
     if (data.type !== undefined) updateData.type = data.type;
     if (data.status !== undefined) updateData.status = data.status;
-    if (data.startDate !== undefined) updateData.releaseDate = data.startDate;
-    if (data.startDate !== undefined) updateData.releaseDate = data.startDate; // Tek tarih alanı var
+    if (data.releaseDate !== undefined) updateData.releaseDate = data.releaseDate;
     if (data.season !== undefined) updateData.season = data.season;
     if (data.year !== undefined) updateData.seasonYear = data.year;
     if (data.source !== undefined) updateData.source = data.source;
