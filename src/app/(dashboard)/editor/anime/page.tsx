@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AnimeSeriesFilters } from "@/components/modules/editor/anime/anime-series-filters";
 import { AnimeSeriesTable } from "@/components/modules/editor/anime/anime-series-table";
 import { AnimeSeriesFormDialog } from "@/components/modules/editor/anime/anime-series-form-dialog";
 import { AnimeSeries } from '@prisma/client';
 
 export default function EditorAnimePage() {
+  const router = useRouter();
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [selectedAnimeSeries, setSelectedAnimeSeries] = useState<AnimeSeries | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -22,6 +24,11 @@ export default function EditorAnimePage() {
   const handleEdit = (animeSeries: AnimeSeries) => {
     setSelectedAnimeSeries(animeSeries);
     setFormDialogOpen(true);
+  };
+
+  const handleMediaParts = (animeSeries: AnimeSeries) => {
+    // Media parts sayfasına yönlendir
+    router.push(`/editor/anime/${animeSeries.id}/media-parts`);
   };
 
   const handleSuccess = () => {
@@ -62,6 +69,7 @@ export default function EditorAnimePage() {
       <AnimeSeriesTable 
         refreshKey={refreshKey}
         onEdit={handleEdit}
+        onMediaParts={handleMediaParts}
         searchTerm={searchTerm}
         selectedType={selectedType}
         selectedStatus={selectedStatus}
