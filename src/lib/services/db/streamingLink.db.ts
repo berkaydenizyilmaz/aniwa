@@ -1,11 +1,11 @@
-// StreamingLink modeli için CRUD operasyonları
+// Streaming Link modeli için CRUD operasyonları
 
 import { Prisma, StreamingLink } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
-// Streaming link oluşturma
+// Streaming Link oluşturma
 export async function createStreamingLinkDB(
   data: Prisma.StreamingLinkCreateInput,
   client: PrismaClientOrTransaction = prisma
@@ -17,120 +17,59 @@ export async function createStreamingLinkDB(
   }
 }
 
-// Streaming link getirme (ID ile)
+// Streaming Link getirme (ID ile)
 export async function findStreamingLinkByIdDB(
   id: string,
+  include?: Prisma.StreamingLinkInclude,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink | null> {
   try {
-    return await client.streamingLink.findUnique({ where: { id } });
+    return await client.streamingLink.findUnique({ 
+      where: { id },
+      include
+    });
   } catch (error) {
     handleDatabaseError(error, 'Streaming link ID ile bulma', { id });
   }
 }
 
-// Streaming link getirme (URL ile)
-export async function findStreamingLinkByUrlDB(
-  url: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingLink | null> {
-  try {
-    return await client.streamingLink.findFirst({ where: { url } });
-  } catch (error) {
-    handleDatabaseError(error, 'Streaming link URL ile bulma', { url });
-  }
-}
-
-// Anime serisi ID'sine göre streaming link'leri getirme
-export async function findStreamingLinksByAnimeSeriesIdDB(
-  animeSeriesId: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingLink[]> {
-  try {
-    return await client.streamingLink.findMany({
-      where: { animeSeriesId },
-    });
-  } catch (error) {
-    handleDatabaseError(error, 'Anime serisi streaming link\'lerini bulma', { animeSeriesId });
-  }
-}
-
-// Media part ID'sine göre streaming link'leri getirme
-export async function findStreamingLinksByMediaPartIdDB(
-  animeMediaPartId: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingLink[]> {
-  try {
-    return await client.streamingLink.findMany({
-      where: { animeMediaPartId },
-    });
-  } catch (error) {
-    handleDatabaseError(error, 'Media part streaming link\'lerini bulma', { animeMediaPartId });
-  }
-}
-
-// Episode ID'sine göre streaming link'leri getirme
+// Episode için streaming linkleri getirme
 export async function findStreamingLinksByEpisodeIdDB(
   episodeId: string,
+  orderBy?: Prisma.StreamingLinkOrderByWithRelationInput,
+  include?: Prisma.StreamingLinkInclude,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink[]> {
   try {
     return await client.streamingLink.findMany({
       where: { episodeId },
+      include: include || {
+        platform: true,
+      },
+      orderBy: orderBy || { createdAt: 'asc' },
     });
   } catch (error) {
-    handleDatabaseError(error, 'Episode streaming link\'lerini bulma', { episodeId });
+    handleDatabaseError(error, 'Streaming link episode ID ile bulma', { episodeId });
   }
 }
 
-// Platform ID'sine göre streaming link'leri getirme
-export async function findStreamingLinksByPlatformIdDB(
-  platformId: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingLink[]> {
-  try {
-    return await client.streamingLink.findMany({
-      where: { platformId },
-    });
-  } catch (error) {
-    handleDatabaseError(error, 'Platform streaming link\'lerini bulma', { platformId });
-  }
-}
-
-// Tüm streaming link'leri getirme (filtrelemeli)
-export async function findAllStreamingLinksDB(
-  where?: Prisma.StreamingLinkWhereInput,
-  skip?: number,
-  take?: number,
-  orderBy?: Prisma.StreamingLinkOrderByWithRelationInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingLink[]> {
-  try {
-    return await client.streamingLink.findMany({
-      where,
-      skip,
-      take,
-      orderBy,
-    });
-  } catch (error) {
-    handleDatabaseError(error, 'Tüm streaming link\'leri listeleme', { where, skip, take, orderBy });
-  }
-}
-
-// Streaming link güncelleme
+// Streaming Link güncelleme
 export async function updateStreamingLinkDB(
   where: Prisma.StreamingLinkWhereUniqueInput,
   data: Prisma.StreamingLinkUpdateInput,
   client: PrismaClientOrTransaction = prisma
 ): Promise<StreamingLink> {
   try {
-    return await client.streamingLink.update({ where, data });
+    return await client.streamingLink.update({
+      where,
+      data,
+    });
   } catch (error) {
     handleDatabaseError(error, 'Streaming link güncelleme', { where, data });
   }
 }
 
-// Streaming link silme
+// Streaming Link silme
 export async function deleteStreamingLinkDB(
   where: Prisma.StreamingLinkWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
@@ -142,7 +81,7 @@ export async function deleteStreamingLinkDB(
   }
 }
 
-// Streaming link sayısı
+// Streaming Link sayısını getirme
 export async function countStreamingLinksDB(
   where?: Prisma.StreamingLinkWhereInput,
   client: PrismaClientOrTransaction = prisma

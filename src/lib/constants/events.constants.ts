@@ -90,6 +90,19 @@ export const EVENTS = {
 
   // Editor Events
   EDITOR: {
+    // Streaming Link Management
+    STREAMING_LINK_CREATED: 'editor_streaming_link_created',
+    STREAMING_LINK_RETRIEVED: 'editor_streaming_link_retrieved',
+    STREAMING_LINKS_RETRIEVED: 'editor_streaming_links_retrieved',
+    STREAMING_LINK_UPDATED: 'editor_streaming_link_updated',
+    STREAMING_LINK_DELETED: 'editor_streaming_link_deleted',
+    STREAMING_LINK_CREATE_FAILED: 'editor_streaming_link_create_failed',
+    STREAMING_LINK_RETRIEVE_FAILED: 'editor_streaming_link_retrieve_failed',
+    STREAMING_LINKS_RETRIEVE_FAILED: 'editor_streaming_links_retrieve_failed',
+    STREAMING_LINK_UPDATE_FAILED: 'editor_streaming_link_update_failed',
+    STREAMING_LINK_DELETE_FAILED: 'editor_streaming_link_delete_failed',
+    STREAMING_PLATFORMS_RETRIEVED: 'editor_streaming_platforms_retrieved',
+    STREAMING_PLATFORMS_RETRIEVE_FAILED: 'editor_streaming_platforms_retrieve_failed',
     STREAMING_LINKS_UPDATED: 'editor_streaming_links_updated',
     
     // Anime Series Management

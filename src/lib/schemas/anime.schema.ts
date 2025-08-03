@@ -116,6 +116,19 @@ export const animeFiltersSchema = z.object({
   limit: z.number().min(MASTER_DATA.PAGINATION.MIN_PAGE).max(MASTER_DATA.PAGINATION.MAX_LIMIT).default(MASTER_DATA.PAGINATION.DEFAULT_LIMIT),
 });
 
+// Streaming Link oluşturma şeması
+export const createStreamingLinkSchema = z.object({
+  episodeId: z.string().min(1, 'Episode ID gerekli'),
+  platformId: z.string().min(1, 'Platform seçimi gerekli'),
+  url: z.string().url('Geçerli bir URL girin'),
+});
+
+// Streaming Link güncelleme şeması
+export const updateStreamingLinkSchema = z.object({
+  platformId: z.string().min(1, 'Platform seçimi gerekli').optional(),
+  url: z.string().url('Geçerli bir URL girin').optional(),
+});
+
 // Tip türetmeleri
 export type CreateAnimeSeriesInput = z.infer<typeof createAnimeSeriesSchema>;
 export type UpdateAnimeSeriesInput = z.infer<typeof updateAnimeSeriesSchema>;
@@ -123,4 +136,6 @@ export type CreateAnimeMediaPartInput = z.infer<typeof createAnimeMediaPartSchem
 export type UpdateAnimeMediaPartInput = z.infer<typeof updateAnimeMediaPartSchema>;
 export type CreateEpisodeInput = z.infer<typeof createEpisodeSchema>;
 export type UpdateEpisodeInput = z.infer<typeof updateEpisodeSchema>;
+export type CreateStreamingLinkInput = z.infer<typeof createStreamingLinkSchema>;
+export type UpdateStreamingLinkInput = z.infer<typeof updateStreamingLinkSchema>;
 export type AnimeFilters = z.infer<typeof animeFiltersSchema>; 

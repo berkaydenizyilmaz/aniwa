@@ -1,11 +1,63 @@
-// StreamingPlatform modeli için CRUD operasyonları
+// Streaming Platform modeli için CRUD operasyonları
 
 import { Prisma, StreamingPlatform } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
 
-// Streaming platform oluşturma
+// Streaming Platform getirme (ID ile)
+export async function findStreamingPlatformByIdDB(
+  id: string,
+  include?: Prisma.StreamingPlatformInclude,
+  client: PrismaClientOrTransaction = prisma
+): Promise<StreamingPlatform | null> {
+  try {
+    return await client.streamingPlatform.findUnique({ 
+      where: { id },
+      include
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Streaming platform ID ile bulma', { id });
+  }
+}
+
+// Tüm streaming platform'ları listeleme
+export async function findAllStreamingPlatformsDB(
+  where?: Prisma.StreamingPlatformWhereInput,
+  skip?: number,
+  take?: number,
+  orderBy?: Prisma.StreamingPlatformOrderByWithRelationInput,
+  include?: Prisma.StreamingPlatformInclude,
+  client: PrismaClientOrTransaction = prisma
+): Promise<StreamingPlatform[]> {
+  try {
+    return await client.streamingPlatform.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include,
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Tüm streaming platform\'ları listeleme', { where, skip, take, orderBy });
+  }
+}
+
+// Streaming Platform getirme (Name ile)
+export async function findStreamingPlatformByNameDB(
+  name: string,
+  client: PrismaClientOrTransaction = prisma
+): Promise<StreamingPlatform | null> {
+  try {
+    return await client.streamingPlatform.findUnique({ 
+      where: { name }
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Streaming platform name ile bulma', { name });
+  }
+}
+
+// Streaming Platform oluşturma
 export async function createStreamingPlatformDB(
   data: Prisma.StreamingPlatformCreateInput,
   client: PrismaClientOrTransaction = prisma
@@ -17,51 +69,7 @@ export async function createStreamingPlatformDB(
   }
 }
 
-// Streaming platform getirme (ID ile)
-export async function findStreamingPlatformByIdDB(
-  id: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingPlatform | null> {
-  try {
-    return await client.streamingPlatform.findUnique({ where: { id } });
-  } catch (error) {
-    handleDatabaseError(error, 'Streaming platform ID ile bulma', { id });
-  }
-}
-
-// Streaming platform getirme (name ile)
-export async function findStreamingPlatformByNameDB(
-  name: string,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingPlatform | null> {
-  try {
-    return await client.streamingPlatform.findFirst({ where: { name } });
-  } catch (error) {
-    handleDatabaseError(error, 'Streaming platform name ile bulma', { name });
-  }
-}
-
-// Tüm streaming platformları getirme (filtrelemeli)
-export async function findAllStreamingPlatformsDB(
-  where?: Prisma.StreamingPlatformWhereInput,
-  skip?: number,
-  take?: number,
-  orderBy?: Prisma.StreamingPlatformOrderByWithRelationInput,
-  client: PrismaClientOrTransaction = prisma
-): Promise<StreamingPlatform[]> {
-  try {
-    return await client.streamingPlatform.findMany({
-      where,
-      skip,
-      take,
-      orderBy,
-    });
-  } catch (error) {
-    handleDatabaseError(error, 'Tüm streaming platformları listeleme', { where, skip, take, orderBy });
-  }
-}
-
-// Streaming platform güncelleme
+// Streaming Platform güncelleme
 export async function updateStreamingPlatformDB(
   where: Prisma.StreamingPlatformWhereUniqueInput,
   data: Prisma.StreamingPlatformUpdateInput,
@@ -74,7 +82,7 @@ export async function updateStreamingPlatformDB(
   }
 }
 
-// Streaming platform silme
+// Streaming Platform silme
 export async function deleteStreamingPlatformDB(
   where: Prisma.StreamingPlatformWhereUniqueInput,
   client: PrismaClientOrTransaction = prisma
@@ -86,7 +94,7 @@ export async function deleteStreamingPlatformDB(
   }
 }
 
-// Streaming platform sayısı
+// Streaming Platform sayma
 export async function countStreamingPlatformsDB(
   where?: Prisma.StreamingPlatformWhereInput,
   client: PrismaClientOrTransaction = prisma

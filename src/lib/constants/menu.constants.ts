@@ -59,11 +59,6 @@ export const EDITOR_NAVIGATION_ITEMS = [
     href: ROUTES.PAGES.EDITOR.ANIME,
     icon: Play
   },
-  {
-    label: 'Yayın Linkleri',
-    href: ROUTES.PAGES.EDITOR.STREAMING_LINKS,
-    icon: Tv
-  },
 ] as const;
 
 export const HEADER_NAVIGATION_ITEMS = [

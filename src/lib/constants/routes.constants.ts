@@ -39,7 +39,6 @@ export const ROUTES = {
     EDITOR: {
       DASHBOARD: '/editor',
       ANIME: '/editor/anime',
-      STREAMING_LINKS: '/editor/yayin-linkleri',
       MEDIA_PARTS: '/editor/anime/:animeId/media-parts',
       EPISODES: '/editor/anime/:animeId/media-parts/:mediaPartId/episodes',
     },
@@ -74,12 +73,10 @@ export const ROUTES = {
       ANIME: '/api/admin/anime',
       STREAMING_PLATFORMS: '/api/admin/streaming-platforms',
       USERS: '/api/admin/users',
-      STREAMING_LINKS: '/api/admin/streaming-links',
     },
 
     // Editor API'leri
     EDITOR: {
-      STREAMING_LINKS: '/api/editor/streaming-links',
     },
   },
   
@@ -140,7 +137,6 @@ export const ROUTES = {
       PAGES: [
         '/editor',            // Editör ana sayfa
         '/editor/anime',      // Anime yönetimi
-        '/editor/streaming-links', // Streaming link yönetimi
       ],
       API: [
         '/api/editor',        // Editör ana API
