@@ -188,25 +188,26 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateAnimeSeriesInput }) => 
-      updateAnimeSeriesAction(id, data),
+    mutationFn: async (data: UpdateAnimeSeriesInput) => {
+      return updateAnimeSeriesAction(animeSeries!.id, data);
+    },
     onSuccess: () => {
-      toast.success('Anime serisi başarıyla güncellendi!');
+      toast.success('Anime serisi başarıyla güncellendi');
       onOpenChange(false);
       onSuccess?.();
-      // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['anime-series'] });
+      // Cache'i temizle
+      queryClient.invalidateQueries({ queryKey: ['anime-series-list'] });
+      queryClient.invalidateQueries({ queryKey: ['anime-series-with-relations', animeSeries?.id] });
     },
     onError: (error) => {
-      console.error('Update anime series error:', error);
-      toast.error('Güncelleme başarısız oldu');
+      toast.error(error.message || 'Anime serisi güncellenirken bir hata oluştu');
     },
   });
 
   const onSubmit = async (data: CreateAnimeSeriesInput | UpdateAnimeSeriesInput) => {
     if (animeSeries) {
       // Güncelleme
-      updateMutation.mutate({ id: animeSeries.id, data: data as UpdateAnimeSeriesInput });
+      updateMutation.mutate(data as UpdateAnimeSeriesInput);
     } else {
       // Oluşturma
       createMutation.mutate(data as CreateAnimeSeriesInput);
