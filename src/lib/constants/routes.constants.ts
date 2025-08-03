@@ -40,6 +40,8 @@ export const ROUTES = {
       DASHBOARD: '/editor',
       ANIME: '/editor/anime',
       STREAMING_LINKS: '/editor/yayin-linkleri',
+      MEDIA_PARTS: '/editor/anime/:animeId/media-parts',
+      EPISODES: '/editor/anime/:animeId/media-parts/:mediaPartId/episodes',
     },
   },
   
