@@ -244,7 +244,15 @@ export async function getAnimeSeriesListBusiness(
 
     // Anime serilerini getir
     const [animeSeries, total] = await Promise.all([
-      findAllAnimeSeriesDB(where, skip, limit, { createdAt: 'desc' }),
+      findAllAnimeSeriesDB(where, skip, limit, { createdAt: 'desc' }, {
+        id: true,
+        aniwaPublicId: true,
+          title: true,
+          type: true,
+          status: true,
+          coverImage: true,
+        }
+      ),
       countAnimeSeriesDB(where)
     ]);
     

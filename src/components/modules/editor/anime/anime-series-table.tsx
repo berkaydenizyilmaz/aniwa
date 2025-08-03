@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Layers } from 'lucide-react';
 import { AnimeSeries, AnimeType, AnimeStatus } from '@prisma/client';
 import { getAnimeSeriesListAction, deleteAnimeSeriesAction } from '@/lib/actions/editor/anime-series.action';
 import { toast } from 'sonner';
@@ -28,17 +29,21 @@ import {
 import { type AnimeFilters } from '@/lib/schemas/anime.schema';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+// Tablo item tipi
+type AnimeSeriesTableItem = GetAnimeSeriesListResponse['animeSeries'][0];
+
 interface AnimeSeriesTableProps {
   onEdit?: (animeSeries: AnimeSeries) => void;
+  onMediaParts?: (animeSeries: AnimeSeries) => void;
   searchTerm?: string;
   selectedType?: string;
   selectedStatus?: string;
   refreshKey?: number;
 }
 
-export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', selectedStatus = '', refreshKey }: AnimeSeriesTableProps) {
+export function AnimeSeriesTable({ onEdit, onMediaParts, searchTerm = '', selectedType = '', selectedStatus = '', refreshKey }: AnimeSeriesTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedAnimeSeries, setSelectedAnimeSeries] = useState<AnimeSeries | null>(null);
+  const [selectedAnimeSeries, setSelectedAnimeSeries] = useState<AnimeSeriesTableItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(50);
   const queryClient = useQueryClient();
@@ -89,18 +94,25 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
     setCurrentPage(1);
   }
 
-  const handleEdit = (animeSeries: AnimeSeries) => {
-    onEdit?.(animeSeries);
+  const handleEdit = (animeSeries: AnimeSeriesTableItem) => {
+    // Sadece id'yi geçir, form kendi verilerini yükleyecek
+    onEdit?.({ id: animeSeries.id } as AnimeSeries);
   };
 
-  const handleDelete = (animeSeries: AnimeSeries) => {
+  const handleDelete = (animeSeries: AnimeSeriesTableItem) => {
     setSelectedAnimeSeries(animeSeries);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedAnimeSeries) return;
-    deleteMutation.mutate(selectedAnimeSeries.id);
+    if (selectedAnimeSeries) {
+      await deleteMutation.mutateAsync(selectedAnimeSeries.id);
+    }
+  };
+
+  const handleMediaParts = (animeSeries: AnimeSeriesTableItem) => {
+    // Sadece id'yi geçir
+    onMediaParts?.({ id: animeSeries.id } as AnimeSeries);
   };
 
   const handlePageChange = (page: number) => {
@@ -162,35 +174,44 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Kapak</TableHead>
               <TableHead>ID</TableHead>
               <TableHead>Başlık</TableHead>
               <TableHead>Tip</TableHead>
               <TableHead>Durum</TableHead>
-              <TableHead>Bölüm Sayısı</TableHead>
-              <TableHead>Puan</TableHead>
               <TableHead>İşlemler</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {animeSeries.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   Anime serisi bulunamadı
                 </TableCell>
               </TableRow>
             ) : (
               animeSeries.map((animeSeries) => (
                 <TableRow key={animeSeries.id}>
+                  <TableCell>
+                    {animeSeries.coverImage ? (
+                      <Image 
+                        src={animeSeries.coverImage} 
+                        alt={animeSeries.title}
+                        width={48}
+                        height={64}
+                        className="rounded object-cover"
+                      />
+                    ) : (
+                      <div className="w-12 h-16 bg-muted rounded flex items-center justify-center">
+                        <span className="text-xs text-muted-foreground">No Image</span>
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-mono text-sm">
                     #{animeSeries.aniwaPublicId}
                   </TableCell>
                   <TableCell>
-                    <div>
-                      <div className="font-medium">{animeSeries.title}</div>
-                      {animeSeries.englishTitle && (
-                        <div className="text-sm text-muted-foreground">{animeSeries.englishTitle}</div>
-                      )}
-                    </div>
+                    <div className="font-medium">{animeSeries.title}</div>
                   </TableCell>
                   <TableCell>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
@@ -208,19 +229,22 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
                     </span>
                   </TableCell>
                   <TableCell>
-                    {animeSeries.episodes || '-'}
-                  </TableCell>
-                  <TableCell>
-                    {animeSeries.averageScore ? animeSeries.averageScore.toFixed(1) : '-'}
-                  </TableCell>
-                  <TableCell>
                     <div className="flex gap-2">
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleEdit(animeSeries)}
-                        disabled={false}
+                        onClick={() => handleMediaParts(animeSeries)}
                         className="h-8 w-8 p-0"
+                        title="Media Parts"
+                      >
+                        <Layers className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(animeSeries)}
+                        className="h-8 w-8 p-0"
+                        title="Düzenle"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -230,6 +254,7 @@ export function AnimeSeriesTable({ onEdit, searchTerm = '', selectedType = '', s
                         onClick={() => handleDelete(animeSeries)}
                         disabled={deleteMutation.isPending}
                         className="h-8 w-8 p-0"
+                        title="Sil"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

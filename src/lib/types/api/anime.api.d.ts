@@ -1,6 +1,6 @@
 // Anime API response tipleri
 
-import { AnimeSeries, AnimeMediaPart, Genre, Studio, Tag } from '@prisma/client';
+import { AnimeSeries, AnimeMediaPart, Genre, Studio, Tag, AnimeType, AnimeStatus } from '@prisma/client';
 import { 
   CreateAnimeSeriesInput, 
   UpdateAnimeSeriesInput, 
@@ -41,7 +41,14 @@ export type UpdateAnimeMediaPartResponse = AnimeMediaPart;
 
 // Anime Series listesi response tipi
 export interface GetAnimeSeriesListResponse {
-  animeSeries: AnimeSeries[];
+  animeSeries: Array<{
+    id: string;
+    aniwaPublicId: number;
+    title: string;
+    type: AnimeType;
+    status: AnimeStatus;
+    coverImage?: string;
+  }>;
   total: number;
   page: number;
   limit: number;

@@ -87,6 +87,7 @@ export async function findAllAnimeSeriesDB(
   skip?: number,
   take?: number,
   orderBy?: Prisma.AnimeSeriesOrderByWithRelationInput,
+  select?: Prisma.AnimeSeriesSelect,
   client: PrismaClientOrTransaction = prisma
 ): Promise<AnimeSeries[]> {
   try {
@@ -95,6 +96,7 @@ export async function findAllAnimeSeriesDB(
       skip,
       take,
       orderBy,
+      select,
     });
   } catch (error) {
     handleDatabaseError(error, 'Tüm anime serilerini listeleme', { where, skip, take, orderBy });
