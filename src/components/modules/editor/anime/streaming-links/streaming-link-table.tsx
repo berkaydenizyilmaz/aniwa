@@ -1,13 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Link } from 'lucide-react';
-import { Episode } from '@prisma/client';
-import { getEpisodeListAction, deleteEpisodeAction } from '@/lib/actions/editor/episode.action';
+import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus } from 'lucide-react';
+import { StreamingLink } from '@prisma/client';
+import { getStreamingLinksByEpisodeAction, deleteStreamingLinkAction } from '@/lib/actions/editor/streaming-link.action';
 import { toast } from 'sonner';
-import { GetEpisodeListResponse } from '@/lib/types/api/anime.api';
+import { GetStreamingLinksResponse } from '@/lib/types/api/anime.api';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -29,73 +28,68 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Tablo item tipi
-type EpisodeTableItem = GetEpisodeListResponse['episodes'][0];
+type StreamingLinkTableItem = GetStreamingLinksResponse['streamingLinks'][0];
 
-interface EpisodeTableProps {
-  mediaPartId: string;
-  onEdit?: (episode: Episode) => void;
-  onStreamingLinks?: (episode: Episode) => void;
+interface StreamingLinkTableProps {
+  episodeId: string;
+  onEdit?: (streamingLink: StreamingLink) => void;
+  onCreateNew?: () => void;
   refreshKey?: number;
 }
 
-export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey }: EpisodeTableProps) {
+export function StreamingLinkTable({ episodeId, onEdit, onCreateNew, refreshKey }: StreamingLinkTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedEpisode, setSelectedEpisode] = useState<EpisodeTableItem | null>(null);
+  const [selectedStreamingLink, setSelectedStreamingLink] = useState<StreamingLinkTableItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(50);
   const queryClient = useQueryClient();
 
   // Query key oluştur
-  const queryKey = ['episodes', { mediaPartId, currentPage, limit, refreshKey }];
+  const queryKey = ['streaming-links', { episodeId, currentPage, limit, refreshKey }];
 
-  // Episode'ları getir
+  // Streaming link'leri getir
   const { data, isLoading: isFetching, error } = useQuery({
     queryKey,
     queryFn: async () => {
-      const result = await getEpisodeListAction(mediaPartId, currentPage, limit);
+      const result = await getStreamingLinksByEpisodeAction(episodeId, currentPage, limit);
       if (!result.success) {
-        throw new Error(result.error || 'Episode\'lar yüklenirken bir hata oluştu');
+        throw new Error(result.error || 'Streaming link\'ler yüklenirken bir hata oluştu');
       }
-      return result.data as GetEpisodeListResponse;
+      return result.data as GetStreamingLinksResponse;
     },
     staleTime: 5 * 60 * 1000, // 5 dakika
   });
 
   // Silme mutation'ı
   const deleteMutation = useMutation({
-    mutationFn: deleteEpisodeAction,
+    mutationFn: deleteStreamingLinkAction,
     onSuccess: () => {
-      toast.success('Episode başarıyla silindi!');
+      toast.success('Streaming link başarıyla silindi!');
       setDeleteDialogOpen(false);
-      setSelectedEpisode(null);
-
+      setSelectedStreamingLink(null);
+      
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['episodes'] });
+      queryClient.invalidateQueries({ queryKey: ['streaming-links'] });
     },
     onError: (error) => {
-      console.error('Delete episode error:', error);
+      console.error('Delete streaming link error:', error);
       toast.error('Silme işlemi sırasında bir hata oluştu');
     },
   });
 
-  const handleEdit = (episode: EpisodeTableItem) => {
+  const handleEdit = (streamingLink: StreamingLinkTableItem) => {
     // Sadece id'yi geçir, form kendi verilerini yükleyecek
-    onEdit?.({ id: episode.id } as Episode);
+    onEdit?.({ id: streamingLink.id } as StreamingLink);
   };
 
-  const handleStreamingLinks = (episode: EpisodeTableItem) => {
-    // Sadece id'yi geçir, streaming links sayfası kendi verilerini yükleyecek
-    onStreamingLinks?.({ id: episode.id } as Episode);
-  };
-
-  const handleDelete = (episode: EpisodeTableItem) => {
-    setSelectedEpisode(episode);
+  const handleDelete = (streamingLink: StreamingLinkTableItem) => {
+    setSelectedStreamingLink(streamingLink);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (selectedEpisode) {
-      deleteMutation.mutate(selectedEpisode.id);
+    if (selectedStreamingLink) {
+      deleteMutation.mutate(selectedStreamingLink.id);
     }
   };
 
@@ -105,41 +99,41 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
 
   const getPageNumbers = () => {
     if (!data) return [];
-
+    
     const totalPages = data.totalPages;
     const current = currentPage;
     const pages = [];
-
+    
     // İlk sayfa
     if (current > 1) {
       pages.push(1);
     }
-
+    
     // Önceki sayfalar
     for (let i = Math.max(2, current - 2); i < current; i++) {
       pages.push(i);
     }
-
+    
     // Mevcut sayfa
     pages.push(current);
-
+    
     // Sonraki sayfalar
     for (let i = current + 1; i <= Math.min(totalPages - 1, current + 2); i++) {
       pages.push(i);
     }
-
+    
     // Son sayfa
     if (current < totalPages) {
       pages.push(totalPages);
     }
-
+    
     return pages;
   };
 
   if (error) {
     return (
       <div className="glass-card p-6 text-center">
-        <p className="text-destructive">Episode&apos;lar yüklenirken bir hata oluştu</p>
+        <p className="text-destructive">Streaming link&apos;ler yüklenirken bir hata oluştu</p>
         <Button onClick={() => window.location.reload()} className="mt-4">
           Tekrar Dene
         </Button>
@@ -153,26 +147,18 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Thumbnail</TableHead>
-              <TableHead>Bölüm</TableHead>
-              <TableHead>Başlık</TableHead>
-              <TableHead>Süre</TableHead>
-              <TableHead>Yayın Tarihi</TableHead>
-              <TableHead>Filler</TableHead>
-              <TableHead>Puan</TableHead>
+              <TableHead>Platform</TableHead>
+              <TableHead>URL</TableHead>
+              <TableHead>Oluşturulma</TableHead>
               <TableHead>İşlemler</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {Array.from({ length: 5 }).map((_, i) => (
               <TableRow key={i}>
-                <TableCell><Skeleton className="h-16 w-24 rounded" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-12" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-[300px]" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Skeleton className="h-8 w-8 rounded" />
@@ -187,10 +173,14 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
     );
   }
 
-  if (!data || data.episodes.length === 0) {
+  if (!data || data.streamingLinks.length === 0) {
     return (
       <div className="glass-card p-6 text-center">
-        <p className="text-muted-foreground">Henüz episode bulunmuyor</p>
+        <p className="text-muted-foreground mb-4">Henüz streaming link bulunmuyor</p>
+        <Button onClick={onCreateNew} variant="outline">
+          <Plus className="h-4 w-4 mr-2" />
+          Yeni Streaming Link Ekle
+        </Button>
       </div>
     );
   }
@@ -201,87 +191,46 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Thumbnail</TableHead>
-              <TableHead>Bölüm</TableHead>
-              <TableHead>Başlık</TableHead>
-              <TableHead>Süre</TableHead>
-              <TableHead>Yayın Tarihi</TableHead>
-              <TableHead>Filler</TableHead>
-              <TableHead>Puan</TableHead>
+              <TableHead>Platform</TableHead>
+              <TableHead>URL</TableHead>
+              <TableHead>Oluşturulma</TableHead>
               <TableHead>İşlemler</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.episodes.map((episode) => (
-              <TableRow key={episode.id}>
+            {data.streamingLinks.map((streamingLink) => (
+              <TableRow key={streamingLink.id}>
                 <TableCell>
-                  {episode.thumbnailImage ? (
-                    <Image
-                      src={episode.thumbnailImage}
-                      alt={episode.title || `Episode ${episode.episodeNumber}`}
-                      width={96}
-                      height={54}
-                      className="rounded object-cover"
-                    />
-                  ) : (
-                    <div className="h-[54px] w-24 bg-muted rounded flex items-center justify-center text-xs text-muted-foreground">
-                      No Image
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell className="font-mono text-sm">
-                  #{episode.episodeNumber}
+                  <div className="font-medium">{streamingLink.platform.name}</div>
                 </TableCell>
                 <TableCell>
-                  <div className="font-medium">{episode.title || `Episode ${episode.episodeNumber}`}</div>
-                  {episode.englishTitle && (
-                    <div className="text-sm text-muted-foreground">{episode.englishTitle}</div>
-                  )}
+                  <a 
+                    href={streamingLink.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline truncate block max-w-[300px]"
+                  >
+                    {streamingLink.url}
+                  </a>
                 </TableCell>
                 <TableCell>
-                  {episode.duration ? `${episode.duration} dk` : '-'}
-                </TableCell>
-                <TableCell>
-                  {episode.airDate ? new Date(episode.airDate).toLocaleDateString('tr-TR') : '-'}
-                </TableCell>
-                <TableCell>
-                  {episode.isFiller ? (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                      Filler
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      Canon
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {episode.averageScore ? episode.averageScore.toFixed(1) : '-'}
+                  {new Date(streamingLink.createdAt).toLocaleDateString('tr-TR')}
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleEdit(episode)}
+                      onClick={() => handleEdit(streamingLink)}
                       className="h-8 w-8 p-0"
                       title="Düzenle"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleStreamingLinks(episode)}
-                      className="h-8 w-8 p-0"
-                      title="Streaming Link'leri"
-                    >
-                      <Link className="h-4 w-4" />
-                    </Button>
-                    <Button
                       variant="ghost-destructive"
                       size="sm"
-                      onClick={() => handleDelete(episode)}
+                      onClick={() => handleDelete(streamingLink)}
                       disabled={deleteMutation.isPending}
                       className="h-8 w-8 p-0"
                       title="Sil"
@@ -300,7 +249,7 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
       {data.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Toplam {data.total} episode
+            Toplam {data.total} streaming link
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -353,9 +302,9 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Episode&apos;u Sil</AlertDialogTitle>
+            <AlertDialogTitle>Streaming Link&apos;i Sil</AlertDialogTitle>
             <AlertDialogDescription>
-              &quot;{selectedEpisode?.title || `Episode ${selectedEpisode?.episodeNumber}`}&quot; episode&apos;unu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+              &quot;{selectedStreamingLink?.platform.name}&quot; platformundaki streaming link&apos;i silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
