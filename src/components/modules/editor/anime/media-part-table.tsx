@@ -126,7 +126,6 @@ export function MediaPartTable({ seriesId, onEdit, onEpisodes, refreshKey }: Med
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Kapak</TableHead>
               <TableHead>ID</TableHead>
               <TableHead>Başlık</TableHead>
               <TableHead>Sıra</TableHead>
@@ -138,9 +137,6 @@ export function MediaPartTable({ seriesId, onEdit, onEpisodes, refreshKey }: Med
           <TableBody>
             {Array.from({ length: 5 }).map((_, i) => (
               <TableRow key={i}>
-                <TableCell>
-                  <Skeleton className="h-16 w-12 rounded" />
-                </TableCell>
                 <TableCell>
                   <Skeleton className="h-4 w-12" />
                 </TableCell>
@@ -189,7 +185,6 @@ export function MediaPartTable({ seriesId, onEdit, onEpisodes, refreshKey }: Med
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Kapak</TableHead>
               <TableHead>ID</TableHead>
               <TableHead>Başlık</TableHead>
               <TableHead>Sıra</TableHead>
@@ -201,26 +196,18 @@ export function MediaPartTable({ seriesId, onEdit, onEpisodes, refreshKey }: Med
           <TableBody>
             {mediaParts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   Medya parçası bulunamadı
                 </TableCell>
               </TableRow>
             ) : (
               mediaParts.map((mediaPart) => (
                 <TableRow key={mediaPart.id}>
-                  <TableCell>
-                    <div className="w-12 h-16 bg-muted rounded flex items-center justify-center">
-                      <span className="text-xs text-muted-foreground">No Image</span>
-                    </div>
-                  </TableCell>
                   <TableCell className="font-mono text-sm">
                     #{mediaPart.id.slice(-6)}
                   </TableCell>
                   <TableCell>
                     <div className="font-medium">{mediaPart.title}</div>
-                    {mediaPart.englishTitle && (
-                      <div className="text-sm text-muted-foreground">{mediaPart.englishTitle}</div>
-                    )}
                   </TableCell>
                   <TableCell>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
