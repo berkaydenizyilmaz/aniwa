@@ -2,12 +2,12 @@
 
 import { Crown, Edit, Shield, LayoutDashboard, Home, Play, List, User, Bell, Settings, Building2, FileText, Tv, Hash, BookOpen } from 'lucide-react';
 import { ROUTES } from './routes.constants';
-import { USER } from './user.constants';
+import { UserRole } from '@prisma/client';
  
 export const ADMIN_MENU_ITEMS = [
-  { icon: Crown, label: 'Admin Paneli', href: ROUTES.PAGES.ADMIN.DASHBOARD, role: USER.ROLES.ADMIN },
-  { icon: Edit, label: 'Editör Paneli', href: ROUTES.PAGES.EDITOR.DASHBOARD, role: USER.ROLES.EDITOR },
-  { icon: Shield, label: 'Moderasyon Paneli', href: ROUTES.PAGES.MODERATOR.DASHBOARD, role: USER.ROLES.MODERATOR },
+  { icon: Crown, label: 'Admin Paneli', href: ROUTES.PAGES.ADMIN.DASHBOARD, role: UserRole.ADMIN },
+  { icon: Edit, label: 'Editör Paneli', href: ROUTES.PAGES.EDITOR.DASHBOARD, role: UserRole.EDITOR },
+  { icon: Shield, label: 'Moderasyon Paneli', href: ROUTES.PAGES.MODERATOR.DASHBOARD, role: UserRole.MODERATOR },
 ] as const; 
 
 export const ADMIN_NAVIGATION_ITEMS = [
