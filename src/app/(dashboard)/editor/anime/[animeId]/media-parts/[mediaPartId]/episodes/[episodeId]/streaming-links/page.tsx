@@ -53,7 +53,7 @@ export default function StreamingLinksPage({ params }: StreamingLinksPageProps) 
           </Link>
           <div>
             <h1 className="text-2xl font-bold">İzleme Link'leri</h1>
-            <p className="text-muted-foreground">Bölüm için streaming link'leri yönetin</p>
+            <p className="text-muted-foreground">Bölüm için izleme linklerini yönetin</p>
           </div>
         </div>
         <Button onClick={handleCreateNew}>
