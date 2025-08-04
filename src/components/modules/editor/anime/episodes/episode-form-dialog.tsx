@@ -175,7 +175,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
                         type="number"
                         placeholder="1"
                         min="1"
-                        {...field}
+                        value={field.value || ''}
                         onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                       />
                     </FormControl>
@@ -274,7 +274,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
                           type="number"
                           placeholder="24"
                           min="1"
-                          {...field}
+                          value={field.value || ''}
                           onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                         />
                       </FormControl>

@@ -79,7 +79,7 @@ export const updateAnimeMediaPartSchema = z.object({
 // Episode oluşturma şeması
 export const createEpisodeSchema = z.object({
   mediaPartId: z.string().min(1, 'Media part ID gerekli'),
-  episodeNumber: z.number().min(1, 'Bölüm numarası en az 1 olmalı').max(9999, 'Bölüm numarası çok yüksek'),
+  episodeNumber: z.number({ required_error: 'Bölüm numarası gerekli' }).min(1, 'Bölüm numarası en az 1 olmalı').max(9999, 'Bölüm numarası çok yüksek'),
   title: z.string().max(ANIME.TITLE.MAX_LENGTH, 'Bölüm başlığı çok uzun').optional(),
   description: z.string().max(ANIME.SYNOPSIS.MAX_LENGTH, 'Açıklama çok uzun').optional(),
   thumbnailImageFile: z.instanceof(File).optional().nullable(),
@@ -91,7 +91,7 @@ export const createEpisodeSchema = z.object({
 
 // Episode güncelleme şeması
 export const updateEpisodeSchema = z.object({
-  episodeNumber: z.number().min(1, 'Bölüm numarası en az 1 olmalı').max(9999, 'Bölüm numarası çok yüksek').optional(),
+  episodeNumber: z.number({ required_error: 'Bölüm numarası gerekli' }).min(1, 'Bölüm numarası en az 1 olmalı').max(9999, 'Bölüm numarası çok yüksek'),
   title: z.string().max(ANIME.TITLE.MAX_LENGTH, 'Bölüm başlığı çok uzun').optional(),
   description: z.string().max(ANIME.SYNOPSIS.MAX_LENGTH, 'Açıklama çok uzun').optional(),
   thumbnailImageFile: z.instanceof(File).optional().nullable(),
