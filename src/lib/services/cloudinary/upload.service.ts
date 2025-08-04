@@ -143,6 +143,23 @@ export class UploadService {
   }
 
   /**
+   * Anime serisine ait tüm episode thumbnail'lerini sil
+   */
+  static async deleteEpisodeThumbnailsByAnimeSeries(animeSeriesId: string): Promise<void> {
+    try {
+      const result = await cloudinary.search
+        .expression(`folder:aniwa/episodes/thumbnails AND public_id:aniwa/episodes/thumbnails/${animeSeriesId}_*`)
+        .execute();
+
+      for (const resource of result.resources) {
+        await this.deleteFile(resource.public_id);
+      }
+    } catch (error) {
+      console.error('Anime series episode thumbnails delete error:', error);
+    }
+  }
+
+  /**
    * Episode thumbnail yükle
    */
   static async uploadEpisodeThumbnail(
@@ -181,6 +198,23 @@ export class UploadService {
       }
     } catch (error) {
       console.error('Episode thumbnail delete error:', error);
+    }
+  }
+
+  /**
+   * Media part'a ait tüm episode thumbnail'lerini sil
+   */
+  static async deleteEpisodeThumbnailsByMediaPart(mediaPartId: string): Promise<void> {
+    try {
+      const result = await cloudinary.search
+        .expression(`folder:aniwa/episodes/thumbnails AND public_id:aniwa/episodes/thumbnails/${mediaPartId}_*`)
+        .execute();
+
+      for (const resource of result.resources) {
+        await this.deleteFile(resource.public_id);
+      }
+    } catch (error) {
+      console.error('Media part episode thumbnails delete error:', error);
     }
   }
 

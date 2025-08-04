@@ -437,6 +437,7 @@ export async function deleteAnimeSeriesBusiness(
 
     // Cloudinary'den resimleri sil
     await UploadService.deleteAnimeImages(id);
+    await UploadService.deleteEpisodeThumbnailsByAnimeSeries(id);
 
     // Başarılı silme logu
     await logger.info(
