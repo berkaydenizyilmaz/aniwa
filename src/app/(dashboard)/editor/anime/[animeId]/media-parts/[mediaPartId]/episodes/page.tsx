@@ -62,19 +62,17 @@ export default function EpisodesPage({ params }: EpisodesPageProps) {
             <span>Geri</span>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Episodes</h1>
-            <p className="text-muted-foreground">
-              Media part için episode&apos;ları yönetin
-            </p>
+            <h1 className="text-2xl font-bold">Bölümler</h1>
+            <p className="text-muted-foreground">Medya part için bölümleri yönetin</p>
           </div>
         </div>
         <Button onClick={handleCreateNew} className="flex items-center space-x-2">
           <Plus className="h-4 w-4" />
-          <span>Yeni Episode</span>
+          <span>Yeni Bölüm</span>
         </Button>
       </div>
 
-      {/* Episodes Table */}
+      {/* Bölümler Tablosu */}
       <EpisodeTable
         mediaPartId={mediaPartId}
         onEdit={handleEdit}

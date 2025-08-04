@@ -102,7 +102,7 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
             {isEditing ? 'Platform Düzenle' : 'Yeni Platform Ekle'}
           </DialogTitle>
           <DialogDescription>
-            {isEditing ? 'Platform bilgilerini güncelleyin.' : 'Yeni bir streaming platformu ekleyin.'}
+            {isEditing ? 'Platform bilgilerini güncelleyin.' : 'Yeni bir izleme platformu ekleyin.'}
           </DialogDescription>
         </DialogHeader>
 

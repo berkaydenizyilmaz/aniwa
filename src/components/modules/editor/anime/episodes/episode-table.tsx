@@ -65,7 +65,7 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
   const deleteMutation = useMutation({
     mutationFn: deleteEpisodeAction,
     onSuccess: () => {
-      toast.success('Episode başarıyla silindi!');
+      toast.success('Bölüm başarıyla silindi!');
       setDeleteDialogOpen(false);
       setSelectedEpisode(null);
 
@@ -139,7 +139,7 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
   if (error) {
     return (
       <div className="glass-card p-6 text-center">
-        <p className="text-destructive">Episode&apos;lar yüklenirken bir hata oluştu</p>
+        <p className="text-destructive">Bölümler yüklenirken bir hata oluştu</p>
         <Button onClick={() => window.location.reload()} className="mt-4">
           Tekrar Dene
         </Button>
@@ -190,7 +190,7 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
   if (!data || data.episodes.length === 0) {
     return (
       <div className="glass-card p-6 text-center">
-        <p className="text-muted-foreground">Henüz episode bulunmuyor</p>
+        <p className="text-muted-foreground">Henüz bölüm bulunmuyor</p>
       </div>
     );
   }
@@ -271,7 +271,7 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
                       size="sm"
                       onClick={() => handleStreamingLinks(episode)}
                       className="h-8 w-8 p-0"
-                      title="Streaming Link'leri"
+                      title="İzleme Linkleri"
                     >
                       <Link className="h-4 w-4" />
                     </Button>
@@ -297,7 +297,7 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
       {data.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Toplam {data.total} episode
+            Toplam {data.total} bölüm
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -350,9 +350,9 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Episode&apos;u Sil</AlertDialogTitle>
+            <AlertDialogTitle>Bölümü Sil</AlertDialogTitle>
             <AlertDialogDescription>
-              &quot;{selectedEpisode?.title || `Episode ${selectedEpisode?.episodeNumber}`}&quot; episode&apos;unu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+                              &quot;{selectedEpisode?.title || `Bölüm ${selectedEpisode?.episodeNumber}`}&quot; bölümünü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

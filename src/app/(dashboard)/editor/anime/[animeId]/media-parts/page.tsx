@@ -61,19 +61,17 @@ export default function MediaPartsPage({ params }: MediaPartsPageProps) {
             <span>Geri</span>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Media Parts</h1>
-            <p className="text-muted-foreground">
-              Anime serisi için media part&apos;ları yönetin
-            </p>
+            <h1 className="text-2xl font-bold">Medya Partlar</h1>
+            <p className="text-muted-foreground">Anime serisi için medya partları yönetin</p>
           </div>
         </div>
         <Button onClick={handleCreateNew} className="flex items-center space-x-2">
           <Plus className="h-4 w-4" />
-          <span>Yeni Media Part</span>
+          <span>Yeni Medya Part</span>
         </Button>
       </div>
 
-      {/* Media Parts Table */}
+      {/* Medya Partlar Tablosu */}
       <MediaPartTable
         seriesId={animeId}
         onEdit={handleEdit}

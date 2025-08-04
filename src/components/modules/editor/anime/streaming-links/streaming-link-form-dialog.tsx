@@ -101,7 +101,7 @@ export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streami
   const createMutation = useMutation({
     mutationFn: createStreamingLinkAction,
     onSuccess: () => {
-      toast.success('Streaming link başarıyla oluşturuldu!');
+      toast.success('İzleme linki başarıyla oluşturuldu!');
       onSuccess?.();
       onOpenChange(false);
       queryClient.invalidateQueries({ queryKey: ['streaming-links'] });
@@ -117,7 +117,7 @@ export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streami
     mutationFn: ({ id, data }: { id: string; data: UpdateStreamingLinkInput }) =>
       updateStreamingLinkAction(id, data),
     onSuccess: () => {
-      toast.success('Streaming link başarıyla güncellendi!');
+      toast.success('İzleme linki başarıyla güncellendi!');
       onSuccess?.();
       onOpenChange(false);
       queryClient.invalidateQueries({ queryKey: ['streaming-links'] });
@@ -143,7 +143,7 @@ export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streami
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {streamingLink ? 'Streaming Link Düzenle' : 'Yeni Streaming Link Oluştur'}
+            {streamingLink ? 'İzleme Linki Düzenle' : 'Yeni İzleme Linki Oluştur'}
           </DialogTitle>
         </DialogHeader>
 

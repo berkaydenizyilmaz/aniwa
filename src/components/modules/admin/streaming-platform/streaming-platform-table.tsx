@@ -41,7 +41,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
   const [limit] = useState(50);
   const queryClient = useQueryClient();
 
-  // Streaming Platform'ları getir (React Query ile)
+  // İzleme Platform'larını getir (React Query ile)
   const { data: platformsData, isLoading } = useQuery({
     queryKey: ['streaming-platforms', searchTerm, currentPage, limit],
     queryFn: async () => {
@@ -52,7 +52,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
       if (searchTerm) filters.search = searchTerm;
       const result = await getStreamingPlatformsAction(filters);
       if (!result.success) {
-        throw new Error(result.error || 'Yayın platformları yüklenirken bir hata oluştu');
+        throw new Error(result.error || 'İzmele platformları yüklenirken bir hata oluştu');
       }
       return result.data as GetStreamingPlatformsResponse;
     },
@@ -77,7 +77,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteStreamingPlatformAction(id),
     onSuccess: () => {
-      toast.success('Yayın platformu başarıyla silindi!');
+      toast.success('İzleme platformu başarıyla silindi!');
       setDeleteDialogOpen(false);
       setSelectedStreamingPlatform(null);
       // Query'yi invalidate et
@@ -196,7 +196,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
 
         {(!platformsData?.platforms || platformsData.platforms.length === 0) && (
           <div className="p-8 text-center text-muted-foreground">
-            {searchTerm ? 'Arama kriterlerine uygun yayın platformu bulunamadı.' : 'Henüz yayın platformu bulunmuyor.'}
+            {searchTerm ? 'Arama kriterlerine uygun izleme platformu bulunamadı.' : 'Henüz izleme platformu bulunmuyor.'}
           </div>
         )}
 
@@ -204,7 +204,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
         {platformsData && platformsData.totalPages > 1 && (
           <div className="flex items-center justify-between p-4 border-t border-border/50">
             <div className="text-sm text-muted-foreground">
-              Toplam {platformsData.total} yayın platformu, {currentPage}. sayfa / {platformsData.totalPages} sayfa
+              Toplam {platformsData.total} izleme platformu, {currentPage}. sayfa / {platformsData.totalPages} sayfa
             </div>
             
             <div className="flex items-center gap-2">
@@ -277,9 +277,9 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Yayın Platformunu Sil</AlertDialogTitle>
+            <AlertDialogTitle>İzleme Platformunu Sil</AlertDialogTitle>
             <AlertDialogDescription>
-              <strong>{selectedStreamingPlatform?.name}</strong> yayın platformunu silmek istediğinizden emin misiniz?
+              <strong>{selectedStreamingPlatform?.name}</strong> izleme platformunu silmek istediğinizden emin misiniz?
               Bu işlem geri alınamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>

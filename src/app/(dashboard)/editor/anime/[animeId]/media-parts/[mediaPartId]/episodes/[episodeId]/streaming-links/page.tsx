@@ -52,13 +52,13 @@ export default function StreamingLinksPage({ params }: StreamingLinksPageProps) 
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold">Streaming Link'leri</h1>
-            <p className="text-muted-foreground">Episode için streaming link'leri yönetin</p>
+            <h1 className="text-2xl font-bold">İzleme Link'leri</h1>
+            <p className="text-muted-foreground">Bölüm için streaming link'leri yönetin</p>
           </div>
         </div>
         <Button onClick={handleCreateNew}>
           <Plus className="h-4 w-4 mr-2" />
-          Yeni Streaming Link
+          Yeni İzleme Link
         </Button>
       </div>
 

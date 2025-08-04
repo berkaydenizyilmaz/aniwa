@@ -36,9 +36,9 @@ export default function StreamingPlatformsPage() {
     <div className="space-y-6">
       {/* Başlık */}
       <div>
-        <h1 className="text-3xl font-bold">Streaming Platformları</h1>
+        <h1 className="text-3xl font-bold">İzleme Platformları</h1>
         <p className="text-muted-foreground">
-          Streaming platformlarını yönetin
+          İzleme platformlarını yönetin
         </p>
       </div>
 

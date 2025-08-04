@@ -105,7 +105,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
   const createMutation = useMutation({
     mutationFn: createEpisodeAction,
     onSuccess: () => {
-      toast.success('Episode başarıyla oluşturuldu');
+      toast.success('Bölüm başarıyla oluşturuldu');
       onOpenChange(false);
       onSuccess?.();
       // Cache'i temizle
@@ -122,7 +122,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
       return updateEpisodeAction(episode!.id, data);
     },
     onSuccess: () => {
-      toast.success('Episode başarıyla güncellendi');
+      toast.success('Bölüm başarıyla güncellendi');
       onOpenChange(false);
       onSuccess?.();
       // Cache'i temizle
@@ -149,7 +149,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {episode ? 'Episode Düzenle' : 'Yeni Episode Oluştur'}
+            {episode ? 'Bölüm Düzenle' : 'Yeni Bölüm Oluştur'}
           </DialogTitle>
         </DialogHeader>
 

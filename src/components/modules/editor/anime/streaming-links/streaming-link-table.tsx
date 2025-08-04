@@ -64,7 +64,7 @@ export function StreamingLinkTable({ episodeId, onEdit, onCreateNew, refreshKey 
   const deleteMutation = useMutation({
     mutationFn: deleteStreamingLinkAction,
     onSuccess: () => {
-      toast.success('Streaming link başarıyla silindi!');
+      toast.success('İzleme linki başarıyla silindi!');
       setDeleteDialogOpen(false);
       setSelectedStreamingLink(null);
       
@@ -133,7 +133,7 @@ export function StreamingLinkTable({ episodeId, onEdit, onCreateNew, refreshKey 
   if (error) {
     return (
       <div className="glass-card p-6 text-center">
-        <p className="text-destructive">Streaming link&apos;ler yüklenirken bir hata oluştu</p>
+        <p className="text-destructive">İzleme linkleri yüklenirken bir hata oluştu</p>
         <Button onClick={() => window.location.reload()} className="mt-4">
           Tekrar Dene
         </Button>
@@ -176,7 +176,7 @@ export function StreamingLinkTable({ episodeId, onEdit, onCreateNew, refreshKey 
   if (!data || data.streamingLinks.length === 0) {
     return (
       <div className="glass-card p-6 text-center">
-        <p className="text-muted-foreground mb-4">Henüz streaming link bulunmuyor</p>
+        <p className="text-muted-foreground mb-4">Henüz izleme linki bulunmuyor</p>
       </div>
     );
   }
