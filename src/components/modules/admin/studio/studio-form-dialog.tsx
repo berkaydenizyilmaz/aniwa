@@ -1,11 +1,18 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
@@ -32,13 +39,7 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
   const isEdit = !!studio;
   const queryClient = useQueryClient();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    control,
-    formState: { errors }
-  } = useForm<CreateStudioInput | UpdateStudioInput>({
+  const form = useForm<CreateStudioInput | UpdateStudioInput>({
     resolver: zodResolver(isEdit ? updateStudioSchema : createStudioSchema),
     defaultValues: {
       name: '',
@@ -49,17 +50,17 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
   // Form'u studio verisi ile doldur (edit mode)
   useEffect(() => {
     if (studio) {
-      reset({
+      form.reset({
         name: studio.name,
         isAnimationStudio: studio.isAnimationStudio,
       });
     } else {
-      reset({
+      form.reset({
         name: '',
         isAnimationStudio: true,
       });
     }
-  }, [studio, reset]);
+  }, [studio, form]);
 
   // Create/Update mutation
   const mutation = useMutation({
@@ -96,63 +97,66 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
           </DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Stüdyo Adı */}
-          <div className="space-y-2">
-            <Label htmlFor="name">Stüdyo Adı</Label>
-            <Input
-              id="name"
-              {...register('name')}
-              placeholder="Stüdyo adını girin"
-              disabled={mutation.isPending}
-            />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
-            )}
-          </div>
-
-          {/* Stüdyo Türü */}
-          <div className="space-y-2">
-            <Controller
-              name="isAnimationStudio"
-              control={control}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Stüdyo Adı */}
+            <FormField
+              control={form.control}
+              name="name"
               render={({ field }) => (
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="isAnimationStudio"
-                    checked={field.value}
-                    onCheckedChange={(checked) => field.onChange(checked === true)}
-                    disabled={mutation.isPending}
-                  />
-                  <Label htmlFor="isAnimationStudio" className="text-sm">
-                    Animasyon Stüdyosu
-                  </Label>
-                </div>
+                <FormItem>
+                  <FormLabel>Stüdyo Adı</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Stüdyo adını girin"
+                      disabled={mutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
-            {errors.isAnimationStudio && (
-              <p className="text-sm text-destructive">{errors.isAnimationStudio.message}</p>
-            )}
-          </div>
 
-          {/* Butonlar */}
-          <div className="flex justify-end gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={mutation.isPending}
-            >
-              İptal
-            </Button>
-            <Button
-              type="submit"
-              disabled={mutation.isPending}
-            >
-              {isEdit ? 'Güncelle' : 'Oluştur'}
-            </Button>
-          </div>
-        </form>
+            {/* Stüdyo Türü */}
+            <FormField
+              control={form.control}
+              name="isAnimationStudio"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={mutation.isPending}
+                    />
+                  </FormControl>
+                  <FormLabel className="text-sm">
+                    Animasyon Stüdyosu
+                  </FormLabel>
+                </FormItem>
+              )}
+            />
+
+            {/* Butonlar */}
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={mutation.isPending}
+              >
+                İptal
+              </Button>
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+              >
+                {isEdit ? 'Güncelle' : 'Oluştur'}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

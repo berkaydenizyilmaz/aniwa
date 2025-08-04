@@ -1,11 +1,18 @@
 'use client';
 
 import { useEffect } from 'react';  
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
@@ -29,13 +36,7 @@ interface UserFormDialogProps {
 export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserFormDialogProps) {
   const queryClient = useQueryClient();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    control,
-    formState: { errors }
-  } = useForm<UpdateUserInput>({
+  const form = useForm<UpdateUserInput>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
       username: '',
@@ -48,21 +49,21 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
   // Form'u user verisi ile doldur (edit mode)
   useEffect(() => {
     if (user) {
-      reset({
+      form.reset({
         username: user.username,
         email: user.email,
         roles: user.roles,
         isBanned: user.isBanned,
       });
     } else {
-      reset({
+      form.reset({
         username: '',
         email: '',
         roles: [],
         isBanned: false,
       });
     }
-  }, [user, reset]);
+  }, [user, form]);
 
   // Update mutation
   const updateMutation = useMutation({
@@ -95,122 +96,130 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
           </DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Kullanıcı Adı */}
-          <div className="space-y-2">
-            <Label htmlFor="username">Kullanıcı Adı</Label>
-            <Input
-              id="username"
-              {...register('username')}
-              placeholder="Kullanıcı adını girin"
-              disabled={updateMutation.isPending}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Kullanıcı Adı */}
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kullanıcı Adı</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Kullanıcı adını girin"
+                      disabled={updateMutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.username && (
-              <p className="text-sm text-destructive">{errors.username.message}</p>
-            )}
-          </div>
 
-          {/* E-posta */}
-          <div className="space-y-2">
-            <Label htmlFor="email">E-posta</Label>
-            <Input
-              id="email"
-              type="email"
-              {...register('email')}
-              placeholder="E-posta adresini girin"
-              disabled={updateMutation.isPending}
+            {/* E-posta */}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>E-posta</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="E-posta adresini girin"
+                      disabled={updateMutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
-          </div>
 
-          {/* Roller */}
-          <div className="space-y-2">
-            <Label htmlFor="roles">Roller</Label>
-            <Controller
+            {/* Roller */}
+            <FormField
+              control={form.control}
               name="roles"
-              control={control}
               render={({ field }) => (
-                <div className="grid grid-cols-2 gap-3 p-3 bg-muted/50 rounded-lg border">
-                  {Object.values(UserRole).map((role) => {
-                    const isSelected = field.value?.includes(role) || false;
-                    return (
-                      <div key={role} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`role-${role}`}
-                          checked={isSelected}
-                          onCheckedChange={(checked) => {
-                            const currentRoles = field.value || [];
-                            if (checked === true) {
-                              field.onChange([...currentRoles, role]);
-                            } else {
-                              field.onChange(currentRoles.filter(r => r !== role));
-                            }
-                          }}
-                          disabled={updateMutation.isPending}
-                        />
-                        <Label 
-                          htmlFor={`role-${role}`} 
-                          className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
-                            isSelected ? 'text-primary' : 'text-muted-foreground'
-                          }`}
-                        >
-                          {role}
-                        </Label>
-                      </div>
-                    );
-                  })}
-                </div>
+                <FormItem>
+                  <FormLabel>Roller</FormLabel>
+                  <FormControl>
+                    <div className="grid grid-cols-2 gap-3 p-3 bg-muted/50 rounded-lg border">
+                      {Object.values(UserRole).map((role) => {
+                        const isSelected = field.value?.includes(role) || false;
+                        return (
+                          <div key={role} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`role-${role}`}
+                              checked={isSelected}
+                              onCheckedChange={(checked) => {
+                                const currentRoles = field.value || [];
+                                if (checked === true) {
+                                  field.onChange([...currentRoles, role]);
+                                } else {
+                                  field.onChange(currentRoles.filter(r => r !== role));
+                                }
+                              }}
+                              disabled={updateMutation.isPending}
+                            />
+                            <FormLabel 
+                              htmlFor={`role-${role}`} 
+                              className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
+                                isSelected ? 'text-primary' : 'text-muted-foreground'
+                              }`}
+                            >
+                              {role}
+                            </FormLabel>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
-            {errors.roles && (
-              <p className="text-sm text-destructive">{errors.roles.message}</p>
-            )}
-          </div>
 
-          {/* Ban Durumu */}
-          <div className="space-y-2">
-            <Controller
+            {/* Ban Durumu */}
+            <FormField
+              control={form.control}
               name="isBanned"
-              control={control}
               render={({ field }) => (
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="isBanned"
-                    checked={field.value}
-                    onCheckedChange={(checked) => field.onChange(checked === true)}
-                    disabled={updateMutation.isPending}
-                  />
-                  <Label htmlFor="isBanned" className="text-sm">
+                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={updateMutation.isPending}
+                    />
+                  </FormControl>
+                  <FormLabel className="text-sm">
                     Yasaklı
-                  </Label>
-                </div>
+                  </FormLabel>
+                </FormItem>
               )}
             />
-            {errors.isBanned && (
-              <p className="text-sm text-destructive">{errors.isBanned.message}</p>
-            )}
-          </div>
 
-          {/* Butonlar */}
-          <div className="flex justify-end gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={updateMutation.isPending}
-            >
-              İptal
-            </Button>
-            <Button
-              type="submit"
-              disabled={updateMutation.isPending}
-            >
-              Güncelle
-            </Button>
-          </div>
-        </form>
+            {/* Butonlar */}
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={updateMutation.isPending}
+              >
+                İptal
+              </Button>
+              <Button
+                type="submit"
+                disabled={updateMutation.isPending}
+              >
+                Güncelle
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

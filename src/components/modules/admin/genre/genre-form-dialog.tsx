@@ -5,7 +5,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import {
   Dialog,
   DialogContent,
@@ -29,12 +36,7 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
   const isEdit = !!genre;
   const queryClient = useQueryClient();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm<CreateGenreInput>({
+  const form = useForm<CreateGenreInput>({
     resolver: zodResolver(isEdit ? updateGenreSchema : createGenreSchema),
     defaultValues: {
       name: '',
@@ -44,15 +46,15 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
   // Form'u genre verisi ile doldur (edit mode)
   useEffect(() => {
     if (genre) {
-      reset({
+      form.reset({
         name: genre.name,
       });
     } else {
-      reset({
+      form.reset({
         name: '',
       });
     }
-  }, [genre, reset]);
+  }, [genre, form]);
 
   // Create/Update mutation
   const mutation = useMutation({
@@ -89,40 +91,47 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Tür Adı */}
-          <div className="space-y-2">
-            <Label htmlFor="name">Tür Adı</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Tür adını girin"
-              {...register('name')}
-              disabled={mutation.isPending}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Tür Adı */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tür Adı</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Tür adını girin"
+                      disabled={mutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
-            )}
-          </div>
 
-          {/* Butonlar */}
-          <div className="flex justify-end gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={mutation.isPending}
-            >
-              İptal
-            </Button>
-            <Button
-              type="submit"
-              disabled={mutation.isPending}
-            >
-              {isEdit ? 'Güncelle' : 'Oluştur'}
-            </Button>
-          </div>
-        </form>
+            {/* Butonlar */}
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={mutation.isPending}
+              >
+                İptal
+              </Button>
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+              >
+                {isEdit ? 'Güncelle' : 'Oluştur'}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

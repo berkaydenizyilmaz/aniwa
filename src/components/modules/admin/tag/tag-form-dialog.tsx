@@ -5,7 +5,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -40,14 +47,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
   const isEdit = !!tag;
   const queryClient = useQueryClient();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-    formState: { errors }
-  } = useForm<CreateTagInput | UpdateTagInput>({
+  const form = useForm<CreateTagInput | UpdateTagInput>({
     resolver: zodResolver(isEdit ? updateTagSchema : createTagSchema),
     defaultValues: {
       name: '',
@@ -61,7 +61,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
   // Form'u tag verisi ile doldur (edit mode)
   useEffect(() => {
     if (tag) {
-      reset({
+      form.reset({
         name: tag.name,
         description: tag.description || '',
         category: tag.category || undefined,
@@ -69,7 +69,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
         isSpoiler: tag.isSpoiler,
       });
     } else {
-      reset({
+      form.reset({
         name: '',
         description: '',
         category: undefined,
@@ -77,7 +77,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
         isSpoiler: false,
       });
     }
-  }, [tag, reset]);
+  }, [tag, form]);
 
   // Create/Update mutation
   const mutation = useMutation({
@@ -114,104 +114,136 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
           </DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Etiket Adı */}
-          <div className="space-y-2">
-            <Label htmlFor="name">Etiket Adı</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Etiket adını girin"
-              {...register('name')}
-              disabled={mutation.isPending}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Etiket Adı */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Etiket Adı</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Etiket adını girin"
+                      disabled={mutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
-            )}
-          </div>
 
-          {/* Açıklama */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Açıklama</Label>
-            <Textarea
-              id="description"
-              placeholder="Etiket açıklaması (isteğe bağlı)"
-              {...register('description')}
-              disabled={mutation.isPending}
-              rows={3}
+            {/* Açıklama */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Açıklama</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Etiket açıklaması (isteğe bağlı)"
+                      disabled={mutation.isPending}
+                      rows={3}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.description && (
-              <p className="text-sm text-destructive">{errors.description.message}</p>
-            )}
-          </div>
 
-          {/* Kategori */}
-          <div className="space-y-2">
-            <Label htmlFor="category">Kategori</Label>
-            <Select
-              onValueChange={(value: string) => setValue('category', value as TagCategory)}
-              defaultValue={tag?.category || undefined}
-              disabled={mutation.isPending}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Kategori seçin" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(MASTER_DATA.TAG_CATEGORY).map(([, value]) => (
-                  <SelectItem key={value} value={value}>
-                    {MASTER_DATA.TAG_CATEGORY_LABELS[value as TagCategory]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.category && (
-              <p className="text-sm text-destructive">{errors.category.message}</p>
-            )}
-          </div>
+            {/* Kategori */}
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kategori</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={mutation.isPending}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Kategori seçin" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.entries(MASTER_DATA.TAG_CATEGORY).map(([, value]) => (
+                        <SelectItem key={value} value={value}>
+                          {MASTER_DATA.TAG_CATEGORY_LABELS[value as TagCategory]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Özel Durumlar */}
-          <div className="space-y-2">
-            <Label>Özel Durumlar</Label>
-            <div className="flex gap-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="isAdult"
-                  checked={watch('isAdult')}
-                  onCheckedChange={(checked) => setValue('isAdult', checked === true)}
-                  disabled={mutation.isPending}
+            {/* Özel Durumlar */}
+            <div className="space-y-2">
+              <FormLabel>Özel Durumlar</FormLabel>
+              <div className="flex gap-4">
+                <FormField
+                  control={form.control}
+                  name="isAdult"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={mutation.isPending}
+                        />
+                      </FormControl>
+                      <FormLabel className="text-sm">Yetişkin İçerik</FormLabel>
+                    </FormItem>
+                  )}
                 />
-                <Label htmlFor="isAdult" className="text-sm">Yetişkin İçerik</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="isSpoiler"
-                  checked={watch('isSpoiler')}
-                  onCheckedChange={(checked) => setValue('isSpoiler', checked === true)}
-                  disabled={mutation.isPending}
+                <FormField
+                  control={form.control}
+                  name="isSpoiler"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={mutation.isPending}
+                        />
+                      </FormControl>
+                      <FormLabel className="text-sm">Spoiler İçerir</FormLabel>
+                    </FormItem>
+                  )}
                 />
-                <Label htmlFor="isSpoiler" className="text-sm">Spoiler İçerir</Label>
               </div>
             </div>
-          </div>
 
-          {/* Butonlar */}
-          <div className="flex justify-end gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={mutation.isPending}
-            >
-              İptal
-            </Button>
-            <Button
-              type="submit"
-              disabled={mutation.isPending}
-            >
-              {isEdit ? 'Güncelle' : 'Oluştur'}
-            </Button>
-          </div>
-        </form>
+            {/* Butonlar */}
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={mutation.isPending}
+              >
+                İptal
+              </Button>
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+              >
+                {isEdit ? 'Güncelle' : 'Oluştur'}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

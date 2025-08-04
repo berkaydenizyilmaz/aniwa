@@ -5,7 +5,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import {
   Dialog,
   DialogContent,
@@ -33,12 +40,7 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
 
   const isEditing = !!platform;
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<CreateStreamingPlatformInput | UpdateStreamingPlatformInput>({
+  const form = useForm<CreateStreamingPlatformInput | UpdateStreamingPlatformInput>({
     resolver: zodResolver(isEditing ? updateStreamingPlatformSchema : createStreamingPlatformSchema),
     defaultValues: {
       name: '',
@@ -49,17 +51,17 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
   // Platform değiştiğinde form'u güncelle
   useEffect(() => {
     if (platform) {
-      reset({
+      form.reset({
         name: platform.name,
         baseUrl: platform.baseUrl,
       });
     } else {
-      reset({
+      form.reset({
         name: '',
         baseUrl: '',
       });
     }
-  }, [platform, reset]);
+  }, [platform, form]);
 
   // Create/Update mutation
   const mutation = useMutation({
@@ -74,7 +76,7 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
       toast.success(isEditing ? 'Platform başarıyla güncellendi!' : 'Platform başarıyla oluşturuldu!');
       onSuccess?.();
       onOpenChange(false);
-      reset();
+      form.reset();
       // Query'yi invalidate et
       queryClient.invalidateQueries({ queryKey: ['streaming-platforms'] });
     },
@@ -100,52 +102,64 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Platform Adı */}
-          <div className="space-y-2">
-            <Label htmlFor="name">Platform Adı</Label>
-            <Input
-              id="name"
-              {...register('name')}
-              placeholder="Örn: Netflix, Crunchyroll"
-              disabled={mutation.isPending}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Platform Adı */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Platform Adı</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Örn: Netflix, Crunchyroll"
+                      disabled={mutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
-            )}
-          </div>
 
-          {/* Base URL */}
-          <div className="space-y-2">
-            <Label htmlFor="baseUrl">Base URL</Label>
-            <Input
-              id="baseUrl"
-              {...register('baseUrl')}
-              placeholder="https://www.example.com"
-              disabled={mutation.isPending}
+            {/* Base URL */}
+            <FormField
+              control={form.control}
+              name="baseUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Base URL</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="https://www.example.com"
+                      disabled={mutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.baseUrl && (
-              <p className="text-sm text-destructive">{errors.baseUrl.message}</p>
-            )}
-          </div>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={mutation.isPending}
-            >
-              İptal
-            </Button>
-            <Button
-              type="submit"
-              disabled={mutation.isPending}
-            >
-              {isEditing ? 'Güncelle' : 'Oluştur'}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={mutation.isPending}
+              >
+                İptal
+              </Button>
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+              >
+                {isEditing ? 'Güncelle' : 'Oluştur'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
