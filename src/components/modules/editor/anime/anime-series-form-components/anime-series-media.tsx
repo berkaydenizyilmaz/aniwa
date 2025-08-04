@@ -33,7 +33,7 @@ export function AnimeSeriesMedia({ isPending }: AnimeSeriesMediaProps) {
                 label="Kapak Görseli"
                 accept={UPLOAD_CONFIGS.ANIME_COVER.accept}
                 maxSize={UPLOAD_CONFIGS.ANIME_COVER.maxSize}
-                value={field.value}
+                value={field.value || null}
                 onChange={field.onChange}
                 disabled={isPending}
               />
@@ -55,7 +55,7 @@ export function AnimeSeriesMedia({ isPending }: AnimeSeriesMediaProps) {
                 label="Banner Görseli"
                 accept={UPLOAD_CONFIGS.ANIME_BANNER.accept}
                 maxSize={UPLOAD_CONFIGS.ANIME_BANNER.maxSize}
-                value={field.value}
+                value={field.value || null}
                 onChange={field.onChange}
                 disabled={isPending}
               />
