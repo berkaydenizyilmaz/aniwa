@@ -187,7 +187,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
                         type="number"
                         placeholder="1"
                         min="1"
-                        {...field}
+                        value={field.value || ''}
                         onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                       />
                     </FormControl>
@@ -227,7 +227,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
                         type="number"
                         placeholder="12"
                         min="1"
-                        {...field}
+                        value={field.value || ''}
                         onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                       />
                     </FormControl>
@@ -248,7 +248,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
                         <Input
                           type="number"
                           placeholder="12345"
-                          {...field}
+                          value={field.value || ''}
                           onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                         />
                       </FormControl>
@@ -267,7 +267,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
                         <Input
                           type="number"
                           placeholder="67890"
-                          {...field}
+                          value={field.value || ''}
                           onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                         />
                       </FormControl>
@@ -292,7 +292,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
                           placeholder="8.5"
                           min="0"
                           max="10"
-                          {...field}
+                          value={field.value || ''}
                           onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                         />
                       </FormControl>
@@ -312,7 +312,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
                           type="number"
                           placeholder="1000"
                           min="0"
-                          {...field}
+                          value={field.value || ''}
                           onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                         />
                       </FormControl>
