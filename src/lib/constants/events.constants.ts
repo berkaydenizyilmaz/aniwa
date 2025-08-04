@@ -13,14 +13,26 @@ export const EVENTS = {
   
   // User Events
   USER: {
+    // Settings Events
+    PROFILE_UPDATED: 'user_profile_updated',
+    GENERAL_SETTINGS_UPDATED: 'user_general_settings_updated',
+    PRIVACY_SETTINGS_UPDATED: 'user_privacy_settings_updated',
+    NOTIFICATION_SETTINGS_UPDATED: 'user_notification_settings_updated',
+    SETTINGS_RETRIEVED: 'user_settings_retrieved',
+    
+    // Custom Lists Events
     CUSTOM_LIST_CREATED: 'user_custom_list_created',
     CUSTOM_LIST_UPDATED: 'user_custom_list_updated',
     CUSTOM_LIST_DELETED: 'user_custom_list_deleted',
     CUSTOM_LISTS_RETRIEVED: 'user_custom_lists_retrieved',
+    
+    // Follow Events
     FOLLOW_TOGGLED: 'user_follow_toggled',
     FOLLOWERS_RETRIEVED: 'user_followers_retrieved',
     FOLLOWING_RETRIEVED: 'user_following_retrieved',
     FOLLOW_STATUS_CHECKED: 'user_follow_status_checked',
+    
+    // Anime List Events
     ANIME_ADDED_TO_LIST: 'user_anime_added_to_list',
     ANIME_REMOVED_FROM_LIST: 'user_anime_removed_from_list',
     ANIME_LIST_RETRIEVED: 'user_anime_list_retrieved',
@@ -30,6 +42,8 @@ export const EVENTS = {
     ANIME_TRACKING_STATUS_CHECKED: 'user_anime_tracking_status_checked',
     FAVOURITE_ANIME_TOGGLED: 'user_favourite_anime_toggled',
     FAVOURITE_ANIMES_RETRIEVED: 'user_favourite_animes_retrieved',
+    
+    // Comment Events
     COMMENT_CREATED: 'user_comment_created',
     COMMENTS_RETRIEVED: 'user_comments_retrieved',
     COMMENT_UPDATED: 'user_comment_updated',
