@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { MASTER_DATA } from '@/lib/constants/masterData.constants';
-
+  
 // Studio oluşturma şeması
 export const createStudioSchema = z.object({
   name: z.string().min(MASTER_DATA.NAME.MIN_LENGTH, 'Stüdyo adı gerekli').max(MASTER_DATA.NAME.MAX_LENGTH, 'Stüdyo adı çok uzun'),

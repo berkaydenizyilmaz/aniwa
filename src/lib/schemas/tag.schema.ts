@@ -2,12 +2,12 @@
 
 import { z } from 'zod';
 import { MASTER_DATA } from '@/lib/constants/masterData.constants';
-
+import { TagCategory } from '@prisma/client';
 // Tag oluşturma şeması
 export const createTagSchema = z.object({
   name: z.string().min(MASTER_DATA.NAME.MIN_LENGTH, 'Etiket adı gerekli').max(MASTER_DATA.NAME.MAX_LENGTH, 'Etiket adı çok uzun'),
   description: z.string().max(MASTER_DATA.DESCRIPTION.MAX_LENGTH, 'Açıklama çok uzun').optional(),
-  category: z.nativeEnum(MASTER_DATA.TAG_CATEGORY).optional(),
+  category: z.nativeEnum(TagCategory).optional(),
   isAdult: z.boolean(),
   isSpoiler: z.boolean(),
 });
@@ -16,7 +16,7 @@ export const createTagSchema = z.object({
 export const updateTagSchema = z.object({
   name: z.string().min(MASTER_DATA.NAME.MIN_LENGTH, 'Etiket adı gerekli').max(MASTER_DATA.NAME.MAX_LENGTH, 'Etiket adı çok uzun').optional(),
   description: z.string().max(MASTER_DATA.DESCRIPTION.MAX_LENGTH, 'Açıklama çok uzun').optional(),
-  category: z.nativeEnum(MASTER_DATA.TAG_CATEGORY).optional(),
+  category: z.nativeEnum(TagCategory).optional(),
   isAdult: z.boolean().optional(),
   isSpoiler: z.boolean().optional(),
 });
@@ -24,7 +24,7 @@ export const updateTagSchema = z.object({
 // Tag filtreleme şeması
 export const tagFiltersSchema = z.object({
   search: z.string().optional(),
-  category: z.nativeEnum(MASTER_DATA.TAG_CATEGORY).optional(),
+  category: z.nativeEnum(TagCategory).optional(),
   isAdult: z.boolean().optional(),
   isSpoiler: z.boolean().optional(),
   page: z.number().min(MASTER_DATA.PAGINATION.MIN_PAGE).default(MASTER_DATA.PAGINATION.MIN_PAGE),
