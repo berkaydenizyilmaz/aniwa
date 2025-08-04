@@ -42,6 +42,14 @@ export async function createEpisodeBusiness(
       throw new BusinessError('Bu episode numarası zaten kullanılıyor');
     }
 
+    // Episode numarası sıralama kontrolü
+    const allEpisodes = await findEpisodesByMediaPartIdDB(data.mediaPartId, { episodeNumber: 'asc' });
+    const maxEpisodeNumber = allEpisodes.length > 0 ? Math.max(...allEpisodes.map(ep => ep.episodeNumber)) : 0;
+    
+    if (data.episodeNumber > maxEpisodeNumber + 1) {
+      throw new BusinessError(`Episode numarası ${maxEpisodeNumber + 1}'den büyük olamaz`);
+    }
+
     const { thumbnailImageFile, ...formData } = data;
     let uploadResult;
     
@@ -206,6 +214,15 @@ export async function updateEpisodeBusiness(
       );
       if (existingEpisodeWithNumber) {
         throw new BusinessError('Bu episode numarası zaten kullanılıyor');
+      }
+
+      // Episode numarası sıralama kontrolü (kendisi hariç)
+      const allEpisodes = await findEpisodesByMediaPartIdDB(existingEpisode.mediaPartId, { episodeNumber: 'asc' });
+      const otherEpisodes = allEpisodes.filter(ep => ep.id !== id);
+      const maxEpisodeNumber = otherEpisodes.length > 0 ? Math.max(...otherEpisodes.map(ep => ep.episodeNumber)) : 0;
+      
+      if (data.episodeNumber > maxEpisodeNumber + 1) {
+        throw new BusinessError(`Episode numarası ${maxEpisodeNumber + 1}'den büyük olamaz`);
       }
     }
 

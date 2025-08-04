@@ -3,7 +3,8 @@
 import { 
   BusinessError, 
   NotFoundError,
-  DatabaseError
+  DatabaseError,
+  ConflictError
 } from '@/lib/errors';
 import { 
   createAnimeMediaPartDB, 
@@ -43,6 +44,15 @@ export async function createAnimeMediaPartBusiness(
     const animeSeries = await findAnimeSeriesByIdDB(data.seriesId);
     if (!animeSeries) {
       throw new NotFoundError('Anime serisi bulunamadı');
+    }
+    
+    // Display order benzersizlik kontrolü
+    const existingMediaPart = await findAllAnimeMediaPartsDB(
+      { seriesId: data.seriesId, displayOrder: data.displayOrder },
+      0, 1
+    );
+    if (existingMediaPart.length > 0) {
+      throw new ConflictError('Bu izleme sırası zaten kullanılıyor');
     }
     
     // Resim yükleme işlemi
@@ -238,6 +248,17 @@ export async function updateAnimeMediaPartBusiness(
     const existingMediaPart = await findAnimeMediaPartByIdDB(id);
     if (!existingMediaPart) {
       throw new NotFoundError('Anime medya parçası bulunamadı');
+    }
+
+    // Display order benzersizlik kontrolü (kendisi hariç)
+    if (data.displayOrder !== existingMediaPart.displayOrder) {
+      const duplicateMediaPart = await findAllAnimeMediaPartsDB(
+        { seriesId: existingMediaPart.seriesId, displayOrder: data.displayOrder },
+        0, 1
+      );
+      if (duplicateMediaPart.length > 0) {
+        throw new ConflictError('Bu izleme sırası zaten kullanılıyor');
+      }
     }
 
     // Resim yükleme işlemi
