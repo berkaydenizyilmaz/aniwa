@@ -35,10 +35,6 @@ import {
   GetUserSettingsResponse
 } from '@/lib/types/api/settings.api';
 
-// =============================================================================
-// PROFİL AYARLARI
-// =============================================================================
-
 // Kullanıcı profil bilgilerini güncelleme
 export async function updateProfileBusiness(
   userId: string,
@@ -132,10 +128,6 @@ export async function updateProfileBusiness(
   }
 }
 
-// =============================================================================
-// GENEL AYARLAR
-// =============================================================================
-
 // Kullanıcı genel ayarlarını güncelleme
 export async function updateGeneralSettingsBusiness(
   userId: string,
@@ -188,10 +180,6 @@ export async function updateGeneralSettingsBusiness(
     throw new BusinessError('Genel ayarlar güncelleme başarısız');
   }
 }
-
-// =============================================================================
-// GİZLİLİK AYARLARI
-// =============================================================================
 
 // Kullanıcı gizlilik ayarlarını güncelleme
 export async function updatePrivacySettingsBusiness(
@@ -246,10 +234,6 @@ export async function updatePrivacySettingsBusiness(
   }
 }
 
-// =============================================================================
-// BİLDİRİM AYARLARI
-// =============================================================================
-
 // Kullanıcı bildirim ayarlarını güncelleme
 export async function updateNotificationSettingsBusiness(
   userId: string,
@@ -302,10 +286,6 @@ export async function updateNotificationSettingsBusiness(
     throw new BusinessError('Bildirim ayarları güncelleme başarısız');
   }
 }
-
-// =============================================================================
-// AYARLARI GETİRME
-// =============================================================================
 
 // Kullanıcı tüm ayarlarını getirme
 export async function getUserSettingsBusiness(

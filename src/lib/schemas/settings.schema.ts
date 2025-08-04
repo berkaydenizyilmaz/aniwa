@@ -3,10 +3,6 @@
 import { z } from 'zod';
 import { Theme, TitleLanguage, ScoreFormat, ProfileVisibility } from '@prisma/client';
 
-// =============================================================================
-// PROFİL AYARLARI
-// =============================================================================
-
 // Profil güncelleme şeması
 export const updateProfileSchema = z.object({
   username: z.string().min(3, 'Kullanıcı adı en az 3 karakter olmalı').max(20, 'Kullanıcı adı en fazla 20 karakter olabilir').optional(),
@@ -14,10 +10,6 @@ export const updateProfileSchema = z.object({
   profilePicture: z.instanceof(File).optional().nullable(),
   profileBanner: z.instanceof(File).optional().nullable(),
 });
-
-// =============================================================================
-// GENEL AYARLAR
-// =============================================================================
 
 // Genel ayarlar güncelleme şeması
 export const updateGeneralSettingsSchema = z.object({
@@ -28,10 +20,6 @@ export const updateGeneralSettingsSchema = z.object({
   autoTrackOnAniwaListAdd: z.boolean().optional(),
 });
 
-// =============================================================================
-// GİZLİLİK AYARLARI
-// =============================================================================
-
 // Gizlilik ayarları güncelleme şeması
 export const updatePrivacySettingsSchema = z.object({
   profileVisibility: z.nativeEnum(ProfileVisibility, { required_error: 'Profil görünürlüğü seçin' }).optional(),
@@ -41,20 +29,12 @@ export const updatePrivacySettingsSchema = z.object({
   showCustomLists: z.boolean().optional(),
 });
 
-// =============================================================================
-// BİLDİRİM AYARLARI
-// =============================================================================
-
 // Bildirim ayarları güncelleme şeması
 export const updateNotificationSettingsSchema = z.object({
   receiveNotificationOnNewFollow: z.boolean().optional(),
   receiveNotificationOnEpisodeAiring: z.boolean().optional(),
   receiveNotificationOnNewMediaPart: z.boolean().optional(),
 });
-
-// =============================================================================
-// TİP TÜRETMELERİ
-// =============================================================================
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type UpdateGeneralSettingsInput = z.infer<typeof updateGeneralSettingsSchema>;

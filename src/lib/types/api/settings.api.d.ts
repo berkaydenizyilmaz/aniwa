@@ -8,10 +8,6 @@ import {
   UpdateNotificationSettingsInput 
 } from '@/lib/schemas/settings.schema';
 
-// =============================================================================
-// PROFİL AYARLARI
-// =============================================================================
-
 // Profil güncelleme response tipi
 export interface UpdateProfileResponse {
   message: string;
@@ -19,10 +15,6 @@ export interface UpdateProfileResponse {
 
 // Profil güncelleme request tipi
 export type UpdateProfileRequest = UpdateProfileInput;
-
-// =============================================================================
-// GENEL AYARLAR
-// =============================================================================
 
 // Genel ayarlar güncelleme response tipi
 export interface UpdateGeneralSettingsResponse {
@@ -32,10 +24,6 @@ export interface UpdateGeneralSettingsResponse {
 // Genel ayarlar güncelleme request tipi
 export type UpdateGeneralSettingsRequest = UpdateGeneralSettingsInput;
 
-// =============================================================================
-// GİZLİLİK AYARLARI
-// =============================================================================
-
 // Gizlilik ayarları güncelleme response tipi
 export interface UpdatePrivacySettingsResponse {
   message: string;
@@ -44,10 +32,6 @@ export interface UpdatePrivacySettingsResponse {
 // Gizlilik ayarları güncelleme request tipi
 export type UpdatePrivacySettingsRequest = UpdatePrivacySettingsInput;
 
-// =============================================================================
-// BİLDİRİM AYARLARI
-// =============================================================================
-
 // Bildirim ayarları güncelleme response tipi
 export interface UpdateNotificationSettingsResponse {
   message: string;
@@ -55,10 +39,6 @@ export interface UpdateNotificationSettingsResponse {
 
 // Bildirim ayarları güncelleme request tipi
 export type UpdateNotificationSettingsRequest = UpdateNotificationSettingsInput;
-
-// =============================================================================
-// AYARLARI GETİRME
-// =============================================================================
 
 // Kullanıcı ayarlarını getirme response tipi
 export interface GetUserSettingsResponse {
