@@ -17,6 +17,7 @@ import { ROUTES } from '@/lib/constants/routes.constants'
 import { ADMIN_MENU_ITEMS, AUTH_MENU_ITEMS } from '@/lib/constants/menu.constants'
 import { USER } from '@/lib/constants/user.constants'
 import { useMutation } from '@tanstack/react-query'
+import { UserRole } from '@prisma/client'
 
 export function AuthSection() {
   const { data: session, status } = useSession()
@@ -85,7 +86,7 @@ export function AuthSection() {
           {ADMIN_MENU_ITEMS
             .filter((item) => 
               session.user.roles.includes(item.role) || 
-              session.user.roles.includes(USER.ROLES.ADMIN)
+              session.user.roles.includes(UserRole.ADMIN)
             )
             .map((item) => {
               const Icon = item.icon
