@@ -47,20 +47,24 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
     },
   });
 
-  // Form'u studio verisi ile doldur (edit mode)
+  // Form'u güncelle
   useEffect(() => {
+    if (!open) return;
+
     if (studio) {
+      // Edit mode - mevcut verileri doldur
       form.reset({
         name: studio.name,
         isAnimationStudio: studio.isAnimationStudio,
       });
     } else {
+      // Create mode - temiz form
       form.reset({
         name: '',
         isAnimationStudio: true,
       });
     }
-  }, [studio, form]);
+  }, [open, studio, form]);
 
   // Create/Update mutation
   const mutation = useMutation({

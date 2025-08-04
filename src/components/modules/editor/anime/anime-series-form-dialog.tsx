@@ -108,9 +108,12 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
     },
   });
 
-  // Form'u anime series verisi ile doldur (edit mode)
+  // Form'u güncelle
   useEffect(() => {
+    if (!open) return;
+
     if (animeSeriesWithRelations) {
+      // Edit mode - mevcut verileri doldur
       form.reset({
         title: animeSeriesWithRelations.title,
         englishTitle: animeSeriesWithRelations.englishTitle || '',
@@ -132,6 +135,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
         tags: animeSeriesWithRelations.animeTags?.map(at => at.tag.id) || [],
       });
     } else if (!animeSeries) {
+      // Create mode - temiz form
       form.reset({
         title: '',
         englishTitle: '',
@@ -154,7 +158,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
         tags: [],
       });
     }
-  }, [animeSeriesWithRelations, animeSeries, form]);
+  }, [open, animeSeriesWithRelations, animeSeries, form]);
 
   // Create mutation
   const createMutation = useMutation({

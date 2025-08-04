@@ -48,20 +48,24 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
     },
   });
 
-  // Platform değiştiğinde form'u güncelle
+  // Form'u güncelle
   useEffect(() => {
+    if (!open) return;
+
     if (platform) {
+      // Edit mode - mevcut verileri doldur
       form.reset({
         name: platform.name,
         baseUrl: platform.baseUrl,
       });
     } else {
+      // Create mode - temiz form
       form.reset({
         name: '',
         baseUrl: '',
       });
     }
-  }, [platform, form]);
+  }, [open, platform, form]);
 
   // Create/Update mutation
   const mutation = useMutation({

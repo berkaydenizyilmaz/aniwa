@@ -43,18 +43,22 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
     },
   });
 
-  // Form'u genre verisi ile doldur (edit mode)
+  // Form'u güncelle
   useEffect(() => {
+    if (!open) return;
+
     if (genre) {
+      // Edit mode - mevcut verileri doldur
       form.reset({
         name: genre.name,
       });
     } else {
+      // Create mode - temiz form
       form.reset({
         name: '',
       });
     }
-  }, [genre, form]);
+  }, [open, genre, form]);
 
   // Create/Update mutation
   const mutation = useMutation({

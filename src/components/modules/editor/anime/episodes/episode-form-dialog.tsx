@@ -70,18 +70,24 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
     }
   });
 
-  // Edit mode'da form'u doldur
+  // Form'u güncelle
   useEffect(() => {
+    if (!open) return;
+
     if (episodeData && episode) {
-      form.setValue('episodeNumber', episodeData.episodeNumber);
-      form.setValue('title', episodeData.title || '');
-      form.setValue('description', episodeData.description || '');
-      form.setValue('airDate', episodeData.airDate || undefined);
-      form.setValue('duration', episodeData.duration || undefined);
-      form.setValue('isFiller', episodeData.isFiller);
-      form.setValue('fillerNotes', episodeData.fillerNotes || '');
+      // Edit mode - mevcut verileri doldur
+      form.reset({
+        mediaPartId: mediaPartId,
+        episodeNumber: episodeData.episodeNumber,
+        title: episodeData.title || '',
+        description: episodeData.description || '',
+        airDate: episodeData.airDate || undefined,
+        duration: episodeData.duration || undefined,
+        isFiller: episodeData.isFiller,
+        fillerNotes: episodeData.fillerNotes || '',
+      });
     } else {
-      // Create mode'da form'u temizle
+      // Create mode - temiz form
       form.reset({
         mediaPartId: mediaPartId,
         episodeNumber: undefined,
@@ -93,7 +99,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
         fillerNotes: '',
       });
     }
-  }, [episodeData, episode, form, mediaPartId]);
+  }, [open, episodeData, episode, form, mediaPartId]);
 
   // Create mutation
   const createMutation = useMutation({

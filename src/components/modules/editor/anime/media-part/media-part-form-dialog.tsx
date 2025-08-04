@@ -68,19 +68,25 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
     }
   });
 
-  // Edit mode'da form'u doldur
+  // Form'u güncelle
   useEffect(() => {
+    if (!open) return;
+
     if (mediaPartData && mediaPart) {
-      form.setValue('title', mediaPartData.title);
-      form.setValue('displayOrder', mediaPartData.displayOrder || undefined);
-      form.setValue('notes', mediaPartData.notes || '');
-      form.setValue('episodes', mediaPartData.episodes || undefined);
-      form.setValue('anilistId', mediaPartData.anilistId || undefined);
-      form.setValue('malId', mediaPartData.malId || undefined);
-      form.setValue('anilistAverageScore', mediaPartData.anilistAverageScore || undefined);
-      form.setValue('anilistPopularity', mediaPartData.anilistPopularity || undefined);
+      // Edit mode - mevcut verileri doldur
+      form.reset({
+        seriesId: seriesId,
+        title: mediaPartData.title,
+        displayOrder: mediaPartData.displayOrder || undefined,
+        notes: mediaPartData.notes || '',
+        episodes: mediaPartData.episodes || undefined,
+        anilistId: mediaPartData.anilistId || undefined,
+        malId: mediaPartData.malId || undefined,
+        anilistAverageScore: mediaPartData.anilistAverageScore || undefined,
+        anilistPopularity: mediaPartData.anilistPopularity || undefined,
+      });
     } else {
-      // Create mode'da form'u temizle
+      // Create mode - temiz form
       form.reset({
         seriesId: seriesId,
         title: '',
@@ -93,7 +99,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
         anilistPopularity: undefined,
       });
     }
-  }, [mediaPartData, mediaPart, form, seriesId]);
+  }, [open, mediaPartData, mediaPart, form, seriesId]);
 
   // Create mutation
   const createMutation = useMutation({

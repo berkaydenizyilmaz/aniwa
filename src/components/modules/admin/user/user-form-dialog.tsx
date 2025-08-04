@@ -46,9 +46,12 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
     },
   });
 
-  // Form'u user verisi ile doldur (edit mode)
+  // Form'u güncelle
   useEffect(() => {
+    if (!open) return;
+
     if (user) {
+      // Edit mode - mevcut verileri doldur
       form.reset({
         username: user.username,
         email: user.email,
@@ -56,6 +59,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
         isBanned: user.isBanned,
       });
     } else {
+      // Create mode - temiz form
       form.reset({
         username: '',
         email: '',
@@ -63,7 +67,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
         isBanned: false,
       });
     }
-  }, [user, form]);
+  }, [open, user, form]);
 
   // Update mutation
   const updateMutation = useMutation({

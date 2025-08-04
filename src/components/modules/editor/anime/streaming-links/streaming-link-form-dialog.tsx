@@ -76,20 +76,26 @@ export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streami
     }
   });
 
-  // Edit mode'da form'u doldur
+  // Form'u güncelle
   useEffect(() => {
+    if (!open) return;
+
     if (streamingLinkData && streamingLink) {
-      form.setValue('platformId', streamingLinkData.platformId);
-      form.setValue('url', streamingLinkData.url);
+      // Edit mode - mevcut verileri doldur
+      form.reset({
+        episodeId: episodeId,
+        platformId: streamingLinkData.platformId,
+        url: streamingLinkData.url,
+      });
     } else {
-      // Create mode'da form'u temizle
+      // Create mode - temiz form
       form.reset({
         episodeId: episodeId,
         platformId: '',
         url: '',
       });
     }
-  }, [streamingLinkData, streamingLink, form, episodeId]);
+  }, [open, streamingLinkData, streamingLink, form, episodeId]);
 
   // Create mutation
   const createMutation = useMutation({

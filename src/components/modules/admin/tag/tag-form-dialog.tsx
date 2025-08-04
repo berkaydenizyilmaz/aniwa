@@ -58,9 +58,12 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
     },
   });
 
-  // Form'u tag verisi ile doldur (edit mode)
+  // Form'u güncelle
   useEffect(() => {
+    if (!open) return;
+
     if (tag) {
+      // Edit mode - mevcut verileri doldur
       form.reset({
         name: tag.name,
         description: tag.description || '',
@@ -69,6 +72,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
         isSpoiler: tag.isSpoiler,
       });
     } else {
+      // Create mode - temiz form
       form.reset({
         name: '',
         description: '',
@@ -77,7 +81,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
         isSpoiler: false,
       });
     }
-  }, [tag, form]);
+  }, [open, tag, form]);
 
   // Create/Update mutation
   const mutation = useMutation({
