@@ -55,7 +55,7 @@ export const updateAnimeSeriesSchema = z.object({
 export const createAnimeMediaPartSchema = z.object({
   seriesId: z.string().min(1, 'Anime serisi ID gerekli'),
   title: z.string().min(ANIME.TITLE.MIN_LENGTH, 'Medya parçası başlığı gerekli').max(ANIME.TITLE.MAX_LENGTH, 'Medya parçası başlığı çok uzun'),
-  displayOrder: z.number().min(1, 'İzleme sırası en az 1 olmalı').optional(),
+  displayOrder: z.number({ required_error: 'İzleme sırası gerekli' }).min(1, 'İzleme sırası gerekli'),
   notes: z.string().max(ANIME.SYNOPSIS.MAX_LENGTH, 'Notlar çok uzun').optional(),
   episodes: z.number().min(ANIME.EPISODES.MIN, 'Bölüm sayısı en az 1 olmalı').max(ANIME.EPISODES.MAX, 'Bölüm sayısı çok yüksek').optional(),
   anilistId: z.number().optional(),
@@ -67,7 +67,7 @@ export const createAnimeMediaPartSchema = z.object({
 // Anime Media Part güncelleme şeması
 export const updateAnimeMediaPartSchema = z.object({
   title: z.string().min(ANIME.TITLE.MIN_LENGTH, 'Medya parçası başlığı gerekli').max(ANIME.TITLE.MAX_LENGTH, 'Medya parçası başlığı çok uzun').optional(),
-  displayOrder: z.number().min(1, 'İzleme sırası en az 1 olmalı').optional(),
+  displayOrder: z.number({ required_error: 'İzleme sırası gerekli' }).min(1, 'İzleme sırası gerekli'),
   notes: z.string().max(ANIME.SYNOPSIS.MAX_LENGTH, 'Notlar çok uzun').optional(),
   episodes: z.number().min(ANIME.EPISODES.MIN, 'Bölüm sayısı en az 1 olmalı').max(ANIME.EPISODES.MAX, 'Bölüm sayısı çok yüksek').optional(),
   anilistId: z.number().optional(),

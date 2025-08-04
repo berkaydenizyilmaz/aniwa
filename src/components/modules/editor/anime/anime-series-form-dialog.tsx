@@ -229,24 +229,24 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
               {/* İlişkiler */}
               <AnimeSeriesRelations relations={relations} />
 
-              {/* Butonlar */}
-              <div className="flex justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => onOpenChange(false)}
+            {/* Butonlar */}
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
                   disabled={isPending}
-                >
-                  İptal
-                </Button>
-                <Button
-                  type="submit"
+              >
+                İptal
+              </Button>
+              <Button
+                type="submit"
                   disabled={isPending}
-                >
-                  {animeSeries ? 'Güncelle' : 'Oluştur'}
-                </Button>
-              </div>
-            </form>
+              >
+                {animeSeries ? 'Güncelle' : 'Oluştur'}
+              </Button>
+            </div>
+          </form>
           </Form>
         )}
       </DialogContent>

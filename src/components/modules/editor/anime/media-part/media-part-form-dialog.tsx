@@ -181,7 +181,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
                 name="displayOrder"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>İzleme Sırası</FormLabel>
+                    <FormLabel>İzleme Sırası *</FormLabel>
                     <FormControl>
                       <Input
                         type="number"

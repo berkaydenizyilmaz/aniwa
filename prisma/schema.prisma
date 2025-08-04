@@ -425,7 +425,7 @@ model AnimeMediaPart {
   
   // Temel Bilgiler
   title             String            // Parçanın başlığı
-  displayOrder      Int?              // İzleme sırası
+  displayOrder      Int               // İzleme sırası (zorunlu)
   notes             String?           @db.String // Ek notlar
   episodes          Int?              // Bölüm sayısı
   duration          Int?              // Bölüm/film süresi
