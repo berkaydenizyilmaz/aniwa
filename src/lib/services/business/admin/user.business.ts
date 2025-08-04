@@ -341,6 +341,11 @@ export async function deleteUserBusiness(
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
 
+    // Admin kendini silmeye çalışıyor mu kontrolü
+    if (id === userId) {
+      throw new ConflictError('Kendinizi silemezsiniz');
+    }
+
     // Kullanıcı sil
     await deleteUserDB({ id });
 
