@@ -1,7 +1,5 @@
 // MediaList sabitleri
 
-import { MediaListStatus } from '@prisma/client';
-
 export const MEDIA_LIST = {
   // Media list status etiketleri
   STATUS_LABELS: {

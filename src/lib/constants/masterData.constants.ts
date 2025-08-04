@@ -1,7 +1,5 @@
 // MasterData sabitleri (Genre, Tag, Studio)
 
-import { TagCategory } from '@prisma/client';
-
 export const MASTER_DATA = {
   // Name kuralları (Genre, Tag, Studio için ortak)
   NAME: {
@@ -20,10 +18,7 @@ export const MASTER_DATA = {
     MAX_LIMIT: 100,
     DEFAULT_LIMIT: 50,
   },
-  
-  // Prisma enum'ları
-  TAG_CATEGORY: TagCategory,
-  
+    
   // Tag kategori etiketleri
   TAG_CATEGORY_LABELS: {
     DEMOGRAPHICS: 'Hedef Kitle',

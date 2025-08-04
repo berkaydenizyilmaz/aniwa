@@ -1,7 +1,5 @@
 // Notification sabitleri
 
-import { NotificationType } from '@prisma/client';
-
 export const NOTIFICATION = {
   // Notification type etiketleri
   TYPE_LABELS: {

@@ -1,7 +1,5 @@
 // Relation sabitleri
 
-import { RelationType } from '@prisma/client';
-
 export const RELATION = {
   // Relation type etiketleri
   TYPE_LABELS: {

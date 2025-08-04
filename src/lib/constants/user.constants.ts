@@ -1,7 +1,5 @@
 // User sabitleri
 
-import { UserRole, ProfileVisibility, Theme, TitleLanguage, ScoreFormat } from '@prisma/client';
-
 export const USER = {
   // Pagination kuralları
   PAGINATION: {
@@ -9,13 +7,6 @@ export const USER = {
     MAX_LIMIT: 100,
     DEFAULT_LIMIT: 50,
   },
-  
-  // Prisma enum'ları
-  ROLES: UserRole,
-  PROFILE_VISIBILITY: ProfileVisibility,
-  THEME: Theme,
-  TITLE_LANGUAGE: TitleLanguage,
-  SCORE_FORMAT: ScoreFormat,
   
   // Role etiketleri
   ROLE_LABELS: {

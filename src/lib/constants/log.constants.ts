@@ -1,7 +1,5 @@
 // Log sabitleri
 
-import { LogLevel } from '@prisma/client';
-
 export const LOG = {
   // Log level etiketleri
   LEVEL_LABELS: {

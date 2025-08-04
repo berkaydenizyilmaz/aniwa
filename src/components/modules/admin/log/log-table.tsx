@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Log, LogLevel } from '@prisma/client';
+import { LOG } from '@/lib/constants/log.constants';
 import { getLogsAction } from '@/lib/actions/admin/log.action';
 import { toast } from 'sonner';
 import { GetLogsResponse } from '@/lib/types/api/log.api';
@@ -100,6 +101,10 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
       default:
         return 'text-muted-foreground';
     }
+  };
+
+  const getLevelLabel = (level: LogLevel) => {
+    return LOG.LEVEL_LABELS[level];
   };
 
   const handleViewMetadata = (log: Log & { user?: { id: string; username: string; email: string } | null }) => {
