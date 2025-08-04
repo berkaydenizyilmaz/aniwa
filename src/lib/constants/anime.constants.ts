@@ -21,7 +21,7 @@ export const ANIME = {
   // Score kuralları
   SCORE: {
     MIN: 0,
-    MAX: 10,
+    MAX: 100,
   },
   
   // Popularity kuralları
