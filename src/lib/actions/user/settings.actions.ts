@@ -107,12 +107,12 @@ export async function updatePrivacySettingsAction(data: UpdatePrivacySettingsInp
 }
 
 // Bildirim ayarları güncelleme action
-export async function updateNotificationSettingsAction(data: UpdateNotificationSettingsInput): Promise<ServerActionResponse> {
+  export async function updateNotificationSettingsAction(data: UpdateNotificationSettingsInput): Promise<ServerActionResponse> {
   // Session'dan user bilgisini al
   const session = await getServerSession(authConfig);
   
   try {
-    // Zod validasyonu
+    //Zod validasyonu
     const validatedData = updateNotificationSettingsSchema.parse(data);
 
     // Business logic çağır
