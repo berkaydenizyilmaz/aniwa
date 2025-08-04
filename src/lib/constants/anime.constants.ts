@@ -45,6 +45,16 @@ export const ANIME = {
     ONA: 'ONA',
   } as const,
   
+  // Anime type renkleri (UI için)
+  TYPE_COLORS: {
+    TV: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    TV_SHORT: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+    MOVIE: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+    SPECIAL: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    OVA: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+    ONA: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
+  } as const,
+  
   // Anime status etiketleri
   STATUS_LABELS: {
     FINISHED: 'Tamamlandı',
@@ -52,6 +62,15 @@ export const ANIME = {
     NOT_YET_RELEASED: 'Henüz Yayınlanmadı',
     CANCELLED: 'İptal Edildi',
     HIATUS: 'Ara Verildi',
+  } as const,
+  
+  // Anime status renkleri (UI için)
+  STATUS_COLORS: {
+    FINISHED: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    RELEASING: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    NOT_YET_RELEASED: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+    CANCELLED: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    HIATUS: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
   } as const,
   
   // Season etiketleri

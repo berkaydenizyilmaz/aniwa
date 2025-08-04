@@ -180,19 +180,19 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
                 <TableCell>{tag.name}</TableCell>
                 <TableCell className="text-muted-foreground">{tag.slug}</TableCell>
                 <TableCell>
-                  <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                  <span className={`px-2 py-1 rounded-full text-xs ${tag.category ? MASTER_DATA.TAG_CATEGORY_COLORS[tag.category] : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'}`}>
                     {tag.category ? MASTER_DATA.TAG_CATEGORY_LABELS[tag.category] || tag.category : '-'}
                   </span>
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
                     {tag.isAdult && (
-                      <span className="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                      <span className={`px-2 py-1 rounded-full text-xs ${MASTER_DATA.TAG_PROPERTY_COLORS.ADULT}`}>
                         Yetişkin
                       </span>
                     )}
                     {tag.isSpoiler && (
-                      <span className="px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                      <span className={`px-2 py-1 rounded-full text-xs ${MASTER_DATA.TAG_PROPERTY_COLORS.SPOILER}`}>
                         Spoiler
                       </span>
                     )}

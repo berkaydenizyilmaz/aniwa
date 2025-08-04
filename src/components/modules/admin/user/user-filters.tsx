@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Search, Plus, Filter } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { USER } from '@/lib/constants/user.constants';
+import { UserRole } from '@prisma/client';
 import {
   Select,
   SelectContent,
@@ -72,9 +73,9 @@ export function UserFilters({ onSearch, onRoleChange, onBannedChange, onAddNew }
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tüm Roller</SelectItem>
-              {Object.values(USER.ROLES).map((role) => (
+              {Object.values(UserRole).map((role) => (
                 <SelectItem key={role} value={role}>
-                  {role}
+                  {USER.ROLE_LABELS[role]}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Studio } from '@prisma/client';
+import { MASTER_DATA } from '@/lib/constants/masterData.constants';
 import { getStudiosAction, deleteStudioAction } from '@/lib/actions/admin/studio.action';
 import { toast } from 'sonner';
 import { GetStudiosResponse } from '@/lib/types/api/studio.api';
@@ -174,10 +175,10 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     studio.isAnimationStudio 
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
-                      : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                      ? MASTER_DATA.STUDIO_TYPE_COLORS.ANIMATION
+                      : MASTER_DATA.STUDIO_TYPE_COLORS.PRODUCTION
                   }`}>
-                    {studio.isAnimationStudio ? 'Animasyon' : 'Üretim'}
+                    {studio.isAnimationStudio ? MASTER_DATA.STUDIO_TYPE_LABELS.ANIMATION : MASTER_DATA.STUDIO_TYPE_LABELS.PRODUCTION}
                   </span>
                 </TableCell>
                 <TableCell>

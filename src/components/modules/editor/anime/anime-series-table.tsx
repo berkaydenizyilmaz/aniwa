@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Layers } from 'lucide-react';
 import { AnimeSeries, AnimeType, AnimeStatus } from '@prisma/client';
+import { ANIME } from '@/lib/constants/anime.constants';
 import { getAnimeSeriesListAction, deleteAnimeSeriesAction } from '@/lib/actions/editor/anime-series.action';
 import { toast } from 'sonner';
 import { GetAnimeSeriesListResponse } from '@/lib/types/api/anime.api';
@@ -246,18 +247,13 @@ export function AnimeSeriesTable({ onEdit, onMediaParts, searchTerm = '', select
                     <div className="font-medium">{animeSeries.title}</div>
                   </TableCell>
                   <TableCell>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                      {animeSeries.type}
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ANIME.TYPE_COLORS[animeSeries.type]}`}>
+                      {ANIME.TYPE_LABELS[animeSeries.type]}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      animeSeries.status === 'FINISHED' ? 'bg-green-100 text-green-800' :
-                      animeSeries.status === 'RELEASING' ? 'bg-blue-100 text-blue-800' :
-                      animeSeries.status === 'NOT_YET_RELEASED' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {animeSeries.status}
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ANIME.STATUS_COLORS[animeSeries.status]}`}>
+                      {ANIME.STATUS_LABELS[animeSeries.status]}
                     </span>
                   </TableCell>
                   <TableCell>

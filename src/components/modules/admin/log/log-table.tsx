@@ -88,23 +88,12 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
     return new Date(date).toLocaleString('tr-TR');
   };
 
-  const getLevelColor = (level: string) => {
-    switch (level) {
-      case 'ERROR':
-        return 'text-red-500';
-      case 'WARN':
-        return 'text-yellow-500';
-      case 'INFO':
-        return 'text-blue-500';
-      case 'DEBUG':
-        return 'text-purple-500';
-      default:
-        return 'text-muted-foreground';
-    }
-  };
-
   const getLevelLabel = (level: LogLevel) => {
     return LOG.LEVEL_LABELS[level];
+  };
+
+  const getLevelColor = (level: LogLevel) => {
+    return LOG.LEVEL_COLORS[level];
   };
 
   const handleViewMetadata = (log: Log & { user?: { id: string; username: string; email: string } | null }) => {
@@ -188,7 +177,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
               <TableRow key={log.id}>
                 <TableCell>
                   <span className={`font-mono text-sm ${getLevelColor(log.level)}`}>
-                    {log.level}
+                    {getLevelLabel(log.level)}
                   </span>
                 </TableCell>
                 <TableCell className="font-mono text-sm text-muted-foreground">
@@ -310,7 +299,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
                 <div>
                   <span className="font-semibold">Seviye:</span>
                   <span className={`ml-2 ${getLevelColor(selectedLog.level)}`}>
-                    {selectedLog.level}
+                    {getLevelLabel(selectedLog.level)}
                   </span>
                 </div>
                 <div>

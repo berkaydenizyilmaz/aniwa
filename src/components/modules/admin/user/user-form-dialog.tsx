@@ -24,6 +24,7 @@ import { updateUserAction } from '@/lib/actions/admin/user.action';
 import { updateUserSchema, type UpdateUserInput } from '@/lib/schemas/user.schema';
 import { toast } from 'sonner';
 import { User, UserRole } from '@prisma/client';
+import { USER } from '@/lib/constants/user.constants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UserFormDialogProps {
@@ -173,7 +174,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
                                 isSelected ? 'text-primary' : 'text-muted-foreground'
                               }`}
                             >
-                              {role}
+                              {USER.ROLE_LABELS[role]}
                             </FormLabel>
                           </div>
                         );

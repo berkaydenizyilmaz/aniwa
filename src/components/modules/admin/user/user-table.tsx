@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { User, UserRole } from '@prisma/client';
+import { USER } from '@/lib/constants/user.constants';
 import { getUsersAction, deleteUserAction } from '@/lib/actions/admin/user.action';
 import { toast } from 'sonner';
 import { GetUsersResponse } from '@/lib/types/api/user.api';
@@ -195,13 +196,13 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
                 <TableCell>{user.username}</TableCell>
                 <TableCell className="text-muted-foreground">{user.email}</TableCell>
                 <TableCell className="text-muted-foreground">
-                  {user.roles?.join(', ') || '-'}
+                  {user.roles?.map(role => USER.ROLE_LABELS[role]).join(', ') || '-'}
                 </TableCell>
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     user.isBanned 
-                      ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' 
-                      : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                      ? USER.BAN_STATUS_COLORS.BANNED
+                      : USER.BAN_STATUS_COLORS.ACTIVE
                   }`}>
                     {user.isBanned ? 'Yasaklı' : 'Aktif'}
                   </span>
