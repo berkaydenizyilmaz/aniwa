@@ -6,7 +6,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { resetPasswordSchema, type ResetPasswordInput } from '@/lib/schemas/auth.schema';
 import { resetPassword } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
@@ -18,11 +25,7 @@ export function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<ResetPasswordInput>({
+  const form = useForm<ResetPasswordInput>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       token: '',
@@ -79,46 +82,57 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Şifre */}
-      <div className="space-y-2">
-        <Label htmlFor="password">Yeni Şifre</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="Yeni şifrenizi girin"
-          {...register('password')}
-          disabled={resetPasswordMutation.isPending}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {/* Şifre */}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Yeni Şifre</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Yeni şifrenizi girin"
+                  disabled={resetPasswordMutation.isPending}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.password && (
-          <p className="text-sm text-destructive">{errors.password.message}</p>
-        )}
-      </div>
 
-      {/* Şifre Tekrarı */}
-      <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Şifre Tekrarı</Label>
-        <Input
-          id="confirmPassword"
-          type="password"
-          placeholder="Şifrenizi tekrar girin"
-          {...register('confirmPassword')}
-          disabled={resetPasswordMutation.isPending}
+        {/* Şifre Tekrarı */}
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Şifre Tekrarı</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Şifrenizi tekrar girin"
+                  disabled={resetPasswordMutation.isPending}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.confirmPassword && (
-          <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-        )}
-      </div>
 
-      {/* Şifre Sıfırla Butonu */}
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={resetPasswordMutation.isPending}
-      >
-        Şifreyi Sıfırla
-      </Button>
-
-    </form>
+        {/* Şifre Sıfırla Butonu */}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={resetPasswordMutation.isPending}
+        >
+          Şifreyi Sıfırla
+        </Button>
+      </form>
+    </Form>
   );
 }

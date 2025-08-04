@@ -5,7 +5,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { registerSchema, type RegisterInput } from '@/lib/schemas/auth.schema';
 import { registerUser } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
@@ -15,11 +22,7 @@ import { useMutation } from '@tanstack/react-query';
 export function RegisterForm() {
   const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<RegisterInput>({
+  const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       username: '',
@@ -55,66 +58,87 @@ export function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Kullanıcı Adı */}
-      <div className="space-y-2">
-        <Label htmlFor="username">Kullanıcı Adı</Label>
-        <Input
-          id="username"
-          type="text"
-          placeholder="Kullanıcı adınızı girin"
-          {...register('username')}
-          disabled={registerMutation.isPending}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {/* Kullanıcı Adı */}
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Kullanıcı Adı</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Kullanıcı adınızı girin"
+                  disabled={registerMutation.isPending}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.username && (
-          <p className="text-sm text-destructive">{errors.username.message}</p>
-        )}
-      </div>
 
-      {/* Email */}
-      <div className="space-y-2">
-        <Label htmlFor="email">E-posta</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="E-posta adresinizi girin"
-          {...register('email')}
-          disabled={registerMutation.isPending}
+        {/* Email */}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>E-posta</FormLabel>
+              <FormControl>
+                <Input
+                  type="email"
+                  placeholder="E-posta adresinizi girin"
+                  disabled={registerMutation.isPending}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.email && (
-          <p className="text-sm text-destructive">{errors.email.message}</p>
-        )}
-      </div>
 
-      {/* Şifre */}
-      <div className="space-y-2">
-        <Label htmlFor="password">Şifre</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="Şifrenizi girin"
-          {...register('password')}
-          disabled={registerMutation.isPending}
+        {/* Şifre */}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Şifre</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Şifrenizi girin"
+                  disabled={registerMutation.isPending}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.password && (
-          <p className="text-sm text-destructive">{errors.password.message}</p>
-        )}
-      </div>
 
-      {/* Şifre Tekrarı */}
-      <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Şifre Tekrarı</Label>
-        <Input
-          id="confirmPassword"
-          type="password"
-          placeholder="Şifrenizi tekrar girin"
-          {...register('confirmPassword')}
-          disabled={registerMutation.isPending}
+        {/* Şifre Tekrarı */}
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Şifre Tekrarı</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Şifrenizi tekrar girin"
+                  disabled={registerMutation.isPending}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.confirmPassword && (
-          <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-        )}
-      </div>
 
         {/* Kayıt Butonu */}
         <Button
@@ -124,7 +148,7 @@ export function RegisterForm() {
         >
           Kayıt Ol
         </Button>
-
-    </form>
+      </form>
+    </Form>
   );
 }

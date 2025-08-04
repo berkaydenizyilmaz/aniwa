@@ -4,18 +4,21 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '@/lib/schemas/auth.schema';
 import { forgotPassword } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
 
 export function ForgotPasswordForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<ForgotPasswordInput>({
+  const form = useForm<ForgotPasswordInput>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: '',
@@ -47,31 +50,37 @@ export function ForgotPasswordForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Email */}
-      <div className="space-y-2">
-        <Label htmlFor="email">E-posta</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="E-posta adresinizi girin"
-          {...register('email')}
-          disabled={forgotPasswordMutation.isPending}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {/* Email */}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>E-posta</FormLabel>
+              <FormControl>
+                <Input
+                  type="email"
+                  placeholder="E-posta adresinizi girin"
+                  disabled={forgotPasswordMutation.isPending}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.email && (
-          <p className="text-sm text-destructive">{errors.email.message}</p>
-        )}
-      </div>
 
-      {/* Gönder Butonu */}
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={forgotPasswordMutation.isPending}
-      >
-        Gönder
-      </Button>
-
-    </form>
+        {/* Gönder Butonu */}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={forgotPasswordMutation.isPending}
+        >
+          Gönder
+        </Button>
+      </form>
+    </Form>
   );
 }

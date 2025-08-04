@@ -6,7 +6,14 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { loginSchema, type LoginInput } from '@/lib/schemas/auth.schema';
 import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
@@ -15,11 +22,7 @@ import { ROUTES } from '@/lib/constants/routes.constants';
 export function LoginForm() {
   const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<LoginInput>({
+  const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       username: '',
@@ -58,38 +61,49 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Kullanıcı Adı */}
-      <div className="space-y-2">
-        <Label htmlFor="username">Kullanıcı Adı</Label>
-        <Input
-          id="username"
-          type="text"
-          placeholder="Kullanıcı adınızı girin"
-          {...register('username')}
-          disabled={loginMutation.isPending}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {/* Kullanıcı Adı */}
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Kullanıcı Adı</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Kullanıcı adınızı girin"
+                  disabled={loginMutation.isPending}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.username && (
-          <p className="text-sm text-destructive">{errors.username.message}</p>
-        )}
-      </div>
 
-      {/* Şifre */}
-      <div className="space-y-2">
-        <Label htmlFor="password">Şifre</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="Şifrenizi girin"
-          {...register('password')}
-          disabled={loginMutation.isPending}
+        {/* Şifre */}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Şifre</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Şifrenizi girin"
+                  disabled={loginMutation.isPending}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.password && (
-          <p className="text-sm text-destructive">{errors.password.message}</p>
-        )}
-      </div>
 
-       {/* Giriş Butonu */}
+        {/* Giriş Butonu */}
         <Button
           type="submit"
           className="w-full"
@@ -97,7 +111,7 @@ export function LoginForm() {
         >
           Giriş Yap
         </Button>
-
-    </form>
+      </form>
+    </Form>
   );
 }
