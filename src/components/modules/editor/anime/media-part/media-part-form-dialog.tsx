@@ -5,7 +5,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
@@ -46,13 +53,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
     staleTime: 5 * 60 * 1000, // 5 dakika
   });
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors }
-  } = useForm<CreateAnimeMediaPartInput | UpdateAnimeMediaPartInput>({
+  const form = useForm<CreateAnimeMediaPartInput | UpdateAnimeMediaPartInput>({
     resolver: zodResolver(mediaPart ? updateAnimeMediaPartSchema : createAnimeMediaPartSchema),
     defaultValues: {
       seriesId: seriesId,
@@ -70,29 +71,29 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
   // Edit mode'da form'u doldur
   useEffect(() => {
     if (mediaPartData && mediaPart) {
-      setValue('title', mediaPartData.title);
-      setValue('displayOrder', mediaPartData.displayOrder || undefined);
-      setValue('notes', mediaPartData.notes || '');
-      setValue('episodes', mediaPartData.episodes || undefined);
-      setValue('anilistId', mediaPartData.anilistId || undefined);
-      setValue('malId', mediaPartData.malId || undefined);
-      setValue('anilistAverageScore', mediaPartData.anilistAverageScore || undefined);
-      setValue('anilistPopularity', mediaPartData.anilistPopularity || undefined);
+      form.setValue('title', mediaPartData.title);
+      form.setValue('displayOrder', mediaPartData.displayOrder || undefined);
+      form.setValue('notes', mediaPartData.notes || '');
+      form.setValue('episodes', mediaPartData.episodes || undefined);
+      form.setValue('anilistId', mediaPartData.anilistId || undefined);
+      form.setValue('malId', mediaPartData.malId || undefined);
+      form.setValue('anilistAverageScore', mediaPartData.anilistAverageScore || undefined);
+      form.setValue('anilistPopularity', mediaPartData.anilistPopularity || undefined);
     } else {
-             // Create mode'da form'u temizle
-       reset({
-         seriesId: seriesId,
-         title: '',
-         displayOrder: undefined,
-         notes: '',
-         episodes: undefined,
-         anilistId: undefined,
-         malId: undefined,
-         anilistAverageScore: undefined,
-         anilistPopularity: undefined,
-       });
+      // Create mode'da form'u temizle
+      form.reset({
+        seriesId: seriesId,
+        title: '',
+        displayOrder: undefined,
+        notes: '',
+        episodes: undefined,
+        anilistId: undefined,
+        malId: undefined,
+        anilistAverageScore: undefined,
+        anilistPopularity: undefined,
+      });
     }
-  }, [mediaPartData, mediaPart, setValue, reset, seriesId]);
+  }, [mediaPartData, mediaPart, form, seriesId]);
 
   // Create mutation
   const createMutation = useMutation({
@@ -154,143 +155,191 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Başlık */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Başlık *</Label>
-            <Input
-              id="title"
-              {...register('title')}
-              placeholder="Media part başlığı"
-            />
-            {errors.title && (
-              <p className="text-sm text-destructive">{errors.title.message}</p>
-            )}
-          </div>
-
-          {/* İzleme Sırası */}
-          <div className="space-y-2">
-            <Label htmlFor="displayOrder">İzleme Sırası</Label>
-            <Input
-              id="displayOrder"
-              type="number"
-              {...register('displayOrder', { valueAsNumber: true })}
-              placeholder="1"
-              min="1"
-            />
-            {errors.displayOrder && (
-              <p className="text-sm text-destructive">{errors.displayOrder.message}</p>
-            )}
-          </div>
-
-          {/* Notlar */}
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notlar</Label>
-            <Textarea
-              id="notes"
-              {...register('notes')}
-              placeholder="Ek notlar..."
-              rows={3}
-            />
-            {errors.notes && (
-              <p className="text-sm text-destructive">{errors.notes.message}</p>
-            )}
-          </div>
-
-          {/* Bölüm Sayısı */}
-          <div className="space-y-2">
-            <Label htmlFor="episodes">Bölüm Sayısı</Label>
-            <Input
-              id="episodes"
-              type="number"
-              {...register('episodes', { valueAsNumber: true })}
-              placeholder="12"
-              min="1"
-            />
-            {errors.episodes && (
-              <p className="text-sm text-destructive">{errors.episodes.message}</p>
-            )}
-          </div>
-
-          {/* Anilist ve MAL ID */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="anilistId">Anilist ID</Label>
-              <Input
-                id="anilistId"
-                type="number"
-                {...register('anilistId', { valueAsNumber: true })}
-                placeholder="12345"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Başlık */}
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Başlık *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Media part başlığı"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.anilistId && (
-                <p className="text-sm text-destructive">{errors.anilistId.message}</p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="malId">MAL ID</Label>
-              <Input
-                id="malId"
-                type="number"
-                {...register('malId', { valueAsNumber: true })}
-                placeholder="67890"
+              {/* İzleme Sırası */}
+              <FormField
+                control={form.control}
+                name="displayOrder"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>İzleme Sırası</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="1"
+                        min="1"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.malId && (
-                <p className="text-sm text-destructive">{errors.malId.message}</p>
-              )}
-            </div>
-          </div>
 
-          {/* Anilist Puanları */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="anilistAverageScore">Anilist Puanı</Label>
-              <Input
-                id="anilistAverageScore"
-                type="number"
-                step="0.1"
-                {...register('anilistAverageScore', { valueAsNumber: true })}
-                placeholder="8.5"
-                min="0"
-                max="10"
+              {/* Notlar */}
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notlar</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Ek notlar..."
+                        rows={3}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.anilistAverageScore && (
-                <p className="text-sm text-destructive">{errors.anilistAverageScore.message}</p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="anilistPopularity">Anilist Popülerlik</Label>
-              <Input
-                id="anilistPopularity"
-                type="number"
-                {...register('anilistPopularity', { valueAsNumber: true })}
-                placeholder="1000"
-                min="0"
+              {/* Bölüm Sayısı */}
+              <FormField
+                control={form.control}
+                name="episodes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bölüm Sayısı</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="12"
+                        min="1"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.anilistPopularity && (
-                <p className="text-sm text-destructive">{errors.anilistPopularity.message}</p>
-              )}
-            </div>
-          </div>
 
-          {/* Butonlar */}
-          <div className="flex justify-end space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              İptal
-            </Button>
-            <Button
-              type="submit"
-              disabled={createMutation.isPending || updateMutation.isPending}
-            >
-              {createMutation.isPending || updateMutation.isPending ? 'Kaydediliyor...' : (mediaPart ? 'Güncelle' : 'Oluştur')}
-            </Button>
-          </div>
-        </form>
+              {/* Anilist ve MAL ID */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="anilistId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Anilist ID</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="12345"
+                          {...field}
+                          onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="malId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>MAL ID</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="67890"
+                          {...field}
+                          onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Anilist Puanları */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="anilistAverageScore"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Anilist Puanı</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          placeholder="8.5"
+                          min="0"
+                          max="10"
+                          {...field}
+                          onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="anilistPopularity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Anilist Popülerlik</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="1000"
+                          min="0"
+                          {...field}
+                          onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Butonlar */}
+              <div className="flex justify-end space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                >
+                  İptal
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                >
+                  {createMutation.isPending || updateMutation.isPending ? 'Kaydediliyor...' : (mediaPart ? 'Güncelle' : 'Oluştur')}
+                </Button>
+              </div>
+            </form>
+          </Form>
         )}
       </DialogContent>
     </Dialog>

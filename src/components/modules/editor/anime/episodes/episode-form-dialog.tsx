@@ -1,11 +1,18 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -49,14 +56,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
     staleTime: 5 * 60 * 1000, // 5 dakika
   });
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    control,
-    setValue,
-    formState: { errors }
-  } = useForm<CreateEpisodeInput | UpdateEpisodeInput>({
+  const form = useForm<CreateEpisodeInput | UpdateEpisodeInput>({
     resolver: zodResolver(episode ? updateEpisodeSchema : createEpisodeSchema),
     defaultValues: {
       mediaPartId: mediaPartId,
@@ -73,16 +73,16 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
   // Edit mode'da form'u doldur
   useEffect(() => {
     if (episodeData && episode) {
-      setValue('episodeNumber', episodeData.episodeNumber);
-      setValue('title', episodeData.title || '');
-      setValue('description', episodeData.description || '');
-      setValue('airDate', episodeData.airDate || undefined);
-      setValue('duration', episodeData.duration || undefined);
-      setValue('isFiller', episodeData.isFiller);
-      setValue('fillerNotes', episodeData.fillerNotes || '');
+      form.setValue('episodeNumber', episodeData.episodeNumber);
+      form.setValue('title', episodeData.title || '');
+      form.setValue('description', episodeData.description || '');
+      form.setValue('airDate', episodeData.airDate || undefined);
+      form.setValue('duration', episodeData.duration || undefined);
+      form.setValue('isFiller', episodeData.isFiller);
+      form.setValue('fillerNotes', episodeData.fillerNotes || '');
     } else {
       // Create mode'da form'u temizle
-      reset({
+      form.reset({
         mediaPartId: mediaPartId,
         episodeNumber: undefined,
         title: '',
@@ -93,7 +93,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
         fillerNotes: '',
       });
     }
-  }, [episodeData, episode, setValue, reset, mediaPartId]);
+  }, [episodeData, episode, form, mediaPartId]);
 
   // Create mutation
   const createMutation = useMutation({
@@ -155,149 +155,183 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Bölüm Numarası */}
-          <div className="space-y-2">
-            <Label htmlFor="episodeNumber">Bölüm Numarası *</Label>
-            <Input
-              id="episodeNumber"
-              type="number"
-              {...register('episodeNumber', { valueAsNumber: true })}
-              placeholder="1"
-              min="1"
-            />
-            {errors.episodeNumber && (
-              <p className="text-sm text-destructive">{errors.episodeNumber.message}</p>
-            )}
-          </div>
-
-          {/* Başlık */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Başlık</Label>
-            <Input
-              id="title"
-              {...register('title')}
-              placeholder="Episode başlığı"
-            />
-            {errors.title && (
-              <p className="text-sm text-destructive">{errors.title.message}</p>
-            )}
-          </div>
-
-          {/* Açıklama */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Açıklama</Label>
-            <Textarea
-              id="description"
-              {...register('description')}
-              placeholder="Episode açıklaması..."
-              rows={3}
-            />
-            {errors.description && (
-              <p className="text-sm text-destructive">{errors.description.message}</p>
-            )}
-          </div>
-
-          {/* Thumbnail Image */}
-          <div className="space-y-2">
-            <Label>Thumbnail</Label>
-            <Controller
-              name="thumbnailImageFile"
-              control={control}
-              render={({ field }) => (
-                <ImageUpload
-                  id="thumbnailImage"
-                  label="Episode thumbnail"
-                  accept="image/*"
-                  maxSize={UPLOAD_CONFIGS.EPISODE_THUMBNAIL.maxSize}
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </div>
-
-          {/* Yayın Tarihi ve Süre */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="airDate">Yayın Tarihi</Label>
-              <Input
-                id="airDate"
-                type="date"
-                {...register('airDate', { valueAsDate: true })}
-              />
-              {errors.airDate && (
-                <p className="text-sm text-destructive">{errors.airDate.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="duration">Süre (dakika)</Label>
-              <Input
-                id="duration"
-                type="number"
-                {...register('duration', { valueAsNumber: true })}
-                placeholder="24"
-                min="1"
-              />
-              {errors.duration && (
-                <p className="text-sm text-destructive">{errors.duration.message}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Filler */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Controller
-                name="isFiller"
-                control={control}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Bölüm Numarası */}
+              <FormField
+                control={form.control}
+                name="episodeNumber"
                 render={({ field }) => (
-                  <Checkbox
-                    id="isFiller"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
+                  <FormItem>
+                    <FormLabel>Bölüm Numarası *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="1"
+                        min="1"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
-              <Label htmlFor="isFiller">Filler Episode</Label>
-            </div>
-            {errors.isFiller && (
-              <p className="text-sm text-destructive">{errors.isFiller.message}</p>
-            )}
-          </div>
 
-          {/* Filler Notları */}
-          <div className="space-y-2">
-            <Label htmlFor="fillerNotes">Filler Notları</Label>
-            <Textarea
-              id="fillerNotes"
-              {...register('fillerNotes')}
-              placeholder="Filler episode hakkında notlar..."
-              rows={2}
-            />
-            {errors.fillerNotes && (
-              <p className="text-sm text-destructive">{errors.fillerNotes.message}</p>
-            )}
-          </div>
+              {/* Başlık */}
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Başlık</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Episode başlığı"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          {/* Butonlar */}
-          <div className="flex justify-end space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              İptal
-            </Button>
-            <Button
-              type="submit"
-              disabled={createMutation.isPending || updateMutation.isPending}
-            >
-              {createMutation.isPending || updateMutation.isPending ? 'Kaydediliyor...' : (episode ? 'Güncelle' : 'Oluştur')}
-            </Button>
-          </div>
-        </form>
+              {/* Açıklama */}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Açıklama</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Episode açıklaması..."
+                        rows={3}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Thumbnail Image */}
+              <FormField
+                control={form.control}
+                name="thumbnailImageFile"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Thumbnail</FormLabel>
+                    <FormControl>
+                      <ImageUpload
+                        id="thumbnailImage"
+                        label="Episode thumbnail"
+                        accept="image/*"
+                        maxSize={UPLOAD_CONFIGS.EPISODE_THUMBNAIL.maxSize}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Yayın Tarihi ve Süre */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="airDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Yayın Tarihi</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="duration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Süre (dakika)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="24"
+                          min="1"
+                          {...field}
+                          onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Filler */}
+              <FormField
+                control={form.control}
+                name="isFiller"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Filler Episode</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              {/* Filler Notları */}
+              <FormField
+                control={form.control}
+                name="fillerNotes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Filler Notları</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Filler episode hakkında notlar..."
+                        rows={2}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Butonlar */}
+              <div className="flex justify-end space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                >
+                  İptal
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                >
+                  {createMutation.isPending || updateMutation.isPending ? 'Kaydediliyor...' : (episode ? 'Güncelle' : 'Oluştur')}
+                </Button>
+              </div>
+            </form>
+          </Form>
         )}
       </DialogContent>
     </Dialog>
