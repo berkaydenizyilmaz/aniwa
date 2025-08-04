@@ -13,48 +13,42 @@ export const CLOUDINARY = {
       AVATARS: 'aniwa/users/avatars',
       BANNERS: 'aniwa/users/banners'
     }
-  }
-} as const;
-
-export const UPLOAD_CONFIGS = {
-  ANIME_COVER: {
-    folder: CLOUDINARY.FOLDERS.ANIME.COVERS,
-    maxSize: 5 * 1024 * 1024, // 5MB
-    accept: 'image/*',
-    quality: 80,
-    width: 400,
-    height: 600
   },
-  ANIME_BANNER: {
-    folder: CLOUDINARY.FOLDERS.ANIME.BANNERS,
-    maxSize: 10 * 1024 * 1024, // 10MB
-    accept: 'image/*',
-    quality: 85,
-    width: 1200,
-    height: 400
-  },
-  EPISODE_THUMBNAIL: {
-    folder: CLOUDINARY.FOLDERS.EPISODES.THUMBNAILS,
-    maxSize: 5 * 1024 * 1024, // 5MB
-    accept: 'image/*',
-    quality: 80,
-    width: 400,
-    height: 225
-  },
-  USER_AVATAR: {
-    folder: CLOUDINARY.FOLDERS.USERS.AVATARS,
-    maxSize: 2 * 1024 * 1024, // 2MB
-    accept: 'image/*',
-    quality: 90,
-    width: 200,
-    height: 200
-  },
-  USER_BANNER: {
-    folder: CLOUDINARY.FOLDERS.USERS.BANNERS,
-    maxSize: 5 * 1024 * 1024, // 5MB
-    accept: 'image/*',
-    quality: 85,
-    width: 800,
-    height: 200
+  CONFIGS: {
+    ANIME_COVER: {
+      folder: 'aniwa/anime/covers',
+      maxSize: 5 * 1024 * 1024, // 5MB
+      width: 400, 
+      height: 600,
+      quality: 80
+    },
+    ANIME_BANNER: {
+      folder: 'aniwa/anime/banners', 
+      maxSize: 10 * 1024 * 1024, // 10MB
+      width: 1200, 
+      height: 400,
+      quality: 85
+    },
+    EPISODE_THUMBNAIL: {
+      folder: 'aniwa/episodes/thumbnails',
+      maxSize: 5 * 1024 * 1024, // 5MB
+      width: 400, 
+      height: 225,
+      quality: 80
+    },
+    USER_AVATAR: {
+      folder: 'aniwa/users/avatars',
+      maxSize: 2 * 1024 * 1024, // 2MB
+      width: 200, 
+      height: 200,
+      quality: 90
+    },
+    USER_BANNER: {
+      folder: 'aniwa/users/banners',
+      maxSize: 5 * 1024 * 1024, // 5MB
+      width: 800, 
+      height: 200,
+      quality: 85
+    }
   }
 } as const; 

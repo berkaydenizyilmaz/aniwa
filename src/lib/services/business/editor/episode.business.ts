@@ -10,7 +10,7 @@ import {
   countEpisodesDB
 } from '@/lib/services/db/episode.db';
 import { findAnimeMediaPartByIdDB } from '@/lib/services/db/mediaPart.db';
-import { UploadService } from '@/lib/services/extends-api/cloudinary/upload.service';
+import { UploadService } from '@/lib/services/cloudinary/upload.service';
 import { 
   CreateEpisodeRequest, 
   UpdateEpisodeRequest,
@@ -286,6 +286,9 @@ export async function deleteEpisodeBusiness(
     }
 
     await deleteEpisodeDB({ id });
+
+    // Cloudinary'den thumbnail sil
+    await UploadService.deleteEpisodeThumbnail(id);
 
     await logger.info(
       EVENTS.EDITOR.EPISODE_DELETED,

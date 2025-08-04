@@ -28,7 +28,7 @@ import {
   UpdateAnimeMediaPartRequest,
   GetAnimeMediaPartsRequest,
 } from '@/lib/types/api/anime.api';
-import { UploadService } from '@/lib/services/extends-api/cloudinary/upload.service';
+
 
 // =============================================================================
 // ANIME MEDIA PART CRUD FUNCTIONS
@@ -55,13 +55,6 @@ export async function createAnimeMediaPartBusiness(
       throw new ConflictError('Bu izleme sırası zaten kullanılıyor');
     }
     
-    // Resim yükleme işlemi
-    let uploadResult;
-    if (data.coverImageFile || data.bannerImageFile) {
-      // Geçici ID ile resim yükle
-      uploadResult = await UploadService.uploadAnimeImages(data.coverImageFile, data.bannerImageFile, 'temp');
-    }
-
     // Anime medya parçası oluştur
     const result = await createAnimeMediaPartDB({
       title: data.title,
@@ -85,8 +78,6 @@ export async function createAnimeMediaPartBusiness(
         seriesId: result.seriesId,
         title: result.title,
         episodes: result.episodes,
-        hasCoverImage: !!uploadResult?.coverImage,
-        hasBannerImage: !!uploadResult?.bannerImage
       },
       userId
     );
@@ -261,13 +252,6 @@ export async function updateAnimeMediaPartBusiness(
       }
     }
 
-    // Resim yükleme işlemi
-    let uploadResult;
-    if (data.coverImageFile || data.bannerImageFile) {
-      // Geçici ID ile resim yükle
-      uploadResult = await UploadService.uploadAnimeImages(data.coverImageFile, data.bannerImageFile, id);
-    }
-
     // Anime medya parçası güncelle
     const result = await updateAnimeMediaPartDB({ id }, {
       title: data.title,
@@ -290,8 +274,6 @@ export async function updateAnimeMediaPartBusiness(
         title: result.title,
         episodes: result.episodes,
         oldTitle: existingMediaPart.title,
-        hasNewCoverImage: !!uploadResult?.coverImage,
-        hasNewBannerImage: !!uploadResult?.bannerImage
       },
       userId
     );

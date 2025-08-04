@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { ImageUpload } from '@/components/ui/image-upload';
-import { UPLOAD_CONFIGS } from '@/lib/constants/cloudinary.constants';
+import { CLOUDINARY } from '@/lib/constants/cloudinary.constants';
 import { CreateAnimeSeriesInput, UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 
 interface AnimeSeriesMediaProps {
@@ -31,8 +31,8 @@ export function AnimeSeriesMedia({ isPending }: AnimeSeriesMediaProps) {
               <ImageUpload
                 id="coverImage"
                 label="Kapak Görseli"
-                accept={UPLOAD_CONFIGS.ANIME_COVER.accept}
-                maxSize={UPLOAD_CONFIGS.ANIME_COVER.maxSize}
+                accept="image/*"
+                maxSize={CLOUDINARY.CONFIGS.ANIME_COVER.maxSize}
                 value={field.value || null}
                 onChange={field.onChange}
                 disabled={isPending}
@@ -53,8 +53,8 @@ export function AnimeSeriesMedia({ isPending }: AnimeSeriesMediaProps) {
               <ImageUpload
                 id="bannerImage"
                 label="Banner Görseli"
-                accept={UPLOAD_CONFIGS.ANIME_BANNER.accept}
-                maxSize={UPLOAD_CONFIGS.ANIME_BANNER.maxSize}
+                accept="image/*"
+                maxSize={CLOUDINARY.CONFIGS.ANIME_BANNER.maxSize}
                 value={field.value || null}
                 onChange={field.onChange}
                 disabled={isPending}

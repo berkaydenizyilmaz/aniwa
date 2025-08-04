@@ -49,7 +49,7 @@ import {
   GetAnimeSeriesRelationsResponse,
   GetAnimeSeriesWithRelationsResponse,
 } from '@/lib/types/api/anime.api';
-import { UploadService } from '@/lib/services/extends-api/cloudinary/upload.service';
+import { UploadService } from '@/lib/services/cloudinary/upload.service';
 
 // =============================================================================
 // ANIME SERIES CRUD FUNCTIONS
@@ -434,6 +434,9 @@ export async function deleteAnimeSeriesBusiness(
 
     // Anime serisi sil
     await deleteAnimeSeriesDB({ id });
+
+    // Cloudinary'den resimleri sil
+    await UploadService.deleteAnimeImages(id);
 
     // Başarılı silme logu
     await logger.info(
