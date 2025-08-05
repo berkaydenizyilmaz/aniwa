@@ -1,8 +1,10 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import {
   Form,
   FormControl,
@@ -59,7 +61,7 @@ export function PrivacySettings() {
   const profileVisibilityForm = useForm<UpdateProfileVisibilityInput>({
     resolver: zodResolver(updateProfileVisibilitySchema),
     defaultValues: {
-      profileVisibility: settings?.profileVisibility || ProfileVisibility.PUBLIC,
+      profileVisibility: ProfileVisibility.PUBLIC,
     },
   });
 
@@ -67,7 +69,7 @@ export function PrivacySettings() {
   const allowFollowsForm = useForm<UpdateAllowFollowsInput>({
     resolver: zodResolver(updateAllowFollowsSchema),
     defaultValues: {
-      allowFollows: settings?.allowFollows ?? true,
+      allowFollows: true,
     },
   });
 
@@ -75,7 +77,7 @@ export function PrivacySettings() {
   const showAnimeListForm = useForm<UpdateShowAnimeListInput>({
     resolver: zodResolver(updateShowAnimeListSchema),
     defaultValues: {
-      showAnimeList: settings?.showAnimeList ?? true,
+      showAnimeList: true,
     },
   });
 
@@ -83,7 +85,7 @@ export function PrivacySettings() {
   const showFavouriteAnimeSeriesForm = useForm<UpdateShowFavouriteAnimeSeriesInput>({
     resolver: zodResolver(updateShowFavouriteAnimeSeriesSchema),
     defaultValues: {
-      showFavouriteAnimeSeries: settings?.showFavouriteAnimeSeries ?? true,
+      showFavouriteAnimeSeries: true,
     },
   });
 
@@ -91,9 +93,20 @@ export function PrivacySettings() {
   const showCustomListsForm = useForm<UpdateShowCustomListsInput>({
     resolver: zodResolver(updateShowCustomListsSchema),
     defaultValues: {
-      showCustomLists: settings?.showCustomLists ?? true,
+      showCustomLists: true,
     },
   });
+
+  // Form'ları settings data yüklendikten sonra güncelle
+  useEffect(() => {
+    if (settings) {
+      profileVisibilityForm.reset({ profileVisibility: settings.profileVisibility || ProfileVisibility.PUBLIC });
+      allowFollowsForm.reset({ allowFollows: settings.allowFollows ?? true });
+      showAnimeListForm.reset({ showAnimeList: settings.showAnimeList ?? true });
+      showFavouriteAnimeSeriesForm.reset({ showFavouriteAnimeSeries: settings.showFavouriteAnimeSeries ?? true });
+      showCustomListsForm.reset({ showCustomLists: settings.showCustomLists ?? true });
+    }
+  }, [settings, profileVisibilityForm, allowFollowsForm, showAnimeListForm, showFavouriteAnimeSeriesForm, showCustomListsForm]);
 
   // Mutations
   const updateProfileVisibilityMutation = useMutation({

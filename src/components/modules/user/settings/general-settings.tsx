@@ -96,6 +96,17 @@ export function GeneralSettings() {
     },
   });
 
+  // Form'ları settings data yüklendikten sonra güncelle
+  useEffect(() => {
+    if (settings) {
+      themeForm.reset({ themePreference: settings.themePreference || Theme.LIGHT });
+      titleLanguageForm.reset({ titleLanguagePreference: settings.titleLanguagePreference || TitleLanguage.ROMAJI });
+      scoreFormatForm.reset({ scoreFormat: settings.scoreFormat || ScoreFormat.POINT_100 });
+      displayAdultContentForm.reset({ displayAdultContent: settings.displayAdultContent ?? true });
+      autoTrackForm.reset({ autoTrackOnAniwaListAdd: settings.autoTrackOnAniwaListAdd ?? false });
+    }
+  }, [settings, themeForm, titleLanguageForm, scoreFormatForm, displayAdultContentForm, autoTrackForm]);
+
   // Mutations
   const updateThemeMutation = useMutation({
     mutationFn: updateThemePreferenceAction,

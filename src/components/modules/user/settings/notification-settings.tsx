@@ -1,6 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +13,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
 import { 
   updateNotificationSettingsAction,
   getUserSettingsAction
@@ -38,11 +40,22 @@ export function NotificationSettings() {
   const notificationForm = useForm<UpdateNotificationSettingsInput>({
     resolver: zodResolver(updateNotificationSettingsSchema),
     defaultValues: {
-      receiveNotificationOnNewFollow: settings?.receiveNotificationOnNewFollow ?? true,
-      receiveNotificationOnEpisodeAiring: settings?.receiveNotificationOnEpisodeAiring ?? true,
-      receiveNotificationOnNewMediaPart: settings?.receiveNotificationOnNewMediaPart ?? true,
+      receiveNotificationOnNewFollow: true,
+      receiveNotificationOnEpisodeAiring: true,
+      receiveNotificationOnNewMediaPart: true,
     },
   });
+
+  // Form'ları settings data yüklendikten sonra güncelle
+  useEffect(() => {
+    if (settings) {
+      notificationForm.reset({
+        receiveNotificationOnNewFollow: settings.receiveNotificationOnNewFollow ?? true,
+        receiveNotificationOnEpisodeAiring: settings.receiveNotificationOnEpisodeAiring ?? true,
+        receiveNotificationOnNewMediaPart: settings.receiveNotificationOnNewMediaPart ?? true,
+      });
+    }
+  }, [settings, notificationForm]);
 
   // Update mutation
   const updateNotificationMutation = useMutation({
