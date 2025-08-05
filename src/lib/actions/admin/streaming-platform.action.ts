@@ -35,7 +35,7 @@ export async function createStreamingPlatformAction(data: CreateStreamingPlatfor
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'createStreamingPlatformAction',
       userId: session?.user.id
     });
@@ -60,7 +60,7 @@ export async function getStreamingPlatformsAction(filters?: StreamingPlatformFil
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getStreamingPlatformsAction',
       userId: session?.user.id
     });
@@ -82,7 +82,7 @@ export async function getStreamingPlatformAction(id: string): Promise<ServerActi
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getStreamingPlatformAction',
       userId: session?.user.id
     });
@@ -110,7 +110,7 @@ export async function updateStreamingPlatformAction(id: string, data: UpdateStre
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateStreamingPlatformAction',
       userId: session?.user.id
     });
@@ -135,7 +135,7 @@ export async function deleteStreamingPlatformAction(id: string): Promise<ServerA
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'deleteStreamingPlatformAction',
       userId: session?.user.id
     });

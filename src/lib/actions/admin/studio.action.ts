@@ -35,7 +35,7 @@ export async function createStudioAction(data: CreateStudioInput): Promise<Serve
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'createStudioAction',
       userId: session?.user.id
     });
@@ -60,7 +60,7 @@ export async function getStudiosAction(filters?: StudioFilters): Promise<ServerA
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getStudiosAction',
       userId: session?.user.id
     });
@@ -82,7 +82,7 @@ export async function getStudioAction(id: string): Promise<ServerActionResponse>
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getStudioAction',
       userId: session?.user.id
     });
@@ -110,7 +110,7 @@ export async function updateStudioAction(id: string, data: UpdateStudioInput): P
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateStudioAction',
       userId: session?.user.id
     });
@@ -135,7 +135,7 @@ export async function deleteStudioAction(id: string): Promise<ServerActionRespon
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'deleteStudioAction',
       userId: session?.user.id
     });

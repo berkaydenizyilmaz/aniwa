@@ -46,7 +46,7 @@ export async function createAnimeSeriesAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'createAnimeSeriesAction',
       userId: session?.user.id
     });
@@ -71,7 +71,7 @@ export async function getAnimeSeriesListAction(filters?: AnimeFilters): Promise<
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getAnimeSeriesListAction',
       userId: session?.user.id
     });
@@ -93,7 +93,7 @@ export async function getAnimeSeriesAction(id: string): Promise<ServerActionResp
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getAnimeSeriesAction',
       userId: session?.user.id
     });
@@ -124,7 +124,7 @@ export async function updateAnimeSeriesAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateAnimeSeriesAction',
       userId: session?.user.id
     });
@@ -149,7 +149,7 @@ export async function deleteAnimeSeriesAction(id: string): Promise<ServerActionR
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'deleteAnimeSeriesAction',
       userId: session?.user.id
     });
@@ -171,7 +171,7 @@ export async function getAnimeSeriesRelationsAction(): Promise<ServerActionRespo
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getAnimeSeriesRelationsAction',
       userId: session?.user.id
     });
@@ -193,7 +193,7 @@ export async function getAnimeSeriesWithRelationsAction(id: string): Promise<Ser
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getAnimeSeriesWithRelationsAction',
       userId: session?.user.id
     });

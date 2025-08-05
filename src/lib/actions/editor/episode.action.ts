@@ -44,7 +44,7 @@ export async function createEpisodeAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'createEpisodeAction',
       userId: session?.user.id
     });
@@ -68,7 +68,7 @@ export async function getEpisodeAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getEpisodeAction',
       userId: session?.user.id
     });
@@ -94,7 +94,7 @@ export async function getEpisodeListAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getEpisodeListAction',
       userId: session?.user.id
     });
@@ -125,7 +125,7 @@ export async function updateEpisodeAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateEpisodeAction',
       userId: session?.user.id
     });
@@ -152,7 +152,7 @@ export async function deleteEpisodeAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'deleteEpisodeAction',
       userId: session?.user.id
     });

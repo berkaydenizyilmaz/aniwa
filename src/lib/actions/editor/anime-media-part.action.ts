@@ -42,7 +42,7 @@ export async function createAnimeMediaPartAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'createAnimeMediaPartAction',
       userId: session?.user.id
     });
@@ -64,7 +64,7 @@ export async function getAnimeMediaPartListAction(seriesId: string): Promise<Ser
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getAnimeMediaPartListAction',
       userId: session?.user.id
     });
@@ -86,7 +86,7 @@ export async function getAnimeMediaPartAction(id: string): Promise<ServerActionR
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getAnimeMediaPartAction',
       userId: session?.user.id
     });
@@ -117,7 +117,7 @@ export async function updateAnimeMediaPartAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateAnimeMediaPartAction',
       userId: session?.user.id
     });
@@ -142,7 +142,7 @@ export async function deleteAnimeMediaPartAction(id: string): Promise<ServerActi
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'deleteAnimeMediaPartAction',
       userId: session?.user.id
     });

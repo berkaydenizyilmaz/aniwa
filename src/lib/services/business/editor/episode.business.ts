@@ -84,6 +84,10 @@ export async function createEpisodeBusiness(
 
     return { success: true, data: result };
   } catch (error) {
+    if (!(error instanceof BusinessError)) {
+      throw error;
+    }
+    
     await logger.error(
       EVENTS.EDITOR.EPISODE_CREATE_FAILED,
       'Episode oluşturma hatası',
@@ -94,7 +98,7 @@ export async function createEpisodeBusiness(
       },
       userId
     );
-    throw error;
+    throw new BusinessError('Episode oluşturma başarısız');
   }
 }
 
@@ -121,6 +125,10 @@ export async function getEpisodeBusiness(
 
     return { success: true, data: episode };
   } catch (error) {
+    if (!(error instanceof BusinessError)) {
+      throw error;
+    }
+    
     await logger.error(
       EVENTS.EDITOR.EPISODE_RETRIEVE_FAILED,
       'Episode getirme hatası',
@@ -130,7 +138,7 @@ export async function getEpisodeBusiness(
       },
       userId
     );
-    throw error;
+    throw new BusinessError('Episode getirme başarısız');
   }
 }
 
@@ -179,6 +187,10 @@ export async function getEpisodeListBusiness(
       },
     };
   } catch (error) {
+    if (!(error instanceof BusinessError)) {
+      throw error;
+    }
+    
     await logger.error(
       EVENTS.EDITOR.EPISODE_LIST_RETRIEVE_FAILED,
       'Episode listesi getirme hatası',
@@ -190,7 +202,7 @@ export async function getEpisodeListBusiness(
       },
       userId
     );
-    throw error;
+    throw new BusinessError('Episode listesi getirme başarısız');
   }
 }
 
@@ -261,6 +273,10 @@ export async function updateEpisodeBusiness(
 
     return { success: true, data: result };
   } catch (error) {
+    if (!(error instanceof BusinessError)) {
+      throw error;
+    }
+    
     await logger.error(
       EVENTS.EDITOR.EPISODE_UPDATE_FAILED,
       'Episode güncelleme hatası',
@@ -270,7 +286,7 @@ export async function updateEpisodeBusiness(
       },
       userId
     );
-    throw error;
+    throw new BusinessError('Episode güncelleme başarısız');
   }
 }
 
@@ -303,6 +319,10 @@ export async function deleteEpisodeBusiness(
 
     return { success: true, data: { success: true } };
   } catch (error) {
+    if (!(error instanceof BusinessError)) {
+      throw error;
+    }
+    
     await logger.error(
       EVENTS.EDITOR.EPISODE_DELETE_FAILED,
       'Episode silme hatası',
@@ -312,6 +332,6 @@ export async function deleteEpisodeBusiness(
       },
       userId
     );
-    throw error;
+    throw new BusinessError('Episode silme başarısız');
   }
 } 

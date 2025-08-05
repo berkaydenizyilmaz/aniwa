@@ -88,7 +88,7 @@ export async function getUsersBusiness(
       }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -132,7 +132,7 @@ export async function getUserBusiness(
       data: user
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -208,7 +208,7 @@ export async function updateUserBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -260,7 +260,7 @@ export async function banUserBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -312,7 +312,7 @@ export async function unbanUserBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -364,7 +364,7 @@ export async function deleteUserBusiness(
       success: true
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }

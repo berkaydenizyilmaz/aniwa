@@ -66,7 +66,7 @@ export async function getLogBusiness(
       data: log
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -169,7 +169,7 @@ export async function getLogsBusiness(
       }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }

@@ -96,106 +96,70 @@ export function ProfileSettings() {
   // Mutations
   const updateUsernameMutation = useMutation({
     mutationFn: updateUsernameAction,
-    onSuccess: (data) => {
-      // Server Action response'unu kontrol et
-      if (data.success) {
-        toast.success('Kullanıcı adı başarıyla güncellendi');
-        queryClient.invalidateQueries({ queryKey: ['userSettings'] });
-      } else {
-        // Error durumunda toast gösterme, onError'da gösterilecek
-      }
+    onSuccess: () => {
+      toast.success('Kullanıcı adı başarıyla güncellendi');
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Username update error:', error);
-      toast.error(error.message || 'Kullanıcı adı güncellenemedi');
+      // Business'dan gelen error message'ını göster
+      toast.error(error.message);
     },
   });
 
   const updateBioMutation = useMutation({
     mutationFn: updateBioAction,
-    onSuccess: (data) => {
-      if (data.success) {
-        toast.success('Biyografi başarıyla güncellendi');
-        queryClient.invalidateQueries({ queryKey: ['userSettings'] });
-      }
+    onSuccess: () => {
+      toast.success('Biyografi başarıyla güncellendi');
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Bio update error:', error);
-      toast.error(error.message || 'Biyografi güncellenemedi');
+      toast.error(error.message);
     },
   });
 
   const updatePasswordMutation = useMutation({
     mutationFn: updatePasswordAction,
-    onSuccess: (data) => {
-      if (data.success) {
-        toast.success('Parola başarıyla güncellendi');
-        passwordForm.reset();
-      }
+    onSuccess: () => {
+      toast.success('Parola başarıyla güncellendi');
+      passwordForm.reset();
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Password update error:', error);
-      toast.error(error.message || 'Parola güncellenemedi');
+      toast.error(error.message);
     },
   });
 
   const updateProfileImagesMutation = useMutation({
     mutationFn: updateProfileImagesAction,
-    onSuccess: (data) => {
-      if (data.success) {
-        toast.success('Profil görselleri başarıyla güncellendi');
-        setProfilePicture(null);
-        setProfileBanner(null);
-        queryClient.invalidateQueries({ queryKey: ['userSettings'] });
-      }
+    onSuccess: () => {
+      toast.success('Profil görselleri başarıyla güncellendi');
+      setProfilePicture(null);
+      setProfileBanner(null);
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Profile images update error:', error);
-      toast.error(error.message || 'Profil görselleri güncellenemedi');
+      toast.error(error.message);
     },
   });
 
   // Form submit handlers
   const onUsernameSubmit = async (data: UpdateUsernameInput) => {
-    const result = await updateUsernameAction(data);
-    if (result.success) {
-      toast.success('Kullanıcı adı başarıyla güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
-    } else {
-      toast.error(result.error || 'Kullanıcı adı güncellenemedi');
-    }
+    updateUsernameMutation.mutate(data);
   };
 
   const onBioSubmit = async (data: UpdateBioInput) => {
-    const result = await updateBioAction(data);
-    if (result.success) {
-      toast.success('Biyografi başarıyla güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
-    } else {
-      toast.error(result.error || 'Biyografi güncellenemedi');
-    }
+    updateBioMutation.mutate(data);
   };
 
   const onPasswordSubmit = async (data: UpdatePasswordInput) => {
-    const result = await updatePasswordAction(data);
-    if (result.success) {
-      toast.success('Parola başarıyla güncellendi');
-      passwordForm.reset();
-    } else {
-      toast.error(result.error || 'Parola güncellenemedi');
-    }
+    updatePasswordMutation.mutate(data);
   };
 
   const onProfileImagesSubmit = async (data: UpdateProfileImagesInput) => {
-    const result = await updateProfileImagesAction(data);
-    if (result.success) {
-      toast.success('Profil görselleri başarıyla güncellendi');
-      setProfilePicture(null);
-      setProfileBanner(null);
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
-    } else {
-      toast.error(result.error || 'Profil görselleri güncellenemedi');
-    }
+    updateProfileImagesMutation.mutate(data);
   };
 
   // File handlers

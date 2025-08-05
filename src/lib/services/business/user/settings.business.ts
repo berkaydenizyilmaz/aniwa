@@ -96,7 +96,7 @@ export async function updateUsernameBusiness(
       data: { message: 'Kullanıcı adı başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -141,7 +141,7 @@ export async function updateBioBusiness(
       data: { message: 'Biyografi başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -183,7 +183,7 @@ export async function updatePasswordBusiness(
       data: { message: 'Parola başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -255,7 +255,7 @@ export async function updateProfileImagesBusiness(
       data: { message: 'Profil görselleri başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -304,7 +304,7 @@ export async function updateThemePreferenceBusiness(
       data: { message: 'Tema tercihi başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -350,7 +350,7 @@ export async function updateTitleLanguagePreferenceBusiness(
       data: { message: 'Başlık dili tercihi başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -396,7 +396,7 @@ export async function updateScoreFormatBusiness(
       data: { message: 'Puanlama formatı başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -442,7 +442,7 @@ export async function updateDisplayAdultContentBusiness(
       data: { message: 'Yetişkin içerik ayarı başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -488,7 +488,7 @@ export async function updateAutoTrackOnAniwaListAddBusiness(
       data: { message: 'Otomatik takip ayarı başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -536,7 +536,7 @@ export async function updateProfileVisibilityBusiness(
       data: { message: 'Profil görünürlüğü başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -582,7 +582,7 @@ export async function updateAllowFollowsBusiness(
       data: { message: 'Takip izinleri başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -628,7 +628,7 @@ export async function updateShowAnimeListBusiness(
       data: { message: 'Anime listesi gösterme ayarı başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -674,7 +674,7 @@ export async function updateShowFavouriteAnimeSeriesBusiness(
       data: { message: 'Favori animeleri gösterme ayarı başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -720,7 +720,7 @@ export async function updateShowCustomListsBusiness(
       data: { message: 'Özel listeleri gösterme ayarı başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -768,7 +768,7 @@ export async function updateNotificationSettingsBusiness(
       data: { message: 'Bildirim ayarları başarıyla güncellendi' }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     
@@ -824,7 +824,7 @@ export async function getUserSettingsBusiness(
       }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       throw error;
     }
     

@@ -33,9 +33,9 @@ export async function createTagAction(data: CreateTagInput): Promise<ServerActio
       success: true,
       data: result.data
     };
-
+  
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'createTagAction',
       userId: session?.user.id
     });
@@ -60,7 +60,7 @@ export async function getTagsAction(filters?: TagFilters): Promise<ServerActionR
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getTagsAction',
       userId: session?.user.id
     });
@@ -82,7 +82,7 @@ export async function getTagAction(id: string): Promise<ServerActionResponse> {
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getTagAction',
       userId: session?.user.id
     });
@@ -110,7 +110,7 @@ export async function updateTagAction(id: string, data: UpdateTagInput): Promise
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateTagAction',
       userId: session?.user.id
     });
@@ -135,7 +135,7 @@ export async function deleteTagAction(id: string): Promise<ServerActionResponse>
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'deleteTagAction',
       userId: session?.user.id
     });

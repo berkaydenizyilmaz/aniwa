@@ -27,7 +27,7 @@ export async function getLogsAction(filters?: LogFilters): Promise<ServerActionR
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getLogsAction',
       userId: session?.user.id
     });
@@ -49,7 +49,7 @@ export async function getLogAction(id: string): Promise<ServerActionResponse> {
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getLogAction',
       userId: session?.user.id
     });

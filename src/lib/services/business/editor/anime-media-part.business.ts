@@ -30,11 +30,6 @@ import {
 } from '@/lib/types/api/anime.api';
 import { UploadService } from '@/lib/services/cloudinary/upload.service';
 
-
-// =============================================================================
-// ANIME MEDIA PART CRUD FUNCTIONS
-// =============================================================================
-
 // Anime medya parçası oluşturma
 export async function createAnimeMediaPartBusiness(
   data: CreateAnimeMediaPartRequest & { coverImageFile?: File; bannerImageFile?: File },

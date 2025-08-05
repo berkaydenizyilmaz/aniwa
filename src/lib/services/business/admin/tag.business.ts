@@ -76,7 +76,7 @@ export async function createTagBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -120,7 +120,7 @@ export async function getTagBusiness(
       data: tag
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -198,7 +198,7 @@ export async function getTagsBusiness(
       }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -277,7 +277,7 @@ export async function updateTagBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -324,7 +324,7 @@ export async function deleteTagBusiness(
       success: true
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }

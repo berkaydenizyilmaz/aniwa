@@ -43,7 +43,7 @@ export async function createStreamingLinkAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'createStreamingLinkAction',
       userId: session?.user.id
     });
@@ -65,7 +65,7 @@ export async function getStreamingLinkAction(id: string): Promise<ServerActionRe
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getStreamingLinkAction',
       userId: session?.user.id
     });
@@ -91,7 +91,7 @@ export async function getStreamingLinksByEpisodeAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getStreamingLinksByEpisodeAction',
       userId: session?.user.id
     });
@@ -113,7 +113,7 @@ export async function getStreamingPlatformsAction(): Promise<ServerActionRespons
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getStreamingPlatformsAction',
       userId: session?.user.id
     });
@@ -144,7 +144,7 @@ export async function updateStreamingLinkAction(
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateStreamingLinkAction',
       userId: session?.user.id
     });
@@ -169,7 +169,7 @@ export async function deleteStreamingLinkAction(id: string): Promise<ServerActio
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'deleteStreamingLinkAction',
       userId: session?.user.id
     });

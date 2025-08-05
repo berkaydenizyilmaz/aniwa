@@ -58,7 +58,7 @@ export async function createStreamingPlatformBusiness(
       data: result,
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -106,7 +106,7 @@ export async function getStreamingPlatformBusiness(
       data: streamingPlatform,
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -168,7 +168,7 @@ export async function getStreamingPlatformsBusiness(
       },
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -234,7 +234,7 @@ export async function updateStreamingPlatformBusiness(
       data: updatedPlatform,
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -286,7 +286,7 @@ export async function deleteStreamingPlatformBusiness(
       data: { message: 'Streaming platform başarıyla silindi' },
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (!(error instanceof BusinessError)) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }

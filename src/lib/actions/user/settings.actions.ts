@@ -84,7 +84,7 @@ export async function updateUsernameAction(data: UpdateUsernameInput): Promise<S
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateUsernameAction',
       userId: session?.user.id
     });
@@ -105,7 +105,7 @@ export async function updateBioAction(data: UpdateBioInput): Promise<ServerActio
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateBioAction',
       userId: session?.user.id
     });
@@ -126,7 +126,7 @@ export async function updatePasswordAction(data: UpdatePasswordInput): Promise<S
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updatePasswordAction',
       userId: session?.user.id
     });
@@ -147,7 +147,7 @@ export async function updateProfileImagesAction(data: UpdateProfileImagesInput):
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateProfileImagesAction',
       userId: session?.user.id
     });
@@ -170,7 +170,7 @@ export async function updateThemePreferenceAction(data: UpdateThemePreferenceInp
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateThemePreferenceAction',
       userId: session?.user.id
     });
@@ -191,7 +191,7 @@ export async function updateTitleLanguagePreferenceAction(data: UpdateTitleLangu
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateTitleLanguagePreferenceAction',
       userId: session?.user.id
     });
@@ -212,7 +212,7 @@ export async function updateScoreFormatAction(data: UpdateScoreFormatInput): Pro
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateScoreFormatAction',
       userId: session?.user.id
     });
@@ -233,7 +233,7 @@ export async function updateDisplayAdultContentAction(data: UpdateDisplayAdultCo
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateDisplayAdultContentAction',
       userId: session?.user.id
     });
@@ -254,7 +254,7 @@ export async function updateAutoTrackOnAniwaListAddAction(data: UpdateAutoTrackO
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateAutoTrackOnAniwaListAddAction',
       userId: session?.user.id
     });
@@ -277,7 +277,7 @@ export async function updateProfileVisibilityAction(data: UpdateProfileVisibilit
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateProfileVisibilityAction',
       userId: session?.user.id
     });
@@ -298,7 +298,7 @@ export async function updateAllowFollowsAction(data: UpdateAllowFollowsInput): P
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateAllowFollowsAction',
       userId: session?.user.id
     });
@@ -319,7 +319,7 @@ export async function updateShowAnimeListAction(data: UpdateShowAnimeListInput):
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateShowAnimeListAction',
       userId: session?.user.id
     });
@@ -340,7 +340,7 @@ export async function updateShowFavouriteAnimeSeriesAction(data: UpdateShowFavou
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateShowFavouriteAnimeSeriesAction',
       userId: session?.user.id
     });
@@ -361,7 +361,7 @@ export async function updateShowCustomListsAction(data: UpdateShowCustomListsInp
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateShowCustomListsAction',
       userId: session?.user.id
     });
@@ -384,7 +384,7 @@ export async function updateNotificationSettingsAction(data: UpdateNotificationS
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateNotificationSettingsAction',
       userId: session?.user.id
     });
@@ -405,7 +405,7 @@ export async function getUserSettingsAction(): Promise<ServerActionResponse> {
       data: result.data
     };
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getUserSettingsAction',
       userId: session?.user.id
     });

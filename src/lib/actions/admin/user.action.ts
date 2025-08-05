@@ -33,7 +33,7 @@ export async function getUsersAction(filters?: UserFilters): Promise<ServerActio
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getUsersAction',
       userId: session?.user.id
     });
@@ -55,7 +55,7 @@ export async function getUserAction(id: string): Promise<ServerActionResponse> {
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getUserAction',
       userId: session?.user.id
     });
@@ -83,7 +83,7 @@ export async function updateUserAction(id: string, data: UpdateUserInput): Promi
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateUserAction',
       userId: session?.user.id
     });
@@ -108,7 +108,7 @@ export async function banUserAction(id: string): Promise<ServerActionResponse> {
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'banUserAction',
       userId: session?.user.id
     });
@@ -133,7 +133,7 @@ export async function unbanUserAction(id: string): Promise<ServerActionResponse>
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'unbanUserAction',
       userId: session?.user.id
     });
@@ -158,7 +158,7 @@ export async function deleteUserAction(id: string): Promise<ServerActionResponse
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'deleteUserAction',
       userId: session?.user.id
     });

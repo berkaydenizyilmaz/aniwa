@@ -35,7 +35,7 @@ export async function createGenreAction(data: CreateGenreInput): Promise<ServerA
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'createGenreAction',
       userId: session?.user.id
     });
@@ -60,7 +60,7 @@ export async function getGenresAction(filters?: GenreFilters): Promise<ServerAct
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getGenresAction',
       userId: session?.user.id
     });
@@ -82,7 +82,7 @@ export async function getGenreAction(id: string): Promise<ServerActionResponse> 
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'getGenreAction',
       userId: session?.user.id
     });
@@ -110,7 +110,7 @@ export async function updateGenreAction(id: string, data: UpdateGenreInput): Pro
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'updateGenreAction',
       userId: session?.user.id
     });
@@ -135,7 +135,7 @@ export async function deleteGenreAction(id: string): Promise<ServerActionRespons
     };
 
   } catch (error) {
-    return handleServerActionError(error, {
+    handleServerActionError(error, {
       actionName: 'deleteGenreAction',
       userId: session?.user.id
     });

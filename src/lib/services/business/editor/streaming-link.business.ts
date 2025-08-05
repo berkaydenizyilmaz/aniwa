@@ -20,7 +20,7 @@ import {
   GetStreamingPlatformsResponse
 } from '@/lib/types/api/anime.api';
 import { ApiResponse } from '@/lib/types/api/index';
-import { NotFoundError } from '@/lib/errors';
+import { BusinessError, NotFoundError } from '@/lib/errors';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
 import { StreamingLink } from '@prisma/client';
@@ -64,6 +64,10 @@ export async function createStreamingLinkBusiness(
 
     return { success: true, data: result };
   } catch (error) {
+    if (!(error instanceof BusinessError)) {
+      throw error;
+    }
+    
     await logger.error(
       EVENTS.EDITOR.STREAMING_LINK_CREATE_FAILED,
       'Streaming link oluşturma hatası',
@@ -75,7 +79,7 @@ export async function createStreamingLinkBusiness(
       },
       userId
     );
-    throw error;
+    throw new BusinessError('Streaming link oluşturma başarısız');
   }
 }
 
@@ -105,6 +109,10 @@ export async function getStreamingLinkBusiness(
 
     return { success: true, data: streamingLink };
   } catch (error) {
+    if (!(error instanceof BusinessError)) {
+      throw error;
+    }
+    
     await logger.error(
       EVENTS.EDITOR.STREAMING_LINK_RETRIEVE_FAILED,
       'Streaming link getirme hatası',
@@ -114,7 +122,7 @@ export async function getStreamingLinkBusiness(
       },
       userId
     );
-    throw error;
+    throw new BusinessError('Streaming link getirme hatası');
   }
 }
 
@@ -166,6 +174,10 @@ export async function getStreamingLinksByEpisodeBusiness(
       },
     };
   } catch (error) {
+    if (!(error instanceof BusinessError)) {
+      throw error;
+    }
+    
     await logger.error(
       EVENTS.EDITOR.STREAMING_LINKS_RETRIEVE_FAILED,
       'Episode streaming link\'leri getirme hatası',
@@ -177,7 +189,7 @@ export async function getStreamingLinksByEpisodeBusiness(
       },
       userId
     );
-    throw error;
+    throw new BusinessError('Episode streaming link\'leri getirme hatası');
   }
 }
 
@@ -204,6 +216,10 @@ export async function getStreamingPlatformsBusiness(
       },
     };
   } catch (error) {
+    if (!(error instanceof BusinessError)) {
+      throw error;
+    }
+    
     await logger.error(
       EVENTS.EDITOR.STREAMING_PLATFORMS_RETRIEVE_FAILED,
       'Streaming platform\'ları getirme hatası',
@@ -212,7 +228,7 @@ export async function getStreamingPlatformsBusiness(
       },
       userId
     );
-    throw error;
+    throw new BusinessError('Streaming platform\'ları getirme hatası');
   }
 }
 
@@ -258,6 +274,10 @@ export async function updateStreamingLinkBusiness(
 
     return { success: true, data: result };
   } catch (error) {
+    if (!(error instanceof BusinessError)) {
+      throw error;
+    }
+    
     await logger.error(
       EVENTS.EDITOR.STREAMING_LINK_UPDATE_FAILED,
       'Streaming link güncelleme hatası',
@@ -267,7 +287,7 @@ export async function updateStreamingLinkBusiness(
       },
       userId
     );
-    throw error;
+    throw new BusinessError('Streaming link güncelleme hatası');
   }
 }
 
@@ -297,6 +317,10 @@ export async function deleteStreamingLinkBusiness(
 
     return { success: true, data: { success: true } };
   } catch (error) {
+    if (!(error instanceof BusinessError)) {
+      throw error;
+    }
+    
     await logger.error(
       EVENTS.EDITOR.STREAMING_LINK_DELETE_FAILED,
       'Streaming link silme hatası',
@@ -306,6 +330,6 @@ export async function deleteStreamingLinkBusiness(
       },
       userId
     );
-    throw error;
+    throw new BusinessError('Streaming link silme hatası');
   }
 } 
