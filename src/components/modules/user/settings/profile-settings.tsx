@@ -100,10 +100,9 @@ export function ProfileSettings() {
       toast.success('Kullanıcı adı başarıyla güncellendi');
       queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       console.error('Username update error:', error);
-      // Business'dan gelen error message'ını göster
-      toast.error(error.message);
+      toast.error('Kullanıcı adı güncellenemedi');
     },
   });
 
@@ -113,9 +112,9 @@ export function ProfileSettings() {
       toast.success('Biyografi başarıyla güncellendi');
       queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       console.error('Bio update error:', error);
-      toast.error(error.message);
+      toast.error('Biyografi güncellenemedi');
     },
   });
 
@@ -125,9 +124,9 @@ export function ProfileSettings() {
       toast.success('Parola başarıyla güncellendi');
       passwordForm.reset();
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       console.error('Password update error:', error);
-      toast.error(error.message);
+      toast.error('Parola güncellenemedi');
     },
   });
 
@@ -139,9 +138,9 @@ export function ProfileSettings() {
       setProfileBanner(null);
       queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       console.error('Profile images update error:', error);
-      toast.error(error.message);
+      toast.error('Profil görselleri güncellenemedi');
     },
   });
 
