@@ -45,6 +45,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProfileVisibility } from '@prisma/client';
 import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
+import { USER } from '@/lib/constants/user.constants';
 
 export function PrivacySettings() {
   // Settings hook'u kullan
@@ -218,9 +219,9 @@ export function PrivacySettings() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={ProfileVisibility.PUBLIC}>Herkese Açık</SelectItem>
-                      <SelectItem value={ProfileVisibility.FOLLOWERS_ONLY}>Sadece Takipçiler</SelectItem>
-                      <SelectItem value={ProfileVisibility.PRIVATE}>Gizli</SelectItem>
+                      <SelectItem value={ProfileVisibility.PUBLIC}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.PUBLIC]}</SelectItem>
+                      <SelectItem value={ProfileVisibility.FOLLOWERS_ONLY}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.FOLLOWERS_ONLY]}</SelectItem>
+                      <SelectItem value={ProfileVisibility.PRIVATE}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.PRIVATE]}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
