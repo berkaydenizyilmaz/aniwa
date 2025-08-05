@@ -112,7 +112,7 @@ export function PrivacySettings() {
     },
     onError: (error) => {
       console.error('Profile visibility update error:', error);
-      toast.error('Profil görünürlüğü güncellenemedi');
+      toast.error(error.message || 'Profil görünürlüğü güncellenemedi');
     },
   });
 
@@ -124,7 +124,7 @@ export function PrivacySettings() {
     },
     onError: (error) => {
       console.error('Allow follows update error:', error);
-      toast.error('Takip ayarı güncellenemedi');
+      toast.error(error.message || 'Takip ayarı güncellenemedi');
     },
   });
 
@@ -136,7 +136,7 @@ export function PrivacySettings() {
     },
     onError: (error) => {
       console.error('Show anime list update error:', error);
-      toast.error('Anime listesi görünürlüğü güncellenemedi');
+      toast.error(error.message || 'Anime listesi görünürlüğü güncellenemedi');
     },
   });
 
@@ -148,7 +148,7 @@ export function PrivacySettings() {
     },
     onError: (error) => {
       console.error('Show favourite anime series update error:', error);
-      toast.error('Favori anime görünürlüğü güncellenemedi');
+      toast.error(error.message || 'Favori anime görünürlüğü güncellenemedi');
     },
   });
 
@@ -160,7 +160,7 @@ export function PrivacySettings() {
     },
     onError: (error) => {
       console.error('Show custom lists update error:', error);
-      toast.error('Özel listeler görünürlüğü güncellenemedi');
+      toast.error(error.message || 'Özel listeler görünürlüğü güncellenemedi');
     },
   });
 

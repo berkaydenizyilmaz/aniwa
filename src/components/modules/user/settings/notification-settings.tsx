@@ -60,7 +60,7 @@ export function NotificationSettings() {
     },
     onError: (error) => {
       console.error('Notification settings update error:', error);
-      toast.error('Bildirim ayarları güncellenemedi');
+      toast.error(error.message || 'Bildirim ayarları güncellenemedi');
     },
   });
 

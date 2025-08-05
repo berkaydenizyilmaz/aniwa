@@ -112,7 +112,7 @@ export function GeneralSettings() {
     },
     onError: (error) => {
       console.error('Theme update error:', error);
-      toast.error('Tema tercihi güncellenemedi');
+      toast.error(error.message || 'Tema tercihi güncellenemedi');
     },
   });
 
@@ -124,7 +124,7 @@ export function GeneralSettings() {
     },
     onError: (error) => {
       console.error('Title language update error:', error);
-      toast.error('Başlık dili tercihi güncellenemedi');
+      toast.error(error.message || 'Başlık dili tercihi güncellenemedi');
     },
   });
 
@@ -136,7 +136,7 @@ export function GeneralSettings() {
     },
     onError: (error) => {
       console.error('Score format update error:', error);
-      toast.error('Puanlama formatı güncellenemedi');
+      toast.error(error.message || 'Puanlama formatı güncellenemedi');
     },
   });
 
@@ -148,7 +148,7 @@ export function GeneralSettings() {
     },
     onError: (error) => {
       console.error('Display adult content update error:', error);
-      toast.error('Yetişkin içerik ayarı güncellenemedi');
+      toast.error(error.message || 'Yetişkin içerik ayarı güncellenemedi');
     },
   });
 
@@ -160,7 +160,7 @@ export function GeneralSettings() {
     },
     onError: (error) => {
       console.error('Auto track update error:', error);
-      toast.error('Otomatik takip ayarı güncellenemedi');
+      toast.error(error.message || 'Otomatik takip ayarı güncellenemedi');
     },
   });
 

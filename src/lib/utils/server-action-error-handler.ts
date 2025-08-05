@@ -41,30 +41,20 @@ export function setFormFieldErrors<T extends Record<string, unknown>>(
 export function handleServerActionError(
   error: unknown, 
   context?: { actionName?: string; userId?: string }
-): ServerActionErrorResponse {
+): never {
   // Business error - zaten loglanmış
   if (error instanceof BusinessError) {
-    return {
-      success: false,
-      error: error.message
-    };
+    throw new Error(error.message);
   }
 
   // Database error - zaten loglanmış
   if (error instanceof DatabaseError) {
-    return {
-      success: false,
-      error: 'Veritabanı hatası'
-    };
+    throw new Error('Veritabanı hatası');
   }
 
   // Zod validation hatası - loglanmaz (client hatası)
   if (error instanceof ZodError) {
-    return {
-      success: false,
-      error: 'Geçersiz veri formatı',
-      fieldErrors: error.flatten().fieldErrors
-    };
+    throw new Error('Geçersiz veri formatı');
   }
 
   // Beklenmedik hata - logla
@@ -81,8 +71,5 @@ export function handleServerActionError(
   );
 
   console.error('Server Action Error:', error);
-  return {
-    success: false,
-    error: 'Bir hata oluştu. Lütfen tekrar deneyin.'
-  };
+  throw new Error('Bir hata oluştu. Lütfen tekrar deneyin.');
 } 
