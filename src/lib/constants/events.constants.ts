@@ -15,8 +15,22 @@ export const EVENTS = {
   USER: {
     // Settings Events
     PROFILE_UPDATED: 'user_profile_updated',
+    USERNAME_UPDATED: 'user_username_updated',
+    BIO_UPDATED: 'user_bio_updated',
+    PASSWORD_UPDATED: 'user_password_updated',
+    PROFILE_IMAGES_UPDATED: 'user_profile_images_updated',
     GENERAL_SETTINGS_UPDATED: 'user_general_settings_updated',
+    THEME_UPDATED: 'user_theme_updated',
+    TITLE_LANGUAGE_UPDATED: 'user_title_language_updated',
+    SCORE_FORMAT_UPDATED: 'user_score_format_updated',
+    ADULT_CONTENT_UPDATED: 'user_adult_content_updated',
+    AUTO_TRACK_UPDATED: 'user_auto_track_updated',
     PRIVACY_SETTINGS_UPDATED: 'user_privacy_settings_updated',
+    PROFILE_VISIBILITY_UPDATED: 'user_profile_visibility_updated',
+    ALLOW_FOLLOWS_UPDATED: 'user_allow_follows_updated',
+    SHOW_ANIME_LIST_UPDATED: 'user_show_anime_list_updated',
+    SHOW_FAVOURITE_ANIME_UPDATED: 'user_show_favourite_anime_updated',
+    SHOW_CUSTOM_LISTS_UPDATED: 'user_show_custom_lists_updated',
     NOTIFICATION_SETTINGS_UPDATED: 'user_notification_settings_updated',
     SETTINGS_RETRIEVED: 'user_settings_retrieved',
     

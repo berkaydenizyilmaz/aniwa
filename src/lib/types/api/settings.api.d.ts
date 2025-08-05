@@ -2,42 +2,105 @@
 
 import { User, UserProfileSettings } from '@prisma/client';
 import { 
-  UpdateProfileInput, 
-  UpdateGeneralSettingsInput, 
-  UpdatePrivacySettingsInput, 
-  UpdateNotificationSettingsInput 
+  UpdateUsernameInput,
+  UpdateBioInput,
+  UpdatePasswordInput,
+  UpdateProfileImagesInput,
+  UpdateThemePreferenceInput,
+  UpdateTitleLanguagePreferenceInput,
+  UpdateScoreFormatInput,
+  UpdateDisplayAdultContentInput,
+  UpdateAutoTrackOnAniwaListAddInput,
+  UpdateProfileVisibilityInput,
+  UpdateAllowFollowsInput,
+  UpdateShowAnimeListInput,
+  UpdateShowFavouriteAnimeSeriesInput,
+  UpdateShowCustomListsInput,
+  UpdateNotificationSettingsInput
 } from '@/lib/schemas/settings.schema';
 
-// Profil güncelleme response tipi
-export interface UpdateProfileResponse {
+// Profile Settings - Ayrı response tipleri
+export interface UpdateUsernameResponse {
   message: string;
 }
 
-// Profil güncelleme request tipi
-export type UpdateProfileRequest = UpdateProfileInput;
-
-// Genel ayarlar güncelleme response tipi
-export interface UpdateGeneralSettingsResponse {
+export interface UpdateBioResponse {
   message: string;
 }
 
-// Genel ayarlar güncelleme request tipi
-export type UpdateGeneralSettingsRequest = UpdateGeneralSettingsInput;
-
-// Gizlilik ayarları güncelleme response tipi
-export interface UpdatePrivacySettingsResponse {
+export interface UpdatePasswordResponse {
   message: string;
 }
 
-// Gizlilik ayarları güncelleme request tipi
-export type UpdatePrivacySettingsRequest = UpdatePrivacySettingsInput;
+export interface UpdateProfileImagesResponse {
+  message: string;
+}
 
-// Bildirim ayarları güncelleme response tipi
+// General Settings - Ayrı response tipleri
+export interface UpdateThemePreferenceResponse {
+  message: string;
+}
+
+export interface UpdateTitleLanguagePreferenceResponse {
+  message: string;
+}
+
+export interface UpdateScoreFormatResponse {
+  message: string;
+}
+
+export interface UpdateDisplayAdultContentResponse {
+  message: string;
+}
+
+export interface UpdateAutoTrackOnAniwaListAddResponse {
+  message: string;
+}
+
+// Privacy Settings - Ayrı response tipleri
+export interface UpdateProfileVisibilityResponse {
+  message: string;
+}
+
+export interface UpdateAllowFollowsResponse {
+  message: string;
+}
+
+export interface UpdateShowAnimeListResponse {
+  message: string;
+}
+
+export interface UpdateShowFavouriteAnimeSeriesResponse {
+  message: string;
+}
+
+export interface UpdateShowCustomListsResponse {
+  message: string;
+}
+
+// Notification Settings - Tek response tipi
 export interface UpdateNotificationSettingsResponse {
   message: string;
 }
 
-// Bildirim ayarları güncelleme request tipi
+// Request tipleri
+export type UpdateUsernameRequest = UpdateUsernameInput;
+export type UpdateBioRequest = UpdateBioInput;
+export type UpdatePasswordRequest = UpdatePasswordInput;
+export type UpdateProfileImagesRequest = UpdateProfileImagesInput;
+
+export type UpdateThemePreferenceRequest = UpdateThemePreferenceInput;
+export type UpdateTitleLanguagePreferenceRequest = UpdateTitleLanguagePreferenceInput;
+export type UpdateScoreFormatRequest = UpdateScoreFormatInput;
+export type UpdateDisplayAdultContentRequest = UpdateDisplayAdultContentInput;
+export type UpdateAutoTrackOnAniwaListAddRequest = UpdateAutoTrackOnAniwaListAddInput;
+
+export type UpdateProfileVisibilityRequest = UpdateProfileVisibilityInput;
+export type UpdateAllowFollowsRequest = UpdateAllowFollowsInput;
+export type UpdateShowAnimeListRequest = UpdateShowAnimeListInput;
+export type UpdateShowFavouriteAnimeSeriesRequest = UpdateShowFavouriteAnimeSeriesInput;
+export type UpdateShowCustomListsRequest = UpdateShowCustomListsInput;
+
 export type UpdateNotificationSettingsRequest = UpdateNotificationSettingsInput;
 
 // Kullanıcı ayarlarını getirme response tipi
