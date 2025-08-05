@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import {
   Form,
   FormControl,
@@ -14,107 +14,208 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ImageUpload } from '@/components/ui/image-upload';
-import { updateProfileAction, getUserSettingsAction } from '@/lib/actions/user/settings.actions';
-import { updateProfileSchema, type UpdateProfileInput } from '@/lib/schemas/settings.schema';
+import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  updateUsernameAction,
+  updateBioAction,
+  updatePasswordAction,
+  updateProfileImagesAction,
+  getUserSettingsAction
+} from '@/lib/actions/user/settings.actions';
+import { 
+  updateUsernameSchema,
+  updateBioSchema,
+  updatePasswordSchema,
+  updateProfileImagesSchema,
+  type UpdateUsernameInput,
+  type UpdateBioInput,
+  type UpdatePasswordInput,
+  type UpdateProfileImagesInput
+} from '@/lib/schemas/settings.schema';
 import { toast } from 'sonner';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CLOUDINARY } from '@/lib/constants/cloudinary.constants';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Eye, EyeOff, Upload, X } from 'lucide-react';
 import { GetUserSettingsResponse } from '@/lib/types/api/settings.api';
 
 export function ProfileSettings() {
-  const queryClient = useQueryClient();
+  const [showPassword, setShowPassword] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [profileBanner, setProfileBanner] = useState<File | null>(null);
 
-  const form = useForm<UpdateProfileInput>({
-    resolver: zodResolver(updateProfileSchema),
+  // Kullanıcı ayarlarını getir
+  const { data: userData, refetch } = useQuery({
+    queryKey: ['userSettings'],
+    queryFn: getUserSettingsAction,
+  });
+
+  const user = userData?.success ? (userData.data as GetUserSettingsResponse)?.user : null;
+  const settings = userData?.success ? (userData.data as GetUserSettingsResponse)?.settings : null;
+
+  // Username form
+  const usernameForm = useForm<UpdateUsernameInput>({
+    resolver: zodResolver(updateUsernameSchema),
     defaultValues: {
       username: '',
+    },
+  });
+
+  // Bio form
+  const bioForm = useForm<UpdateBioInput>({
+    resolver: zodResolver(updateBioSchema),
+    defaultValues: {
       bio: '',
+    },
+  });
+
+  // Password form
+  const passwordForm = useForm<UpdatePasswordInput>({
+    resolver: zodResolver(updatePasswordSchema),
+    defaultValues: {
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
+
+  // Profile images form
+  const profileImagesForm = useForm<UpdateProfileImagesInput>({
+    resolver: zodResolver(updateProfileImagesSchema),
+    defaultValues: {
       profilePicture: null,
       profileBanner: null,
     },
   });
 
-  // Kullanıcı ayarlarını getir
-  const { data: userData, isLoading: isLoadingUser } = useQuery({
-    queryKey: ['userSettings'],
-    queryFn: getUserSettingsAction,
-  });
-
-  // Form'u güncelle
-  useEffect(() => {
-    if (userData?.success && userData.data) {
-      const { user } = userData.data as GetUserSettingsResponse;
-      form.reset({
-        username: user.username,
-        bio: user.bio || '',
-        profilePicture: null,
-        profileBanner: null,
-      });
-    }
-  }, [userData, form]);
-
-  // Update mutation
-  const updateMutation = useMutation({
-    mutationFn: (data: UpdateProfileInput) => updateProfileAction(data),
+  // Mutations
+  const updateUsernameMutation = useMutation({
+    mutationFn: updateUsernameAction,
     onSuccess: () => {
-      toast.success('Profil bilgileri başarıyla güncellendi!');
-      // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      toast.success('Kullanıcı adı başarıyla güncellendi');
+      refetch();
     },
     onError: (error) => {
-      console.error('Update profile error:', error);
-      toast.error('Güncelleme başarısız oldu');
+      console.error('Username update error:', error);
+      toast.error('Kullanıcı adı güncellenemedi');
     },
   });
 
-  const onSubmit = async (data: UpdateProfileInput) => {
-    updateMutation.mutate(data);
+  const updateBioMutation = useMutation({
+    mutationFn: updateBioAction,
+    onSuccess: () => {
+      toast.success('Biyografi başarıyla güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Bio update error:', error);
+      toast.error('Biyografi güncellenemedi');
+    },
+  });
+
+  const updatePasswordMutation = useMutation({
+    mutationFn: updatePasswordAction,
+    onSuccess: () => {
+      toast.success('Parola başarıyla güncellendi');
+      passwordForm.reset();
+    },
+    onError: (error) => {
+      console.error('Password update error:', error);
+      toast.error('Parola güncellenemedi');
+    },
+  });
+
+  const updateProfileImagesMutation = useMutation({
+    mutationFn: updateProfileImagesAction,
+    onSuccess: () => {
+      toast.success('Profil görselleri başarıyla güncellendi');
+      setProfilePicture(null);
+      setProfileBanner(null);
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Profile images update error:', error);
+      toast.error('Profil görselleri güncellenemedi');
+    },
+  });
+
+  // Form submit handlers
+  const onUsernameSubmit = async (data: UpdateUsernameInput) => {
+    updateUsernameMutation.mutate(data);
   };
 
-  if (isLoadingUser) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Profil Bilgileri</CardTitle>
-          <CardDescription>
-            Kişisel bilgilerinizi güncelleyin
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="h-4 bg-muted rounded animate-pulse" />
-            <div className="h-4 bg-muted rounded animate-pulse" />
-            <div className="h-4 bg-muted rounded animate-pulse" />
-          </div>
-        </CardContent>
-      </Card>
-    );
+  const onBioSubmit = async (data: UpdateBioInput) => {
+    updateBioMutation.mutate(data);
+  };
+
+  const onPasswordSubmit = async (data: UpdatePasswordInput) => {
+    updatePasswordMutation.mutate(data);
+  };
+
+  const onProfileImagesSubmit = async (data: UpdateProfileImagesInput) => {
+    updateProfileImagesMutation.mutate(data);
+  };
+
+  // File handlers
+  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfilePicture(file);
+      profileImagesForm.setValue('profilePicture', file);
+    }
+  };
+
+  const handleProfileBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfileBanner(file);
+      profileImagesForm.setValue('profileBanner', file);
+    }
+  };
+
+  const removeProfilePicture = () => {
+    setProfilePicture(null);
+    profileImagesForm.setValue('profilePicture', null);
+  };
+
+  const removeProfileBanner = () => {
+    setProfileBanner(null);
+    profileImagesForm.setValue('profileBanner', null);
+  };
+
+  // Form'ları user data yüklendikten sonra güncelle
+  useEffect(() => {
+    if (user) {
+      usernameForm.reset({ username: user.username });
+      bioForm.reset({ bio: user.bio || '' });
+    }
+  }, [user, usernameForm, bioForm]);
+
+  if (!user) {
+    return <div>Yükleniyor...</div>;
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Profil Bilgileri</CardTitle>
-        <CardDescription>
-          Kişisel bilgilerinizi güncelleyin
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Kullanıcı Adı */}
+    <div className="space-y-6">
+      {/* Username Section */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Kullanıcı Adı</h3>
+          <p className="text-sm text-muted-foreground">
+            Kullanıcı adınızı değiştirin
+          </p>
+        </div>
+        <Form {...usernameForm}>
+          <form onSubmit={usernameForm.handleSubmit(onUsernameSubmit)} className="space-y-4">
             <FormField
-              control={form.control}
+              control={usernameForm.control}
               name="username"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Kullanıcı Adı</FormLabel>
                   <FormControl>
                     <Input
+                      type="text"
                       placeholder="Kullanıcı adınızı girin"
-                      disabled={updateMutation.isPending}
+                      disabled={updateUsernameMutation.isPending}
                       {...field}
                     />
                   </FormControl>
@@ -122,19 +223,60 @@ export function ProfileSettings() {
                 </FormItem>
               )}
             />
+            <Button
+              type="submit"
+              disabled={updateUsernameMutation.isPending}
+            >
+              Kullanıcı Adını Güncelle
+            </Button>
+          </form>
+        </Form>
+      </div>
 
-            {/* Biyografi */}
+      <Separator />
+
+      {/* Email Section */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">E-posta</h3>
+          <p className="text-sm text-muted-foreground">
+            E-posta adresiniz (değiştirilemez)
+          </p>
+        </div>
+        <div className="space-y-2">
+          <Label>E-posta</Label>
+          <Input
+            type="email"
+            value={user.email}
+            disabled
+            className="bg-muted"
+          />
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Bio Section */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Biyografi</h3>
+          <p className="text-sm text-muted-foreground">
+            Kendiniz hakkında kısa bir açıklama ekleyin
+          </p>
+        </div>
+        <Form {...bioForm}>
+          <form onSubmit={bioForm.handleSubmit(onBioSubmit)} className="space-y-4">
             <FormField
-              control={form.control}
+              control={bioForm.control}
               name="bio"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Biyografi</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Kendiniz hakkında kısa bir açıklama yazın"
-                      disabled={updateMutation.isPending}
-                      className="min-h-[100px]"
+                    <Input
+                      type="text"
+                      placeholder="Biyografinizi girin"
+                      disabled={updateBioMutation.isPending}
                       {...field}
                     />
                   </FormControl>
@@ -142,65 +284,175 @@ export function ProfileSettings() {
                 </FormItem>
               )}
             />
-
-            {/* Profil Fotoğrafı */}
-            <FormField
-              control={form.control}
-              name="profilePicture"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Profil Fotoğrafı</FormLabel>
-                  <FormControl>
-                    <ImageUpload
-                      id="profilePicture"
-                      label="Profil fotoğrafı seçin"
-                      value={field.value}
-                      onChange={field.onChange}
-                      disabled={updateMutation.isPending}
-                      accept="image/*"
-                      maxSize={CLOUDINARY.CONFIGS.USER_AVATAR.maxSize}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Profil Banner */}
-            <FormField
-              control={form.control}
-              name="profileBanner"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Profil Banner</FormLabel>
-                  <FormControl>
-                    <ImageUpload
-                      id="profileBanner"
-                      label="Profil banner seçin"
-                      value={field.value}
-                      onChange={field.onChange}
-                      disabled={updateMutation.isPending}
-                      accept="image/*"
-                      maxSize={CLOUDINARY.CONFIGS.USER_BANNER.maxSize}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Kaydet Butonu */}
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={updateMutation.isPending}
-              >
-                Kaydet
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              disabled={updateBioMutation.isPending}
+            >
+              Biyografiyi Güncelle
+            </Button>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+      </div>
+
+      <Separator />
+
+      {/* Password Section */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Parola</h3>
+          <p className="text-sm text-muted-foreground">
+            Parolanızı güvenli bir şekilde değiştirin
+          </p>
+        </div>
+        <Form {...passwordForm}>
+          <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+            <FormField
+              control={passwordForm.control}
+              name="newPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Yeni Parola</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Yeni parolanızı girin"
+                        disabled={updatePasswordMutation.isPending}
+                        {...field}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={passwordForm.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Yeni Parola Tekrar</FormLabel>
+                  <FormControl>
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Yeni parolanızı tekrar girin"
+                      disabled={updatePasswordMutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              disabled={updatePasswordMutation.isPending}
+            >
+              Parolayı Güncelle
+            </Button>
+          </form>
+        </Form>
+      </div>
+
+      <Separator />
+
+      {/* Profile Images Section */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Profil Görselleri</h3>
+          <p className="text-sm text-muted-foreground">
+            Profil fotoğrafınızı ve banner'ınızı güncelleyin
+          </p>
+        </div>
+        <Form {...profileImagesForm}>
+          <form onSubmit={profileImagesForm.handleSubmit(onProfileImagesSubmit)} className="space-y-4">
+            {/* Profile Picture */}
+            <div className="space-y-4">
+              <Label>Profil Fotoğrafı</Label>
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarImage src={user.profilePicture || ''} />
+                  <AvatarFallback>{user.username?.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfilePictureChange}
+                    disabled={updateProfileImagesMutation.isPending}
+                  />
+                </div>
+                {profilePicture && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={removeProfilePicture}
+                    disabled={updateProfileImagesMutation.isPending}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Profile Banner */}
+            <div className="space-y-4">
+              <Label>Profil Banner</Label>
+              <div className="flex items-center gap-4">
+                {user.profileBanner && (
+                  <div className="h-16 w-32 rounded border overflow-hidden">
+                    <img
+                      src={user.profileBanner}
+                      alt="Profile Banner"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfileBannerChange}
+                    disabled={updateProfileImagesMutation.isPending}
+                  />
+                </div>
+                {profileBanner && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={removeProfileBanner}
+                    disabled={updateProfileImagesMutation.isPending}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={updateProfileImagesMutation.isPending}
+            >
+              Görselleri Güncelle
+            </Button>
+          </form>
+        </Form>
+      </div>
+    </div>
   );
 } 

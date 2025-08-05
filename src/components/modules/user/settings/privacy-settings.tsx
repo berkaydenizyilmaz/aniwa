@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -12,112 +11,202 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { updatePrivacySettingsAction, getUserSettingsAction } from '@/lib/actions/user/settings.actions';
-import { updatePrivacySettingsSchema, type UpdatePrivacySettingsInput } from '@/lib/schemas/settings.schema';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { 
+  updateProfileVisibilityAction,
+  updateAllowFollowsAction,
+  updateShowAnimeListAction,
+  updateShowFavouriteAnimeSeriesAction,
+  updateShowCustomListsAction,
+  getUserSettingsAction
+} from '@/lib/actions/user/settings.actions';
+import { 
+  updateProfileVisibilitySchema,
+  updateAllowFollowsSchema,
+  updateShowAnimeListSchema,
+  updateShowFavouriteAnimeSeriesSchema,
+  updateShowCustomListsSchema,
+  type UpdateProfileVisibilityInput,
+  type UpdateAllowFollowsInput,
+  type UpdateShowAnimeListInput,
+  type UpdateShowFavouriteAnimeSeriesInput,
+  type UpdateShowCustomListsInput
+} from '@/lib/schemas/settings.schema';
 import { toast } from 'sonner';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { GetUserSettingsResponse } from '@/lib/types/api/settings.api';
 import { ProfileVisibility } from '@prisma/client';
 
 export function PrivacySettings() {
-  const queryClient = useQueryClient();
-
-  const form = useForm<UpdatePrivacySettingsInput>({
-    resolver: zodResolver(updatePrivacySettingsSchema),
-    defaultValues: {
-      profileVisibility: undefined,
-      allowFollows: false,
-      showAnimeList: false,
-      showFavouriteAnimeSeries: false,
-      showCustomLists: false,
-    },
-  });
-
   // Kullanıcı ayarlarını getir
-  const { data: userData, isLoading: isLoadingUser } = useQuery({
+  const { data: userData, refetch } = useQuery({
     queryKey: ['userSettings'],
     queryFn: getUserSettingsAction,
   });
 
-  // Form'u güncelle
-  useEffect(() => {
-    if (userData?.success && userData.data) {
-      const { settings } = userData.data as GetUserSettingsResponse;
-      if (settings) {
-        form.reset({
-          profileVisibility: settings.profileVisibility,
-          allowFollows: settings.allowFollows,
-          showAnimeList: settings.showAnimeList,
-          showFavouriteAnimeSeries: settings.showFavouriteAnimeSeries,
-          showCustomLists: settings.showCustomLists,
-        });
-      }
-    }
-  }, [userData, form]);
+  const user = userData?.success ? (userData.data as GetUserSettingsResponse)?.user : null;
+  const settings = userData?.success ? (userData.data as GetUserSettingsResponse)?.settings : null;
 
-  // Update mutation
-  const updateMutation = useMutation({
-    mutationFn: (data: UpdatePrivacySettingsInput) => updatePrivacySettingsAction(data),
-    onSuccess: () => {
-      toast.success('Gizlilik ayarları başarıyla güncellendi!');
-      // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
-    },
-    onError: (error) => {
-      console.error('Update privacy settings error:', error);
-      toast.error('Güncelleme başarısız oldu');
+  // Profile visibility form
+  const profileVisibilityForm = useForm<UpdateProfileVisibilityInput>({
+    resolver: zodResolver(updateProfileVisibilitySchema),
+    defaultValues: {
+      profileVisibility: settings?.profileVisibility || ProfileVisibility.PUBLIC,
     },
   });
 
-  const onSubmit = async (data: UpdatePrivacySettingsInput) => {
-    updateMutation.mutate(data);
+  // Allow follows form
+  const allowFollowsForm = useForm<UpdateAllowFollowsInput>({
+    resolver: zodResolver(updateAllowFollowsSchema),
+    defaultValues: {
+      allowFollows: settings?.allowFollows ?? true,
+    },
+  });
+
+  // Show anime list form
+  const showAnimeListForm = useForm<UpdateShowAnimeListInput>({
+    resolver: zodResolver(updateShowAnimeListSchema),
+    defaultValues: {
+      showAnimeList: settings?.showAnimeList ?? true,
+    },
+  });
+
+  // Show favourite anime series form
+  const showFavouriteAnimeSeriesForm = useForm<UpdateShowFavouriteAnimeSeriesInput>({
+    resolver: zodResolver(updateShowFavouriteAnimeSeriesSchema),
+    defaultValues: {
+      showFavouriteAnimeSeries: settings?.showFavouriteAnimeSeries ?? true,
+    },
+  });
+
+  // Show custom lists form
+  const showCustomListsForm = useForm<UpdateShowCustomListsInput>({
+    resolver: zodResolver(updateShowCustomListsSchema),
+    defaultValues: {
+      showCustomLists: settings?.showCustomLists ?? true,
+    },
+  });
+
+  // Mutations
+  const updateProfileVisibilityMutation = useMutation({
+    mutationFn: updateProfileVisibilityAction,
+    onSuccess: () => {
+      toast.success('Profil görünürlüğü güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Profile visibility update error:', error);
+      toast.error('Profil görünürlüğü güncellenemedi');
+    },
+  });
+
+  const updateAllowFollowsMutation = useMutation({
+    mutationFn: updateAllowFollowsAction,
+    onSuccess: () => {
+      toast.success('Takip izinleri güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Allow follows update error:', error);
+      toast.error('Takip izinleri güncellenemedi');
+    },
+  });
+
+  const updateShowAnimeListMutation = useMutation({
+    mutationFn: updateShowAnimeListAction,
+    onSuccess: () => {
+      toast.success('Anime listesi gösterme ayarı güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Show anime list update error:', error);
+      toast.error('Anime listesi gösterme ayarı güncellenemedi');
+    },
+  });
+
+  const updateShowFavouriteAnimeSeriesMutation = useMutation({
+    mutationFn: updateShowFavouriteAnimeSeriesAction,
+    onSuccess: () => {
+      toast.success('Favori animeleri gösterme ayarı güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Show favourite anime series update error:', error);
+      toast.error('Favori animeleri gösterme ayarı güncellenemedi');
+    },
+  });
+
+  const updateShowCustomListsMutation = useMutation({
+    mutationFn: updateShowCustomListsAction,
+    onSuccess: () => {
+      toast.success('Özel listeleri gösterme ayarı güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Show custom lists update error:', error);
+      toast.error('Özel listeleri gösterme ayarı güncellenemedi');
+    },
+  });
+
+  // Form submit handlers
+  const onProfileVisibilitySubmit = async (data: UpdateProfileVisibilityInput) => {
+    updateProfileVisibilityMutation.mutate(data);
   };
 
-  if (isLoadingUser) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Gizlilik Ayarları</CardTitle>
-          <CardDescription>
-            Profil gizlilik ayarlarınızı yönetin
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="h-4 bg-muted rounded animate-pulse" />
-            <div className="h-4 bg-muted rounded animate-pulse" />
-            <div className="h-4 bg-muted rounded animate-pulse" />
-          </div>
-        </CardContent>
-      </Card>
-    );
+  const onAllowFollowsSubmit = async (data: UpdateAllowFollowsInput) => {
+    updateAllowFollowsMutation.mutate(data);
+  };
+
+  const onShowAnimeListSubmit = async (data: UpdateShowAnimeListInput) => {
+    updateShowAnimeListMutation.mutate(data);
+  };
+
+  const onShowFavouriteAnimeSeriesSubmit = async (data: UpdateShowFavouriteAnimeSeriesInput) => {
+    updateShowFavouriteAnimeSeriesMutation.mutate(data);
+  };
+
+  const onShowCustomListsSubmit = async (data: UpdateShowCustomListsInput) => {
+    updateShowCustomListsMutation.mutate(data);
+  };
+
+  if (!settings) {
+    return <div>Yükleniyor...</div>;
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Gizlilik Ayarları</CardTitle>
-        <CardDescription>
-          Profil gizlilik ayarlarınızı yönetin
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Profil Görünürlüğü */}
+    <div className="space-y-6">
+      {/* Profile Visibility */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Profil Görünürlüğü</h3>
+          <p className="text-sm text-muted-foreground">
+            Profilinizin kimler tarafından görülebileceğini belirleyin
+          </p>
+        </div>
+        <Form {...profileVisibilityForm}>
+          <form onSubmit={profileVisibilityForm.handleSubmit(onProfileVisibilitySubmit)} className="space-y-4">
             <FormField
-              control={form.control}
+              control={profileVisibilityForm.control}
               name="profileVisibility"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Profil Görünürlüğü</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={updateProfileVisibilityMutation.isPending}
+                  >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Profil görünürlüğü seçin" />
+                        <SelectValue placeholder="Görünürlük seçin" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -130,99 +219,195 @@ export function PrivacySettings() {
                 </FormItem>
               )}
             />
-
-            {/* Takip İzinleri */}
-            <FormField
-              control={form.control}
-              name="allowFollows"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateMutation.isPending}
-                    />
-                  </FormControl>
-                  <FormLabel className="text-sm">
-                    Takip edilmeye izin ver
-                  </FormLabel>
-                </FormItem>
-              )}
-            />
-
-            {/* Anime Listesi */}
-            <FormField
-              control={form.control}
-              name="showAnimeList"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateMutation.isPending}
-                    />
-                  </FormControl>
-                  <FormLabel className="text-sm">
-                    Anime listemi göster
-                  </FormLabel>
-                </FormItem>
-              )}
-            />
-
-            {/* Favori Anime Serileri */}
-            <FormField
-              control={form.control}
-              name="showFavouriteAnimeSeries"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateMutation.isPending}
-                    />
-                  </FormControl>
-                  <FormLabel className="text-sm">
-                    Favori anime serilerimi göster
-                  </FormLabel>
-                </FormItem>
-              )}
-            />
-
-            {/* Özel Listeler */}
-            <FormField
-              control={form.control}
-              name="showCustomLists"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateMutation.isPending}
-                    />
-                  </FormControl>
-                  <FormLabel className="text-sm">
-                    Özel listelerimi göster
-                  </FormLabel>
-                </FormItem>
-              )}
-            />
-
-            {/* Kaydet Butonu */}
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={updateMutation.isPending}
-              >
-                Kaydet
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              disabled={updateProfileVisibilityMutation.isPending}
+            >
+              Görünürlüğü Güncelle
+            </Button>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+      </div>
+
+      <Separator />
+
+      {/* Allow Follows */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Takip İzinleri</h3>
+          <p className="text-sm text-muted-foreground">
+            Kullanıcıların sizi takip edip edemeyeceğini belirleyin
+          </p>
+        </div>
+        <Form {...allowFollowsForm}>
+          <form onSubmit={allowFollowsForm.handleSubmit(onAllowFollowsSubmit)} className="space-y-4">
+            <FormField
+              control={allowFollowsForm.control}
+              name="allowFollows"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Takip İzinleri
+                    </FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Kullanıcıların sizi takip etmesine izin ver
+                    </div>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={updateAllowFollowsMutation.isPending}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              disabled={updateAllowFollowsMutation.isPending}
+            >
+              Takip İzinlerini Güncelle
+            </Button>
+          </form>
+        </Form>
+      </div>
+
+      <Separator />
+
+      {/* Show Anime List */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Anime Listesi Gösterimi</h3>
+          <p className="text-sm text-muted-foreground">
+            Anime listenizin diğer kullanıcılar tarafından görülüp görülmeyeceğini belirleyin
+          </p>
+        </div>
+        <Form {...showAnimeListForm}>
+          <form onSubmit={showAnimeListForm.handleSubmit(onShowAnimeListSubmit)} className="space-y-4">
+            <FormField
+              control={showAnimeListForm.control}
+              name="showAnimeList"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Anime Listesi Göster
+                    </FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Anime listenizi diğer kullanıcılara göster
+                    </div>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={updateShowAnimeListMutation.isPending}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              disabled={updateShowAnimeListMutation.isPending}
+            >
+              Anime Listesi Ayarını Güncelle
+            </Button>
+          </form>
+        </Form>
+      </div>
+
+      <Separator />
+
+      {/* Show Favourite Anime Series */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Favori Animeleri Gösterimi</h3>
+          <p className="text-sm text-muted-foreground">
+            Favori anime serilerinizin diğer kullanıcılar tarafından görülüp görülmeyeceğini belirleyin
+          </p>
+        </div>
+        <Form {...showFavouriteAnimeSeriesForm}>
+          <form onSubmit={showFavouriteAnimeSeriesForm.handleSubmit(onShowFavouriteAnimeSeriesSubmit)} className="space-y-4">
+            <FormField
+              control={showFavouriteAnimeSeriesForm.control}
+              name="showFavouriteAnimeSeries"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Favori Animeleri Göster
+                    </FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Favori anime serilerinizi diğer kullanıcılara göster
+                    </div>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={updateShowFavouriteAnimeSeriesMutation.isPending}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              disabled={updateShowFavouriteAnimeSeriesMutation.isPending}
+            >
+              Favori Animeleri Ayarını Güncelle
+            </Button>
+          </form>
+        </Form>
+      </div>
+
+      <Separator />
+
+      {/* Show Custom Lists */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Özel Listeleri Gösterimi</h3>
+          <p className="text-sm text-muted-foreground">
+            Özel listelerinizin diğer kullanıcılar tarafından görülüp görülmeyeceğini belirleyin
+          </p>
+        </div>
+        <Form {...showCustomListsForm}>
+          <form onSubmit={showCustomListsForm.handleSubmit(onShowCustomListsSubmit)} className="space-y-4">
+            <FormField
+              control={showCustomListsForm.control}
+              name="showCustomLists"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Özel Listeleri Göster
+                    </FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Özel listelerinizi diğer kullanıcılara göster
+                    </div>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={updateShowCustomListsMutation.isPending}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              disabled={updateShowCustomListsMutation.isPending}
+            >
+              Özel Listeleri Ayarını Güncelle
+            </Button>
+          </form>
+        </Form>
+      </div>
+    </div>
   );
 } 

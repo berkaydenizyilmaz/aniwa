@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,109 +12,199 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { updateGeneralSettingsAction, getUserSettingsAction } from '@/lib/actions/user/settings.actions';
-import { updateGeneralSettingsSchema, type UpdateGeneralSettingsInput } from '@/lib/schemas/settings.schema';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { 
+  updateThemePreferenceAction,
+  updateTitleLanguagePreferenceAction,
+  updateScoreFormatAction,
+  updateDisplayAdultContentAction,
+  updateAutoTrackOnAniwaListAddAction,
+  getUserSettingsAction
+} from '@/lib/actions/user/settings.actions';
+import { 
+  updateThemePreferenceSchema,
+  updateTitleLanguagePreferenceSchema,
+  updateScoreFormatSchema,
+  updateDisplayAdultContentSchema,
+  updateAutoTrackOnAniwaListAddSchema,
+  type UpdateThemePreferenceInput,
+  type UpdateTitleLanguagePreferenceInput,
+  type UpdateScoreFormatInput,
+  type UpdateDisplayAdultContentInput,
+  type UpdateAutoTrackOnAniwaListAddInput
+} from '@/lib/schemas/settings.schema';
 import { toast } from 'sonner';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { GetUserSettingsResponse } from '@/lib/types/api/settings.api';
 import { Theme, TitleLanguage, ScoreFormat } from '@prisma/client';
 
 export function GeneralSettings() {
-  const queryClient = useQueryClient();
-
-  const form = useForm<UpdateGeneralSettingsInput>({
-    resolver: zodResolver(updateGeneralSettingsSchema),
-    defaultValues: {
-      themePreference: undefined,
-      titleLanguagePreference: undefined,
-      displayAdultContent: false,
-      scoreFormat: undefined,
-      autoTrackOnAniwaListAdd: false,
-    },
-  });
-
   // Kullanıcı ayarlarını getir
-  const { data: userData, isLoading: isLoadingUser } = useQuery({
+  const { data: userData, refetch } = useQuery({
     queryKey: ['userSettings'],
     queryFn: getUserSettingsAction,
   });
 
-  // Form'u güncelle
-  useEffect(() => {
-    if (userData?.success && userData.data) {
-      const { settings } = userData.data as GetUserSettingsResponse;
-      if (settings) {
-        form.reset({
-          themePreference: settings.themePreference,
-          titleLanguagePreference: settings.titleLanguagePreference,
-          displayAdultContent: settings.displayAdultContent,
-          scoreFormat: settings.scoreFormat,
-          autoTrackOnAniwaListAdd: settings.autoTrackOnAniwaListAdd,
-        });
-      }
-    }
-  }, [userData, form]);
+  const user = userData?.success ? (userData.data as GetUserSettingsResponse)?.user : null;
+  const settings = userData?.success ? (userData.data as GetUserSettingsResponse)?.settings : null;
 
-  // Update mutation
-  const updateMutation = useMutation({
-    mutationFn: (data: UpdateGeneralSettingsInput) => updateGeneralSettingsAction(data),
-    onSuccess: () => {
-      toast.success('Genel ayarlar başarıyla güncellendi!');
-      // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
-    },
-    onError: (error) => {
-      console.error('Update general settings error:', error);
-      toast.error('Güncelleme başarısız oldu');
+  // Theme preference form
+  const themeForm = useForm<UpdateThemePreferenceInput>({
+    resolver: zodResolver(updateThemePreferenceSchema),
+    defaultValues: {
+      themePreference: Theme.LIGHT,
     },
   });
 
-  const onSubmit = async (data: UpdateGeneralSettingsInput) => {
-    updateMutation.mutate(data);
+  // Title language preference form
+  const titleLanguageForm = useForm<UpdateTitleLanguagePreferenceInput>({
+    resolver: zodResolver(updateTitleLanguagePreferenceSchema),
+    defaultValues: {
+      titleLanguagePreference: TitleLanguage.ROMAJI,
+    },
+  });
+
+  // Score format form
+  const scoreFormatForm = useForm<UpdateScoreFormatInput>({
+    resolver: zodResolver(updateScoreFormatSchema),
+    defaultValues: {
+      scoreFormat: ScoreFormat.POINT_100,
+    },
+  });
+
+  // Display adult content form
+  const displayAdultContentForm = useForm<UpdateDisplayAdultContentInput>({
+    resolver: zodResolver(updateDisplayAdultContentSchema),
+    defaultValues: {
+      displayAdultContent: true,
+    },
+  });
+
+  // Auto track form
+  const autoTrackForm = useForm<UpdateAutoTrackOnAniwaListAddInput>({
+    resolver: zodResolver(updateAutoTrackOnAniwaListAddSchema),
+    defaultValues: {
+      autoTrackOnAniwaListAdd: false,
+    },
+  });
+
+  // Mutations
+  const updateThemeMutation = useMutation({
+    mutationFn: updateThemePreferenceAction,
+    onSuccess: () => {
+      toast.success('Tema tercihi güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Theme update error:', error);
+      toast.error('Tema tercihi güncellenemedi');
+    },
+  });
+
+  const updateTitleLanguageMutation = useMutation({
+    mutationFn: updateTitleLanguagePreferenceAction,
+    onSuccess: () => {
+      toast.success('Başlık dili tercihi güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Title language update error:', error);
+      toast.error('Başlık dili tercihi güncellenemedi');
+    },
+  });
+
+  const updateScoreFormatMutation = useMutation({
+    mutationFn: updateScoreFormatAction,
+    onSuccess: () => {
+      toast.success('Puanlama formatı güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Score format update error:', error);
+      toast.error('Puanlama formatı güncellenemedi');
+    },
+  });
+
+  const updateDisplayAdultContentMutation = useMutation({
+    mutationFn: updateDisplayAdultContentAction,
+    onSuccess: () => {
+      toast.success('Yetişkin içerik ayarı güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Display adult content update error:', error);
+      toast.error('Yetişkin içerik ayarı güncellenemedi');
+    },
+  });
+
+  const updateAutoTrackMutation = useMutation({
+    mutationFn: updateAutoTrackOnAniwaListAddAction,
+    onSuccess: () => {
+      toast.success('Otomatik takip ayarı güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Auto track update error:', error);
+      toast.error('Otomatik takip ayarı güncellenemedi');
+    },
+  });
+
+  // Form submit handlers
+  const onThemeSubmit = async (data: UpdateThemePreferenceInput) => {
+    updateThemeMutation.mutate(data);
   };
 
-  if (isLoadingUser) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Genel Ayarlar</CardTitle>
-          <CardDescription>
-            Genel uygulama ayarlarınızı yönetin
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="h-4 bg-muted rounded animate-pulse" />
-            <div className="h-4 bg-muted rounded animate-pulse" />
-            <div className="h-4 bg-muted rounded animate-pulse" />
-          </div>
-        </CardContent>
-      </Card>
-    );
+  const onTitleLanguageSubmit = async (data: UpdateTitleLanguagePreferenceInput) => {
+    updateTitleLanguageMutation.mutate(data);
+  };
+
+  const onScoreFormatSubmit = async (data: UpdateScoreFormatInput) => {
+    updateScoreFormatMutation.mutate(data);
+  };
+
+  const onDisplayAdultContentSubmit = async (data: UpdateDisplayAdultContentInput) => {
+    updateDisplayAdultContentMutation.mutate(data);
+  };
+
+  const onAutoTrackSubmit = async (data: UpdateAutoTrackOnAniwaListAddInput) => {
+    updateAutoTrackMutation.mutate(data);
+  };
+
+  if (!settings) {
+    return <div>Yükleniyor...</div>;
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Genel Ayarlar</CardTitle>
-        <CardDescription>
-          Genel uygulama ayarlarınızı yönetin
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Tema Tercihi */}
+    <div className="space-y-6">
+      {/* Theme Preference */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Tema Tercihi</h3>
+          <p className="text-sm text-muted-foreground">
+            Uygulamanın görünüm temasını seçin
+          </p>
+        </div>
+        <Form {...themeForm}>
+          <form onSubmit={themeForm.handleSubmit(onThemeSubmit)} className="space-y-4">
             <FormField
-              control={form.control}
+              control={themeForm.control}
               name="themePreference"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tema Tercihi</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormLabel>Tema</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={updateThemeMutation.isPending}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Tema seçin" />
@@ -130,15 +220,39 @@ export function GeneralSettings() {
                 </FormItem>
               )}
             />
+            <Button
+              type="submit"
+              disabled={updateThemeMutation.isPending}
+            >
+              Temayı Güncelle
+            </Button>
+          </form>
+        </Form>
+      </div>
 
-            {/* Başlık Dili */}
+      <Separator />
+
+      {/* Title Language Preference */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Başlık Dili</h3>
+          <p className="text-sm text-muted-foreground">
+            Anime başlıklarının hangi dilde gösterileceğini seçin
+          </p>
+        </div>
+        <Form {...titleLanguageForm}>
+          <form onSubmit={titleLanguageForm.handleSubmit(onTitleLanguageSubmit)} className="space-y-4">
             <FormField
-              control={form.control}
+              control={titleLanguageForm.control}
               name="titleLanguagePreference"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Başlık Dili</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={updateTitleLanguageMutation.isPending}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Başlık dili seçin" />
@@ -154,83 +268,153 @@ export function GeneralSettings() {
                 </FormItem>
               )}
             />
+            <Button
+              type="submit"
+              disabled={updateTitleLanguageMutation.isPending}
+            >
+              Başlık Dilini Güncelle
+            </Button>
+          </form>
+        </Form>
+      </div>
 
-            {/* Yetişkin İçeriği */}
-            <FormField
-              control={form.control}
-              name="displayAdultContent"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateMutation.isPending}
-                    />
-                  </FormControl>
-                  <FormLabel className="text-sm">
-                    Yetişkin içeriği göster
-                  </FormLabel>
-                </FormItem>
-              )}
-            />
+      <Separator />
 
-            {/* Puanlama Formatı */}
+      {/* Score Format */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Puanlama Formatı</h3>
+          <p className="text-sm text-muted-foreground">
+            Anime puanlarının hangi formatta gösterileceğini seçin
+          </p>
+        </div>
+        <Form {...scoreFormatForm}>
+          <form onSubmit={scoreFormatForm.handleSubmit(onScoreFormatSubmit)} className="space-y-4">
             <FormField
-              control={form.control}
+              control={scoreFormatForm.control}
               name="scoreFormat"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Puanlama Formatı</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={updateScoreFormatMutation.isPending}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Puanlama formatı seçin" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={ScoreFormat.POINT_100}>100 Puanlık</SelectItem>
-                      <SelectItem value={ScoreFormat.POINT_10}>10 Puanlık</SelectItem>
-                      <SelectItem value={ScoreFormat.POINT_5}>5 Puanlık</SelectItem>
+                      <SelectItem value={ScoreFormat.POINT_100}>100</SelectItem>
+                      <SelectItem value={ScoreFormat.POINT_10}>10</SelectItem>
+                      <SelectItem value={ScoreFormat.POINT_5}>5</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <Button
+              type="submit"
+              disabled={updateScoreFormatMutation.isPending}
+            >
+              Puanlama Formatını Güncelle
+            </Button>
+          </form>
+        </Form>
+      </div>
 
-            {/* Otomatik Takip */}
+      <Separator />
+
+      {/* Display Adult Content */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Yetişkin İçerik Gösterimi</h3>
+          <p className="text-sm text-muted-foreground">
+            Yetişkin içerikli animelerin gösterilip gösterilmeyeceğini belirleyin
+          </p>
+        </div>
+        <Form {...displayAdultContentForm}>
+          <form onSubmit={displayAdultContentForm.handleSubmit(onDisplayAdultContentSubmit)} className="space-y-4">
             <FormField
-              control={form.control}
-              name="autoTrackOnAniwaListAdd"
+              control={displayAdultContentForm.control}
+              name="displayAdultContent"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Yetişkin İçerik Göster
+                    </FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Yetişkin içerikli animeleri göster
+                    </div>
+                  </div>
                   <FormControl>
-                    <Checkbox
+                    <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      disabled={updateMutation.isPending}
+                      disabled={updateDisplayAdultContentMutation.isPending}
                     />
                   </FormControl>
-                  <FormLabel className="text-sm">
-                    Listeye eklerken otomatik takip et
-                  </FormLabel>
                 </FormItem>
               )}
             />
-
-            {/* Kaydet Butonu */}
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={updateMutation.isPending}
-              >
-                Kaydet
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              disabled={updateDisplayAdultContentMutation.isPending}
+            >
+              Yetişkin İçerik Ayarını Güncelle
+            </Button>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+      </div>
+
+      <Separator />
+
+      {/* Auto Track */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Otomatik Takip</h3>
+          <p className="text-sm text-muted-foreground">
+            Anime listesine eklediğinizde otomatik olarak takip edilsin
+          </p>
+        </div>
+        <Form {...autoTrackForm}>
+          <form onSubmit={autoTrackForm.handleSubmit(onAutoTrackSubmit)} className="space-y-4">
+            <FormField
+              control={autoTrackForm.control}
+              name="autoTrackOnAniwaListAdd"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Otomatik Takip Et
+                    </FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Listeye eklediğinizde otomatik takip et
+                    </div>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={updateAutoTrackMutation.isPending}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              disabled={updateAutoTrackMutation.isPending}
+            >
+              Otomatik Takip Ayarını Güncelle
+            </Button>
+          </form>
+        </Form>
+      </div>
+    </div>
   );
 } 

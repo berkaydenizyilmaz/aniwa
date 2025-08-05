@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -12,167 +11,154 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { updateNotificationSettingsAction, getUserSettingsAction } from '@/lib/actions/user/settings.actions';
-import { updateNotificationSettingsSchema, type UpdateNotificationSettingsInput } from '@/lib/schemas/settings.schema';
+import { Switch } from '@/components/ui/switch';
+import { 
+  updateNotificationSettingsAction,
+  getUserSettingsAction
+} from '@/lib/actions/user/settings.actions';
+import { 
+  updateNotificationSettingsSchema,
+  type UpdateNotificationSettingsInput
+} from '@/lib/schemas/settings.schema';
 import { toast } from 'sonner';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { GetUserSettingsResponse } from '@/lib/types/api/settings.api';
 
 export function NotificationSettings() {
-  const queryClient = useQueryClient();
-
-  const form = useForm<UpdateNotificationSettingsInput>({
-    resolver: zodResolver(updateNotificationSettingsSchema),
-    defaultValues: {
-      receiveNotificationOnNewFollow: false,
-      receiveNotificationOnEpisodeAiring: false,
-      receiveNotificationOnNewMediaPart: false,
-    },
-  });
-
   // Kullanıcı ayarlarını getir
-  const { data: userData, isLoading: isLoadingUser } = useQuery({
+  const { data: userData, refetch } = useQuery({
     queryKey: ['userSettings'],
     queryFn: getUserSettingsAction,
   });
 
-  // Form'u güncelle
-  useEffect(() => {
-    if (userData?.success && userData.data) {
-      const { settings } = userData.data as GetUserSettingsResponse;
-      if (settings) {
-        form.reset({
-          receiveNotificationOnNewFollow: settings.receiveNotificationOnNewFollow,
-          receiveNotificationOnEpisodeAiring: settings.receiveNotificationOnEpisodeAiring,
-          receiveNotificationOnNewMediaPart: settings.receiveNotificationOnNewMediaPart,
-        });
-      }
-    }
-  }, [userData, form]);
+  const user = userData?.success ? (userData.data as GetUserSettingsResponse)?.user : null;
+  const settings = userData?.success ? (userData.data as GetUserSettingsResponse)?.settings : null;
 
-  // Update mutation
-  const updateMutation = useMutation({
-    mutationFn: (data: UpdateNotificationSettingsInput) => updateNotificationSettingsAction(data),
-    onSuccess: () => {
-      toast.success('Bildirim ayarları başarıyla güncellendi!');
-      // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
-    },
-    onError: (error) => {
-      console.error('Update notification settings error:', error);
-      toast.error('Güncelleme başarısız oldu');
+  // Notification settings form
+  const notificationForm = useForm<UpdateNotificationSettingsInput>({
+    resolver: zodResolver(updateNotificationSettingsSchema),
+    defaultValues: {
+      receiveNotificationOnNewFollow: settings?.receiveNotificationOnNewFollow ?? true,
+      receiveNotificationOnEpisodeAiring: settings?.receiveNotificationOnEpisodeAiring ?? true,
+      receiveNotificationOnNewMediaPart: settings?.receiveNotificationOnNewMediaPart ?? true,
     },
   });
 
-  const onSubmit = async (data: UpdateNotificationSettingsInput) => {
-    updateMutation.mutate(data);
+  // Update mutation
+  const updateNotificationMutation = useMutation({
+    mutationFn: updateNotificationSettingsAction,
+    onSuccess: () => {
+      toast.success('Bildirim ayarları güncellendi');
+      refetch();
+    },
+    onError: (error) => {
+      console.error('Notification settings update error:', error);
+      toast.error('Bildirim ayarları güncellenemedi');
+    },
+  });
+
+  // Form submit handler
+  const onNotificationSubmit = async (data: UpdateNotificationSettingsInput) => {
+    updateNotificationMutation.mutate(data);
   };
 
-  if (isLoadingUser) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Bildirim Ayarları</CardTitle>
-          <CardDescription>
-            Bildirim tercihlerinizi yönetin
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="h-4 bg-muted rounded animate-pulse" />
-            <div className="h-4 bg-muted rounded animate-pulse" />
-            <div className="h-4 bg-muted rounded animate-pulse" />
-          </div>
-        </CardContent>
-      </Card>
-    );
+  if (!settings) {
+    return <div>Yükleniyor...</div>;
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Bildirim Ayarları</CardTitle>
-        <CardDescription>
-          Bildirim tercihlerinizi yönetin
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Yeni Takipçi Bildirimi */}
+    <div className="space-y-6">
+      {/* New Follow Notifications */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Yeni Takipçi Bildirimleri</h3>
+          <p className="text-sm text-muted-foreground">
+            Yeni takipçileriniz olduğunda bildirim alın
+          </p>
+        </div>
+        <Form {...notificationForm}>
+          <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-4">
             <FormField
-              control={form.control}
+              control={notificationForm.control}
               name="receiveNotificationOnNewFollow"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Yeni Takipçi Bildirimleri
+                    </FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Yeni takipçileriniz olduğunda bildirim al
+                    </div>
+                  </div>
                   <FormControl>
-                    <Checkbox
+                    <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      disabled={updateMutation.isPending}
+                      disabled={updateNotificationMutation.isPending}
                     />
                   </FormControl>
-                  <FormLabel className="text-sm">
-                    Yeni takipçi bildirimleri al
-                  </FormLabel>
                 </FormItem>
               )}
             />
 
-            {/* Bölüm Yayın Bildirimi */}
             <FormField
-              control={form.control}
+              control={notificationForm.control}
               name="receiveNotificationOnEpisodeAiring"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Yeni Bölüm Bildirimleri
+                    </FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Takip ettiğiniz animelerin yeni bölümleri yayınlandığında bildirim al
+                    </div>
+                  </div>
                   <FormControl>
-                    <Checkbox
+                    <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      disabled={updateMutation.isPending}
+                      disabled={updateNotificationMutation.isPending}
                     />
                   </FormControl>
-                  <FormLabel className="text-sm">
-                    Takip ettiğim anime serilerinin yeni bölüm bildirimleri
-                  </FormLabel>
                 </FormItem>
               )}
             />
 
-            {/* Yeni Medya Parçası Bildirimi */}
             <FormField
-              control={form.control}
+              control={notificationForm.control}
               name="receiveNotificationOnNewMediaPart"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Yeni Medya Parçası Bildirimleri
+                    </FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Takip ettiğiniz animelerin yeni medya parçaları eklendiğinde bildirim al
+                    </div>
+                  </div>
                   <FormControl>
-                    <Checkbox
+                    <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      disabled={updateMutation.isPending}
+                      disabled={updateNotificationMutation.isPending}
                     />
                   </FormControl>
-                  <FormLabel className="text-sm">
-                    Takip ettiğim anime serilerinin yeni medya parçası bildirimleri
-                  </FormLabel>
                 </FormItem>
               )}
             />
 
-            {/* Kaydet Butonu */}
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={updateMutation.isPending}
-              >
-                Kaydet
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              disabled={updateNotificationMutation.isPending}
+            >
+              Bildirim Ayarlarını Güncelle
+            </Button>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 } 
