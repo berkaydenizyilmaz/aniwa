@@ -91,7 +91,7 @@ export function MobileAuthSection() {
           return (
             <DropdownMenuItem key={item.label} asChild>
               <Link href={item.href} className="group">
-                <Icon className="mr-2 h-4 w-4 group-hover:text-foreground" />
+                <Icon className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
                 <span>{item.label}</span>
               </Link>
             </DropdownMenuItem>
@@ -108,7 +108,7 @@ export function MobileAuthSection() {
             return (
               <DropdownMenuItem key={item.label} asChild>
                 <Link href={item.href} className="group">
-                  <Icon className="mr-2 h-4 w-4 group-hover:text-foreground" />
+                  <Icon className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
                   <span>{item.label}</span>
                 </Link>
               </DropdownMenuItem>
