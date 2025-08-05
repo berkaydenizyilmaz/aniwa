@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ImageUploadProps {
   id: string;
@@ -17,6 +18,7 @@ interface ImageUploadProps {
   onChange: (file: File | null) => void;
   disabled?: boolean;
   className?: string;
+  loading?: boolean;
 }
 
 export function ImageUpload({
@@ -27,7 +29,8 @@ export function ImageUpload({
   value,
   onChange,
   disabled,
-  className
+  className,
+  loading = false
 }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -49,12 +52,12 @@ export function ImageUpload({
   // Dosya seçildiğinde
   const handleFileSelect = (file: File) => {
     if (file.size > maxSize) {
-      alert(`Dosya boyutu ${maxSize / (1024 * 1024)}MB'dan büyük olamaz`);
+      toast.error(`Dosya boyutu ${maxSize / (1024 * 1024)}MB'dan büyük olamaz`);
       return;
     }
 
     if (!file.type.startsWith('image/')) {
-      alert('Sadece resim dosyaları yüklenebilir');
+      toast.error('Sadece resim dosyaları yüklenebilir');
       return;
     }
 
@@ -113,20 +116,38 @@ export function ImageUpload({
         className={cn(
           "relative border-2 border-dashed rounded-lg p-4 transition-colors",
           dragActive ? "border-primary bg-primary/5" : "border-border",
-          disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+          disabled || loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
         )}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        onClick={() => !disabled && fileInputRef.current?.click()}
+        onClick={() => !disabled && !loading && fileInputRef.current?.click()}
+        role="button"
+        tabIndex={disabled || loading ? -1 : 0}
+        aria-label="Resim yükleme alanı"
+        aria-describedby={`${id}-description`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (!disabled && !loading) {
+              fileInputRef.current?.click();
+            }
+          }
+        }}
       >
-        {preview ? (
+        {loading ? (
+          // Loading state
+          <div className="flex flex-col items-center justify-center py-6 text-center">
+            <Loader2 className="h-8 w-8 text-muted-foreground mb-2 animate-spin" />
+            <p className="text-sm text-muted-foreground">Yükleniyor...</p>
+          </div>
+        ) : preview ? (
           // Yüklenen resim preview
           <div className="relative">
             <Image
               src={preview}
-              alt="Preview"
+              alt="Önizleme"
               width={400}
               height={128}
               className="w-full h-32 object-cover rounded-md"
@@ -140,7 +161,8 @@ export function ImageUpload({
                 e.stopPropagation();
                 handleRemove();
               }}
-              disabled={disabled}
+              disabled={disabled || loading}
+              aria-label="Resmi kaldır"
             >
               <X className="h-3 w-3" />
             </Button>
@@ -159,6 +181,11 @@ export function ImageUpload({
         )}
       </div>
 
+      <div id={`${id}-description`} className="sr-only">
+        Resim dosyası yüklemek için tıklayın veya dosyayı bu alana sürükleyin. 
+        Maksimum dosya boyutu {maxSize / (1024 * 1024)}MB'dır.
+      </div>
+
       <Input
         ref={fileInputRef}
         id={id}
@@ -166,7 +193,8 @@ export function ImageUpload({
         accept={accept}
         onChange={handleInputChange}
         className="hidden"
-        disabled={disabled}
+        disabled={disabled || loading}
+        aria-describedby={`${id}-description`}
       />
     </div>
   );
