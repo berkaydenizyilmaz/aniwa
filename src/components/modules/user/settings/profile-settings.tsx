@@ -16,12 +16,13 @@ import {
 } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ImageUpload } from '@/components/ui/image-upload';
+import Image from 'next/image';
 import { 
   updateUsernameAction,
   updateBioAction,
   updatePasswordAction,
   updateProfileImagesAction,
-  getUserSettingsAction
 } from '@/lib/actions/user/settings.actions';
 import { 
   updateUsernameSchema,
@@ -34,23 +35,21 @@ import {
   type UpdateProfileImagesInput
 } from '@/lib/schemas/settings.schema';
 import { toast } from 'sonner';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { Eye, EyeOff, Upload, X } from 'lucide-react';
-import { GetUserSettingsResponse } from '@/lib/types/api/settings.api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Eye, EyeOff } from 'lucide-react';
+import { useSettings } from '@/lib/hooks/use-settings';
+import { useSettingsStore } from '@/lib/stores/settings.store';
+import { CLOUDINARY } from '@/lib/constants/cloudinary.constants';
 
 export function ProfileSettings() {
   const [showPassword, setShowPassword] = useState(false);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [profileBanner, setProfileBanner] = useState<File | null>(null);
 
-  // Kullanıcı ayarlarını getir
-  const { data: userData, refetch } = useQuery({
-    queryKey: ['userSettings'],
-    queryFn: getUserSettingsAction,
-  });
-
-  const user = userData?.success ? (userData.data as GetUserSettingsResponse)?.user : null;
-  const settings = userData?.success ? (userData.data as GetUserSettingsResponse)?.settings : null;
+  // Settings hook'u kullan
+  const { data: userData, refetch } = useSettings();
+  const { user, settings } = useSettingsStore();
+  const queryClient = useQueryClient();
 
   // Username form
   const usernameForm = useForm<UpdateUsernameInput>({
@@ -86,12 +85,20 @@ export function ProfileSettings() {
     },
   });
 
+  // Form'ları user data yüklendikten sonra güncelle
+  useEffect(() => {
+    if (user) {
+      usernameForm.reset({ username: user.username });
+      bioForm.reset({ bio: user.bio || '' });
+    }
+  }, [user, usernameForm, bioForm]);
+
   // Mutations
   const updateUsernameMutation = useMutation({
     mutationFn: updateUsernameAction,
     onSuccess: () => {
       toast.success('Kullanıcı adı başarıyla güncellendi');
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
     onError: (error) => {
       console.error('Username update error:', error);
@@ -103,7 +110,7 @@ export function ProfileSettings() {
     mutationFn: updateBioAction,
     onSuccess: () => {
       toast.success('Biyografi başarıyla güncellendi');
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
     onError: (error) => {
       console.error('Bio update error:', error);
@@ -129,7 +136,7 @@ export function ProfileSettings() {
       toast.success('Profil görselleri başarıyla güncellendi');
       setProfilePicture(null);
       setProfileBanner(null);
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
     onError: (error) => {
       console.error('Profile images update error:', error);
@@ -155,39 +162,15 @@ export function ProfileSettings() {
   };
 
   // File handlers
-  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setProfilePicture(file);
-      profileImagesForm.setValue('profilePicture', file);
-    }
+  const handleProfilePictureChange = (file: File | null) => {
+    setProfilePicture(file);
+    profileImagesForm.setValue('profilePicture', file);
   };
 
-  const handleProfileBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setProfileBanner(file);
-      profileImagesForm.setValue('profileBanner', file);
-    }
+  const handleProfileBannerChange = (file: File | null) => {
+    setProfileBanner(file);
+    profileImagesForm.setValue('profileBanner', file);
   };
-
-  const removeProfilePicture = () => {
-    setProfilePicture(null);
-    profileImagesForm.setValue('profilePicture', null);
-  };
-
-  const removeProfileBanner = () => {
-    setProfileBanner(null);
-    profileImagesForm.setValue('profileBanner', null);
-  };
-
-  // Form'ları user data yüklendikten sonra güncelle
-  useEffect(() => {
-    if (user) {
-      usernameForm.reset({ username: user.username });
-      bioForm.reset({ bio: user.bio || '' });
-    }
-  }, [user, usernameForm, bioForm]);
 
   if (!user) {
     return <div>Yükleniyor...</div>;
@@ -388,24 +371,16 @@ export function ProfileSettings() {
                   <AvatarFallback>{user.username?.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <Input
-                    type="file"
+                  <ImageUpload
+                    id="profile-picture"
+                    label=""
                     accept="image/*"
+                    maxSize={CLOUDINARY.CONFIGS.USER_AVATAR.maxSize}
+                    value={profilePicture}
                     onChange={handleProfilePictureChange}
                     disabled={updateProfileImagesMutation.isPending}
                   />
                 </div>
-                {profilePicture && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={removeProfilePicture}
-                    disabled={updateProfileImagesMutation.isPending}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
               </div>
             </div>
 
@@ -415,32 +390,26 @@ export function ProfileSettings() {
               <div className="flex items-center gap-4">
                 {user.profileBanner && (
                   <div className="h-16 w-32 rounded border overflow-hidden">
-                    <img
+                    <Image
                       src={user.profileBanner}
                       alt="Profile Banner"
+                      width={128}
+                      height={64}
                       className="h-full w-full object-cover"
                     />
                   </div>
                 )}
                 <div className="flex-1">
-                  <Input
-                    type="file"
+                  <ImageUpload
+                    id="profile-banner"
+                    label=""
                     accept="image/*"
+                    maxSize={CLOUDINARY.CONFIGS.USER_BANNER.maxSize}
+                    value={profileBanner}
                     onChange={handleProfileBannerChange}
                     disabled={updateProfileImagesMutation.isPending}
                   />
                 </div>
-                {profileBanner && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={removeProfileBanner}
-                    disabled={updateProfileImagesMutation.isPending}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
               </div>
             </div>
 

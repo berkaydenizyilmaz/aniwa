@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import {
   Form,
   FormControl,
@@ -28,7 +27,6 @@ import {
   updateShowAnimeListAction,
   updateShowFavouriteAnimeSeriesAction,
   updateShowCustomListsAction,
-  getUserSettingsAction
 } from '@/lib/actions/user/settings.actions';
 import { 
   updateProfileVisibilitySchema,
@@ -43,19 +41,16 @@ import {
   type UpdateShowCustomListsInput
 } from '@/lib/schemas/settings.schema';
 import { toast } from 'sonner';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { GetUserSettingsResponse } from '@/lib/types/api/settings.api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProfileVisibility } from '@prisma/client';
+import { useSettings } from '@/lib/hooks/use-settings';
+import { useSettingsStore } from '@/lib/stores/settings.store';
 
 export function PrivacySettings() {
-  // Kullanıcı ayarlarını getir
-  const { data: userData, refetch } = useQuery({
-    queryKey: ['userSettings'],
-    queryFn: getUserSettingsAction,
-  });
-
-  const user = userData?.success ? (userData.data as GetUserSettingsResponse)?.user : null;
-  const settings = userData?.success ? (userData.data as GetUserSettingsResponse)?.settings : null;
+  // Settings hook'u kullan
+  const { data: userData } = useSettings();
+  const { settings } = useSettingsStore();
+  const queryClient = useQueryClient();
 
   // Profile visibility form
   const profileVisibilityForm = useForm<UpdateProfileVisibilityInput>({
@@ -113,7 +108,7 @@ export function PrivacySettings() {
     mutationFn: updateProfileVisibilityAction,
     onSuccess: () => {
       toast.success('Profil görünürlüğü güncellendi');
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
     onError: (error) => {
       console.error('Profile visibility update error:', error);
@@ -124,48 +119,48 @@ export function PrivacySettings() {
   const updateAllowFollowsMutation = useMutation({
     mutationFn: updateAllowFollowsAction,
     onSuccess: () => {
-      toast.success('Takip izinleri güncellendi');
-      refetch();
+      toast.success('Takip ayarı güncellendi');
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
     onError: (error) => {
       console.error('Allow follows update error:', error);
-      toast.error('Takip izinleri güncellenemedi');
+      toast.error('Takip ayarı güncellenemedi');
     },
   });
 
   const updateShowAnimeListMutation = useMutation({
     mutationFn: updateShowAnimeListAction,
     onSuccess: () => {
-      toast.success('Anime listesi gösterme ayarı güncellendi');
-      refetch();
+      toast.success('Anime listesi görünürlüğü güncellendi');
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
     onError: (error) => {
       console.error('Show anime list update error:', error);
-      toast.error('Anime listesi gösterme ayarı güncellenemedi');
+      toast.error('Anime listesi görünürlüğü güncellenemedi');
     },
   });
 
   const updateShowFavouriteAnimeSeriesMutation = useMutation({
     mutationFn: updateShowFavouriteAnimeSeriesAction,
     onSuccess: () => {
-      toast.success('Favori animeleri gösterme ayarı güncellendi');
-      refetch();
+      toast.success('Favori anime görünürlüğü güncellendi');
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
     onError: (error) => {
       console.error('Show favourite anime series update error:', error);
-      toast.error('Favori animeleri gösterme ayarı güncellenemedi');
+      toast.error('Favori anime görünürlüğü güncellenemedi');
     },
   });
 
   const updateShowCustomListsMutation = useMutation({
     mutationFn: updateShowCustomListsAction,
     onSuccess: () => {
-      toast.success('Özel listeleri gösterme ayarı güncellendi');
-      refetch();
+      toast.success('Özel listeler görünürlüğü güncellendi');
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
     onError: (error) => {
       console.error('Show custom lists update error:', error);
-      toast.error('Özel listeleri gösterme ayarı güncellenemedi');
+      toast.error('Özel listeler görünürlüğü güncellenemedi');
     },
   });
 
@@ -261,7 +256,7 @@ export function PrivacySettings() {
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">
-                      Takip İzinleri
+                      Takip İzni Ver
                     </FormLabel>
                     <div className="text-sm text-muted-foreground">
                       Kullanıcıların sizi takip etmesine izin ver
@@ -281,7 +276,7 @@ export function PrivacySettings() {
               type="submit"
               disabled={updateAllowFollowsMutation.isPending}
             >
-              Takip İzinlerini Güncelle
+              Takip Ayarını Güncelle
             </Button>
           </form>
         </Form>
@@ -292,9 +287,9 @@ export function PrivacySettings() {
       {/* Show Anime List */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium">Anime Listesi Gösterimi</h3>
+          <h3 className="text-lg font-medium">Anime Listesi Görünürlüğü</h3>
           <p className="text-sm text-muted-foreground">
-            Anime listenizin diğer kullanıcılar tarafından görülüp görülmeyeceğini belirleyin
+            Anime listenizin başkaları tarafından görülüp görülmeyeceğini belirleyin
           </p>
         </div>
         <Form {...showAnimeListForm}>
@@ -306,10 +301,10 @@ export function PrivacySettings() {
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">
-                      Anime Listesi Göster
+                      Anime Listesini Göster
                     </FormLabel>
                     <div className="text-sm text-muted-foreground">
-                      Anime listenizi diğer kullanıcılara göster
+                      Anime listenizi başkalarına göster
                     </div>
                   </div>
                   <FormControl>
@@ -337,9 +332,9 @@ export function PrivacySettings() {
       {/* Show Favourite Anime Series */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium">Favori Animeleri Gösterimi</h3>
+          <h3 className="text-lg font-medium">Favori Anime Görünürlüğü</h3>
           <p className="text-sm text-muted-foreground">
-            Favori anime serilerinizin diğer kullanıcılar tarafından görülüp görülmeyeceğini belirleyin
+            Favori anime serilerinizin başkaları tarafından görülüp görülmeyeceğini belirleyin
           </p>
         </div>
         <Form {...showFavouriteAnimeSeriesForm}>
@@ -354,7 +349,7 @@ export function PrivacySettings() {
                       Favori Animeleri Göster
                     </FormLabel>
                     <div className="text-sm text-muted-foreground">
-                      Favori anime serilerinizi diğer kullanıcılara göster
+                      Favori anime serilerinizi başkalarına göster
                     </div>
                   </div>
                   <FormControl>
@@ -371,7 +366,7 @@ export function PrivacySettings() {
               type="submit"
               disabled={updateShowFavouriteAnimeSeriesMutation.isPending}
             >
-              Favori Animeleri Ayarını Güncelle
+              Favori Anime Ayarını Güncelle
             </Button>
           </form>
         </Form>
@@ -382,9 +377,9 @@ export function PrivacySettings() {
       {/* Show Custom Lists */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium">Özel Listeleri Gösterimi</h3>
+          <h3 className="text-lg font-medium">Özel Listeler Görünürlüğü</h3>
           <p className="text-sm text-muted-foreground">
-            Özel listelerinizin diğer kullanıcılar tarafından görülüp görülmeyeceğini belirleyin
+            Özel listelerinizin başkaları tarafından görülüp görülmeyeceğini belirleyin
           </p>
         </div>
         <Form {...showCustomListsForm}>
@@ -399,7 +394,7 @@ export function PrivacySettings() {
                       Özel Listeleri Göster
                     </FormLabel>
                     <div className="text-sm text-muted-foreground">
-                      Özel listelerinizi diğer kullanıcılara göster
+                      Özel listelerinizi başkalarına göster
                     </div>
                   </div>
                   <FormControl>
@@ -416,7 +411,7 @@ export function PrivacySettings() {
               type="submit"
               disabled={updateShowCustomListsMutation.isPending}
             >
-              Özel Listeleri Ayarını Güncelle
+              Özel Listeler Ayarını Güncelle
             </Button>
           </form>
         </Form>

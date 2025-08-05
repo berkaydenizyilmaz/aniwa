@@ -14,27 +14,21 @@ import {
 } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { 
-  updateNotificationSettingsAction,
-  getUserSettingsAction
-} from '@/lib/actions/user/settings.actions';
+import { updateNotificationSettingsAction } from '@/lib/actions/user/settings.actions';
 import { 
   updateNotificationSettingsSchema,
   type UpdateNotificationSettingsInput
 } from '@/lib/schemas/settings.schema';
 import { toast } from 'sonner';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { GetUserSettingsResponse } from '@/lib/types/api/settings.api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSettings } from '@/lib/hooks/use-settings';
+import { useSettingsStore } from '@/lib/stores/settings.store';
 
 export function NotificationSettings() {
-  // Kullanıcı ayarlarını getir
-  const { data: userData, refetch } = useQuery({
-    queryKey: ['userSettings'],
-    queryFn: getUserSettingsAction,
-  });
-
-  const user = userData?.success ? (userData.data as GetUserSettingsResponse)?.user : null;
-  const settings = userData?.success ? (userData.data as GetUserSettingsResponse)?.settings : null;
+  // Settings hook'u kullan
+  const { data: userData } = useSettings();
+  const { settings } = useSettingsStore();
+  const queryClient = useQueryClient();
 
   // Notification settings form
   const notificationForm = useForm<UpdateNotificationSettingsInput>({
@@ -46,7 +40,7 @@ export function NotificationSettings() {
     },
   });
 
-  // Form'ları settings data yüklendikten sonra güncelle
+  // Form'u settings data yüklendikten sonra güncelle
   useEffect(() => {
     if (settings) {
       notificationForm.reset({
@@ -57,12 +51,12 @@ export function NotificationSettings() {
     }
   }, [settings, notificationForm]);
 
-  // Update mutation
+  // Mutation
   const updateNotificationMutation = useMutation({
     mutationFn: updateNotificationSettingsAction,
     onSuccess: () => {
       toast.success('Bildirim ayarları güncellendi');
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
     },
     onError: (error) => {
       console.error('Notification settings update error:', error);
@@ -84,9 +78,9 @@ export function NotificationSettings() {
       {/* New Follow Notifications */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium">Yeni Takipçi Bildirimleri</h3>
+          <h3 className="text-lg font-medium">Takip Bildirimleri</h3>
           <p className="text-sm text-muted-foreground">
-            Yeni takipçileriniz olduğunda bildirim alın
+            Yeni takipçiler hakkında bildirim alın
           </p>
         </div>
         <Form {...notificationForm}>
@@ -101,7 +95,7 @@ export function NotificationSettings() {
                       Yeni Takipçi Bildirimleri
                     </FormLabel>
                     <div className="text-sm text-muted-foreground">
-                      Yeni takipçileriniz olduğunda bildirim al
+                      Biri sizi takip ettiğinde bildirim al
                     </div>
                   </div>
                   <FormControl>
@@ -122,7 +116,7 @@ export function NotificationSettings() {
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">
-                      Yeni Bölüm Bildirimleri
+                      Bölüm Yayın Bildirimleri
                     </FormLabel>
                     <div className="text-sm text-muted-foreground">
                       Takip ettiğiniz animelerin yeni bölümleri yayınlandığında bildirim al
