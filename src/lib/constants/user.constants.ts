@@ -27,4 +27,11 @@ export const USER = {
     FOLLOWERS_ONLY: 'Sadece Takipçiler',
     PRIVATE: 'Gizli',
   } as const,
+  
+  // Score format etiketleri
+  SCORE_FORMAT_LABELS: {
+    POINT_100: '100',
+    POINT_10: '10',
+    POINT_5: '5',
+  } as const,
 } as const; 

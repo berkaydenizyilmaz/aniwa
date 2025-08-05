@@ -46,6 +46,7 @@ import { Theme, TitleLanguage, ScoreFormat } from '@prisma/client';
 import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
 import { ANIME } from '@/lib/constants/anime.constants';
+import { USER } from '@/lib/constants/user.constants';
 
 export function GeneralSettings() {
   // Settings hook'u kullan
@@ -315,9 +316,9 @@ export function GeneralSettings() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={ScoreFormat.POINT_100}>100</SelectItem>
-                      <SelectItem value={ScoreFormat.POINT_10}>10</SelectItem>
-                      <SelectItem value={ScoreFormat.POINT_5}>5</SelectItem>
+                      <SelectItem value={ScoreFormat.POINT_100}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_100]}</SelectItem>
+                      <SelectItem value={ScoreFormat.POINT_10}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_10]}</SelectItem>
+                      <SelectItem value={ScoreFormat.POINT_5}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_5]}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
