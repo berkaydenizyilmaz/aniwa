@@ -68,7 +68,7 @@ export function ResetPasswordForm() {
     },
     onError: (error) => {
       console.error('Reset password error:', error);
-      toast.error(error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     },
   });
 

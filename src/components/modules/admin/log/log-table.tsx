@@ -77,7 +77,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
 
   // Hata durumu
   if (error) {
-    toast.error(error.message || 'Loglar yüklenirken bir hata oluştu');
+    toast.error('Loglar yüklenirken bir hata oluştu');
   }
 
   const logs = data?.logs || [];

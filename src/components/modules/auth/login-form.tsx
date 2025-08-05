@@ -52,7 +52,7 @@ export function LoginForm() {
     },
     onError: (error) => {
       console.error('Login error:', error);
-      toast.error(error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
     },
   });
 
