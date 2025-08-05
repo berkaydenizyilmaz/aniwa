@@ -171,7 +171,8 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
       queryClient.invalidateQueries({ queryKey: ['anime-series-list'] });
     },
     onError: (error) => {
-      toast.error(error.message || 'Anime serisi oluşturulurken bir hata oluştu');
+      console.error('Anime series create error:', error);
+      toast.error('Anime serisi oluşturulurken bir hata oluştu');
     },
   });
 
@@ -189,7 +190,8 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
       queryClient.invalidateQueries({ queryKey: ['anime-series-with-relations', animeSeries?.id] });
     },
     onError: (error) => {
-      toast.error(error.message || 'Anime serisi güncellenirken bir hata oluştu');
+      console.error('Anime series update error:', error);
+      toast.error('Anime serisi güncellenirken bir hata oluştu');
     },
   });
 

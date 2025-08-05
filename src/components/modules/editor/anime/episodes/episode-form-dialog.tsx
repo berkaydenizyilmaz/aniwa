@@ -112,7 +112,8 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
       queryClient.invalidateQueries({ queryKey: ['episodes'] });
     },
     onError: (error) => {
-      toast.error(error.message || 'Episode oluşturulurken bir hata oluştu');
+      console.error('Episode create error:', error);
+      toast.error('Episode oluşturulurken bir hata oluştu');
     },
   });
 
@@ -130,7 +131,8 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
       queryClient.invalidateQueries({ queryKey: ['episode', episode?.id] });
     },
     onError: (error) => {
-      toast.error(error.message || 'Episode güncellenirken bir hata oluştu');
+      console.error('Episode update error:', error);
+      toast.error('Episode güncellenirken bir hata oluştu');
     },
   });
 

@@ -112,7 +112,8 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
       queryClient.invalidateQueries({ queryKey: ['anime-media-parts'] });
     },
     onError: (error) => {
-      toast.error(error.message || 'Media part oluşturulurken bir hata oluştu');
+      console.error('Media part create error:', error);
+      toast.error('Media part oluşturulurken bir hata oluştu');
     },
   });
 
@@ -130,7 +131,8 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
       queryClient.invalidateQueries({ queryKey: ['anime-media-part', mediaPart?.id] });
     },
     onError: (error) => {
-      toast.error(error.message || 'Media part güncellenirken bir hata oluştu');
+      console.error('Media part update error:', error);
+      toast.error('Media part güncellenirken bir hata oluştu');
     },
   });
 
