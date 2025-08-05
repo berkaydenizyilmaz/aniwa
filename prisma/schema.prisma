@@ -78,7 +78,7 @@ enum AnimeType {
 enum TitleLanguage {
   ROMAJI
   ENGLISH
-  JAPANESE
+  NATIVE
 }
 
 // Sezonlar
@@ -369,7 +369,7 @@ model AnimeSeries {
   // Başlık Bilgileri
   title             String            // Ana başlık (romaji)
   englishTitle      String?           // İngilizce başlık
-  japaneseTitle     String?           // Japonca başlık
+  nativeTitle     String?           // Japonca başlık
   synonyms          String[]          // Alternatif başlıklar
   
   // Temel Bilgiler
