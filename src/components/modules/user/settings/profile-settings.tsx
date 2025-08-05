@@ -47,7 +47,7 @@ export function ProfileSettings() {
   const [profileBanner, setProfileBanner] = useState<File | null>(null);
 
   // Settings hook'u kullan
-  const { data: userData, refetch } = useSettings();
+  const { data: userData } = useSettings();
   const { user, settings } = useSettingsStore();
   const queryClient = useQueryClient();
 
