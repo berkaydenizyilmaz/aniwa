@@ -16,7 +16,7 @@ Editör Hareketi: editor/anime panelinde "Yeni Anime Ekle" butonuna tıklar.
 
 **Opsiyonel Alanlar:**
 - englishTitle (String): İngilizce başlık
-- japaneseTitle (String): Japonca başlık
+- nativeTitle (String): Yerel başlık
 - synonyms (String[]): Alternatif başlıklar (array olarak)
 - synopsis (String): Anime'nin genel özeti/açıklaması
 - season (Season): Yayınlandığı sezon (örn. WINTER)
@@ -54,7 +54,7 @@ Editör Hareketi: Oluşturulan anime'nin tablo satırında "MediaPart Ekle" buto
 
 **Opsiyonel Alanlar:**
 - englishTitle (String): İngilizce başlık
-- japaneseTitle (String): Japonca başlık
+- nativeTitle (String): Yerel başlık
 - notes (String): Ek notlar
 - releaseDate (DateTime): Yayın tarihi
 - anilistId (Int): Anilist üzerindeki ID

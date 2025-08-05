@@ -80,6 +80,13 @@ export const ANIME = {
     SUMMER: 'Yaz',
     FALL: 'Sonbahar',
   } as const,
+
+  // Title Language etiketleri
+  TITLE_LANGUAGE_LABELS: {
+    ROMAJI: 'Romaji',
+    ENGLISH: 'İngilizce',
+    NATIVE: 'Yerel',
+  } as const,
   
   // Source etiketleri
   SOURCE_LABELS: {

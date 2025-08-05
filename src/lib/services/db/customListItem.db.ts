@@ -45,8 +45,8 @@ export async function findCustomListItemByIdDB(
                             select: {
                                 id: true,
                                 title: true,
-                                englishTitle: true,
-                                japaneseTitle: true,
+                                englishTitle: true,     
+                                nativeTitle: true,
                                 coverImage: true,
                                 bannerImage: true,
                                 type: true,

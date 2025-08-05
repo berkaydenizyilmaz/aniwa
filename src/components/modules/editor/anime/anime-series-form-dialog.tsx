@@ -63,7 +63,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
         id: string;
         title: string;
         englishTitle?: string;
-        japaneseTitle?: string;
+        nativeTitle?: string;
         synopsis?: string;
         type: any;
         status: any;
@@ -89,7 +89,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
     defaultValues: {
       title: '',
       englishTitle: '',
-      japaneseTitle: '',
+      nativeTitle: '',
       synopsis: '',
       type: undefined,
       status: undefined,
@@ -117,7 +117,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
       form.reset({
         title: animeSeriesWithRelations.title,
         englishTitle: animeSeriesWithRelations.englishTitle || '',
-        japaneseTitle: animeSeriesWithRelations.japaneseTitle || '',
+        nativeTitle: animeSeriesWithRelations.nativeTitle || '',
         synopsis: animeSeriesWithRelations.synopsis || '',
         type: animeSeriesWithRelations.type,
         status: animeSeriesWithRelations.status,
@@ -139,7 +139,7 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
       form.reset({
         title: '',
         englishTitle: '',
-        japaneseTitle: '',
+        nativeTitle: '',
         synopsis: '',
         type: undefined,
         status: undefined,

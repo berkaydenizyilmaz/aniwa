@@ -71,7 +71,7 @@ export async function createAnimeSeriesBusiness(
     const result = await createAnimeSeriesDB({
       title: formData.title,
       englishTitle: formData.englishTitle,
-      japaneseTitle: formData.japaneseTitle,
+      nativeTitle: formData.nativeTitle,
       synopsis: formData.synopsis,
       type: formData.type,
       status: formData.status,
@@ -215,7 +215,7 @@ export async function getAnimeSeriesListBusiness(
       where.OR = [
         { title: { contains: filters.search, mode: 'insensitive' } },
         { englishTitle: { contains: filters.search, mode: 'insensitive' } },
-        { japaneseTitle: { contains: filters.search, mode: 'insensitive' } },
+        { nativeTitle: { contains: filters.search, mode: 'insensitive' } },
       ];
     }
     
@@ -320,7 +320,7 @@ export async function updateAnimeSeriesBusiness(
     const result = await updateAnimeSeriesDB({ id }, {
       title: data.title,
       englishTitle: data.englishTitle,
-      japaneseTitle: data.japaneseTitle,
+      nativeTitle: data.nativeTitle,
       synopsis: data.synopsis,
       type: data.type,
       status: data.status,

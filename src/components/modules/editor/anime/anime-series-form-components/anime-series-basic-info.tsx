@@ -63,16 +63,16 @@ export function AnimeSeriesBasicInfo() {
         )}
       />
 
-      {/* Japonca Başlık */}
+      {/* Yerel Başlık */}
       <FormField
         control={form.control}
-        name="japaneseTitle"
+        name="nativeTitle"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Japonca Başlık</FormLabel>
+            <FormLabel>Yerel Başlık</FormLabel>
             <FormControl>
               <Input
-                placeholder="日本語タイトル"
+                placeholder="Yerel başlık"
                 {...field}
               />
             </FormControl>

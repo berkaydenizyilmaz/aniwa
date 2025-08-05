@@ -45,6 +45,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Theme, TitleLanguage, ScoreFormat } from '@prisma/client';
 import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
+import { ANIME } from '@/lib/constants/anime.constants';
 
 export function GeneralSettings() {
   // Settings hook'u kullan
@@ -266,9 +267,9 @@ export function GeneralSettings() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={TitleLanguage.ROMAJI}>Romaji</SelectItem>
-                      <SelectItem value={TitleLanguage.ENGLISH}>İngilizce</SelectItem>
-                      <SelectItem value={TitleLanguage.JAPANESE}>Japonca</SelectItem>
+                      <SelectItem value={TitleLanguage.ROMAJI}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.ROMAJI]}</SelectItem>
+                      <SelectItem value={TitleLanguage.ENGLISH}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.ENGLISH]}</SelectItem>
+                      <SelectItem value={TitleLanguage.NATIVE}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.NATIVE]}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

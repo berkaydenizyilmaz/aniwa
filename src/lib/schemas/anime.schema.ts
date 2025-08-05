@@ -9,7 +9,7 @@ import { MASTER_DATA } from '@/lib/constants/masterData.constants';
 export const createAnimeSeriesSchema = z.object({
   title: z.string().min(ANIME.TITLE.MIN_LENGTH, 'Anime başlığı gerekli').max(ANIME.TITLE.MAX_LENGTH, 'Anime başlığı çok uzun'),
   englishTitle: z.string().max(ANIME.TITLE.MAX_LENGTH, 'İngilizce başlık çok uzun').optional(),
-  japaneseTitle: z.string().max(ANIME.TITLE.MAX_LENGTH, 'Japonca başlık çok uzun').optional(),
+  nativeTitle: z.string().max(ANIME.TITLE.MAX_LENGTH, 'Yerel başlık çok uzun').optional(),
   synopsis: z.string().max(ANIME.SYNOPSIS.MAX_LENGTH, 'Özet çok uzun').optional(),
   type: z.nativeEnum(AnimeType, { required_error: 'Anime tipi seçin' }),
   status: z.nativeEnum(AnimeStatus, { required_error: 'Anime durumu seçin' }),
@@ -32,7 +32,7 @@ export const createAnimeSeriesSchema = z.object({
 export const updateAnimeSeriesSchema = z.object({
   title: z.string().min(ANIME.TITLE.MIN_LENGTH, 'Anime başlığı gerekli').max(ANIME.TITLE.MAX_LENGTH, 'Anime başlığı çok uzun').optional(),
   englishTitle: z.string().max(ANIME.TITLE.MAX_LENGTH, 'İngilizce başlık çok uzun').optional(),
-  japaneseTitle: z.string().max(ANIME.TITLE.MAX_LENGTH, 'Japonca başlık çok uzun').optional(),
+  nativeTitle: z.string().max(ANIME.TITLE.MAX_LENGTH, 'Yerel başlık çok uzun').optional(),
   synopsis: z.string().max(ANIME.SYNOPSIS.MAX_LENGTH, 'Özet çok uzun').optional(),
   type: z.nativeEnum(AnimeType).optional(),
   status: z.nativeEnum(AnimeStatus).optional(),

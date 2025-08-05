@@ -369,7 +369,7 @@ model AnimeSeries {
   // Başlık Bilgileri
   title             String            // Ana başlık (romaji)
   englishTitle      String?           // İngilizce başlık
-  nativeTitle     String?           // Japonca başlık
+  nativeTitle       String?           // Yerel başlık
   synonyms          String[]          // Alternatif başlıklar
   
   // Temel Bilgiler

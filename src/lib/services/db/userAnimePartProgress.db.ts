@@ -35,7 +35,7 @@ export async function findUserAnimePartProgressByIdDB(
                                 id: true,
                                 title: true,
                                 englishTitle: true,
-                                japaneseTitle: true,
+                                nativeTitle: true,
                                 coverImage: true,
                                 bannerImage: true,
                                 type: true,
