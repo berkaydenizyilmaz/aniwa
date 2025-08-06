@@ -211,7 +211,7 @@ export function ProfileSettings() {
             />
             <Button
               type="submit"
-              disabled={updateUsernameMutation.isPending}
+              disabled={updateUsernameMutation.isPending || usernameForm.watch('username') === user.username}
             >
               Kullanıcı Adını Güncelle
             </Button>
@@ -272,7 +272,7 @@ export function ProfileSettings() {
             />
             <Button
               type="submit"
-              disabled={updateBioMutation.isPending}
+              disabled={updateBioMutation.isPending || bioForm.watch('bio') === user.bio}
             >
               Biyografiyi Güncelle
             </Button>
