@@ -134,7 +134,8 @@ export async function createAnimeSeriesBusiness(
       data: result
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -181,7 +182,8 @@ export async function getAnimeSeriesBusiness(
       data: animeSeries
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -279,7 +281,8 @@ export async function getAnimeSeriesListBusiness(
       }
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -399,7 +402,8 @@ export async function updateAnimeSeriesBusiness(
       data: result
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -451,7 +455,8 @@ export async function deleteAnimeSeriesBusiness(
 
     return { success: true };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -501,7 +506,8 @@ export async function getAnimeSeriesRelationsBusiness(
       }
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -566,7 +572,8 @@ export async function getAnimeSeriesWithRelationsBusiness(
       data: animeSeries as GetAnimeSeriesWithRelationsResponse
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }

@@ -72,7 +72,7 @@ export async function createGenreBusiness(
       data: result
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -117,7 +117,7 @@ export async function getGenreBusiness(
       data: genre
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -182,7 +182,7 @@ export async function getGenresBusiness(
       }
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -257,7 +257,7 @@ export async function updateGenreBusiness(
       data: result
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -303,7 +303,7 @@ export async function deleteGenreBusiness(
 
     return { success: true };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }

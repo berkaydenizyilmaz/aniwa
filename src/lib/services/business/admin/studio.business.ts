@@ -74,7 +74,7 @@ export async function createStudioBusiness(
       data: result
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -118,7 +118,7 @@ export async function getStudioBusiness(
       data: studio
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -187,7 +187,7 @@ export async function getStudiosBusiness(
       }
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -264,7 +264,7 @@ export async function updateStudioBusiness(
       data: result
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -311,7 +311,7 @@ export async function deleteStudioBusiness(
       success: true
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }

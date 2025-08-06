@@ -20,7 +20,7 @@ import {
   UpdateEpisodeResponse
 } from '@/lib/types/api/anime.api';
 import { ApiResponse } from '@/lib/types/api/index';
-import { BusinessError, NotFoundError } from '@/lib/errors';
+import { BusinessError, DatabaseError, NotFoundError } from '@/lib/errors';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
 
@@ -84,7 +84,8 @@ export async function createEpisodeBusiness(
 
     return { success: true, data: result };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       throw error;
     }
     
@@ -125,7 +126,8 @@ export async function getEpisodeBusiness(
 
     return { success: true, data: episode };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       throw error;
     }
     
@@ -187,7 +189,8 @@ export async function getEpisodeListBusiness(
       },
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       throw error;
     }
     
@@ -273,7 +276,8 @@ export async function updateEpisodeBusiness(
 
     return { success: true, data: result };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       throw error;
     }
     
@@ -319,7 +323,8 @@ export async function deleteEpisodeBusiness(
 
     return { success: true, data: { success: true } };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       throw error;
     }
     

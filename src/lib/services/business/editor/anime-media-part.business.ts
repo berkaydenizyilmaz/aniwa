@@ -83,7 +83,7 @@ export async function createAnimeMediaPartBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (error instanceof DatabaseError || error instanceof BusinessError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -129,7 +129,7 @@ export async function getAnimeMediaPartBusiness(
       data: mediaPart
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (error instanceof DatabaseError || error instanceof BusinessError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -207,7 +207,7 @@ export async function getAnimeMediaPartListBusiness(
       }
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (error instanceof DatabaseError || error instanceof BusinessError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -279,7 +279,7 @@ export async function updateAnimeMediaPartBusiness(
       data: result
     };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (error instanceof DatabaseError || error instanceof BusinessError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -329,7 +329,7 @@ export async function deleteAnimeMediaPartBusiness(
 
     return { success: true };
   } catch (error) {
-    if (error instanceof DatabaseError) {
+    if (error instanceof DatabaseError || error instanceof BusinessError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }

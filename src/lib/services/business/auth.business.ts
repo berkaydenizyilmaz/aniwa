@@ -80,7 +80,8 @@ export async function registerUserBusiness(data: RegisterRequest): Promise<ApiRe
       }
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -130,7 +131,8 @@ export async function forgotPasswordBusiness(email: string): Promise<ApiResponse
 
     return { success: true };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }
@@ -184,7 +186,8 @@ export async function resetPasswordBusiness(token: string, newPassword: string):
 
     return { success: true };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       // DB hatası zaten loglanmış, direkt fırlat
       throw error;
     }

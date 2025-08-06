@@ -20,7 +20,7 @@ import {
   GetStreamingPlatformsResponse
 } from '@/lib/types/api/anime.api';
 import { ApiResponse } from '@/lib/types/api/index';
-import { BusinessError, NotFoundError } from '@/lib/errors';
+import { BusinessError, DatabaseError, NotFoundError } from '@/lib/errors';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
 import { StreamingLink } from '@prisma/client';
@@ -64,7 +64,8 @@ export async function createStreamingLinkBusiness(
 
     return { success: true, data: result };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       throw error;
     }
     
@@ -109,7 +110,8 @@ export async function getStreamingLinkBusiness(
 
     return { success: true, data: streamingLink };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       throw error;
     }
     
@@ -174,7 +176,8 @@ export async function getStreamingLinksByEpisodeBusiness(
       },
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       throw error;
     }
     
@@ -216,7 +219,8 @@ export async function getStreamingPlatformsBusiness(
       },
     };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       throw error;
     }
     
@@ -274,7 +278,8 @@ export async function updateStreamingLinkBusiness(
 
     return { success: true, data: result };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       throw error;
     }
     
@@ -317,7 +322,8 @@ export async function deleteStreamingLinkBusiness(
 
     return { success: true, data: { success: true } };
   } catch (error) {
-    if (!(error instanceof BusinessError)) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
       throw error;
     }
     
