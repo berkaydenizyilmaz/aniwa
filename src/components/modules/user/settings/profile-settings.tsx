@@ -91,7 +91,7 @@ export function ProfileSettings() {
     },
     onError: (error) => {
       console.error('Username update error:', error);
-      toast.error('Kullanıcı adı güncellenemedi');
+      toast.error(error.message || 'Kullanıcı adı güncellenemedi');
     },
   });
 
@@ -103,7 +103,7 @@ export function ProfileSettings() {
     },
     onError: (error) => {
       console.error('Bio update error:', error);
-      toast.error('Biyografi güncellenemedi');
+      toast.error(error.message || 'Biyografi güncellenemedi');
     },
   });
 
@@ -115,7 +115,7 @@ export function ProfileSettings() {
     },
     onError: (error) => {
       console.error('Password update error:', error);
-      toast.error('Parola güncellenemedi');
+      toast.error(error.message || 'Parola güncellenemedi');
     },
   });
 
@@ -129,7 +129,7 @@ export function ProfileSettings() {
     },
     onError: (error) => {
       console.error('Profile images update error:', error);
-      toast.error('Profil görselleri güncellenemedi');
+      toast.error(error.message || 'Profil görselleri güncellenemedi');
     },
   });
 
