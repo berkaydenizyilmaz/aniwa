@@ -86,7 +86,7 @@ export function AnimeSeriesTable({ onEdit, onMediaParts, searchTerm = '', select
     },
     onError: (error) => {
       console.error('Delete anime series error:', error);
-      toast.error('Silme işlemi sırasında bir hata oluştu');
+      toast.error(error.message || 'Silme işlemi sırasında bir hata oluştu');
     },
   });
 

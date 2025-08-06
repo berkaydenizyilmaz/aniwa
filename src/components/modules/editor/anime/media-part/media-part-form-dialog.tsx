@@ -113,7 +113,7 @@ export function MediaPartFormDialog({ open, onOpenChange, seriesId, mediaPart, o
     },
     onError: (error) => {
       console.error('Media part create error:', error);
-      toast.error('Media part oluşturulurken bir hata oluştu');
+      toast.error(error.message || 'Media part oluşturulurken bir hata oluştu');
     },
   });
 

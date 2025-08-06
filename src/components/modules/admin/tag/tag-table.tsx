@@ -91,7 +91,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
     },
     onError: (error) => {
       console.error('Delete tag error:', error);
-      toast.error('Silme işlemi başarısız oldu');
+      toast.error(error.message || 'Silme işlemi başarısız oldu');
     },
   });
 

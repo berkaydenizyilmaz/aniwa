@@ -108,7 +108,7 @@ export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streami
     },
     onError: (error) => {
       console.error('Create streaming link error:', error);
-      toast.error('Oluşturma işlemi sırasında bir hata oluştu');
+      toast.error(error.message || 'Oluşturma işlemi sırasında bir hata oluştu');
     },
   });
 
@@ -124,7 +124,7 @@ export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streami
     },
     onError: (error) => {
       console.error('Update streaming link error:', error);
-      toast.error('Güncelleme işlemi sırasında bir hata oluştu');
+      toast.error(error.message || 'Güncelleme işlemi sırasında bir hata oluştu');
     },
   });
 

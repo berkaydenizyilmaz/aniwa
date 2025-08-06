@@ -80,7 +80,7 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
     },
     onError: (error) => {
       console.error('Delete user error:', error);
-      toast.error('Silme işlemi sırasında bir hata oluştu');
+      toast.error(error.message || 'Silme işlemi sırasında bir hata oluştu');
     },
   });
 

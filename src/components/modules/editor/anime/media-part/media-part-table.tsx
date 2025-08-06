@@ -73,7 +73,7 @@ export function MediaPartTable({ seriesId, onEdit, onEpisodes, refreshKey }: Med
     },
     onError: (error) => {
       console.error('Delete media part error:', error);
-      toast.error('Silme işlemi sırasında bir hata oluştu');
+      toast.error(error.message || 'Silme işlemi sırasında bir hata oluştu');
     },
   });
 

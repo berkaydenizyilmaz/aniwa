@@ -73,7 +73,7 @@ export function StreamingLinkTable({ episodeId, onEdit, onCreateNew, refreshKey 
     },
     onError: (error) => {
       console.error('Delete streaming link error:', error);
-      toast.error('Silme işlemi sırasında bir hata oluştu');
+      toast.error(error.message || 'Silme işlemi sırasında bir hata oluştu');
     },
   });
 

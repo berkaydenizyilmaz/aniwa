@@ -41,7 +41,7 @@ export function ForgotPasswordForm() {
     },
     onError: (error) => {
       console.error('Forgot password error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
+      toast.error(error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
     },
   });
 

@@ -49,7 +49,7 @@ export function RegisterForm() {
     },
     onError: (error) => {
       console.error('Register error:', error);
-      toast.error('Bir hata oluştu. Lütfen tekrar deneyin.');
+      toast.error(error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
     },
   });
 

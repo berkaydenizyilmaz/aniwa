@@ -74,7 +74,7 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
     },
     onError: (error) => {
       console.error('Delete episode error:', error);
-      toast.error('Silme işlemi sırasında bir hata oluştu');
+      toast.error(error.message || 'Silme işlemi sırasında bir hata oluştu');
     },
   });
 

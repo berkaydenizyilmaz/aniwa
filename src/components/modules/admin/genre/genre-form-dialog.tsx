@@ -78,7 +78,7 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
     },
     onError: (error) => {
       console.error('Genre form error:', error);
-      toast.error(`${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
+      toast.error(error.message || `${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
     },
   });
 

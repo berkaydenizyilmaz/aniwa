@@ -83,7 +83,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
     },
     onError: (error) => {
       console.error('Update user error:', error);
-      toast.error('Güncelleme başarısız oldu');
+      toast.error(error.message || 'Güncelleme başarısız oldu');
     },
   });
 

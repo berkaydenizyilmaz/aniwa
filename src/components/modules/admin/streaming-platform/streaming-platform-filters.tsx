@@ -6,8 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Search, Plus } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 
-
-
 interface StreamingPlatformFiltersProps {
   onSearch?: (search: string) => void;
   onAddNew?: () => void;

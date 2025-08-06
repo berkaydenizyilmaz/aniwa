@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Search, Plus } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 
-
 interface StudioFiltersProps {
   onSearch?: (search: string) => void;
   onStudioTypeChange?: (isAnimationStudio: boolean | null) => void;

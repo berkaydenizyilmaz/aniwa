@@ -85,7 +85,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
     },
     onError: (error) => {
       console.error('Delete streaming platform error:', error);
-      toast.error('Silme işlemi başarısız oldu');
+      toast.error(error.message || 'Silme işlemi başarısız oldu');
     },
   });
 

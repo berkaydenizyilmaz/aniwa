@@ -84,7 +84,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
     },
     onError: (error) => {
       console.error('Delete genre error:', error);
-      toast.error('Silme işlemi başarısız oldu');
+      toast.error(error.message || 'Silme işlemi başarısız oldu');
     },
   });
 

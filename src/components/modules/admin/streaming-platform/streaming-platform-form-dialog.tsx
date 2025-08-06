@@ -25,7 +25,6 @@ import { createStreamingPlatformAction, updateStreamingPlatformAction } from '@/
 import { createStreamingPlatformSchema, updateStreamingPlatformSchema, type CreateStreamingPlatformInput, type UpdateStreamingPlatformInput } from '@/lib/schemas/streamingPlatform.schema';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-
 import { StreamingPlatform } from '@prisma/client';
 
 interface StreamingPlatformFormDialogProps {
@@ -86,7 +85,7 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
     },
     onError: (error) => {
       console.error('Form submission error:', error);
-      toast.error('İşlem başarısız oldu');
+      toast.error(error.message || 'İşlem başarısız oldu');
     },
   });
 

@@ -101,7 +101,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
     },
     onError: (error) => {
       console.error('Tag form error:', error);
-      toast.error(`${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
+      toast.error(error.message || `${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
     },
   });
 

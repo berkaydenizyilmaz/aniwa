@@ -20,7 +20,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-
 import { createStudioAction, updateStudioAction } from '@/lib/actions/admin/studio.action';
 import { createStudioSchema, updateStudioSchema, type CreateStudioInput, type UpdateStudioInput } from '@/lib/schemas/studio.schema';
 import { toast } from 'sonner';
@@ -84,7 +83,7 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
     },
     onError: (error) => {
       console.error('Studio form error:', error);
-      toast.error(`${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
+      toast.error(error.message || `${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
     },
   });
 

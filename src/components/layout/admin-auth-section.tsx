@@ -11,7 +11,7 @@ import { USER } from '@/lib/constants/user.constants';
 import { useMutation } from '@tanstack/react-query';
 import { UserRole } from '@prisma/client';
 
-    
+
 interface AdminAuthSectionProps {
   isSidebarOpen: boolean;
 }
@@ -52,8 +52,25 @@ export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
           )}
         </div>
       </DropdownMenuTrigger>
-              <DropdownMenuContent className="glass-card w-48" align="center" forceMount>
-          {AUTH_MENU_ITEMS.map((item) => {
+      <DropdownMenuContent className="glass-card w-48" align="center" forceMount>
+        {AUTH_MENU_ITEMS.map((item) => {
+          const Icon = item.icon;
+          return (
+            <DropdownMenuItem key={item.label} asChild>
+              <Link href={item.href} className="group">
+                <Icon className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
+                <span>{item.label}</span>
+              </Link>
+            </DropdownMenuItem>
+          );
+        })}
+        <DropdownMenuSeparator />
+        {ADMIN_MENU_ITEMS
+          .filter((item) =>
+            session.user.roles.includes(item.role) ||
+            session.user.roles.includes(UserRole.ADMIN)
+          )
+          .map((item) => {
             const Icon = item.icon;
             return (
               <DropdownMenuItem key={item.label} asChild>
@@ -64,33 +81,16 @@ export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
               </DropdownMenuItem>
             );
           })}
-          <DropdownMenuSeparator />
-          {ADMIN_MENU_ITEMS
-            .filter((item) => 
-              session.user.roles.includes(item.role) || 
-              session.user.roles.includes(UserRole.ADMIN)
-            )
-            .map((item) => {
-              const Icon = item.icon;
-              return (
-                <DropdownMenuItem key={item.label} asChild>
-                  <Link href={item.href} className="group">
-                    <Icon className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
-                    <span>{item.label}</span>
-                  </Link>
-                </DropdownMenuItem>
-              );
-            })}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem 
-            className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive group"
-            onClick={handleSignOut}
-            disabled={signOutMutation.isPending}
-          >
-            <LogOut className="mr-2 h-4 w-4 group-hover:text-destructive" />
-            <span>Çıkış Yap</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive group"
+          onClick={handleSignOut}
+          disabled={signOutMutation.isPending}
+        >
+          <LogOut className="mr-2 h-4 w-4 group-hover:text-destructive" />
+          <span>Çıkış Yap</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 } 
