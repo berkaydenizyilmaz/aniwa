@@ -28,11 +28,9 @@ import {
   updateUsernameSchema,
   updateBioSchema,
   updatePasswordSchema,
-  updateProfileImagesSchema,
   type UpdateUsernameInput,
   type UpdateBioInput,
   type UpdatePasswordInput,
-  type UpdateProfileImagesInput
 } from '@/lib/schemas/settings.schema';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -73,15 +71,6 @@ export function ProfileSettings() {
     defaultValues: {
       newPassword: '',
       confirmPassword: '',
-    },
-  });
-
-  // Profile images form
-  const profileImagesForm = useForm<UpdateProfileImagesInput>({
-    resolver: zodResolver(updateProfileImagesSchema),
-    defaultValues: {
-      profilePicture: null,
-      profileBanner: null,
     },
   });
 
@@ -157,19 +146,33 @@ export function ProfileSettings() {
     updatePasswordMutation.mutate(data);
   };
 
-  const onProfileImagesSubmit = async (data: UpdateProfileImagesInput) => {
-    updateProfileImagesMutation.mutate(data);
-  };
-
   // File handlers
   const handleProfilePictureChange = (file: File | null) => {
     setProfilePicture(file);
-    profileImagesForm.setValue('profilePicture', file);
+    
+    // Otomatik kaydet
+    if (file) {
+      const formData = new FormData();
+      formData.append('profilePicture', file);
+      updateProfileImagesMutation.mutate({
+        profilePicture: file,
+        profileBanner: profileBanner,
+      });
+    }
   };
 
   const handleProfileBannerChange = (file: File | null) => {
     setProfileBanner(file);
-    profileImagesForm.setValue('profileBanner', file);
+    
+    // Otomatik kaydet
+    if (file) {
+      const formData = new FormData();
+      formData.append('profileBanner', file);
+      updateProfileImagesMutation.mutate({
+        profilePicture: profilePicture,
+        profileBanner: file,
+      });
+    }
   };
 
   if (!user) {
@@ -360,69 +363,58 @@ export function ProfileSettings() {
             Profil fotoğrafınızı ve banner'ınızı güncelleyin
           </p>
         </div>
-        <Form {...profileImagesForm}>
-          <form onSubmit={profileImagesForm.handleSubmit(onProfileImagesSubmit)} className="space-y-4">
-            {/* Profile Picture */}
-            <div className="space-y-4">
-              <Label>Profil Fotoğrafı</Label>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={user.profilePicture || ''} />
-                  <AvatarFallback>{user.username?.charAt(0).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <ImageUpload
-                    id="profile-picture"
-                    label=""
-                    accept="image/*"
-                    maxSize={CLOUDINARY.CONFIGS.USER_AVATAR.maxSize}
-                    value={profilePicture}
-                    onChange={handleProfilePictureChange}
-                    disabled={updateProfileImagesMutation.isPending}
-                    loading={updateProfileImagesMutation.isPending}
-                  />
-                </div>
-              </div>
+        {/* Profile Picture */}
+        <div className="space-y-4">
+          <Label>Profil Fotoğrafı</Label>
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16">
+              <AvatarImage src={user.profilePicture || ''} />
+              <AvatarFallback>{user.username?.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <ImageUpload
+                id="profile-picture"
+                label=""
+                accept="image/*"
+                maxSize={CLOUDINARY.CONFIGS.USER_AVATAR.maxSize}
+                value={profilePicture}
+                onChange={handleProfilePictureChange}
+                disabled={updateProfileImagesMutation.isPending}
+                loading={updateProfileImagesMutation.isPending}
+              />
             </div>
+          </div>
+        </div>
 
-            {/* Profile Banner */}
-            <div className="space-y-4">
-              <Label>Profil Banner</Label>
-              <div className="flex items-center gap-4">
-                {user.profileBanner && (
-                  <div className="h-16 w-32 rounded border overflow-hidden">
-                    <Image
-                      src={user.profileBanner}
-                      alt="Profile Banner"
-                      width={128}
-                      height={64}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                )}
-                <div className="flex-1">
-                  <ImageUpload
-                    id="profile-banner"
-                    label=""
-                    accept="image/*"
-                    maxSize={CLOUDINARY.CONFIGS.USER_BANNER.maxSize}
-                    value={profileBanner}
-                    onChange={handleProfileBannerChange}
-                    disabled={updateProfileImagesMutation.isPending}
-                    loading={updateProfileImagesMutation.isPending}
-                  />
-                </div>
+        {/* Profile Banner */}
+        <div className="space-y-4">
+          <Label>Profil Banner</Label>
+          <div className="flex items-center gap-4">
+            {user.profileBanner && (
+              <div className="h-16 w-32 rounded border overflow-hidden">
+                <Image
+                  src={user.profileBanner}
+                  alt="Profile Banner"
+                  width={128}
+                  height={64}
+                  className="h-full w-full object-cover"
+                />
               </div>
+            )}
+            <div className="flex-1">
+              <ImageUpload
+                id="profile-banner"
+                label=""
+                accept="image/*"
+                maxSize={CLOUDINARY.CONFIGS.USER_BANNER.maxSize}
+                value={profileBanner}
+                onChange={handleProfileBannerChange}
+                disabled={updateProfileImagesMutation.isPending}
+                loading={updateProfileImagesMutation.isPending}
+              />
             </div>
-
-            <Button
-              type="submit"
-              disabled={updateProfileImagesMutation.isPending}
-            >
-              Görselleri Güncelle
-            </Button>
-          </form>
-        </Form>
+          </div>
+        </div>
       </div>
     </div>
   );

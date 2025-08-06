@@ -3,7 +3,6 @@
 import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -114,7 +113,7 @@ export function GeneralSettings() {
     },
     onError: (error) => {
       console.error('Theme update error:', error);
-      toast.error('Tema tercihi güncellenemedi');
+      toast.error(error.message || 'Tema tercihi güncellenemedi');
     },
   });
 
@@ -126,7 +125,7 @@ export function GeneralSettings() {
     },
     onError: (error) => {
       console.error('Title language update error:', error);
-      toast.error('Başlık dili tercihi güncellenemedi');
+      toast.error(error.message || 'Başlık dili tercihi güncellenemedi');
     },
   });
 
@@ -138,7 +137,7 @@ export function GeneralSettings() {
     },
     onError: (error) => {
       console.error('Score format update error:', error);
-      toast.error('Puanlama formatı güncellenemedi');
+      toast.error(error.message || 'Puanlama formatı güncellenemedi');
     },
   });
 
@@ -150,7 +149,7 @@ export function GeneralSettings() {
     },
     onError: (error) => {
       console.error('Display adult content update error:', error);
-      toast.error('Yetişkin içerik ayarı güncellenemedi');
+      toast.error(error.message || 'Yetişkin içerik ayarı güncellenemedi');
     },
   });
 
@@ -162,29 +161,29 @@ export function GeneralSettings() {
     },
     onError: (error) => {
       console.error('Auto track update error:', error);
-      toast.error('Otomatik takip ayarı güncellenemedi');
+      toast.error(error.message || 'Otomatik takip ayarı güncellenemedi');
     },
   });
 
-  // Form submit handlers
-  const onThemeSubmit = async (data: UpdateThemePreferenceInput) => {
-    updateThemeMutation.mutate(data);
+  // Auto-save handlers
+  const handleThemeChange = (value: string) => {
+    updateThemeMutation.mutate({ themePreference: value as Theme });
   };
 
-  const onTitleLanguageSubmit = async (data: UpdateTitleLanguagePreferenceInput) => {
-    updateTitleLanguageMutation.mutate(data);
+  const handleTitleLanguageChange = (value: string) => {
+    updateTitleLanguageMutation.mutate({ titleLanguagePreference: value as TitleLanguage });
   };
 
-  const onScoreFormatSubmit = async (data: UpdateScoreFormatInput) => {
-    updateScoreFormatMutation.mutate(data);
+  const handleScoreFormatChange = (value: string) => {
+    updateScoreFormatMutation.mutate({ scoreFormat: value as ScoreFormat });
   };
 
-  const onDisplayAdultContentSubmit = async (data: UpdateDisplayAdultContentInput) => {
-    updateDisplayAdultContentMutation.mutate(data);
+  const handleDisplayAdultContentChange = (checked: boolean) => {
+    updateDisplayAdultContentMutation.mutate({ displayAdultContent: checked });
   };
 
-  const onAutoTrackSubmit = async (data: UpdateAutoTrackOnAniwaListAddInput) => {
-    updateAutoTrackMutation.mutate(data);
+  const handleAutoTrackChange = (checked: boolean) => {
+    updateAutoTrackMutation.mutate({ autoTrackOnAniwaListAdd: checked });
   };
 
   if (!settings) {
@@ -202,40 +201,32 @@ export function GeneralSettings() {
           </p>
         </div>
         <Form {...themeForm}>
-          <form onSubmit={themeForm.handleSubmit(onThemeSubmit)} className="space-y-4">
-            <FormField
-              control={themeForm.control}
-              name="themePreference"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tema</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={updateThemeMutation.isPending}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Tema seçin" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={Theme.LIGHT}>Açık</SelectItem>
-                      <SelectItem value={Theme.DARK}>Koyu</SelectItem>
-                      <SelectItem value={Theme.SYSTEM}>Sistem</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateThemeMutation.isPending}
-            >
-              Temayı Güncelle
-            </Button>
-          </form>
+          <FormField
+            control={themeForm.control}
+            name="themePreference"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tema</FormLabel>
+                <Select
+                  onValueChange={handleThemeChange}
+                  defaultValue={field.value}
+                  disabled={updateThemeMutation.isPending}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Tema seçin" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={Theme.LIGHT}>Açık</SelectItem>
+                    <SelectItem value={Theme.DARK}>Koyu</SelectItem>
+                    <SelectItem value={Theme.SYSTEM}>Sistem</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </Form>
       </div>
 
@@ -250,40 +241,32 @@ export function GeneralSettings() {
           </p>
         </div>
         <Form {...titleLanguageForm}>
-          <form onSubmit={titleLanguageForm.handleSubmit(onTitleLanguageSubmit)} className="space-y-4">
-            <FormField
-              control={titleLanguageForm.control}
-              name="titleLanguagePreference"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Başlık Dili</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={updateTitleLanguageMutation.isPending}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Başlık dili seçin" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={TitleLanguage.ROMAJI}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.ROMAJI]}</SelectItem>
-                      <SelectItem value={TitleLanguage.ENGLISH}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.ENGLISH]}</SelectItem>
-                      <SelectItem value={TitleLanguage.NATIVE}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.NATIVE]}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateTitleLanguageMutation.isPending}
-            >
-              Başlık Dilini Güncelle
-            </Button>
-          </form>
+          <FormField
+            control={titleLanguageForm.control}
+            name="titleLanguagePreference"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Başlık Dili</FormLabel>
+                <Select
+                  onValueChange={handleTitleLanguageChange}
+                  defaultValue={field.value}
+                  disabled={updateTitleLanguageMutation.isPending}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Başlık dili seçin" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={TitleLanguage.ROMAJI}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.ROMAJI]}</SelectItem>
+                    <SelectItem value={TitleLanguage.ENGLISH}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.ENGLISH]}</SelectItem>
+                    <SelectItem value={TitleLanguage.NATIVE}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.NATIVE]}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </Form>
       </div>
 
@@ -298,40 +281,32 @@ export function GeneralSettings() {
           </p>
         </div>
         <Form {...scoreFormatForm}>
-          <form onSubmit={scoreFormatForm.handleSubmit(onScoreFormatSubmit)} className="space-y-4">
-            <FormField
-              control={scoreFormatForm.control}
-              name="scoreFormat"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Puanlama Formatı</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={updateScoreFormatMutation.isPending}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Puanlama formatı seçin" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={ScoreFormat.POINT_100}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_100]}</SelectItem>
-                      <SelectItem value={ScoreFormat.POINT_10}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_10]}</SelectItem>
-                      <SelectItem value={ScoreFormat.POINT_5}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_5]}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateScoreFormatMutation.isPending}
-            >
-              Puanlama Formatını Güncelle
-            </Button>
-          </form>
+          <FormField
+            control={scoreFormatForm.control}
+            name="scoreFormat"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Puanlama Formatı</FormLabel>
+                <Select
+                  onValueChange={handleScoreFormatChange}
+                  defaultValue={field.value}
+                  disabled={updateScoreFormatMutation.isPending}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Puanlama formatı seçin" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={ScoreFormat.POINT_100}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_100]}</SelectItem>
+                    <SelectItem value={ScoreFormat.POINT_10}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_10]}</SelectItem>
+                    <SelectItem value={ScoreFormat.POINT_5}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_5]}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </Form>
       </div>
 
@@ -346,37 +321,29 @@ export function GeneralSettings() {
           </p>
         </div>
         <Form {...displayAdultContentForm}>
-          <form onSubmit={displayAdultContentForm.handleSubmit(onDisplayAdultContentSubmit)} className="space-y-4">
-            <FormField
-              control={displayAdultContentForm.control}
-              name="displayAdultContent"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Yetişkin İçerik Göster
-                    </FormLabel>
-                    <div className="text-sm text-muted-foreground">
-                      Yetişkin içerikli animeleri göster
-                    </div>
+          <FormField
+            control={displayAdultContentForm.control}
+            name="displayAdultContent"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">
+                    Yetişkin İçerik Göster
+                  </FormLabel>
+                  <div className="text-sm text-muted-foreground">
+                    Yetişkin içerikli animeleri göster
                   </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateDisplayAdultContentMutation.isPending}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateDisplayAdultContentMutation.isPending}
-            >
-              Yetişkin İçerik Ayarını Güncelle
-            </Button>
-          </form>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={handleDisplayAdultContentChange}
+                    disabled={updateDisplayAdultContentMutation.isPending}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </Form>
       </div>
 
@@ -391,37 +358,29 @@ export function GeneralSettings() {
           </p>
         </div>
         <Form {...autoTrackForm}>
-          <form onSubmit={autoTrackForm.handleSubmit(onAutoTrackSubmit)} className="space-y-4">
-            <FormField
-              control={autoTrackForm.control}
-              name="autoTrackOnAniwaListAdd"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Otomatik Takip Et
-                    </FormLabel>
-                    <div className="text-sm text-muted-foreground">
-                      Listeye eklediğinizde otomatik takip et
-                    </div>
+          <FormField
+            control={autoTrackForm.control}
+            name="autoTrackOnAniwaListAdd"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">
+                    Otomatik Takip Et
+                  </FormLabel>
+                  <div className="text-sm text-muted-foreground">
+                    Listeye eklediğinizde otomatik takip et
                   </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateAutoTrackMutation.isPending}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateAutoTrackMutation.isPending}
-            >
-              Otomatik Takip Ayarını Güncelle
-            </Button>
-          </form>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={handleAutoTrackChange}
+                    disabled={updateAutoTrackMutation.isPending}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </Form>
       </div>
     </div>

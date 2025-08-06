@@ -3,7 +3,6 @@
 import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -113,7 +112,7 @@ export function PrivacySettings() {
     },
     onError: (error) => {
       console.error('Profile visibility update error:', error);
-      toast.error('Profil görünürlüğü güncellenemedi');
+      toast.error(error.message || 'Profil görünürlüğü güncellenemedi');
     },
   });
 
@@ -125,7 +124,7 @@ export function PrivacySettings() {
     },
     onError: (error) => {
       console.error('Allow follows update error:', error);
-      toast.error('Takip ayarı güncellenemedi');
+      toast.error(error.message || 'Takip ayarı güncellenemedi');
     },
   });
 
@@ -137,7 +136,7 @@ export function PrivacySettings() {
     },
     onError: (error) => {
       console.error('Show anime list update error:', error);
-      toast.error('Anime listesi görünürlüğü güncellenemedi');
+      toast.error(error.message || 'Anime listesi görünürlüğü güncellenemedi');
     },
   });
 
@@ -149,7 +148,7 @@ export function PrivacySettings() {
     },
     onError: (error) => {
       console.error('Show favourite anime series update error:', error);
-      toast.error('Favori anime görünürlüğü güncellenemedi');
+      toast.error(error.message || 'Favori anime görünürlüğü güncellenemedi');
     },
   });
 
@@ -161,29 +160,29 @@ export function PrivacySettings() {
     },
     onError: (error) => {
       console.error('Show custom lists update error:', error);
-      toast.error('Özel listeler görünürlüğü güncellenemedi');
+      toast.error(error.message || 'Özel listeler görünürlüğü güncellenemedi');
     },
   });
 
-  // Form submit handlers
-  const onProfileVisibilitySubmit = async (data: UpdateProfileVisibilityInput) => {
-    updateProfileVisibilityMutation.mutate(data);
+  // Auto-save handlers
+  const handleProfileVisibilityChange = (value: string) => {
+    updateProfileVisibilityMutation.mutate({ profileVisibility: value as ProfileVisibility });
   };
 
-  const onAllowFollowsSubmit = async (data: UpdateAllowFollowsInput) => {
-    updateAllowFollowsMutation.mutate(data);
+  const handleAllowFollowsChange = (checked: boolean) => {
+    updateAllowFollowsMutation.mutate({ allowFollows: checked });
   };
 
-  const onShowAnimeListSubmit = async (data: UpdateShowAnimeListInput) => {
-    updateShowAnimeListMutation.mutate(data);
+  const handleShowAnimeListChange = (checked: boolean) => {
+    updateShowAnimeListMutation.mutate({ showAnimeList: checked });
   };
 
-  const onShowFavouriteAnimeSeriesSubmit = async (data: UpdateShowFavouriteAnimeSeriesInput) => {
-    updateShowFavouriteAnimeSeriesMutation.mutate(data);
+  const handleShowFavouriteAnimeSeriesChange = (checked: boolean) => {
+    updateShowFavouriteAnimeSeriesMutation.mutate({ showFavouriteAnimeSeries: checked });
   };
 
-  const onShowCustomListsSubmit = async (data: UpdateShowCustomListsInput) => {
-    updateShowCustomListsMutation.mutate(data);
+  const handleShowCustomListsChange = (checked: boolean) => {
+    updateShowCustomListsMutation.mutate({ showCustomLists: checked });
   };
 
   if (!settings) {
@@ -201,40 +200,32 @@ export function PrivacySettings() {
           </p>
         </div>
         <Form {...profileVisibilityForm}>
-          <form onSubmit={profileVisibilityForm.handleSubmit(onProfileVisibilitySubmit)} className="space-y-4">
-            <FormField
-              control={profileVisibilityForm.control}
-              name="profileVisibility"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Profil Görünürlüğü</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={updateProfileVisibilityMutation.isPending}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Görünürlük seçin" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={ProfileVisibility.PUBLIC}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.PUBLIC]}</SelectItem>
-                      <SelectItem value={ProfileVisibility.FOLLOWERS_ONLY}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.FOLLOWERS_ONLY]}</SelectItem>
-                      <SelectItem value={ProfileVisibility.PRIVATE}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.PRIVATE]}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateProfileVisibilityMutation.isPending}
-            >
-              Görünürlüğü Güncelle
-            </Button>
-          </form>
+          <FormField
+            control={profileVisibilityForm.control}
+            name="profileVisibility"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Profil Görünürlüğü</FormLabel>
+                <Select
+                  onValueChange={handleProfileVisibilityChange}
+                  defaultValue={field.value}
+                  disabled={updateProfileVisibilityMutation.isPending}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Görünürlük seçin" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={ProfileVisibility.PUBLIC}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.PUBLIC]}</SelectItem>
+                    <SelectItem value={ProfileVisibility.FOLLOWERS_ONLY}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.FOLLOWERS_ONLY]}</SelectItem>
+                    <SelectItem value={ProfileVisibility.PRIVATE}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.PRIVATE]}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </Form>
       </div>
 
@@ -249,37 +240,29 @@ export function PrivacySettings() {
           </p>
         </div>
         <Form {...allowFollowsForm}>
-          <form onSubmit={allowFollowsForm.handleSubmit(onAllowFollowsSubmit)} className="space-y-4">
-            <FormField
-              control={allowFollowsForm.control}
-              name="allowFollows"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Takip İzni Ver
-                    </FormLabel>
-                    <div className="text-sm text-muted-foreground">
-                      Kullanıcıların sizi takip etmesine izin ver
-                    </div>
+          <FormField
+            control={allowFollowsForm.control}
+            name="allowFollows"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">
+                    Takip İzni Ver
+                  </FormLabel>
+                  <div className="text-sm text-muted-foreground">
+                    Kullanıcıların sizi takip etmesine izin ver
                   </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateAllowFollowsMutation.isPending}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateAllowFollowsMutation.isPending}
-            >
-              Takip Ayarını Güncelle
-            </Button>
-          </form>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={handleAllowFollowsChange}
+                    disabled={updateAllowFollowsMutation.isPending}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </Form>
       </div>
 
@@ -294,37 +277,29 @@ export function PrivacySettings() {
           </p>
         </div>
         <Form {...showAnimeListForm}>
-          <form onSubmit={showAnimeListForm.handleSubmit(onShowAnimeListSubmit)} className="space-y-4">
-            <FormField
-              control={showAnimeListForm.control}
-              name="showAnimeList"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Anime Listesini Göster
-                    </FormLabel>
-                    <div className="text-sm text-muted-foreground">
-                      Anime listenizi başkalarına göster
-                    </div>
+          <FormField
+            control={showAnimeListForm.control}
+            name="showAnimeList"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">
+                    Anime Listesini Göster
+                  </FormLabel>
+                  <div className="text-sm text-muted-foreground">
+                    Anime listenizi başkalarına göster
                   </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateShowAnimeListMutation.isPending}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateShowAnimeListMutation.isPending}
-            >
-              Anime Listesi Ayarını Güncelle
-            </Button>
-          </form>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={handleShowAnimeListChange}
+                    disabled={updateShowAnimeListMutation.isPending}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </Form>
       </div>
 
@@ -339,37 +314,29 @@ export function PrivacySettings() {
           </p>
         </div>
         <Form {...showFavouriteAnimeSeriesForm}>
-          <form onSubmit={showFavouriteAnimeSeriesForm.handleSubmit(onShowFavouriteAnimeSeriesSubmit)} className="space-y-4">
-            <FormField
-              control={showFavouriteAnimeSeriesForm.control}
-              name="showFavouriteAnimeSeries"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Favori Animeleri Göster
-                    </FormLabel>
-                    <div className="text-sm text-muted-foreground">
-                      Favori anime serilerinizi başkalarına göster
-                    </div>
+          <FormField
+            control={showFavouriteAnimeSeriesForm.control}
+            name="showFavouriteAnimeSeries"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">
+                    Favori Animeleri Göster
+                  </FormLabel>
+                  <div className="text-sm text-muted-foreground">
+                    Favori anime serilerinizi başkalarına göster
                   </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateShowFavouriteAnimeSeriesMutation.isPending}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateShowFavouriteAnimeSeriesMutation.isPending}
-            >
-              Favori Anime Ayarını Güncelle
-            </Button>
-          </form>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={handleShowFavouriteAnimeSeriesChange}
+                    disabled={updateShowFavouriteAnimeSeriesMutation.isPending}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </Form>
       </div>
 
@@ -384,37 +351,29 @@ export function PrivacySettings() {
           </p>
         </div>
         <Form {...showCustomListsForm}>
-          <form onSubmit={showCustomListsForm.handleSubmit(onShowCustomListsSubmit)} className="space-y-4">
-            <FormField
-              control={showCustomListsForm.control}
-              name="showCustomLists"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Özel Listeleri Göster
-                    </FormLabel>
-                    <div className="text-sm text-muted-foreground">
-                      Özel listelerinizi başkalarına göster
-                    </div>
+          <FormField
+            control={showCustomListsForm.control}
+            name="showCustomLists"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">
+                    Özel Listeleri Göster
+                  </FormLabel>
+                  <div className="text-sm text-muted-foreground">
+                    Özel listelerinizi başkalarına göster
                   </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateShowCustomListsMutation.isPending}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateShowCustomListsMutation.isPending}
-            >
-              Özel Listeler Ayarını Güncelle
-            </Button>
-          </form>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={handleShowCustomListsChange}
+                    disabled={updateShowCustomListsMutation.isPending}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </Form>
       </div>
     </div>

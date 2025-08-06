@@ -3,7 +3,6 @@
 import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -60,13 +59,33 @@ export function NotificationSettings() {
     },
     onError: (error) => {
       console.error('Notification settings update error:', error);
-      toast.error('Bildirim ayarları güncellenemedi');
+      toast.error(error.message || 'Bildirim ayarları güncellenemedi');
     },
   });
 
-  // Form submit handler
-  const onNotificationSubmit = async (data: UpdateNotificationSettingsInput) => {
-    updateNotificationMutation.mutate(data);
+  // Auto-save handlers
+  const handleNewFollowNotificationChange = (checked: boolean) => {
+    const currentValues = notificationForm.getValues();
+    updateNotificationMutation.mutate({
+      ...currentValues,
+      receiveNotificationOnNewFollow: checked,
+    });
+  };
+
+  const handleEpisodeAiringNotificationChange = (checked: boolean) => {
+    const currentValues = notificationForm.getValues();
+    updateNotificationMutation.mutate({
+      ...currentValues,
+      receiveNotificationOnEpisodeAiring: checked,
+    });
+  };
+
+  const handleNewMediaPartNotificationChange = (checked: boolean) => {
+    const currentValues = notificationForm.getValues();
+    updateNotificationMutation.mutate({
+      ...currentValues,
+      receiveNotificationOnNewMediaPart: checked,
+    });
   };
 
   if (!settings) {
@@ -84,86 +103,77 @@ export function NotificationSettings() {
           </p>
         </div>
         <Form {...notificationForm}>
-          <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-4">
-            <FormField
-              control={notificationForm.control}
-              name="receiveNotificationOnNewFollow"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Yeni Takipçi Bildirimleri
-                    </FormLabel>
-                    <div className="text-sm text-muted-foreground">
-                      Biri sizi takip ettiğinde bildirim al
-                    </div>
+          <FormField
+            control={notificationForm.control}
+            name="receiveNotificationOnNewFollow"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">
+                    Yeni Takipçi Bildirimleri
+                  </FormLabel>
+                  <div className="text-sm text-muted-foreground">
+                    Biri sizi takip ettiğinde bildirim al
                   </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateNotificationMutation.isPending}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={handleNewFollowNotificationChange}
+                    disabled={updateNotificationMutation.isPending}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={notificationForm.control}
-              name="receiveNotificationOnEpisodeAiring"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Bölüm Yayın Bildirimleri
-                    </FormLabel>
-                    <div className="text-sm text-muted-foreground">
-                      Takip ettiğiniz animelerin yeni bölümleri yayınlandığında bildirim al
-                    </div>
+          <FormField
+            control={notificationForm.control}
+            name="receiveNotificationOnEpisodeAiring"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">
+                    Bölüm Yayın Bildirimleri
+                  </FormLabel>
+                  <div className="text-sm text-muted-foreground">
+                    Takip ettiğiniz animelerin yeni bölümleri yayınlandığında bildirim al
                   </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateNotificationMutation.isPending}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={handleEpisodeAiringNotificationChange}
+                    disabled={updateNotificationMutation.isPending}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={notificationForm.control}
-              name="receiveNotificationOnNewMediaPart"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Yeni Medya Parçası Bildirimleri
-                    </FormLabel>
-                    <div className="text-sm text-muted-foreground">
-                      Takip ettiğiniz animelerin yeni medya parçaları eklendiğinde bildirim al
-                    </div>
+          <FormField
+            control={notificationForm.control}
+            name="receiveNotificationOnNewMediaPart"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">
+                    Yeni Medya Parçası Bildirimleri
+                  </FormLabel>
+                  <div className="text-sm text-muted-foreground">
+                    Takip ettiğiniz animelerin yeni medya parçaları eklendiğinde bildirim al
                   </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={updateNotificationMutation.isPending}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <Button
-              type="submit"
-              disabled={updateNotificationMutation.isPending}
-            >
-              Bildirim Ayarlarını Güncelle
-            </Button>
-          </form>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={handleNewMediaPartNotificationChange}
+                    disabled={updateNotificationMutation.isPending}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </Form>
       </div>
     </div>
