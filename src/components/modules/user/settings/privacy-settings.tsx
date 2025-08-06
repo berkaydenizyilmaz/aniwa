@@ -49,7 +49,7 @@ import { USER } from '@/lib/constants/user.constants';
 export function PrivacySettings() {
   // Settings hook'u kullan
   const { data: userData } = useSettings();
-  const { settings } = useSettingsStore();
+  const { settings, updateSetting } = useSettingsStore();
   const queryClient = useQueryClient();
 
   // Profile visibility form
@@ -166,23 +166,58 @@ export function PrivacySettings() {
 
   // Auto-save handlers
   const handleProfileVisibilityChange = (value: string) => {
-    updateProfileVisibilityMutation.mutate({ profileVisibility: value as ProfileVisibility });
+    updateProfileVisibilityMutation.mutate(
+      { profileVisibility: value as ProfileVisibility },
+      {
+        onSuccess: () => {
+          updateSetting('profileVisibility', value as ProfileVisibility);
+        }
+      }
+    );
   };
 
   const handleAllowFollowsChange = (checked: boolean) => {
-    updateAllowFollowsMutation.mutate({ allowFollows: checked });
+    updateAllowFollowsMutation.mutate(
+      { allowFollows: checked },
+      {
+        onSuccess: () => {
+          updateSetting('allowFollows', checked);
+        }
+      }
+    );
   };
 
   const handleShowAnimeListChange = (checked: boolean) => {
-    updateShowAnimeListMutation.mutate({ showAnimeList: checked });
+    updateShowAnimeListMutation.mutate(
+      { showAnimeList: checked },
+      {
+        onSuccess: () => {
+          updateSetting('showAnimeList', checked);
+        }
+      }
+    );
   };
 
   const handleShowFavouriteAnimeSeriesChange = (checked: boolean) => {
-    updateShowFavouriteAnimeSeriesMutation.mutate({ showFavouriteAnimeSeries: checked });
+    updateShowFavouriteAnimeSeriesMutation.mutate(
+      { showFavouriteAnimeSeries: checked },
+      {
+        onSuccess: () => {
+          updateSetting('showFavouriteAnimeSeries', checked);
+        }
+      }
+    );
   };
 
   const handleShowCustomListsChange = (checked: boolean) => {
-    updateShowCustomListsMutation.mutate({ showCustomLists: checked });
+    updateShowCustomListsMutation.mutate(
+      { showCustomLists: checked },
+      {
+        onSuccess: () => {
+          updateSetting('showCustomLists', checked);
+        }
+      }
+    );
   };
 
   if (!settings) {

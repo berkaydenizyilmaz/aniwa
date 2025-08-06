@@ -46,7 +46,7 @@ export function ProfileSettings() {
 
   // Settings hook'u kullan
   const { data: userData } = useSettings();
-  const { user, settings } = useSettingsStore();
+  const { user, settings, updateSetting } = useSettingsStore();
   const queryClient = useQueryClient();
 
   // Username form
@@ -135,11 +135,23 @@ export function ProfileSettings() {
 
   // Form submit handlers
   const onUsernameSubmit = async (data: UpdateUsernameInput) => {
-    updateUsernameMutation.mutate(data);
+    updateUsernameMutation.mutate(data, {
+      onSuccess: () => {
+        // Store'da user bilgisini güncelle
+        // Not: User bilgisi session'dan geldiği için store'da güncellemeye gerek yok
+        // Sadece query invalidation yeterli
+      }
+    });
   };
 
   const onBioSubmit = async (data: UpdateBioInput) => {
-    updateBioMutation.mutate(data);
+    updateBioMutation.mutate(data, {
+      onSuccess: () => {
+        // Store'da user bilgisini güncelle
+        // Not: User bilgisi session'dan geldiği için store'da güncellemeye gerek yok
+        // Sadece query invalidation yeterli
+      }
+    });
   };
 
   const onPasswordSubmit = async (data: UpdatePasswordInput) => {

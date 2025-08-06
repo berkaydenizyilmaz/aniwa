@@ -26,7 +26,7 @@ import { useSettingsStore } from '@/lib/stores/settings.store';
 export function NotificationSettings() {
   // Settings hook'u kullan
   const { data: userData } = useSettings();
-  const { settings } = useSettingsStore();
+  const { settings, updateSetting } = useSettingsStore();
   const queryClient = useQueryClient();
 
   // Notification settings form
@@ -66,26 +66,47 @@ export function NotificationSettings() {
   // Auto-save handlers
   const handleNewFollowNotificationChange = (checked: boolean) => {
     const currentValues = notificationForm.getValues();
-    updateNotificationMutation.mutate({
-      ...currentValues,
-      receiveNotificationOnNewFollow: checked,
-    });
+    updateNotificationMutation.mutate(
+      {
+        ...currentValues,
+        receiveNotificationOnNewFollow: checked,
+      },
+      {
+        onSuccess: () => {
+          updateSetting('receiveNotificationOnNewFollow', checked);
+        }
+      }
+    );
   };
 
   const handleEpisodeAiringNotificationChange = (checked: boolean) => {
     const currentValues = notificationForm.getValues();
-    updateNotificationMutation.mutate({
-      ...currentValues,
-      receiveNotificationOnEpisodeAiring: checked,
-    });
+    updateNotificationMutation.mutate(
+      {
+        ...currentValues,
+        receiveNotificationOnEpisodeAiring: checked,
+      },
+      {
+        onSuccess: () => {
+          updateSetting('receiveNotificationOnEpisodeAiring', checked);
+        }
+      }
+    );
   };
 
   const handleNewMediaPartNotificationChange = (checked: boolean) => {
     const currentValues = notificationForm.getValues();
-    updateNotificationMutation.mutate({
-      ...currentValues,
-      receiveNotificationOnNewMediaPart: checked,
-    });
+    updateNotificationMutation.mutate(
+      {
+        ...currentValues,
+        receiveNotificationOnNewMediaPart: checked,
+      },
+      {
+        onSuccess: () => {
+          updateSetting('receiveNotificationOnNewMediaPart', checked);
+        }
+      }
+    );
   };
 
   if (!settings) {

@@ -50,7 +50,7 @@ import { USER } from '@/lib/constants/user.constants';
 export function GeneralSettings() {
   // Settings hook'u kullan
   const { data: userData } = useSettings();
-  const { settings } = useSettingsStore();
+  const { settings, updateSetting } = useSettingsStore();
   const queryClient = useQueryClient();
 
   // Theme preference form
@@ -167,23 +167,58 @@ export function GeneralSettings() {
 
   // Auto-save handlers
   const handleThemeChange = (value: string) => {
-    updateThemeMutation.mutate({ themePreference: value as Theme });
+    updateThemeMutation.mutate(
+      { themePreference: value as Theme },
+      {
+        onSuccess: () => {
+          updateSetting('themePreference', value as Theme);
+        }
+      }
+    );
   };
 
   const handleTitleLanguageChange = (value: string) => {
-    updateTitleLanguageMutation.mutate({ titleLanguagePreference: value as TitleLanguage });
+    updateTitleLanguageMutation.mutate(
+      { titleLanguagePreference: value as TitleLanguage },
+      {
+        onSuccess: () => {
+          updateSetting('titleLanguagePreference', value as TitleLanguage);
+        }
+      }
+    );
   };
 
   const handleScoreFormatChange = (value: string) => {
-    updateScoreFormatMutation.mutate({ scoreFormat: value as ScoreFormat });
+    updateScoreFormatMutation.mutate(
+      { scoreFormat: value as ScoreFormat },
+      {
+        onSuccess: () => {
+          updateSetting('scoreFormat', value as ScoreFormat);
+        }
+      }
+    );
   };
 
   const handleDisplayAdultContentChange = (checked: boolean) => {
-    updateDisplayAdultContentMutation.mutate({ displayAdultContent: checked });
+    updateDisplayAdultContentMutation.mutate(
+      { displayAdultContent: checked },
+      {
+        onSuccess: () => {
+          updateSetting('displayAdultContent', checked);
+        }
+      }
+    );
   };
 
   const handleAutoTrackChange = (checked: boolean) => {
-    updateAutoTrackMutation.mutate({ autoTrackOnAniwaListAdd: checked });
+    updateAutoTrackMutation.mutate(
+      { autoTrackOnAniwaListAdd: checked },
+      {
+        onSuccess: () => {
+          updateSetting('autoTrackOnAniwaListAdd', checked);
+        }
+      }
+    );
   };
 
   if (!settings) {
