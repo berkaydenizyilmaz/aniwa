@@ -352,7 +352,7 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
           <AlertDialogHeader>
             <AlertDialogTitle>Bölümü Sil</AlertDialogTitle>
             <AlertDialogDescription>
-                              &quot;{selectedEpisode?.title || `Bölüm ${selectedEpisode?.episodeNumber}`}&quot; bölümünü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+              &quot;{selectedEpisode?.title || `Bölüm ${selectedEpisode?.episodeNumber}`}&quot; bölümünü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

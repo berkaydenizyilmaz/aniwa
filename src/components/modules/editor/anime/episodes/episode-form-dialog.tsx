@@ -335,7 +335,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
                   type="submit"
                   disabled={createMutation.isPending || updateMutation.isPending}
                 >
-                  {createMutation.isPending || updateMutation.isPending ? 'Kaydediliyor...' : (episode ? 'Güncelle' : 'Oluştur')}
+                  {episode ? 'Güncelle' : 'Oluştur'}
                 </Button>
               </div>
             </form>
