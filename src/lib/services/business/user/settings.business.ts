@@ -23,6 +23,7 @@ import { EVENTS } from '@/lib/constants/events.constants';
 import { ApiResponse } from '@/lib/types/api';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 import {
   // Profile Settings
   UpdateUsernameRequest, UpdateUsernameResponse,
@@ -46,6 +47,7 @@ import {
   // Get Settings
   GetUserSettingsResponse
 } from '@/lib/types/api/settings.api';
+import { AUTH } from '@/lib/constants/auth.constants';
 
 // ===== PROFILE SETTINGS =====
 
@@ -171,8 +173,12 @@ export async function updatePasswordBusiness(
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
 
-    // Parola hash'leme (Auth.js ile entegre edilecek)
-    // Bu kısım Auth.js password update ile entegre edilmeli
+    // Yeni parolayı hash'le ve kaydet
+    const passwordHash = await bcrypt.hash(data.newPassword, AUTH.BCRYPT_SALT_ROUNDS);
+    await updateUserDB(
+      { id: userId },
+      { passwordHash }
+    );
     
     // Başarılı güncelleme logu
     await logger.info(
