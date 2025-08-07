@@ -35,9 +35,9 @@ import {
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Eye, EyeOff } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
-import { useSession } from 'next-auth/react';
 import { CLOUDINARY } from '@/lib/constants/cloudinary.constants';
 
 export function ProfileSettings() {
@@ -48,7 +48,7 @@ export function ProfileSettings() {
   // Settings hook'u kullan
   const { data: userData } = useSettings();
   const { settings, updateSetting, userProfile } = useSettingsStore();
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const queryClient = useQueryClient();
 
   // Username form
@@ -139,9 +139,8 @@ export function ProfileSettings() {
   const onUsernameSubmit = async (data: UpdateUsernameInput) => {
     updateUsernameMutation.mutate(data, {
       onSuccess: () => {
-        // Store'da user bilgisini güncelle
-        // Not: User bilgisi session'dan geldiği için store'da güncellemeye gerek yok
-        // Sadece query invalidation yeterli
+        // Session'ı da güncelle (NextAuth v4 update callback)
+        updateSession({ user: { username: data.username } });
       }
     });
   };

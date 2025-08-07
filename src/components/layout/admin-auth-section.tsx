@@ -10,6 +10,7 @@ import { ADMIN_MENU_ITEMS, AUTH_MENU_ITEMS } from '@/lib/constants/menu.constant
 import { USER } from '@/lib/constants/user.constants';
 import { useMutation } from '@tanstack/react-query';
 import { UserRole } from '@prisma/client';
+import { useSettingsStore } from '@/lib/stores/settings.store';
 
 
 interface AdminAuthSectionProps {
@@ -22,6 +23,8 @@ export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
   // Sign out mutation
   const signOutMutation = useMutation({
     mutationFn: async () => {
+      // Store temizlik
+      useSettingsStore.getState().reset()
       await signOut({ callbackUrl: ROUTES.PAGES.HOME });
     },
     onError: (error) => {

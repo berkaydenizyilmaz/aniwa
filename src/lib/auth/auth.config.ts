@@ -58,10 +58,16 @@ export const authConfig: NextAuthOptions = {
     maxAge: AUTH.SESSION.MAX_AGE,
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.username = user.username;
-        token.roles = user.roles;
+    async jwt({ token, user, trigger, session }) {
+      if (user && 'username' in user && 'roles' in user) {
+        const u = user as { username: string; roles: string[] };
+        token.username = u.username;
+        token.roles = u.roles;
+      }
+      // Client-side update() çağrıları
+      if (trigger === 'update' && session?.user) {
+        if (session.user.username) token.username = session.user.username;
+        if (session.user.roles) token.roles = session.user.roles;
       }
       return token;
     },
