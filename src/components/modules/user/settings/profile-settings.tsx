@@ -229,7 +229,7 @@ export function ProfileSettings() {
 
       {/* Satır 2 */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="p-4">
+        <Card className="p-4 md:col-span-2">
           <h4 className="text-sm font-medium mb-3">Biyografi</h4>
           <Form {...bioForm}>
             <form onSubmit={bioForm.handleSubmit(onBioSubmit)} className="space-y-3">
@@ -289,7 +289,17 @@ export function ProfileSettings() {
                 )}
               />
               <div className="flex justify-end">
-                <Button type="submit" size="sm" disabled={updatePasswordMutation.isPending}>Güncelle</Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={
+                    updatePasswordMutation.isPending ||
+                    !passwordForm.watch('newPassword') ||
+                    !passwordForm.watch('confirmPassword')
+                  }
+                >
+                  Güncelle
+                </Button>
               </div>
             </form>
           </Form>
