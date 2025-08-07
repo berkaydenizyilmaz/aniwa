@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
+import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ImageUpload } from '@/components/ui/image-upload';
 import Image from 'next/image';
@@ -148,9 +149,7 @@ export function ProfileSettings() {
   const onBioSubmit = async (data: UpdateBioInput) => {
     updateBioMutation.mutate(data, {
       onSuccess: () => {
-        // Store'da user bilgisini güncelle
-        // Not: User bilgisi session'dan geldiği için store'da güncellemeye gerek yok
-        // Sadece query invalidation yeterli
+        updateSession({ user: { bio: data.bio } });
       }
     });
   };
@@ -194,241 +193,141 @@ export function ProfileSettings() {
 
   return (
     <div className="space-y-6">
-      {/* Username Section */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Kullanıcı Adı</h3>
-          <p className="text-sm text-muted-foreground">
-            Kullanıcı adınızı değiştirin
-          </p>
-        </div>
-        <Form {...usernameForm}>
-          <form onSubmit={usernameForm.handleSubmit(onUsernameSubmit)} className="space-y-4">
-            <FormField
-              control={usernameForm.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Kullanıcı Adı</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Kullanıcı adınızı girin"
-                      disabled={updateUsernameMutation.isPending}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateUsernameMutation.isPending || usernameForm.watch('username') === session.user.username}
-            >
-              Kullanıcı Adını Güncelle
-            </Button>
-          </form>
-        </Form>
-      </div>
-
-      <Separator />
-
-      {/* Email Section */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">E-posta</h3>
-          <p className="text-sm text-muted-foreground">
-            E-posta adresiniz (değiştirilemez)
-          </p>
-        </div>
-        <div className="space-y-2">
-          <Label>E-posta</Label>
-          <Input
-            type="email"
-            value={session.user.email}
-            disabled
-            className="bg-muted"
-          />
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* Bio Section */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Biyografi</h3>
-          <p className="text-sm text-muted-foreground">
-            Kendiniz hakkında kısa bir açıklama ekleyin
-          </p>
-        </div>
-        <Form {...bioForm}>
-          <form onSubmit={bioForm.handleSubmit(onBioSubmit)} className="space-y-4">
-            <FormField
-              control={bioForm.control}
-              name="bio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Biyografi</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Biyografinizi girin"
-                      disabled={updateBioMutation.isPending}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updateBioMutation.isPending || bioForm.watch('bio') === (userProfile?.bio ?? '')}
-            >
-              Biyografiyi Güncelle
-            </Button>
-          </form>
-        </Form>
-      </div>
-
-      <Separator />
-
-      {/* Password Section */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Parola</h3>
-          <p className="text-sm text-muted-foreground">
-            Parolanızı güvenli bir şekilde değiştirin
-          </p>
-        </div>
-        <Form {...passwordForm}>
-          <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
-            <FormField
-              control={passwordForm.control}
-              name="newPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Yeni Parola</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Yeni parolanızı girin"
-                        disabled={updatePasswordMutation.isPending}
-                        {...field}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={passwordForm.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Yeni Parola Tekrar</FormLabel>
-                  <FormControl>
-                    <Input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Yeni parolanızı tekrar girin"
-                      disabled={updatePasswordMutation.isPending}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={updatePasswordMutation.isPending}
-            >
-              Parolayı Güncelle
-            </Button>
-          </form>
-        </Form>
-      </div>
-
-      <Separator />
-
-      {/* Profile Images Section */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Profil Görselleri</h3>
-          <p className="text-sm text-muted-foreground">
-            Profil fotoğrafınızı ve banner'ınızı güncelleyin
-          </p>
-        </div>
-        {/* Profile Picture */}
-        <div className="space-y-4">
-          <Label>Profil Fotoğrafı</Label>
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16">
-              <AvatarImage src={userProfile?.profilePicture || ''} />
-              <AvatarFallback>{session.user.username?.charAt(0).toUpperCase()}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <ImageUpload
-                id="profile-picture"
-                label=""
-                accept="image/*"
-                maxSize={CLOUDINARY.CONFIGS.USER_AVATAR.maxSize}
-                value={profilePicture}
-                onChange={handleProfilePictureChange}
-                disabled={updateProfileImagesMutation.isPending}
-                loading={updateProfileImagesMutation.isPending}
+      {/* Satır 1 */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-3">Kullanıcı Adı</h4>
+          <Form {...usernameForm}>
+            <form onSubmit={usernameForm.handleSubmit(onUsernameSubmit)} className="space-y-3">
+              <FormField
+                control={usernameForm.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Kullanıcı Adı</FormLabel>
+                    <FormControl>
+                      <Input type="text" placeholder="Kullanıcı adınız" disabled={updateUsernameMutation.isPending} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
-        </div>
-
-        {/* Profile Banner */}
-        <div className="space-y-4">
-          <Label>Profil Banner</Label>
-          <div className="flex items-center gap-4">
-            {userProfile?.profileBanner && (
-              <div className="h-16 w-32 rounded border overflow-hidden">
-                <Image
-                  src={userProfile.profileBanner}
-                  alt="Profile Banner"
-                  width={128}
-                  height={64}
-                  className="h-full w-full object-cover"
-                />
+              <div className="flex justify-end">
+                <Button type="submit" size="sm" disabled={updateUsernameMutation.isPending || usernameForm.watch('username') === session.user.username}>Kaydet</Button>
               </div>
-            )}
-            <div className="flex-1">
-              <ImageUpload
-                id="profile-banner"
-                label=""
-                accept="image/*"
-                maxSize={CLOUDINARY.CONFIGS.USER_BANNER.maxSize}
-                value={profileBanner}
-                onChange={handleProfileBannerChange}
-                disabled={updateProfileImagesMutation.isPending}
-                loading={updateProfileImagesMutation.isPending}
+            </form>
+          </Form>
+        </Card>
+
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-3">E-posta</h4>
+          <div className="space-y-2">
+            <Label className="text-xs">E-posta</Label>
+            <Input type="email" value={session.user.email} disabled className="bg-muted" />
+          </div>
+        </Card>
+      </div>
+
+      {/* Satır 2 */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-3">Biyografi</h4>
+          <Form {...bioForm}>
+            <form onSubmit={bioForm.handleSubmit(onBioSubmit)} className="space-y-3">
+              <FormField
+                control={bioForm.control}
+                name="bio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Biyografi</FormLabel>
+                    <FormControl>
+                      <Input type="text" placeholder="Kısa bir açıklama" disabled={updateBioMutation.isPending} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
+              <div className="flex justify-end">
+                <Button type="submit" size="sm" disabled={updateBioMutation.isPending || bioForm.watch('bio') === (userProfile?.bio ?? '')}>Kaydet</Button>
+              </div>
+            </form>
+          </Form>
+        </Card>
+
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-3">Parola</h4>
+          <Form {...passwordForm}>
+            <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-3">
+              <FormField
+                control={passwordForm.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Yeni Parola</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input type={showPassword ? 'text' : 'password'} placeholder="Yeni parola" disabled={updatePasswordMutation.isPending} {...field} />
+                        <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1 h-8 w-8" onClick={() => setShowPassword(!showPassword)}>
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={passwordForm.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Yeni Parola Tekrar</FormLabel>
+                    <FormControl>
+                      <Input type={showPassword ? 'text' : 'password'} placeholder="Tekrar" disabled={updatePasswordMutation.isPending} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end">
+                <Button type="submit" size="sm" disabled={updatePasswordMutation.isPending}>Güncelle</Button>
+              </div>
+            </form>
+          </Form>
+        </Card>
+      </div>
+
+      {/* Satır 3 */}
+      <Card className="p-4">
+        <h4 className="text-sm font-medium mb-4">Profil Görselleri</h4>
+        <div className="grid gap-6 md:grid-cols-2">
+          <div>
+            <Label className="text-xs">Profil Fotoğrafı</Label>
+            <div className="mt-2 flex items-center gap-4">
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={userProfile?.profilePicture || ''} />
+                <AvatarFallback>{session.user.username?.charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <ImageUpload id="profile-picture" label="" accept="image/*" maxSize={CLOUDINARY.CONFIGS.USER_AVATAR.maxSize} value={profilePicture} onChange={handleProfilePictureChange} disabled={updateProfileImagesMutation.isPending} loading={updateProfileImagesMutation.isPending} />
+              </div>
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs">Profil Banner</Label>
+            <div className="mt-2 flex items-center gap-4">
+              {userProfile?.profileBanner && (
+                <div className="h-16 w-32 rounded border overflow-hidden">
+                  <Image src={userProfile.profileBanner} alt="Profile Banner" width={128} height={64} className="h-full w-full object-cover" />
+                </div>
+              )}
+              <div className="flex-1">
+                <ImageUpload id="profile-banner" label="" accept="image/*" maxSize={CLOUDINARY.CONFIGS.USER_BANNER.maxSize} value={profileBanner} onChange={handleProfileBannerChange} disabled={updateProfileImagesMutation.isPending} loading={updateProfileImagesMutation.isPending} />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 } 

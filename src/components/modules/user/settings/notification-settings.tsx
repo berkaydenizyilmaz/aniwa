@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Card } from '@/components/ui/card';
 import { updateNotificationSettingsAction } from '@/lib/actions/user/settings.actions';
 import { 
   updateNotificationSettingsSchema,
@@ -117,35 +118,24 @@ export function NotificationSettings() {
 
   return (
     <div className="space-y-6">
-      {/* New Follow Notifications */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Takip Bildirimleri</h3>
-          <p className="text-sm text-muted-foreground">
-            Yeni takipçiler hakkında bildirim alın
-          </p>
-        </div>
+      <Card className="p-4">
+        <h4 className="text-sm font-medium mb-2">Bildirim Tercihleri</h4>
+        <p className="text-xs text-muted-foreground mb-3">Hangi olaylarda bildirim almak istersiniz?</p>
         <Form {...notificationForm}>
           <FormField
             control={notificationForm.control}
             name="receiveNotificationOnNewFollow"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">
-                    Yeni Takipçi Bildirimleri
-                  </FormLabel>
-                  <div className="text-sm text-muted-foreground">
-                    Biri sizi takip ettiğinde bildirim al
+              <FormItem>
+                <div className="flex flex-row items-center justify-between rounded-md border p-3">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-sm">Yeni takipçi</FormLabel>
+                    <div className="text-xs text-muted-foreground">Biri sizi takip ettiğinde</div>
                   </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={handleNewFollowNotificationChange} disabled={updateNotificationMutation.isPending} />
+                  </FormControl>
                 </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={handleNewFollowNotificationChange}
-                    disabled={updateNotificationMutation.isPending}
-                  />
-                </FormControl>
               </FormItem>
             )}
           />
@@ -154,22 +144,16 @@ export function NotificationSettings() {
             control={notificationForm.control}
             name="receiveNotificationOnEpisodeAiring"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">
-                    Bölüm Yayın Bildirimleri
-                  </FormLabel>
-                  <div className="text-sm text-muted-foreground">
-                    Takip ettiğiniz animelerin yeni bölümleri yayınlandığında bildirim al
+              <FormItem>
+                <div className="mt-3 flex flex-row items-center justify-between rounded-md border p-3">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-sm">Bölüm yayını</FormLabel>
+                    <div className="text-xs text-muted-foreground">Takip edilen anime yeni bölüm</div>
                   </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={handleEpisodeAiringNotificationChange} disabled={updateNotificationMutation.isPending} />
+                  </FormControl>
                 </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={handleEpisodeAiringNotificationChange}
-                    disabled={updateNotificationMutation.isPending}
-                  />
-                </FormControl>
               </FormItem>
             )}
           />
@@ -178,27 +162,21 @@ export function NotificationSettings() {
             control={notificationForm.control}
             name="receiveNotificationOnNewMediaPart"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">
-                    Yeni Medya Parçası Bildirimleri
-                  </FormLabel>
-                  <div className="text-sm text-muted-foreground">
-                    Takip ettiğiniz animelerin yeni medya parçaları eklendiğinde bildirim al
+              <FormItem>
+                <div className="mt-3 flex flex-row items-center justify-between rounded-md border p-3">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-sm">Yeni medya parçası</FormLabel>
+                    <div className="text-xs text-muted-foreground">Takip edilen animeye yeni parça</div>
                   </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={handleNewMediaPartNotificationChange} disabled={updateNotificationMutation.isPending} />
+                  </FormControl>
                 </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={handleNewMediaPartNotificationChange}
-                    disabled={updateNotificationMutation.isPending}
-                  />
-                </FormControl>
               </FormItem>
             )}
           />
         </Form>
-      </div>
+      </Card>
     </div>
   );
 } 

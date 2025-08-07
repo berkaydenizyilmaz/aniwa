@@ -1,87 +1,94 @@
 'use client';
 
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { User, Settings2, Shield, Bell } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { ProfileSettings } from '@/components/modules/user/settings/profile-settings';
 import { GeneralSettings } from '@/components/modules/user/settings/general-settings';
 import { PrivacySettings } from '@/components/modules/user/settings/privacy-settings';
 import { NotificationSettings } from '@/components/modules/user/settings/notification-settings';
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState('profile');
+  const [active, setActive] = useState<'profile' | 'general' | 'privacy' | 'notifications'>('profile');
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex flex-col space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Ayarlar</h1>
-        <p className="text-muted-foreground">Hesap ayarlarınızı ve tercihlerinizi yönetin.</p>
+    <div className="container mx-auto py-6">
+      <div className="mb-4">
+        <h1 className="text-2xl font-semibold tracking-tight">Ayarlar</h1>
+        <p className="text-sm text-muted-foreground">Hesap ve uygulama tercihleri</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 glass-card">
-          <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="general">Genel</TabsTrigger>
-          <TabsTrigger value="privacy">Gizlilik</TabsTrigger>
-          <TabsTrigger value="notifications">Bildirimler</TabsTrigger>
-        </TabsList>
+      <div className="grid gap-6 md:grid-cols-[220px,1fr]">
+        {/* Sidebar */}
+        <aside className="rounded-lg border bg-card">
+          <nav className="p-2 md:p-3 flex md:flex-col gap-2">
+            {[
+              { key: 'profile', label: 'Profil', icon: User },
+              { key: 'general', label: 'Genel', icon: Settings2 },
+              { key: 'privacy', label: 'Gizlilik', icon: Shield },
+              { key: 'notifications', label: 'Bildirimler', icon: Bell },
+            ].map((item) => {
+              const Icon = item.icon;
+              const isActive = active === (item.key as typeof active);
+              return (
+                <Button
+                  key={item.key}
+                  variant={isActive ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className={cn(
+                    'justify-start h-9 w-full',
+                    isActive ? 'border-l-2 border-primary' : 'hover:bg-accent/40'
+                  )}
+                  onClick={() => setActive(item.key as typeof active)}
+                >
+                  <Icon className="h-4 w-4 mr-2 opacity-80" />
+                  {item.label}
+                </Button>
+              );
+            })}
+          </nav>
+        </aside>
 
-        <TabsContent value="profile" className="space-y-6">
+        {/* Panel */}
+        <section>
           <Card>
-            <CardHeader>
-              <CardTitle>Profil Bilgileri</CardTitle>
-              <CardDescription>
-                Kişisel bilgilerinizi ve profil ayarlarınızı güncelleyin.
-              </CardDescription>
+            <CardHeader className="pb-3">
+              {active === 'profile' && (
+                <>
+                  <CardTitle>Profil Bilgileri</CardTitle>
+                  <CardDescription>Kişisel bilgiler ve profil içerikleri</CardDescription>
+                </>
+              )}
+              {active === 'general' && (
+                <>
+                  <CardTitle>Genel Tercihler</CardTitle>
+                  <CardDescription>Uygulama genelinde geçerli ayarlar</CardDescription>
+                </>
+              )}
+              {active === 'privacy' && (
+                <>
+                  <CardTitle>Gizlilik Ayarları</CardTitle>
+                  <CardDescription>Görünürlük ve paylaşım tercihleri</CardDescription>
+                </>
+              )}
+              {active === 'notifications' && (
+                <>
+                  <CardTitle>Bildirim Ayarları</CardTitle>
+                  <CardDescription>Hangi bildirimleri almak istediğini seç</CardDescription>
+                </>
+              )}
             </CardHeader>
-            <CardContent>
-              <ProfileSettings />
+            <CardContent className="p-4 md:p-5">
+              {active === 'profile' && <ProfileSettings />}
+              {active === 'general' && <GeneralSettings />}
+              {active === 'privacy' && <PrivacySettings />}
+              {active === 'notifications' && <NotificationSettings />}
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="general" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Genel Tercihler</CardTitle>
-              <CardDescription>
-                Uygulama genelindeki tercihlerinizi ayarlayın.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <GeneralSettings />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="privacy" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gizlilik Ayarları</CardTitle>
-              <CardDescription>
-                Profilinizin görünürlüğünü ve gizlilik tercihlerinizi yönetin.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PrivacySettings />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="notifications" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Bildirim Ayarları</CardTitle>
-              <CardDescription>
-                Bildirim tercihlerinizi ve ayarlarınızı yönetin.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <NotificationSettings />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        </section>
+      </div>
     </div>
   );
 }

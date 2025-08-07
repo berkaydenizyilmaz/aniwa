@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Card } from '@/components/ui/card';
 import { 
   updateThemePreferenceAction,
   updateTitleLanguagePreferenceAction,
@@ -229,197 +230,147 @@ export function GeneralSettings() {
 
   return (
     <div className="space-y-6">
-      {/* Theme Preference */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Tema Tercihi</h3>
-          <p className="text-sm text-muted-foreground">
-            Uygulamanın görünüm temasını seçin
-          </p>
-        </div>
-        <Form {...themeForm}>
-          <FormField
-            control={themeForm.control}
-            name="themePreference"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tema</FormLabel>
-                <Select
-                  onValueChange={handleThemeChange}
-                  defaultValue={field.value}
-                  disabled={updateThemeMutation.isPending}
-                >
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-2">Tema</h4>
+          <p className="text-xs text-muted-foreground mb-3">Uygulama görünümü</p>
+          <Form {...themeForm}>
+            <FormField
+              control={themeForm.control}
+              name="themePreference"
+              render={({ field }) => (
+                <FormItem>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Tema seçin" />
-                    </SelectTrigger>
+                    <Select onValueChange={handleThemeChange} defaultValue={field.value} disabled={updateThemeMutation.isPending}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Tema" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={Theme.LIGHT}>Açık</SelectItem>
+                        <SelectItem value={Theme.DARK}>Koyu</SelectItem>
+                        <SelectItem value={Theme.SYSTEM}>Sistem</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value={Theme.LIGHT}>Açık</SelectItem>
-                    <SelectItem value={Theme.DARK}>Koyu</SelectItem>
-                    <SelectItem value={Theme.SYSTEM}>Sistem</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Form>
-      </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Form>
+        </Card>
 
-      <Separator />
-
-      {/* Title Language Preference */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Başlık Dili</h3>
-          <p className="text-sm text-muted-foreground">
-            Anime başlıklarının hangi dilde gösterileceğini seçin
-          </p>
-        </div>
-        <Form {...titleLanguageForm}>
-          <FormField
-            control={titleLanguageForm.control}
-            name="titleLanguagePreference"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Başlık Dili</FormLabel>
-                <Select
-                  onValueChange={handleTitleLanguageChange}
-                  defaultValue={field.value}
-                  disabled={updateTitleLanguageMutation.isPending}
-                >
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-2">Başlık Dili</h4>
+          <p className="text-xs text-muted-foreground mb-3">Anime başlık gösterimi</p>
+          <Form {...titleLanguageForm}>
+            <FormField
+              control={titleLanguageForm.control}
+              name="titleLanguagePreference"
+              render={({ field }) => (
+                <FormItem>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Başlık dili seçin" />
-                    </SelectTrigger>
+                    <Select onValueChange={handleTitleLanguageChange} defaultValue={field.value} disabled={updateTitleLanguageMutation.isPending}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Dil" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={TitleLanguage.ROMAJI}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.ROMAJI]}</SelectItem>
+                        <SelectItem value={TitleLanguage.ENGLISH}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.ENGLISH]}</SelectItem>
+                        <SelectItem value={TitleLanguage.NATIVE}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.NATIVE]}</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value={TitleLanguage.ROMAJI}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.ROMAJI]}</SelectItem>
-                    <SelectItem value={TitleLanguage.ENGLISH}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.ENGLISH]}</SelectItem>
-                    <SelectItem value={TitleLanguage.NATIVE}>{ANIME.TITLE_LANGUAGE_LABELS[TitleLanguage.NATIVE]}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Form>
-      </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Form>
+        </Card>
 
-      <Separator />
-
-      {/* Score Format */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Puanlama Formatı</h3>
-          <p className="text-sm text-muted-foreground">
-            Anime puanlarının hangi formatta gösterileceğini seçin
-          </p>
-        </div>
-        <Form {...scoreFormatForm}>
-          <FormField
-            control={scoreFormatForm.control}
-            name="scoreFormat"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Puanlama Formatı</FormLabel>
-                <Select
-                  onValueChange={handleScoreFormatChange}
-                  defaultValue={field.value}
-                  disabled={updateScoreFormatMutation.isPending}
-                >
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-2">Puanlama</h4>
+          <p className="text-xs text-muted-foreground mb-3">Skor formatı</p>
+          <Form {...scoreFormatForm}>
+            <FormField
+              control={scoreFormatForm.control}
+              name="scoreFormat"
+              render={({ field }) => (
+                <FormItem>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Puanlama formatı seçin" />
-                    </SelectTrigger>
+                    <Select onValueChange={handleScoreFormatChange} defaultValue={field.value} disabled={updateScoreFormatMutation.isPending}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Format" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={ScoreFormat.POINT_100}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_100]}</SelectItem>
+                        <SelectItem value={ScoreFormat.POINT_10}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_10]}</SelectItem>
+                        <SelectItem value={ScoreFormat.POINT_5}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_5]}</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value={ScoreFormat.POINT_100}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_100]}</SelectItem>
-                    <SelectItem value={ScoreFormat.POINT_10}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_10]}</SelectItem>
-                    <SelectItem value={ScoreFormat.POINT_5}>{USER.SCORE_FORMAT_LABELS[ScoreFormat.POINT_5]}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Form>
-      </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Form>
+        </Card>
 
-      <Separator />
-
-      {/* Display Adult Content */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Yetişkin İçerik Gösterimi</h3>
-          <p className="text-sm text-muted-foreground">
-            Yetişkin içerikli animelerin gösterilip gösterilmeyeceğini belirleyin
-          </p>
-        </div>
-        <Form {...displayAdultContentForm}>
-          <FormField
-            control={displayAdultContentForm.control}
-            name="displayAdultContent"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">
-                    Yetişkin İçerik Göster
-                  </FormLabel>
-                  <div className="text-sm text-muted-foreground">
-                    Yetişkin içerikli animeleri göster
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-2">Yetişkin İçerik</h4>
+          <p className="text-xs text-muted-foreground mb-3">Uygunsuz içerikleri filtrele</p>
+          <Form {...displayAdultContentForm}>
+            <FormField
+              control={displayAdultContentForm.control}
+              name="displayAdultContent"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center justify-between rounded-md border p-3">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm">Göster</FormLabel>
+                      <div className="text-xs text-muted-foreground">Yetişkin içerikleri göster</div>
+                    </div>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={handleDisplayAdultContentChange} disabled={updateDisplayAdultContentMutation.isPending} />
+                    </FormControl>
                   </div>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={handleDisplayAdultContentChange}
-                    disabled={updateDisplayAdultContentMutation.isPending}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </Form>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Form>
+        </Card>
       </div>
 
-      <Separator />
-
-      {/* Auto Track */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Otomatik Takip</h3>
-          <p className="text-sm text-muted-foreground">
-            Anime listesine eklediğinizde otomatik olarak takip edilsin
-          </p>
-        </div>
+      <Card className="p-4">
+        <h4 className="text-sm font-medium mb-2">Otomatik Takip</h4>
+        <p className="text-xs text-muted-foreground mb-3">Listeye eklediğinde otomatik takip et</p>
         <Form {...autoTrackForm}>
           <FormField
             control={autoTrackForm.control}
             name="autoTrackOnAniwaListAdd"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">
-                    Otomatik Takip Et
-                  </FormLabel>
-                  <div className="text-sm text-muted-foreground">
-                    Listeye eklediğinizde otomatik takip et
+              <FormItem>
+                <div className="flex items-center justify-between rounded-md border p-3">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-sm">Aktif</FormLabel>
+                    <div className="text-xs text-muted-foreground">Listelere hızlı takip</div>
                   </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={handleAutoTrackChange} disabled={updateAutoTrackMutation.isPending} />
+                  </FormControl>
                 </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={handleAutoTrackChange}
-                    disabled={updateAutoTrackMutation.isPending}
-                  />
-                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
         </Form>
-      </div>
+      </Card>
     </div>
   );
 } 

@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Card } from '@/components/ui/card';
 import { 
   updateProfileVisibilityAction,
   updateAllowFollowsAction,
@@ -228,191 +229,137 @@ export function PrivacySettings() {
 
   return (
     <div className="space-y-6">
-      {/* Profile Visibility */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Profil Görünürlüğü</h3>
-          <p className="text-sm text-muted-foreground">
-            Profilinizin kimler tarafından görülebileceğini belirleyin
-          </p>
-        </div>
-        <Form {...profileVisibilityForm}>
-          <FormField
-            control={profileVisibilityForm.control}
-            name="profileVisibility"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Profil Görünürlüğü</FormLabel>
-                <Select
-                  onValueChange={handleProfileVisibilityChange}
-                  defaultValue={field.value}
-                  disabled={updateProfileVisibilityMutation.isPending}
-                >
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-2">Profil Görünürlüğü</h4>
+          <p className="text-xs text-muted-foreground mb-3">Kimler görebilir?</p>
+          <Form {...profileVisibilityForm}>
+            <FormField
+              control={profileVisibilityForm.control}
+              name="profileVisibility"
+              render={({ field }) => (
+                <FormItem>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Görünürlük seçin" />
-                    </SelectTrigger>
+                    <Select onValueChange={handleProfileVisibilityChange} defaultValue={field.value} disabled={updateProfileVisibilityMutation.isPending}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Görünürlük" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={ProfileVisibility.PUBLIC}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.PUBLIC]}</SelectItem>
+                        <SelectItem value={ProfileVisibility.FOLLOWERS_ONLY}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.FOLLOWERS_ONLY]}</SelectItem>
+                        <SelectItem value={ProfileVisibility.PRIVATE}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.PRIVATE]}</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value={ProfileVisibility.PUBLIC}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.PUBLIC]}</SelectItem>
-                    <SelectItem value={ProfileVisibility.FOLLOWERS_ONLY}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.FOLLOWERS_ONLY]}</SelectItem>
-                    <SelectItem value={ProfileVisibility.PRIVATE}>{USER.PROFILE_VISIBILITY_LABELS[ProfileVisibility.PRIVATE]}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Form>
-      </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Form>
+        </Card>
 
-      <Separator />
-
-      {/* Allow Follows */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Takip İzinleri</h3>
-          <p className="text-sm text-muted-foreground">
-            Kullanıcıların sizi takip edip edemeyeceğini belirleyin
-          </p>
-        </div>
-        <Form {...allowFollowsForm}>
-          <FormField
-            control={allowFollowsForm.control}
-            name="allowFollows"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">
-                    Takip İzni Ver
-                  </FormLabel>
-                  <div className="text-sm text-muted-foreground">
-                    Kullanıcıların sizi takip etmesine izin ver
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-2">Takip İzni</h4>
+          <p className="text-xs text-muted-foreground mb-3">Kullanıcılar sizi takip edebilsin</p>
+          <Form {...allowFollowsForm}>
+            <FormField
+              control={allowFollowsForm.control}
+              name="allowFollows"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center justify-between rounded-md border p-3">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm">İzin ver</FormLabel>
+                      <div className="text-xs text-muted-foreground">Takip etmeye izin ver</div>
+                    </div>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={handleAllowFollowsChange} disabled={updateAllowFollowsMutation.isPending} />
+                    </FormControl>
                   </div>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={handleAllowFollowsChange}
-                    disabled={updateAllowFollowsMutation.isPending}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </Form>
-      </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Form>
+        </Card>
 
-      <Separator />
-
-      {/* Show Anime List */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Anime Listesi Görünürlüğü</h3>
-          <p className="text-sm text-muted-foreground">
-            Anime listenizin başkaları tarafından görülüp görülmeyeceğini belirleyin
-          </p>
-        </div>
-        <Form {...showAnimeListForm}>
-          <FormField
-            control={showAnimeListForm.control}
-            name="showAnimeList"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">
-                    Anime Listesini Göster
-                  </FormLabel>
-                  <div className="text-sm text-muted-foreground">
-                    Anime listenizi başkalarına göster
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-2">Anime Listesi</h4>
+          <p className="text-xs text-muted-foreground mb-3">Listenin görünürlüğü</p>
+          <Form {...showAnimeListForm}>
+            <FormField
+              control={showAnimeListForm.control}
+              name="showAnimeList"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center justify-between rounded-md border p-3">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm">Göster</FormLabel>
+                      <div className="text-xs text-muted-foreground">Anime listeniz görünsün</div>
+                    </div>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={handleShowAnimeListChange} disabled={updateShowAnimeListMutation.isPending} />
+                    </FormControl>
                   </div>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={handleShowAnimeListChange}
-                    disabled={updateShowAnimeListMutation.isPending}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </Form>
-      </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Form>
+        </Card>
 
-      <Separator />
-
-      {/* Show Favourite Anime Series */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Favori Anime Görünürlüğü</h3>
-          <p className="text-sm text-muted-foreground">
-            Favori anime serilerinizin başkaları tarafından görülüp görülmeyeceğini belirleyin
-          </p>
-        </div>
-        <Form {...showFavouriteAnimeSeriesForm}>
-          <FormField
-            control={showFavouriteAnimeSeriesForm.control}
-            name="showFavouriteAnimeSeries"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">
-                    Favori Animeleri Göster
-                  </FormLabel>
-                  <div className="text-sm text-muted-foreground">
-                    Favori anime serilerinizi başkalarına göster
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-2">Favori Animeler</h4>
+          <p className="text-xs text-muted-foreground mb-3">Favoriler görünürlüğü</p>
+          <Form {...showFavouriteAnimeSeriesForm}>
+            <FormField
+              control={showFavouriteAnimeSeriesForm.control}
+              name="showFavouriteAnimeSeries"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center justify-between rounded-md border p-3">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm">Göster</FormLabel>
+                      <div className="text-xs text-muted-foreground">Favoriler görünür olsun</div>
+                    </div>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={handleShowFavouriteAnimeSeriesChange} disabled={updateShowFavouriteAnimeSeriesMutation.isPending} />
+                    </FormControl>
                   </div>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={handleShowFavouriteAnimeSeriesChange}
-                    disabled={updateShowFavouriteAnimeSeriesMutation.isPending}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </Form>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Form>
+        </Card>
       </div>
 
-      <Separator />
-
-      {/* Show Custom Lists */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Özel Listeler Görünürlüğü</h3>
-          <p className="text-sm text-muted-foreground">
-            Özel listelerinizin başkaları tarafından görülüp görülmeyeceğini belirleyin
-          </p>
-        </div>
+      <Card className="p-4">
+        <h4 className="text-sm font-medium mb-2">Özel Listeler</h4>
+        <p className="text-xs text-muted-foreground mb-3">Özel listeler görünürlüğü</p>
         <Form {...showCustomListsForm}>
           <FormField
             control={showCustomListsForm.control}
             name="showCustomLists"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">
-                    Özel Listeleri Göster
-                  </FormLabel>
-                  <div className="text-sm text-muted-foreground">
-                    Özel listelerinizi başkalarına göster
+              <FormItem>
+                <div className="flex items-center justify-between rounded-md border p-3">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-sm">Göster</FormLabel>
+                    <div className="text-xs text-muted-foreground">Özel listeler görünsün</div>
                   </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={handleShowCustomListsChange} disabled={updateShowCustomListsMutation.isPending} />
+                  </FormControl>
                 </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={handleShowCustomListsChange}
-                    disabled={updateShowCustomListsMutation.isPending}
-                  />
-                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
         </Form>
-      </div>
+      </Card>
     </div>
   );
 } 
