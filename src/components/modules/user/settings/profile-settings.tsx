@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
+import { Loading } from '@/components/ui/loading';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ImageUpload } from '@/components/ui/image-upload';
 import Image from 'next/image';
@@ -187,9 +188,7 @@ export function ProfileSettings() {
     }
   };
 
-  if (!session?.user) {
-    return <div>Yükleniyor...</div>;
-  }
+  if (!session?.user) return <Loading variant="card" lines={5} />;
 
   return (
     <div className="space-y-6">

@@ -21,6 +21,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
+import { Loading } from '@/components/ui/loading';
 import { 
   updateProfileVisibilityAction,
   updateAllowFollowsAction,
@@ -223,9 +224,7 @@ export function PrivacySettings() {
     );
   };
 
-  if (!settings) {
-    return <div>Yükleniyor...</div>;
-  }
+  if (!settings) return <Loading variant="card" lines={4} />;
 
   return (
     <div className="space-y-6">
