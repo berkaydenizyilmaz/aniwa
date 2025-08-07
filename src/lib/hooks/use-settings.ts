@@ -30,7 +30,7 @@ export function useSettings() {
   const query = useQuery({
     queryKey: ['user', userId, 'settings'],
     queryFn: getUserSettingsAction,
-    enabled: status === 'authenticated' && !!userId && !settings,
+    enabled: status === 'authenticated' && !!userId,
     staleTime: 30 * 60 * 1000, // 30 dakika
     gcTime: 60 * 60 * 1000, // 1 saat
     refetchOnWindowFocus: false,

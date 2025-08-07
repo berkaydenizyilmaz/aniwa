@@ -150,6 +150,8 @@ export function ProfileSettings() {
   const onBioSubmit = async (data: UpdateBioInput) => {
     updateBioMutation.mutate(data, {
       onSuccess: () => {
+        // Session update'ı dışında settings cache'ini de tazele
+        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
         updateSession({ user: { bio: data.bio } });
       }
     });

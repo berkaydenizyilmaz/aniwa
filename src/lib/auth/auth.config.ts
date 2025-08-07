@@ -60,13 +60,15 @@ export const authConfig: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user && 'username' in user && 'roles' in user) {
-        const u = user as { username: string; roles: string[] };
+        const u = user as { username: string; roles: string[]; bio?: string };
         token.username = u.username;
         token.roles = u.roles;
+        if (u.bio) token.bio = u.bio;
       }
       // Client-side update() çağrıları
       if (trigger === 'update' && session?.user) {
         if (session.user.username) token.username = session.user.username;
+        if (session.user.bio) token.bio = session.user.bio;
         if (session.user.roles) token.roles = session.user.roles;
       }
       return token;
@@ -75,6 +77,7 @@ export const authConfig: NextAuthOptions = {
       if (token) {
         session.user.id = token.sub!;
         session.user.username = token.username as string;
+        session.user.bio = token.bio;
         session.user.roles = token.roles as string[];
       }
       return session;
