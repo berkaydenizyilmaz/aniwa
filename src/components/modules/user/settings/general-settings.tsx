@@ -44,6 +44,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Theme, TitleLanguage, ScoreFormat } from '@prisma/client';
 import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
+import { useSession } from 'next-auth/react';
 import { ANIME } from '@/lib/constants/anime.constants';
 import { USER } from '@/lib/constants/user.constants';
 
@@ -51,6 +52,7 @@ export function GeneralSettings() {
   // Settings hook'u kullan
   const { data: userData } = useSettings();
   const { settings, updateSetting } = useSettingsStore();
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   // Theme preference form
@@ -109,7 +111,7 @@ export function GeneralSettings() {
     mutationFn: updateThemePreferenceAction,
     onSuccess: () => {
       toast.success('Tema tercihi güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Theme update error:', error);
@@ -121,7 +123,7 @@ export function GeneralSettings() {
     mutationFn: updateTitleLanguagePreferenceAction,
     onSuccess: () => {
       toast.success('Başlık dili tercihi güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Title language update error:', error);
@@ -133,7 +135,7 @@ export function GeneralSettings() {
     mutationFn: updateScoreFormatAction,
     onSuccess: () => {
       toast.success('Puanlama formatı güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Score format update error:', error);
@@ -145,7 +147,7 @@ export function GeneralSettings() {
     mutationFn: updateDisplayAdultContentAction,
     onSuccess: () => {
       toast.success('Yetişkin içerik ayarı güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Display adult content update error:', error);
@@ -157,7 +159,7 @@ export function GeneralSettings() {
     mutationFn: updateAutoTrackOnAniwaListAddAction,
     onSuccess: () => {
       toast.success('Otomatik takip ayarı güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Auto track update error:', error);

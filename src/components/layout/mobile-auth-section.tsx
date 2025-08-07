@@ -17,6 +17,7 @@ import { ADMIN_MENU_ITEMS, AUTH_MENU_ITEMS } from '@/lib/constants/menu.constant
 import { USER } from '@/lib/constants/user.constants'
 import { useMutation } from '@tanstack/react-query'
 import { UserRole } from '@prisma/client'
+import { useSettingsStore } from '@/lib/stores/settings.store'
 
 export function MobileAuthSection() {
   const { data: session, status } = useSession()
@@ -24,6 +25,8 @@ export function MobileAuthSection() {
   // Sign out mutation
   const signOutMutation = useMutation({
     mutationFn: async () => {
+      // Store temizlik
+      useSettingsStore.getState().reset()
       await signOut({ callbackUrl: ROUTES.PAGES.HOME });
     },
     onError: (error) => {

@@ -37,6 +37,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Eye, EyeOff } from 'lucide-react';
 import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
+import { useSession } from 'next-auth/react';
 import { CLOUDINARY } from '@/lib/constants/cloudinary.constants';
 
 export function ProfileSettings() {
@@ -46,7 +47,8 @@ export function ProfileSettings() {
 
   // Settings hook'u kullan
   const { data: userData } = useSettings();
-  const { user, settings, updateSetting } = useSettingsStore();
+  const { settings, updateSetting, userProfile } = useSettingsStore();
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   // Username form
@@ -76,18 +78,18 @@ export function ProfileSettings() {
 
   // Form'ları user data yüklendikten sonra güncelle
   useEffect(() => {
-    if (user) {
-      usernameForm.reset({ username: user.username });
-      bioForm.reset({ bio: user.bio || '' });
+    if (session?.user) {
+      usernameForm.reset({ username: session.user.username });
+      bioForm.reset({ bio: userProfile?.bio ?? '' });
     }
-  }, [user, usernameForm, bioForm]);
+  }, [session?.user, userProfile, usernameForm, bioForm]);
 
   // Mutations
   const updateUsernameMutation = useMutation({
     mutationFn: updateUsernameAction,
-    onSuccess: () => {
+      onSuccess: () => {
       toast.success('Kullanıcı adı başarıyla güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Username update error:', error);
@@ -97,9 +99,9 @@ export function ProfileSettings() {
 
   const updateBioMutation = useMutation({
     mutationFn: updateBioAction,
-    onSuccess: () => {
+      onSuccess: () => {
       toast.success('Biyografi başarıyla güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Bio update error:', error);
@@ -121,11 +123,11 @@ export function ProfileSettings() {
 
   const updateProfileImagesMutation = useMutation({
     mutationFn: updateProfileImagesAction,
-    onSuccess: () => {
+      onSuccess: () => {
       toast.success('Profil görselleri başarıyla güncellendi');
       setProfilePicture(null);
       setProfileBanner(null);
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Profile images update error:', error);
@@ -187,7 +189,7 @@ export function ProfileSettings() {
     }
   };
 
-  if (!user) {
+  if (!session?.user) {
     return <div>Yükleniyor...</div>;
   }
 
@@ -223,7 +225,7 @@ export function ProfileSettings() {
             />
             <Button
               type="submit"
-              disabled={updateUsernameMutation.isPending || usernameForm.watch('username') === user.username}
+              disabled={updateUsernameMutation.isPending || usernameForm.watch('username') === session.user.username}
             >
               Kullanıcı Adını Güncelle
             </Button>
@@ -245,7 +247,7 @@ export function ProfileSettings() {
           <Label>E-posta</Label>
           <Input
             type="email"
-            value={user.email}
+            value={session.user.email}
             disabled
             className="bg-muted"
           />
@@ -284,7 +286,7 @@ export function ProfileSettings() {
             />
             <Button
               type="submit"
-              disabled={updateBioMutation.isPending || bioForm.watch('bio') === user.bio}
+              disabled={updateBioMutation.isPending || bioForm.watch('bio') === (userProfile?.bio ?? '')}
             >
               Biyografiyi Güncelle
             </Button>
@@ -380,8 +382,8 @@ export function ProfileSettings() {
           <Label>Profil Fotoğrafı</Label>
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
-              <AvatarImage src={user.profilePicture || ''} />
-              <AvatarFallback>{user.username?.charAt(0).toUpperCase()}</AvatarFallback>
+              <AvatarImage src={userProfile?.profilePicture || ''} />
+              <AvatarFallback>{session.user.username?.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <ImageUpload
@@ -402,10 +404,10 @@ export function ProfileSettings() {
         <div className="space-y-4">
           <Label>Profil Banner</Label>
           <div className="flex items-center gap-4">
-            {user.profileBanner && (
+            {userProfile?.profileBanner && (
               <div className="h-16 w-32 rounded border overflow-hidden">
                 <Image
-                  src={user.profileBanner}
+                  src={userProfile.profileBanner}
                   alt="Profile Banner"
                   width={128}
                   height={64}

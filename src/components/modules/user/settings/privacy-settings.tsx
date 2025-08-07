@@ -44,12 +44,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProfileVisibility } from '@prisma/client';
 import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
+import { useSession } from 'next-auth/react';
 import { USER } from '@/lib/constants/user.constants';
 
 export function PrivacySettings() {
   // Settings hook'u kullan
   const { data: userData } = useSettings();
   const { settings, updateSetting } = useSettingsStore();
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   // Profile visibility form
@@ -108,7 +110,7 @@ export function PrivacySettings() {
     mutationFn: updateProfileVisibilityAction,
     onSuccess: () => {
       toast.success('Profil görünürlüğü güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Profile visibility update error:', error);
@@ -120,7 +122,7 @@ export function PrivacySettings() {
     mutationFn: updateAllowFollowsAction,
     onSuccess: () => {
       toast.success('Takip ayarı güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Allow follows update error:', error);
@@ -132,7 +134,7 @@ export function PrivacySettings() {
     mutationFn: updateShowAnimeListAction,
     onSuccess: () => {
       toast.success('Anime listesi görünürlüğü güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Show anime list update error:', error);
@@ -144,7 +146,7 @@ export function PrivacySettings() {
     mutationFn: updateShowFavouriteAnimeSeriesAction,
     onSuccess: () => {
       toast.success('Favori anime görünürlüğü güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Show favourite anime series update error:', error);
@@ -156,7 +158,7 @@ export function PrivacySettings() {
     mutationFn: updateShowCustomListsAction,
     onSuccess: () => {
       toast.success('Özel listeler görünürlüğü güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Show custom lists update error:', error);

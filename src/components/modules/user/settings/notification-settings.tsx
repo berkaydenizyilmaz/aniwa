@@ -22,11 +22,13 @@ import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
+import { useSession } from 'next-auth/react';
 
 export function NotificationSettings() {
   // Settings hook'u kullan
   const { data: userData } = useSettings();
   const { settings, updateSetting } = useSettingsStore();
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   // Notification settings form
@@ -55,7 +57,7 @@ export function NotificationSettings() {
     mutationFn: updateNotificationSettingsAction,
     onSuccess: () => {
       toast.success('Bildirim ayarları güncellendi');
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
     },
     onError: (error) => {
       console.error('Notification settings update error:', error);

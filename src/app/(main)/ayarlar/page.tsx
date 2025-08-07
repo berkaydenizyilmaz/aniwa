@@ -15,15 +15,13 @@ export default function SettingsPage() {
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex flex-col space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Ayarlar</h1>
-        <p className="text-muted-foreground">
-          Hesap ayarlarınızı ve tercihlerinizi yönetin.
-        </p>
+        <p className="text-muted-foreground">Hesap ayarlarınızı ve tercihlerinizi yönetin.</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="profile">Profil Bilgileri</TabsTrigger>
-          <TabsTrigger value="general">Genel Tercihler</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 glass-card">
+          <TabsTrigger value="profile">Profil</TabsTrigger>
+          <TabsTrigger value="general">Genel</TabsTrigger>
           <TabsTrigger value="privacy">Gizlilik</TabsTrigger>
           <TabsTrigger value="notifications">Bildirimler</TabsTrigger>
         </TabsList>

@@ -2,20 +2,23 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { User, UserProfileSettings } from '@prisma/client';
+import { UserProfileSettings } from '@prisma/client';
+import type { GetUserSettingsResponse } from '@/lib/types/api/settings.api';
 
 interface SettingsState {
   // State
   settings: UserProfileSettings | null;
-  user: Partial<User> | null;
+  ownerUserId: string | null; // Persist edilen settings'in ait olduğu kullanıcı
   isLoading: boolean;
-  
+  userProfile: GetUserSettingsResponse['user'] | null; // Persist edilmez
+
   // Actions
   setSettings: (settings: UserProfileSettings | null) => void;
-  setUser: (user: Partial<User> | null) => void;
+  setOwnerUserId: (userId: string | null) => void;
   setLoading: (loading: boolean) => void;
+  setUserProfile: (user: GetUserSettingsResponse['user'] | null) => void;
   updateSetting: <K extends keyof UserProfileSettings>(
-    key: K, 
+    key: K,
     value: UserProfileSettings[K]
   ) => void;
   reset: () => void;
@@ -26,14 +29,16 @@ export const useSettingsStore = create<SettingsState>()(
     (set, get) => ({
       // Initial state
       settings: null,
-      user: null,
+      ownerUserId: null,
       isLoading: false,
+      userProfile: null,
 
       // Actions
       setSettings: (settings) => set({ settings }),
-      setUser: (user) => set({ user }),
+      setOwnerUserId: (userId) => set({ ownerUserId: userId }),
       setLoading: (isLoading) => set({ isLoading }),
-      
+      setUserProfile: (user) => set({ userProfile: user }),
+
       updateSetting: (key, value) => {
         const { settings } = get();
         if (settings) {
@@ -46,16 +51,18 @@ export const useSettingsStore = create<SettingsState>()(
         }
       },
 
-      reset: () => set({
-        settings: null,
-        user: null,
-        isLoading: false,
-      }),
+      reset: () =>
+        set({
+          settings: null,
+          ownerUserId: null,
+          isLoading: false,
+          userProfile: null,
+        }),
     }),
     {
       name: 'settings-store',
-      // Sadece settings'i persist et, user'ı session'dan alacağız
-      partialize: (state) => ({ settings: state.settings }),
+      // Persist edilen minimal state
+      partialize: (state) => ({ settings: state.settings, ownerUserId: state.ownerUserId }),
     }
   )
-); 
+);
