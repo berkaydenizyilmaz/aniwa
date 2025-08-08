@@ -103,7 +103,10 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: createEpisodeAction,
+    mutationFn: async (data: CreateEpisodeInput) => {
+      // File'ı direkt gönder - server action File objelerini handle edebilir
+      return createEpisodeAction(data);
+    },
     onSuccess: () => {
       toast.success('Bölüm başarıyla oluşturuldu');
       onOpenChange(false);
@@ -120,6 +123,7 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: UpdateEpisodeInput) => {
+      // File'ı direkt gönder - server action File objelerini handle edebilir
       return updateEpisodeAction(episode!.id, data);
     },
     onSuccess: () => {

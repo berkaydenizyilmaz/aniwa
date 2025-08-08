@@ -162,7 +162,14 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: createAnimeSeriesAction,
+    mutationFn: async (data: CreateAnimeSeriesInput) => {
+      // File'sız data'yı ayrı tut
+      const { coverImageFile, bannerImageFile, ...restData } = data;
+      
+      // Eğer file varsa, createAnimeSeriesAction'ı direkt çağır
+      // Çünkü File objeler JSON serialize edilebilir (FormData gerekmez)
+      return createAnimeSeriesAction(data);
+    },
     onSuccess: () => {
       toast.success('Anime serisi başarıyla oluşturuldu');
       onOpenChange(false);
@@ -179,6 +186,10 @@ export function AnimeSeriesFormDialog({ open, onOpenChange, animeSeries, onSucce
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: UpdateAnimeSeriesInput) => {
+      // File'sız data'yı ayrı tut
+      const { coverImageFile, bannerImageFile, ...restData } = data;
+      
+      // Eğer file varsa, updateAnimeSeriesAction'ı direkt çağır
       return updateAnimeSeriesAction(animeSeries!.id, data);
     },
     onSuccess: () => {
