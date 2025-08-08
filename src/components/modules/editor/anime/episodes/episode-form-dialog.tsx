@@ -26,7 +26,7 @@ import { createEpisodeAction, updateEpisodeAction, getEpisodeAction } from '@/li
 import { createEpisodeSchema, updateEpisodeSchema, type CreateEpisodeInput, type UpdateEpisodeInput } from '@/lib/schemas/anime.schema';
 import { toast } from 'sonner';
 import { Episode } from '@prisma/client';
-import { CLOUDINARY } from '@/lib/constants/cloudinary.constants';
+import { IMAGE_TYPES } from '@/lib/constants/image.constants';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -232,12 +232,10 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
                     <FormLabel>Thumbnail</FormLabel>
                     <FormControl>
                       <ImageUpload
-                        id="thumbnailImage"
-                        label="Episode thumbnail"
-                        accept="image/*"
-                        maxSize={CLOUDINARY.CONFIGS.EPISODE_THUMBNAIL.maxSize}
+                        imageType={IMAGE_TYPES.EPISODE_THUMBNAIL}
                         value={field.value}
                         onChange={field.onChange}
+                        variant="default"
                       />
                     </FormControl>
                     <FormMessage />

@@ -40,7 +40,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
-import { CLOUDINARY } from '@/lib/constants/cloudinary.constants';
+import { IMAGE_TYPES } from '@/lib/constants/image.constants';
 
 export function ProfileSettings() {
   const [showPassword, setShowPassword] = useState(false);
@@ -321,7 +321,7 @@ export function ProfileSettings() {
                 <AvatarFallback>{session.user.username?.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <ImageUpload id="profile-picture" label="" accept="image/*" maxSize={CLOUDINARY.CONFIGS.USER_AVATAR.maxSize} value={profilePicture} onChange={handleProfilePictureChange} disabled={updateProfileImagesMutation.isPending} loading={updateProfileImagesMutation.isPending} />
+                <ImageUpload imageType={IMAGE_TYPES.USER_AVATAR} value={profilePicture} onChange={handleProfilePictureChange} disabled={updateProfileImagesMutation.isPending} loading={updateProfileImagesMutation.isPending} variant="avatar" />
               </div>
             </div>
           </div>
@@ -334,7 +334,7 @@ export function ProfileSettings() {
                 </div>
               )}
               <div className="flex-1">
-                <ImageUpload id="profile-banner" label="" accept="image/*" maxSize={CLOUDINARY.CONFIGS.USER_BANNER.maxSize} value={profileBanner} onChange={handleProfileBannerChange} disabled={updateProfileImagesMutation.isPending} loading={updateProfileImagesMutation.isPending} />
+                <ImageUpload imageType={IMAGE_TYPES.USER_BANNER} value={profileBanner} onChange={handleProfileBannerChange} disabled={updateProfileImagesMutation.isPending} loading={updateProfileImagesMutation.isPending} variant="default" />
               </div>
             </div>
           </div>

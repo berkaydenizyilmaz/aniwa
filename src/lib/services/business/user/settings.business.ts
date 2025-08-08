@@ -16,7 +16,9 @@ import {
   updateUserSettingsDB,
   createUserSettingsDB
 } from '@/lib/services/db/userProfileSettings.db';
-import { UploadService } from '@/lib/services/cloudinary/upload.service';
+import { uploadImage, deleteImagesByEntity } from '@/lib/services/image/upload.service';
+import { extractPublicId } from '@/lib/services/image/naming.service';
+import { IMAGE_TYPES } from '@/lib/constants/image.constants';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
@@ -228,23 +230,23 @@ export async function updateProfileImagesBusiness(
     if (data.profilePicture) {
       // Sadece eski avatarı sil
       if (user.profilePicture) {
-        const publicId = UploadService.extractPublicIdFromUrl(user.profilePicture);
-        if (publicId) await UploadService.deleteByPublicId(publicId);
+        const publicId = extractPublicId(user.profilePicture);
+        if (publicId) await deleteImagesByEntity(publicId, 'user');
       }
       // Yeni görseli yükle
-      const uploadResult = await UploadService.uploadUserImages(data.profilePicture, undefined, userId);
-      profilePictureUrl = uploadResult.avatar?.secureUrl ?? profilePictureUrl;
+      const uploadResult = await uploadImage(data.profilePicture, IMAGE_TYPES.USER_AVATAR, userId);
+      profilePictureUrl = uploadResult.secureUrl;
     }
 
     if (data.profileBanner) {
       // Sadece eski banner'ı sil
       if (user.profileBanner) {
-        const publicId = UploadService.extractPublicIdFromUrl(user.profileBanner);
-        if (publicId) await UploadService.deleteByPublicId(publicId);
+        const publicId = extractPublicId(user.profileBanner);
+        if (publicId) await deleteImagesByEntity(publicId, 'user');
       }
       // Yeni banner'ı yükle
-      const uploadResult = await UploadService.uploadUserImages(undefined, data.profileBanner, userId);
-      profileBannerUrl = uploadResult.banner?.secureUrl ?? profileBannerUrl;
+      const uploadResult = await uploadImage(data.profileBanner, IMAGE_TYPES.USER_BANNER, userId);
+      profileBannerUrl = uploadResult.secureUrl;
     }
 
     // Güncelleme

@@ -10,7 +10,8 @@ import {
   countEpisodesDB
 } from '@/lib/services/db/episode.db';
 import { findAnimeMediaPartByIdDB } from '@/lib/services/db/mediaPart.db';
-import { UploadService } from '@/lib/services/cloudinary/upload.service';
+import { deleteImagesByEntity, uploadImage } from '@/lib/services/image/upload.service';
+import { IMAGE_TYPES } from '@/lib/constants/image.constants';
 import { 
   CreateEpisodeRequest, 
   UpdateEpisodeRequest,
@@ -51,10 +52,11 @@ export async function createEpisodeBusiness(
     }
 
     const { thumbnailImageFile, ...formData } = data;
-    let uploadResult;
+    let thumbnailImageUrl;
     
     if (thumbnailImageFile) {
-      uploadResult = await UploadService.uploadEpisodeThumbnail(thumbnailImageFile, data.mediaPartId);
+      const thumbnailResult = await uploadImage(thumbnailImageFile, IMAGE_TYPES.EPISODE_THUMBNAIL, `${data.mediaPartId}_ep${data.episodeNumber}`);
+      thumbnailImageUrl = thumbnailResult.secureUrl;
     }
 
     const result = await createEpisodeDB({
@@ -62,7 +64,7 @@ export async function createEpisodeBusiness(
       episodeNumber: formData.episodeNumber,
       title: formData.title,
       description: formData.description,
-      thumbnailImage: uploadResult?.thumbnailImage?.secureUrl,
+      thumbnailImage: thumbnailImageUrl,
       airDate: formData.airDate,
       duration: formData.duration,
       isFiller: formData.isFiller,
@@ -77,7 +79,7 @@ export async function createEpisodeBusiness(
         episodeId: result.id,
         mediaPartId: result.mediaPartId,
         episodeNumber: result.episodeNumber,
-        hasThumbnail: !!uploadResult?.thumbnailImage
+        hasThumbnail: !!thumbnailImageUrl
       },
       userId
     );
@@ -245,7 +247,7 @@ export async function updateEpisodeBusiness(
     let uploadResult;
     
     if (thumbnailImageFile) {
-      uploadResult = await UploadService.uploadEpisodeThumbnail(thumbnailImageFile, existingEpisode.mediaPartId);
+      uploadResult = await uploadImage(thumbnailImageFile, IMAGE_TYPES.EPISODE_THUMBNAIL, existingEpisode.mediaPartId);
     }
 
     const result = await updateEpisodeDB(
@@ -308,7 +310,7 @@ export async function deleteEpisodeBusiness(
     await deleteEpisodeDB({ id });
 
     // Cloudinary'den thumbnail sil
-    await UploadService.deleteEpisodeThumbnail(id);
+    await deleteImagesByEntity(id, 'episode');
 
     await logger.info(
       EVENTS.EDITOR.EPISODE_DELETED,

@@ -49,7 +49,8 @@ import {
   GetAnimeSeriesRelationsResponse,
   GetAnimeSeriesWithRelationsResponse,
 } from '@/lib/types/api/anime.api';
-import { UploadService } from '@/lib/services/cloudinary/upload.service';
+import { uploadImage, deleteImagesByEntity } from '@/lib/services/image/upload.service';
+import { IMAGE_TYPES } from '@/lib/constants/image.constants';
 
 // Anime serisi oluşturma
 export async function createAnimeSeriesBusiness(
@@ -61,10 +62,16 @@ export async function createAnimeSeriesBusiness(
     const { coverImageFile, bannerImageFile, ...formData } = data;
     
     // Resim yükleme işlemi
-    let uploadResult;
-    if (coverImageFile || bannerImageFile) {
-      // Geçici ID ile resim yükle
-      uploadResult = await UploadService.uploadAnimeImages(coverImageFile, bannerImageFile, 'temp');
+    let coverImageUrl, bannerImageUrl;
+    
+    if (coverImageFile) {
+      const coverResult = await uploadImage(coverImageFile, IMAGE_TYPES.ANIME_COVER, 'temp');
+      coverImageUrl = coverResult.secureUrl;
+    }
+    
+    if (bannerImageFile) {
+      const bannerResult = await uploadImage(bannerImageFile, IMAGE_TYPES.ANIME_BANNER, 'temp');
+      bannerImageUrl = bannerResult.secureUrl;
     }
 
     // Anime serisi oluştur
@@ -84,8 +91,8 @@ export async function createAnimeSeriesBusiness(
       trailer: formData.trailer || null,
       synonyms: formData.synonyms || [],
       // Resim URL'leri
-      coverImage: uploadResult?.coverImage?.secureUrl,
-      bannerImage: uploadResult?.bannerImage?.secureUrl,
+      coverImage: coverImageUrl,
+      bannerImage: bannerImageUrl,
     });
 
     // İlişkileri oluştur
@@ -123,8 +130,8 @@ export async function createAnimeSeriesBusiness(
         title: result.title,
         type: result.type,
         status: result.status,
-        hasCoverImage: !!uploadResult?.coverImage,
-        hasBannerImage: !!uploadResult?.bannerImage
+        hasCoverImage: !!coverImageUrl,
+        hasBannerImage: !!bannerImageUrl
       },
       userId
     );
@@ -313,10 +320,16 @@ export async function updateAnimeSeriesBusiness(
     }
 
     // Resim yükleme işlemi
-    let uploadResult;
-    if (data.coverImageFile || data.bannerImageFile) {
-      // Geçici ID ile resim yükle
-      uploadResult = await UploadService.uploadAnimeImages(data.coverImageFile, data.bannerImageFile, id);
+    let coverImageUrl, bannerImageUrl;
+    
+    if (data.coverImageFile) {
+      const coverResult = await uploadImage(data.coverImageFile, IMAGE_TYPES.ANIME_COVER, id);
+      coverImageUrl = coverResult.secureUrl;
+    }
+    
+    if (data.bannerImageFile) {
+      const bannerResult = await uploadImage(data.bannerImageFile, IMAGE_TYPES.ANIME_BANNER, id);
+      bannerImageUrl = bannerResult.secureUrl;
     }
 
     // Anime serisi güncelle
@@ -336,8 +349,8 @@ export async function updateAnimeSeriesBusiness(
       trailer: data.trailer || null,
       synonyms: data.synonyms || [],
       // Resim URL'leri (sadece yeni yüklenen varsa güncelle)
-      ...(uploadResult?.coverImage && { coverImage: uploadResult.coverImage.secureUrl }),
-      ...(uploadResult?.bannerImage && { bannerImage: uploadResult.bannerImage.secureUrl }),
+      ...(coverImageUrl && { coverImage: coverImageUrl }),
+      ...(bannerImageUrl && { bannerImage: bannerImageUrl }),
     });
 
     // İlişkileri güncelle
@@ -391,8 +404,8 @@ export async function updateAnimeSeriesBusiness(
         type: result.type,
         status: result.status,
         oldTitle: existingAnime.title,
-        hasNewCoverImage: !!uploadResult?.coverImage,
-        hasNewBannerImage: !!uploadResult?.bannerImage
+        hasNewCoverImage: !!coverImageUrl,
+        hasNewBannerImage: !!bannerImageUrl
       },
       userId
     );
@@ -436,8 +449,7 @@ export async function deleteAnimeSeriesBusiness(
     await deleteAnimeSeriesDB({ id });
 
     // Cloudinary'den resimleri sil
-    await UploadService.deleteAnimeImages(id);
-    await UploadService.deleteEpisodeThumbnailsByAnimeSeries(id);
+    await deleteImagesByEntity(id, 'anime');
 
     // Başarılı silme logu
     await logger.info(
