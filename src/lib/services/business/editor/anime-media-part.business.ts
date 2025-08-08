@@ -28,7 +28,7 @@ import {
   UpdateAnimeMediaPartRequest,
   GetAnimeMediaPartsRequest,
 } from '@/lib/types/api/anime.api';
-import { UploadService } from '@/lib/services/cloudinary/upload.service';
+import { deleteImagesByEntity } from '@/lib/services/image/upload.service';
 
 // Anime medya parçası oluşturma
 export async function createAnimeMediaPartBusiness(
@@ -312,7 +312,7 @@ export async function deleteAnimeMediaPartBusiness(
     await deleteAnimeMediaPartDB({ id });
 
     // Altındaki episode'ların thumbnail'lerini sil
-    await UploadService.deleteEpisodeThumbnailsByMediaPart(id);
+    await deleteImagesByEntity(id, 'episode');
 
     // Başarılı silme logu
     await logger.info(

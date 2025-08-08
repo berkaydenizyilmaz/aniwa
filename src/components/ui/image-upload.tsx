@@ -36,6 +36,17 @@ export function ImageUpload({
   
   const config = IMAGE_CONFIG[imageType];
   
+  if (!config) {
+    console.error(`Image config not found for type: ${imageType}`);
+    return (
+      <div className={cn("space-y-2", className)}>
+        <Card className="h-48 flex items-center justify-center">
+          <p className="text-destructive">Hata: Geçersiz görsel türü</p>
+        </Card>
+      </div>
+    );
+  }
+  
   // Value handling
   const existingUrl = typeof value === 'string' ? value : null;
   const selectedFile = value instanceof File ? value : null;
@@ -88,7 +99,7 @@ export function ImageUpload({
   const getContainerStyles = () => {
     switch (variant) {
       case 'avatar':
-        return 'w-24 h-24 rounded-full overflow-hidden';
+        return 'w-24 h-24 rounded-full overflow-hidden border-4 border-muted bg-muted/50';
       case 'compact':
         return 'h-32';
       default:
@@ -122,7 +133,10 @@ export function ImageUpload({
             
             {/* Loading overlay */}
             {loading && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+              <div className={cn(
+                "absolute inset-0 bg-black/50 flex items-center justify-center",
+                variant === 'avatar' ? "rounded-full" : "rounded-lg"
+              )}>
                 <div className="text-center text-white">
                   <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                   <p className="text-sm">Yükleniyor...</p>
@@ -132,33 +146,72 @@ export function ImageUpload({
             
             {/* Hover overlay with actions */}
             {!loading && (
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-lg">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = config.allowedFormats.map(f => `.${f}`).join(',');
-                    input.onchange = (e) => {
-                      const file = (e.target as HTMLInputElement).files?.[0];
-                      if (file) onDrop([file]);
-                    };
-                    input.click();
-                  }}
-                  disabled={disabled}
-                >
-                  <Upload className="w-4 h-4 mr-1" />
-                  Değiştir
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={handleRemove}
-                  disabled={disabled}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
+              <div className={cn(
+                "absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2",
+                variant === 'avatar' ? "rounded-full" : "rounded-lg"
+              )}>
+                {variant === 'avatar' ? (
+                  // Avatar variant - compact buttons
+                  <div className="flex flex-col gap-1">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="h-8 w-8 p-0"
+                      onClick={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = config.allowedFormats.map(f => `.${f}`).join(',');
+                        input.onchange = (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0];
+                          if (file) onDrop([file]);
+                        };
+                        input.click();
+                      }}
+                      disabled={disabled}
+                    >
+                      <Upload className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="h-8 w-8 p-0"
+                      onClick={handleRemove}
+                      disabled={disabled}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  // Default/compact variant - horizontal buttons
+                  <>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = config.allowedFormats.map(f => `.${f}`).join(',');
+                        input.onchange = (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0];
+                          if (file) onDrop([file]);
+                        };
+                        input.click();
+                      }}
+                      disabled={disabled}
+                    >
+                      <Upload className="w-4 h-4 mr-1" />
+                      Değiştir
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={handleRemove}
+                      disabled={disabled}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -167,8 +220,12 @@ export function ImageUpload({
           <div
             {...getRootProps()}
             className={cn(
-              "w-full h-full border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors",
-              isDragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-muted-foreground/50",
+              "w-full h-full border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-colors",
+              variant === 'avatar' ? (
+                isDragActive ? "border-primary bg-primary/5 rounded-full" : "border-muted-foreground/25 hover:border-muted-foreground/50 rounded-full"
+              ) : (
+                isDragActive ? "border-primary bg-primary/5 rounded-lg" : "border-muted-foreground/25 hover:border-muted-foreground/50 rounded-lg"
+              ),
               (disabled || loading) && "cursor-not-allowed opacity-50"
             )}
           >
@@ -180,31 +237,40 @@ export function ImageUpload({
                 <p className="text-sm text-muted-foreground">Hazırlanıyor...</p>
               </div>
             ) : (
-              <div className="text-center p-4">
+              <div className={cn(
+                "text-center",
+                variant === 'avatar' ? "p-2" : "p-4"
+              )}>
                 <Upload className={cn(
-                  "mb-3 text-muted-foreground mx-auto",
+                  "mb-2 text-muted-foreground mx-auto",
+                  variant === 'avatar' ? "w-6 h-6" : 
                   variant === 'compact' ? "w-6 h-6" : "w-10 h-10"
                 )} />
                 
                 <div className="space-y-1">
-                  <p className={cn(
-                    "font-medium text-foreground",
-                    variant === 'compact' ? "text-sm" : "text-base"
-                  )}>
-                    {isDragActive ? 'Dosyayı buraya bırakın' : 'Görsel yükleyin'}
-                  </p>
+                  {variant !== 'avatar' && (
+                    <p className={cn(
+                      "font-medium text-foreground",
+                      variant === 'compact' ? "text-sm" : "text-base"
+                    )}>
+                      {isDragActive ? 'Dosyayı buraya bırakın' : 'Görsel yükleyin'}
+                    </p>
+                  )}
                   
                   <p className={cn(
                     "text-muted-foreground",
+                    variant === 'avatar' ? "text-xs" :
                     variant === 'compact' ? "text-xs" : "text-sm"
                   )}>
-                    Tıklayın veya sürükleyin
+                    {variant === 'avatar' ? 'Fotoğraf' : 'Tıklayın veya sürükleyin'}
                   </p>
                   
-                  <p className="text-xs text-muted-foreground/70">
-                    {config.allowedFormats.map(f => f.toUpperCase()).join(', ')} • 
-                    Max {formatFileSize(config.maxSize)}
-                  </p>
+                  {variant !== 'avatar' && (
+                    <p className="text-xs text-muted-foreground/70">
+                      {config.allowedFormats.map(f => f.toUpperCase()).join(', ')} • 
+                      Max {formatFileSize(config.maxSize)}
+                    </p>
+                  )}
                 </div>
               </div>
             )}

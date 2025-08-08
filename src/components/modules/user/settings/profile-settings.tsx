@@ -312,31 +312,42 @@ export function ProfileSettings() {
       {/* Satır 3 */}
       <Card className="p-4">
         <h4 className="text-sm font-medium mb-4">Profil Görselleri</h4>
-        <div className="grid gap-6 md:grid-cols-2">
-          <div>
-            <Label className="text-xs">Profil Fotoğrafı</Label>
-            <div className="mt-2 flex items-center gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={userProfile?.profilePicture || ''} />
-                <AvatarFallback>{session.user.username?.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <ImageUpload imageType={IMAGE_TYPES.USER_AVATAR} value={profilePicture} onChange={handleProfilePictureChange} disabled={updateProfileImagesMutation.isPending} loading={updateProfileImagesMutation.isPending} variant="avatar" />
+        <div className="space-y-6">
+          {/* Profil Fotoğrafı */}
+          <div className="flex items-start gap-6">
+            <div className="flex-shrink-0">
+              <Label className="text-sm font-medium mb-3 block">Profil Fotoğrafı</Label>
+              <ImageUpload 
+                imageType={IMAGE_TYPES.USER_AVATAR} 
+                value={profilePicture || userProfile?.profilePicture || null}
+                onChange={handleProfilePictureChange} 
+                disabled={updateProfileImagesMutation.isPending} 
+                loading={updateProfileImagesMutation.isPending} 
+                variant="avatar" 
+              />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm text-muted-foreground mt-8">
+                <p>Profil fotoğrafınız diğer kullanıcılar tarafından görülebilir.</p>
+                <p className="text-xs mt-1">JPG, PNG veya WebP formatında, maksimum 2MB</p>
               </div>
             </div>
           </div>
+          
+          {/* Profil Banner */}
           <div>
-            <Label className="text-xs">Profil Banner</Label>
-            <div className="mt-2 flex items-center gap-4">
-              {userProfile?.profileBanner && (
-                <div className="h-16 w-32 rounded border overflow-hidden">
-                  <Image src={userProfile.profileBanner} alt="Profile Banner" width={128} height={64} className="h-full w-full object-cover" />
-                </div>
-              )}
-              <div className="flex-1">
-                <ImageUpload imageType={IMAGE_TYPES.USER_BANNER} value={profileBanner} onChange={handleProfileBannerChange} disabled={updateProfileImagesMutation.isPending} loading={updateProfileImagesMutation.isPending} variant="default" />
-              </div>
-            </div>
+            <Label className="text-sm font-medium mb-3 block">Profil Banner</Label>
+            <ImageUpload 
+              imageType={IMAGE_TYPES.USER_BANNER} 
+              value={profileBanner || userProfile?.profileBanner || null}
+              onChange={handleProfileBannerChange} 
+              disabled={updateProfileImagesMutation.isPending} 
+              loading={updateProfileImagesMutation.isPending} 
+              variant="default" 
+            />
+            <p className="text-xs text-muted-foreground mt-2">
+              Banner görseliniz profilinizin üst kısmında görüntülenecektir. Maksimum 5MB
+            </p>
           </div>
         </div>
       </Card>

@@ -27,6 +27,7 @@ export function AnimeSeriesMedia({ isPending }: AnimeSeriesMediaProps) {
         name="coverImageFile"
         render={({ field }) => (
           <FormItem>
+            <FormLabel>Kapak Görseli</FormLabel>
             <FormControl>
               <ImageUpload
                 imageType={IMAGE_TYPES.ANIME_COVER}
@@ -47,6 +48,7 @@ export function AnimeSeriesMedia({ isPending }: AnimeSeriesMediaProps) {
         name="bannerImageFile"
         render={({ field }) => (
           <FormItem>
+            <FormLabel>Banner Görseli</FormLabel>
             <FormControl>
               <ImageUpload
                 imageType={IMAGE_TYPES.ANIME_BANNER}
