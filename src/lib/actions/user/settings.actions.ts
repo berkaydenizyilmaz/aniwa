@@ -134,12 +134,18 @@ export async function updatePasswordAction(data: UpdatePasswordInput): Promise<S
 }
 
 // Profile images güncelleme action
-export async function updateProfileImagesAction(data: UpdateProfileImagesInput): Promise<ServerActionResponse> {
+export async function updateProfileImagesAction(formData: FormData): Promise<ServerActionResponse> {
   const session = await getServerSession(authConfig);
   
   try {
-    const validatedData = updateProfileImagesSchema.parse(data);
-    const result = await updateProfileImagesBusiness(session!.user.id, validatedData);
+    const profilePicture = formData.get('profilePicture');
+    const profileBanner = formData.get('profileBanner');
+
+    const parsed = updateProfileImagesSchema.parse({
+      profilePicture: profilePicture instanceof File ? profilePicture : null,
+      profileBanner: profileBanner instanceof File ? profileBanner : null,
+    });
+    const result = await updateProfileImagesBusiness(session!.user.id, parsed);
     revalidatePath(ROUTES.PAGES.SETTINGS);
 
     return {

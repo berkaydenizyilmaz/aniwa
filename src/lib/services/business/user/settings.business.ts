@@ -226,23 +226,25 @@ export async function updateProfileImagesBusiness(
     let profileBannerUrl = user.profileBanner;
 
     if (data.profilePicture) {
-      // Eski görseli sil
+      // Sadece eski avatarı sil
       if (user.profilePicture) {
-        await UploadService.deleteUserImages(userId);
+        const publicId = UploadService.extractPublicIdFromUrl(user.profilePicture);
+        if (publicId) await UploadService.deleteByPublicId(publicId);
       }
       // Yeni görseli yükle
       const uploadResult = await UploadService.uploadUserImages(data.profilePicture, undefined, userId);
-      profilePictureUrl = uploadResult.avatar?.secureUrl;
+      profilePictureUrl = uploadResult.avatar?.secureUrl ?? profilePictureUrl;
     }
 
     if (data.profileBanner) {
-      // Eski banner'ı sil
+      // Sadece eski banner'ı sil
       if (user.profileBanner) {
-        await UploadService.deleteUserImages(userId);
+        const publicId = UploadService.extractPublicIdFromUrl(user.profileBanner);
+        if (publicId) await UploadService.deleteByPublicId(publicId);
       }
       // Yeni banner'ı yükle
       const uploadResult = await UploadService.uploadUserImages(undefined, data.profileBanner, userId);
-      profileBannerUrl = uploadResult.banner?.secureUrl;
+      profileBannerUrl = uploadResult.banner?.secureUrl ?? profileBannerUrl;
     }
 
     // Güncelleme

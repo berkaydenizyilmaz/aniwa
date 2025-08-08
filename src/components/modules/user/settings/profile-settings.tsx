@@ -124,7 +124,12 @@ export function ProfileSettings() {
   });
 
   const updateProfileImagesMutation = useMutation({
-    mutationFn: updateProfileImagesAction,
+    mutationFn: (payload: { profilePicture: File | null; profileBanner: File | null }) => {
+      const fd = new FormData();
+      if (payload.profilePicture) fd.append('profilePicture', payload.profilePicture);
+      if (payload.profileBanner) fd.append('profileBanner', payload.profileBanner);
+      return updateProfileImagesAction(fd);
+    },
       onSuccess: () => {
       toast.success('Profil görselleri başarıyla güncellendi');
       setProfilePicture(null);
@@ -167,8 +172,6 @@ export function ProfileSettings() {
     
     // Otomatik kaydet
     if (file) {
-      const formData = new FormData();
-      formData.append('profilePicture', file);
       updateProfileImagesMutation.mutate({
         profilePicture: file,
         profileBanner: profileBanner,
@@ -181,8 +184,6 @@ export function ProfileSettings() {
     
     // Otomatik kaydet
     if (file) {
-      const formData = new FormData();
-      formData.append('profileBanner', file);
       updateProfileImagesMutation.mutate({
         profilePicture: profilePicture,
         profileBanner: file,

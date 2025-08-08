@@ -35,9 +35,20 @@ export class UploadService {
     publicId: string
   ): Promise<CloudinaryUploadResult> {
     try {
-      const result = await cloudinary.uploader.upload(file.toString('base64'), {
+      // MIME tespit et (JPEG/PNG/WebP)
+      const header = file.subarray(0, 4);
+      const isJPEG = header[0] === 0xFF && header[1] === 0xD8 && header[2] === 0xFF;
+      const isPNG = header[0] === 0x89 && header[1] === 0x50 && header[2] === 0x4E && header[3] === 0x47;
+      const isWebP = header[0] === 0x52 && header[1] === 0x49 && header[2] === 0x46 && header[3] === 0x46;
+      const mime = isJPEG ? 'image/jpeg' : isPNG ? 'image/png' : isWebP ? 'image/webp' : 'application/octet-stream';
+
+      // Cloudinary base64 upload için Data URI bekler; buffer'ı doğru prefix ile gönder
+      const base64 = file.toString('base64');
+      const dataUri = `data:${mime};base64,${base64}`;
+      const result = await cloudinary.uploader.upload(dataUri, {
         folder: config.folder,
         public_id: publicId,
+        resource_type: 'image',
         transformation: {
           width: config.width,
           height: config.height,
@@ -73,6 +84,13 @@ export class UploadService {
       console.error('Cloudinary delete error:', error);
       return false;
     }
+  }
+
+  /**
+   * Public ID ile sil (public API)
+   */
+  static async deleteByPublicId(publicId: string): Promise<boolean> {
+    return this.deleteFile(publicId);
   }
 
   /**
