@@ -62,10 +62,16 @@ export function validateFileFormat(file: File, imageType: ImageType): Validation
 /**
  * Dosya boyutlarını valide eder (client-side)
  */
-export function validateImageDimensions(
+export async function validateImageDimensions(
   file: File, 
   imageType: ImageType
 ): Promise<ValidationResult> {
+  // Server-side: Boyut kontrolünü Cloudinary'ye bırak, sadece temel validasyon
+  if (typeof window === 'undefined') {
+    return { isValid: true }; // Server-side'da boyut kontrolü yapma
+  }
+  
+  // Client-side: Browser Image API kullan
   return new Promise((resolve) => {
     const config = IMAGE_CONFIG[imageType];
     const img = new Image();

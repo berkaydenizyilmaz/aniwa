@@ -1,6 +1,6 @@
 // Modern görsel yükleme servisi
 
-import { v2 as cloudinary } from 'cloudinary';
+import cloudinary from '@/lib/cloudinary'; // Configured instance kullan
 import { IMAGE_CONFIG, type ImageType } from '@/lib/constants/image.constants';
 import { BusinessError } from '@/lib/errors';
 import { validateImageFile, throwValidationError } from './validation.service';
