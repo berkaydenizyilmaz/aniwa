@@ -40,7 +40,7 @@ export function ProfileSettings() {
   const [showPassword, setShowPassword] = useState(false);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [profileBanner, setProfileBanner] = useState<File | null>(null);
-  const { profile: userProfile } = useUserProfileStore();
+  const { profile: userProfile, setProfile } = useUserProfileStore();
   const { data: session, update: updateSession } = useSession();
   const queryClient = useQueryClient();
 
@@ -83,6 +83,7 @@ export function ProfileSettings() {
       onSuccess: () => {
       toast.success('Kullanıcı adı başarıyla güncellendi');
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
+        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'profile'] });
     },
     onError: (error) => {
       console.error('Username update error:', error);
@@ -95,6 +96,7 @@ export function ProfileSettings() {
       onSuccess: () => {
       toast.success('Biyografi başarıyla güncellendi');
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
+        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'profile'] });
     },
     onError: (error) => {
       console.error('Bio update error:', error);
@@ -126,6 +128,7 @@ export function ProfileSettings() {
       setProfilePicture(null);
       setProfileBanner(null);
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
+        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'profile'] });
     },
     onError: (error) => {
       console.error('Profile images update error:', error);
