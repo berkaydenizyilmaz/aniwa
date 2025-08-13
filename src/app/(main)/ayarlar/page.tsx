@@ -9,15 +9,9 @@ import { ProfileSettings } from '@/components/modules/user/settings/profile-sett
 import { GeneralSettings } from '@/components/modules/user/settings/general-settings';
 import { PrivacySettings } from '@/components/modules/user/settings/privacy-settings';
 import { NotificationSettings } from '@/components/modules/user/settings/notification-settings';
-import { useSettings } from '@/lib/hooks/use-settings';
-import { useUserProfile } from '@/lib/hooks/use-user-profile';
 
 export default function SettingsPage() {
   const [active, setActive] = useState<'profile' | 'general' | 'privacy' | 'notifications'>('profile');
-
-  // Hook'ları çağır
-  useSettings();
-  useUserProfile();
 
   return (
     <div className="container mx-auto py-6 px-2 md:px-0">
