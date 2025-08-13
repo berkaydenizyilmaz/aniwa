@@ -82,7 +82,6 @@ export function ProfileSettings() {
     mutationFn: updateUsernameAction,
       onSuccess: () => {
       toast.success('Kullanıcı adı başarıyla güncellendi');
-        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'profile'] });
     },
     onError: (error) => {
@@ -95,7 +94,6 @@ export function ProfileSettings() {
     mutationFn: updateBioAction,
       onSuccess: () => {
       toast.success('Biyografi başarıyla güncellendi');
-        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'profile'] });
     },
     onError: (error) => {
@@ -127,7 +125,6 @@ export function ProfileSettings() {
       toast.success('Profil görselleri başarıyla güncellendi');
       setProfilePicture(null);
       setProfileBanner(null);
-        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'profile'] });
     },
     onError: (error) => {
@@ -150,7 +147,6 @@ export function ProfileSettings() {
     updateBioMutation.mutate(data, {
       onSuccess: () => {
         // Session update'ı dışında settings cache'ini de tazele
-        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
         updateSession({ user: { bio: data.bio } });
       }
     });

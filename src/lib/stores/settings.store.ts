@@ -52,7 +52,8 @@ export const useSettingsStore = create<SettingsState>()(
         try {
           const result = await getUserSettingsAction();
           if (result && 'success' in result && result.success) {
-            set({ settings: result.data as UserProfileSettings });
+            const response = result.data as { settings: UserProfileSettings | null };
+            set({ settings: response.settings });
           }
         } catch (error) {
           console.error('Failed to refresh settings:', error);

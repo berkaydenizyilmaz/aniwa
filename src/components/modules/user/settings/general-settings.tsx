@@ -49,7 +49,7 @@ import { ANIME } from '@/lib/constants/anime.constants';
 import { USER } from '@/lib/constants/user.constants';
 
 export function GeneralSettings() {
-  const { settings, updateSetting, refreshSettings } = useSettingsStore();
+  const { settings, updateSetting } = useSettingsStore();
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 
@@ -172,7 +172,6 @@ export function GeneralSettings() {
       {
         onSuccess: () => {
           updateSetting('themePreference', value as Theme);
-          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -184,7 +183,6 @@ export function GeneralSettings() {
       {
         onSuccess: () => {
           updateSetting('titleLanguagePreference', value as TitleLanguage);
-          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -196,7 +194,6 @@ export function GeneralSettings() {
       {
         onSuccess: () => {
           updateSetting('scoreFormat', value as ScoreFormat);
-          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -208,7 +205,6 @@ export function GeneralSettings() {
       {
         onSuccess: () => {
           updateSetting('displayAdultContent', checked);
-          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -220,7 +216,6 @@ export function GeneralSettings() {
       {
         onSuccess: () => {
           updateSetting('autoTrackOnAniwaListAdd', checked);
-          refreshSettings(); // Store'u güncelle
         }
       }
     );

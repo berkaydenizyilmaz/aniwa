@@ -48,7 +48,7 @@ import { useSession } from 'next-auth/react';
 import { USER } from '@/lib/constants/user.constants';
 
 export function PrivacySettings() {
-  const { settings, updateSetting, refreshSettings } = useSettingsStore();
+  const { settings, updateSetting } = useSettingsStore();
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 
@@ -171,7 +171,6 @@ export function PrivacySettings() {
       {
         onSuccess: () => {
           updateSetting('profileVisibility', value as ProfileVisibility);
-          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -183,7 +182,6 @@ export function PrivacySettings() {
       {
         onSuccess: () => {
           updateSetting('allowFollows', checked);
-          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -195,7 +193,6 @@ export function PrivacySettings() {
       {
         onSuccess: () => {
           updateSetting('showAnimeList', checked);
-          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -207,7 +204,6 @@ export function PrivacySettings() {
       {
         onSuccess: () => {
           updateSetting('showFavouriteAnimeSeries', checked);
-          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -219,7 +215,6 @@ export function PrivacySettings() {
       {
         onSuccess: () => {
           updateSetting('showCustomLists', checked);
-          refreshSettings(); // Store'u güncelle
         }
       }
     );
