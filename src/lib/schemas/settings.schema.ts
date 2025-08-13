@@ -2,19 +2,27 @@
 
 import { z } from 'zod';
 import { Theme, TitleLanguage, ScoreFormat, ProfileVisibility } from '@prisma/client';
+import { AUTH } from '@/lib/constants/auth.constants';
 
 // Profile Settings - Ayrı şemalar
 export const updateUsernameSchema = z.object({
-  username: z.string().min(3, 'Kullanıcı adı en az 3 karakter olmalı').max(20, 'Kullanıcı adı en fazla 20 karakter olabilir'),
+  username: z.string()
+    .min(AUTH.USERNAME.MIN_LENGTH, 'Kullanıcı adı en az 3 karakter olmalı')
+    .max(AUTH.USERNAME.MAX_LENGTH, 'Kullanıcı adı en fazla 50 karakter olabilir')
+    .regex(AUTH.USERNAME.REGEX, 'Kullanıcı adı sadece harf ve rakam içerebilir'),
 });
 
 export const updateBioSchema = z.object({
-  bio: z.string().max(500, 'Biyografi en fazla 500 karakter olabilir').nullable(),
+  bio: z.string()
+    .max(500, 'Biyografi en fazla 500 karakter olabilir')
+    .nullable(),
 });
 
 export const updatePasswordSchema = z.object({
-  newPassword: z.string().min(6, 'Parola en az 6 karakter olmalı'),
-  confirmPassword: z.string().min(6, 'Parola en az 6 karakter olmalı'),
+  newPassword: z.string()
+    .min(AUTH.PASSWORD.MIN_LENGTH, 'Parola en az 6 karakter olmalı'),
+  confirmPassword: z.string()
+    .min(AUTH.PASSWORD.MIN_LENGTH, 'Parola en az 6 karakter olmalı'),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: 'Parolalar eşleşmiyor',
   path: ['confirmPassword'],
@@ -27,15 +35,21 @@ export const updateProfileImagesSchema = z.object({
 
 // General Settings - Ayrı şemalar
 export const updateThemePreferenceSchema = z.object({
-  themePreference: z.nativeEnum(Theme, { required_error: 'Tema tercihi seçin' }),
+  themePreference: z.nativeEnum(Theme, { 
+    required_error: 'Tema tercihi seçin' 
+  }),
 });
 
 export const updateTitleLanguagePreferenceSchema = z.object({
-  titleLanguagePreference: z.nativeEnum(TitleLanguage, { required_error: 'Başlık dili seçin' }),
+  titleLanguagePreference: z.nativeEnum(TitleLanguage, { 
+    required_error: 'Başlık dili seçin' 
+  }),
 });
 
 export const updateScoreFormatSchema = z.object({
-  scoreFormat: z.nativeEnum(ScoreFormat, { required_error: 'Puanlama formatı seçin' }),
+  scoreFormat: z.nativeEnum(ScoreFormat, { 
+    required_error: 'Puanlama formatı seçin' 
+  }),
 });
 
 export const updateDisplayAdultContentSchema = z.object({
@@ -48,7 +62,9 @@ export const updateAutoTrackOnAniwaListAddSchema = z.object({
 
 // Privacy Settings - Ayrı şemalar
 export const updateProfileVisibilitySchema = z.object({
-  profileVisibility: z.nativeEnum(ProfileVisibility, { required_error: 'Profil görünürlüğü seçin' }),
+  profileVisibility: z.nativeEnum(ProfileVisibility, { 
+    required_error: 'Profil görünürlüğü seçin' 
+  }),
 });
 
 export const updateAllowFollowsSchema = z.object({
