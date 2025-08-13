@@ -24,12 +24,18 @@ export function PrivacySettings() {
   const { updateSetting } = useSettingsStore();
 
   // Local state for optimistic updates
-  const [localSettings, setLocalSettings] = useState({
-    profileVisibility: (settings as UserProfileSettings)?.profileVisibility || ProfileVisibility.PUBLIC,
-    allowFollows: (settings as UserProfileSettings)?.allowFollows ?? true,
-    showAnimeList: (settings as UserProfileSettings)?.showAnimeList ?? true,
-    showFavouriteAnimeSeries: (settings as UserProfileSettings)?.showFavouriteAnimeSeries ?? true,
-    showCustomLists: (settings as UserProfileSettings)?.showCustomLists ?? true,
+  const [localSettings, setLocalSettings] = useState<{
+    profileVisibility: ProfileVisibility;
+    allowFollows: boolean;
+    showAnimeList: boolean;
+    showFavouriteAnimeSeries: boolean;
+    showCustomLists: boolean;
+  }>({
+    profileVisibility: ProfileVisibility.PUBLIC,
+    allowFollows: true,
+    showAnimeList: true,
+    showFavouriteAnimeSeries: true,
+    showCustomLists: true,
   });
 
   // Update local state when settings change

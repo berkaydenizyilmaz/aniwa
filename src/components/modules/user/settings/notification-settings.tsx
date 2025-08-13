@@ -16,10 +16,14 @@ export function NotificationSettings() {
   const { updateSetting } = useSettingsStore();
 
   // Local state for optimistic updates
-  const [localSettings, setLocalSettings] = useState({
-    receiveNotificationOnNewFollow: (settings as UserProfileSettings)?.receiveNotificationOnNewFollow ?? true,
-    receiveNotificationOnEpisodeAiring: (settings as UserProfileSettings)?.receiveNotificationOnEpisodeAiring ?? true,
-    receiveNotificationOnNewMediaPart: (settings as UserProfileSettings)?.receiveNotificationOnNewMediaPart ?? true,
+  const [localSettings, setLocalSettings] = useState<{
+    receiveNotificationOnNewFollow: boolean;
+    receiveNotificationOnEpisodeAiring: boolean;
+    receiveNotificationOnNewMediaPart: boolean;
+  }>({
+    receiveNotificationOnNewFollow: true,
+    receiveNotificationOnEpisodeAiring: true,
+    receiveNotificationOnNewMediaPart: true,
   });
 
   // Update local state when settings change

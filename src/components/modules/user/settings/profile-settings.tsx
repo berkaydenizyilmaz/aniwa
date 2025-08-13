@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loading } from '@/components/ui/loading';
 import { GetUserProfileResponse } from '@/lib/types/api/settings.api';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function ProfileSettings() {
   const { profile, isLoading } = useSettings();
@@ -22,16 +22,18 @@ export function ProfileSettings() {
   } = useSettingsMutations();
 
   // Form states
-  const [username, setUsername] = useState((profile as GetUserProfileResponse)?.username || '');
-  const [bio, setBio] = useState((profile as GetUserProfileResponse)?.bio || '');
+  const [username, setUsername] = useState('');
+  const [bio, setBio] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   // Update form when profile changes
-  if (profile && (username !== (profile as GetUserProfileResponse).username || bio !== (profile as GetUserProfileResponse).bio)) {
-    setUsername((profile as GetUserProfileResponse).username);
-    setBio((profile as GetUserProfileResponse).bio || '');
-  }
+  useEffect(() => {
+    if (profile) {
+      setUsername((profile as GetUserProfileResponse).username);
+      setBio((profile as GetUserProfileResponse).bio || '');
+    }
+  }, [profile]);
 
   // Handle username update
   const handleUsernameUpdate = () => {
@@ -170,4 +172,4 @@ export function ProfileSettings() {
       </CardContent>
     </Card>
   );
-}
+} 

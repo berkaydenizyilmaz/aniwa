@@ -25,12 +25,18 @@ export function GeneralSettings() {
   const { updateSetting } = useSettingsStore();
 
   // Local state for optimistic updates
-  const [localSettings, setLocalSettings] = useState({
-    themePreference: (settings as UserProfileSettings)?.themePreference || Theme.SYSTEM,
-    titleLanguagePreference: (settings as UserProfileSettings)?.titleLanguagePreference || TitleLanguage.ROMAJI,
-    scoreFormat: (settings as UserProfileSettings)?.scoreFormat || ScoreFormat.POINT_10,
-    displayAdultContent: (settings as UserProfileSettings)?.displayAdultContent ?? true,
-    autoTrackOnAniwaListAdd: (settings as UserProfileSettings)?.autoTrackOnAniwaListAdd ?? false,
+  const [localSettings, setLocalSettings] = useState<{
+    themePreference: Theme;
+    titleLanguagePreference: TitleLanguage;
+    scoreFormat: ScoreFormat;
+    displayAdultContent: boolean;
+    autoTrackOnAniwaListAdd: boolean;
+  }>({
+    themePreference: Theme.SYSTEM,
+    titleLanguagePreference: TitleLanguage.ROMAJI,
+    scoreFormat: ScoreFormat.POINT_10,
+    displayAdultContent: true,
+    autoTrackOnAniwaListAdd: false,
   });
 
   // Update local state when settings change
