@@ -11,7 +11,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loading } from '@/components/ui/loading';
 import { GetUserProfileResponse } from '@/lib/types/api/settings.api';
-import { useEffect, useState } from 'react';
+import { updateUsernameSchema, updateBioSchema, updatePasswordSchema, type UpdateUsernameInput, type UpdateBioInput, type UpdatePasswordInput } from '@/lib/schemas/settings.schema';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 export function ProfileSettings() {
   const { profile, isLoading } = useSettings();
@@ -21,44 +32,57 @@ export function ProfileSettings() {
     updatePasswordMutation
   } = useSettingsMutations();
 
-  // Form states
-  const [username, setUsername] = useState('');
-  const [bio, setBio] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  // Username form
+  const usernameForm = useForm<UpdateUsernameInput>({
+    resolver: zodResolver(updateUsernameSchema),
+    defaultValues: {
+      username: '',
+    },
+  });
 
-  // Update form when profile changes
+  // Bio form
+  const bioForm = useForm<UpdateBioInput>({
+    resolver: zodResolver(updateBioSchema),
+    defaultValues: {
+      bio: '',
+    },
+  });
+
+  // Password form
+  const passwordForm = useForm<UpdatePasswordInput>({
+    resolver: zodResolver(updatePasswordSchema),
+    defaultValues: {
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
+
+  // Form'ları güncelle
   useEffect(() => {
     if (profile) {
-      setUsername((profile as GetUserProfileResponse).username);
-      setBio((profile as GetUserProfileResponse).bio || '');
+      usernameForm.reset({ username: (profile as GetUserProfileResponse).username });
+      bioForm.reset({ bio: (profile as GetUserProfileResponse).bio || '' });
     }
-  }, [profile]);
+  }, [profile, usernameForm, bioForm]);
 
-  // Handle username update
-  const handleUsernameUpdate = () => {
-    if (username.trim() && username !== (profile as GetUserProfileResponse)?.username) {
-      updateUsernameMutation.mutate({ username: username.trim() });
+  // Username submit
+  const onUsernameSubmit = async (data: UpdateUsernameInput) => {
+    if (data.username !== (profile as GetUserProfileResponse)?.username) {
+      updateUsernameMutation.mutate(data);
     }
   };
 
-  // Handle bio update
-  const handleBioUpdate = () => {
-    if (bio !== (profile as GetUserProfileResponse)?.bio) {
-      updateBioMutation.mutate({ bio: bio.trim() || null });
+  // Bio submit
+  const onBioSubmit = async (data: UpdateBioInput) => {
+    if (data.bio !== (profile as GetUserProfileResponse)?.bio) {
+      updateBioMutation.mutate(data);
     }
   };
 
-  // Handle password update
-  const handlePasswordUpdate = () => {
-    if (newPassword && confirmPassword && newPassword === confirmPassword) {
-      updatePasswordMutation.mutate({ 
-        newPassword, 
-        confirmPassword 
-      });
-      setNewPassword('');
-      setConfirmPassword('');
-    }
+  // Password submit
+  const onPasswordSubmit = async (data: UpdatePasswordInput) => {
+    updatePasswordMutation.mutate(data);
+    passwordForm.reset();
   };
 
   if (isLoading) {
@@ -82,93 +106,134 @@ export function ProfileSettings() {
         <CardDescription>Kullanıcı adı, biyografi ve parola değişiklikleri</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Kullanıcı Adı */}
+        {/* E-posta (Salt Okunur) */}
         <div className="space-y-2">
-          <Label htmlFor="username">Kullanıcı Adı</Label>
+          <Label>E-posta</Label>
           <Input
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Kullanıcı adınızı girin"
-            disabled={updateUsernameMutation.isPending}
+            value={(profile as GetUserProfileResponse)?.email || ''}
+            disabled
+            className="bg-muted"
           />
-          <Button
-            onClick={handleUsernameUpdate}
-            disabled={updateUsernameMutation.isPending || !username.trim() || username === (profile as GetUserProfileResponse)?.username}
-            size="sm"
-          >
-            {updateUsernameMutation.isPending ? 'Güncelleniyor...' : 'Güncelle'}
-          </Button>
+          <p className="text-sm text-muted-foreground">
+            E-posta adresi güvenlik nedeniyle değiştirilemez
+          </p>
         </div>
 
-        {/* Biyografi */}
-        <div className="space-y-2">
-          <Label htmlFor="bio">Biyografi</Label>
-          <Textarea
-            id="bio"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            placeholder="Kendiniz hakkında kısa bir açıklama yazın"
-            rows={3}
-            maxLength={500}
-            disabled={updateBioMutation.isPending}
-          />
-          <div className="flex items-center justify-between">
+        {/* Kullanıcı Adı */}
+        <Form {...usernameForm}>
+          <form onSubmit={usernameForm.handleSubmit(onUsernameSubmit)} className="space-y-2">
+            <FormField
+              control={usernameForm.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kullanıcı Adı</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Kullanıcı adınızı girin"
+                      disabled={updateUsernameMutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button
-              onClick={handleBioUpdate}
-              disabled={updateBioMutation.isPending || bio === (profile as GetUserProfileResponse)?.bio}
+              type="submit"
+              disabled={updateUsernameMutation.isPending || usernameForm.watch('username') === (profile as GetUserProfileResponse)?.username}
               size="sm"
             >
-              {updateBioMutation.isPending ? 'Güncelleniyor...' : 'Güncelle'}
+              Güncelle
             </Button>
-            <span className="text-sm text-muted-foreground">
-              {bio.length}/500
-            </span>
-          </div>
-        </div>
+          </form>
+        </Form>
+
+        {/* Biyografi */}
+        <Form {...bioForm}>
+          <form onSubmit={bioForm.handleSubmit(onBioSubmit)} className="space-y-2">
+            <FormField
+              control={bioForm.control}
+              name="bio"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Biyografi</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Kendiniz hakkında kısa bir açıklama yazın"
+                      rows={3}
+                      maxLength={500}
+                      disabled={updateBioMutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      {field.value?.length || 0}/500
+                    </span>
+                  </div>
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              disabled={updateBioMutation.isPending || bioForm.watch('bio') === (profile as GetUserProfileResponse)?.bio || !bioForm.watch('bio')?.trim()}
+              size="sm"
+            >
+              Güncelle
+            </Button>
+          </form>
+        </Form>
 
         {/* Parola Değiştirme */}
-        <div className="space-y-2">
-          <Label htmlFor="newPassword">Yeni Parola</Label>
-          <Input
-            id="newPassword"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="Yeni parolanızı girin"
-            disabled={updatePasswordMutation.isPending}
-          />
-          <Input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Yeni parolanızı tekrar girin"
-            disabled={updatePasswordMutation.isPending}
-          />
-          <Button
-            onClick={handlePasswordUpdate}
-            disabled={
-              updatePasswordMutation.isPending || 
-              !newPassword || 
-              !confirmPassword || 
-              newPassword !== confirmPassword ||
-              newPassword.length < 6
-            }
-            size="sm"
-          >
-            {updatePasswordMutation.isPending ? 'Güncelleniyor...' : 'Parolayı Güncelle'}
-          </Button>
-          {newPassword && newPassword.length < 6 && (
-            <p className="text-sm text-destructive">
-              Parola en az 6 karakter olmalıdır
-            </p>
-          )}
-          {newPassword && confirmPassword && newPassword !== confirmPassword && (
-            <p className="text-sm text-destructive">
-              Parolalar eşleşmiyor
-            </p>
-          )}
-        </div>
+        <Form {...passwordForm}>
+          <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-2">
+            <FormField
+              control={passwordForm.control}
+              name="newPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Yeni Parola</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Yeni parolanızı girin"
+                      disabled={updatePasswordMutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={passwordForm.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Parola Tekrarı</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Yeni parolanızı tekrar girin"
+                      disabled={updatePasswordMutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              disabled={updatePasswordMutation.isPending}
+              size="sm"
+            >
+              Parolayı Güncelle
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );
