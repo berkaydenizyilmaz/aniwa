@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { UserWithSettings } from '@/lib/types/db/user';
 import { PrismaClientOrTransaction } from '@/lib/types/db';
 import { handleDatabaseError } from '@/lib/utils/db-error-handler';
+import { GetUserProfileResponse } from '@/lib/types/api/settings.api';
 
 // User CRUD operasyonları
 
@@ -150,6 +151,31 @@ export async function countUsersDB(
         return await client.user.count({ where });
     } catch (error) {
         handleDatabaseError(error, 'Kullanıcı sayma', { where });
+    }
+}
+
+// Kullanıcı profilini getirir (settings olmadan)
+export async function findUserProfileDB(
+    id: string,
+    client: PrismaClientOrTransaction = prisma
+): Promise<GetUserProfileResponse | null> {
+    try {
+        return await client.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                bio: true,
+                profilePicture: true,
+                profileBanner: true,
+                lastLoginAt: true,
+                usernameChangedAt: true,
+                createdAt: true,
+            },
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Kullanıcı profili getirme', { id });
     }
 }
 

@@ -26,7 +26,8 @@ import {
   // Notification Settings
   updateNotificationSettingsBusiness,
   // Get Settings
-  getUserSettingsBusiness
+  getUserSettingsBusiness,
+  getUserProfileBusiness
 } from '@/lib/services/business/user/settings.business';
 import { 
   // Profile Settings
@@ -413,6 +414,25 @@ export async function getUserSettingsAction(): Promise<ServerActionResponse> {
   } catch (error) {
     handleServerActionError(error, {
       actionName: 'getUserSettingsAction',
+      userId: session?.user.id
+    });
+  }
+}
+
+// Kullanıcı profilini getirme action
+export async function getUserProfileAction(): Promise<ServerActionResponse> {
+  const session = await getServerSession(authConfig);
+  
+  try {
+    const result = await getUserProfileBusiness(session!.user.id);
+
+    return {
+      success: true,
+      data: result.data
+    };
+  } catch (error) {
+    handleServerActionError(error, {
+      actionName: 'getUserProfileAction',
       userId: session?.user.id
     });
   }

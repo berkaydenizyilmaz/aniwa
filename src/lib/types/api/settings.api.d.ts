@@ -104,17 +104,17 @@ export type UpdateShowCustomListsRequest = UpdateShowCustomListsInput;
 export type UpdateNotificationSettingsRequest = UpdateNotificationSettingsInput;
 
 // Kullanıcı ayarlarını getirme response tipi
-export interface GetUserSettingsResponse {
-  user: {
-    id: string;
-    username: string;
-    email: string;
-    bio: string | null;
-    profilePicture: string | null;
-    profileBanner: string | null;
-    lastLoginAt: Date | null;
-    usernameChangedAt: Date | null;
-    createdAt: Date;
-  };
-  settings: UserProfileSettings | null;
+export type GetUserSettingsResponse = UserProfileSettings;
+
+// Kullanıcı profilini getirme response tipi
+export interface GetUserProfileResponse {
+  id: string;
+  username: string;
+  email: string;
+  bio: string | null;
+  profilePicture: string | null;
+  profileBanner: string | null;
+  lastLoginAt: Date | null;
+  usernameChangedAt: Date | null;
+  createdAt: Date;
 } 

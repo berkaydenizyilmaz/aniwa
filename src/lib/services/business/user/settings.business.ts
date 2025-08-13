@@ -9,7 +9,8 @@ import {
 import { 
   findUserByIdDB,
   findUserByUsernameDB,
-  updateUserDB
+  updateUserDB,
+  findUserProfileDB
 } from '@/lib/services/db/user.db';
 import { 
   findUserSettingsDB,
@@ -44,11 +45,10 @@ import {
   // Notification Settings
   UpdateNotificationSettingsRequest, UpdateNotificationSettingsResponse,
   // Get Settings
-  GetUserSettingsResponse
+  GetUserSettingsResponse,
+  GetUserProfileResponse
 } from '@/lib/types/api/settings.api';
 import { AUTH } from '@/lib/constants/auth.constants';
-
-// ===== PROFILE SETTINGS =====
 
 // Username güncelleme
 export async function updateUsernameBusiness(
@@ -260,8 +260,6 @@ export async function updateProfileImagesBusiness(
     throw new BusinessError('Profil görselleri güncelleme başarısız');
   }
 }
-
-// ===== GENERAL SETTINGS =====
 
 // Tema tercihi güncelleme
 export async function updateThemePreferenceBusiness(
@@ -497,9 +495,6 @@ export async function updateAutoTrackOnAniwaListAddBusiness(
     throw new BusinessError('Otomatik takip ayarı güncelleme başarısız');
   }
 }
-
-// ===== PRIVACY SETTINGS =====
-
 // Profil görünürlüğü güncelleme
 export async function updateProfileVisibilityBusiness(
   userId: string,
@@ -783,8 +778,6 @@ export async function updateNotificationSettingsBusiness(
   }
 }
 
-// ===== GET SETTINGS =====
-
 // Kullanıcı tüm ayarlarını getirme
 export async function getUserSettingsBusiness(
   userId: string
@@ -810,17 +803,6 @@ export async function getUserSettingsBusiness(
     return {
       success: true,
       data: {
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          bio: user.bio,
-          profilePicture: user.profilePicture,
-          profileBanner: user.profileBanner,
-          lastLoginAt: user.lastLoginAt,
-          usernameChangedAt: user.usernameChangedAt,
-          createdAt: user.createdAt,
-        },
         settings: userSettings
       }
     };
@@ -837,5 +819,44 @@ export async function getUserSettingsBusiness(
     );
     
     throw new BusinessError('Kullanıcı ayarları getirme başarısız');
+  }
+}
+
+// Kullanıcı profilini getir
+export async function getUserProfileBusiness(
+  userId: string
+): Promise<ApiResponse<GetUserProfileResponse>> {
+  try {
+    // Kullanıcı profilini bul
+    const user = await findUserProfileDB(userId);
+    if (!user) {
+      throw new NotFoundError('Kullanıcı bulunamadı');
+    }
+
+    // Başarılı getirme logu
+    await logger.info(
+      EVENTS.USER.SETTINGS_RETRIEVED,
+      'Kullanıcı profili görüntülendi',
+      { userId },
+      userId
+    );
+
+    return {
+      success: true,
+      data: user
+    };
+  } catch (error) {
+    // BusinessError'ları direkt re-throw et
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
+      throw error;
+    }
+    
+    await logger.error(
+      EVENTS.SYSTEM.BUSINESS_ERROR,
+      'Kullanıcı profili getirme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
+    );
+    
+    throw new BusinessError('Kullanıcı profili getirme başarısız');
   }
 } 
