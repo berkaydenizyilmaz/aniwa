@@ -802,9 +802,7 @@ export async function getUserSettingsBusiness(
 
     return {
       success: true,
-      data: {
-        settings: userSettings
-      }
+      data: userSettings
     };
   } catch (error) {
     // BusinessError'ları direkt re-throw et
