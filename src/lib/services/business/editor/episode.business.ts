@@ -10,8 +10,6 @@ import {
   countEpisodesDB
 } from '@/lib/services/db/episode.db';
 import { findAnimeMediaPartByIdDB } from '@/lib/services/db/mediaPart.db';
-import { deleteImagesByEntity, uploadImage } from '@/lib/services/image/upload.service';
-import { IMAGE_TYPES } from '@/lib/constants/image.constants';
 import { 
   CreateEpisodeRequest, 
   UpdateEpisodeRequest,
@@ -52,12 +50,8 @@ export async function createEpisodeBusiness(
     }
 
     const { thumbnailImageFile, ...formData } = data;
+    // TODO: Image upload will be implemented
     let thumbnailImageUrl;
-    
-    if (thumbnailImageFile) {
-      const thumbnailResult = await uploadImage(thumbnailImageFile, IMAGE_TYPES.EPISODE_THUMBNAIL, `${data.mediaPartId}_ep${data.episodeNumber}`);
-      thumbnailImageUrl = thumbnailResult.secureUrl;
-    }
 
     const result = await createEpisodeDB({
       mediaPart: { connect: { id: formData.mediaPartId } },
@@ -244,11 +238,8 @@ export async function updateEpisodeBusiness(
     }
 
     const { thumbnailImageFile, ...formData } = data;
+    // TODO: Image upload will be implemented
     let uploadResult;
-    
-    if (thumbnailImageFile) {
-      uploadResult = await uploadImage(thumbnailImageFile, IMAGE_TYPES.EPISODE_THUMBNAIL, existingEpisode.mediaPartId);
-    }
 
     const result = await updateEpisodeDB(
       { id },
@@ -309,8 +300,7 @@ export async function deleteEpisodeBusiness(
 
     await deleteEpisodeDB({ id });
 
-    // Cloudinary'den thumbnail sil
-    await deleteImagesByEntity(id, 'episode');
+    // TODO: Image deletion will be implemented
 
     await logger.info(
       EVENTS.EDITOR.EPISODE_DELETED,

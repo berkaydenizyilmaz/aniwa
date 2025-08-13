@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { ImageUpload } from '@/components/ui/image-upload';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
@@ -26,7 +25,6 @@ import { createEpisodeAction, updateEpisodeAction, getEpisodeAction } from '@/li
 import { createEpisodeSchema, updateEpisodeSchema, type CreateEpisodeInput, type UpdateEpisodeInput } from '@/lib/schemas/anime.schema';
 import { toast } from 'sonner';
 import { Episode } from '@prisma/client';
-import { IMAGE_TYPES } from '@/lib/constants/image.constants';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -235,12 +233,10 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
                   <FormItem>
                     <FormLabel>Thumbnail</FormLabel>
                     <FormControl>
-                      <ImageUpload
-                        imageType={IMAGE_TYPES.EPISODE_THUMBNAIL}
-                        value={field.value}
-                        onChange={field.onChange}
-                        variant="default"
-                      />
+                      {/* TODO: Image upload component will be added */}
+                      <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <span className="text-gray-500">Thumbnail</span>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

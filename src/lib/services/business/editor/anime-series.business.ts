@@ -49,8 +49,6 @@ import {
   GetAnimeSeriesRelationsResponse,
   GetAnimeSeriesWithRelationsResponse,
 } from '@/lib/types/api/anime.api';
-import { uploadImage, deleteImagesByEntity } from '@/lib/services/image/upload.service';
-import { IMAGE_TYPES } from '@/lib/constants/image.constants';
 
 // Anime serisi oluşturma
 export async function createAnimeSeriesBusiness(
@@ -61,18 +59,8 @@ export async function createAnimeSeriesBusiness(
     // Image'ları data'dan çıkar
     const { coverImageFile, bannerImageFile, ...formData } = data;
     
-    // Resim yükleme işlemi
+    // TODO: Image upload will be implemented
     let coverImageUrl, bannerImageUrl;
-    
-    if (coverImageFile) {
-      const coverResult = await uploadImage(coverImageFile, IMAGE_TYPES.ANIME_COVER, 'temp');
-      coverImageUrl = coverResult.secureUrl;
-    }
-    
-    if (bannerImageFile) {
-      const bannerResult = await uploadImage(bannerImageFile, IMAGE_TYPES.ANIME_BANNER, 'temp');
-      bannerImageUrl = bannerResult.secureUrl;
-    }
 
     // Anime serisi oluştur
     const result = await createAnimeSeriesDB({
@@ -319,18 +307,8 @@ export async function updateAnimeSeriesBusiness(
       throw new NotFoundError('Anime serisi bulunamadı');
     }
 
-    // Resim yükleme işlemi
+    // TODO: Image upload will be implemented
     let coverImageUrl, bannerImageUrl;
-    
-    if (data.coverImageFile) {
-      const coverResult = await uploadImage(data.coverImageFile, IMAGE_TYPES.ANIME_COVER, id);
-      coverImageUrl = coverResult.secureUrl;
-    }
-    
-    if (data.bannerImageFile) {
-      const bannerResult = await uploadImage(data.bannerImageFile, IMAGE_TYPES.ANIME_BANNER, id);
-      bannerImageUrl = bannerResult.secureUrl;
-    }
 
     // Anime serisi güncelle
     const result = await updateAnimeSeriesDB({ id }, {
@@ -448,8 +426,7 @@ export async function deleteAnimeSeriesBusiness(
     // Anime serisi sil
     await deleteAnimeSeriesDB({ id });
 
-    // Cloudinary'den resimleri sil
-    await deleteImagesByEntity(id, 'anime');
+    // TODO: Image deletion will be implemented
 
     // Başarılı silme logu
     await logger.info(

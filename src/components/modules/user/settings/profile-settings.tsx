@@ -14,12 +14,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 import { Loading } from '@/components/ui/loading';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ImageUpload } from '@/components/ui/image-upload';
-import Image from 'next/image';
 import { 
   updateUsernameAction,
   updateBioAction,
@@ -40,7 +36,6 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
-import { IMAGE_TYPES } from '@/lib/constants/image.constants';
 
 export function ProfileSettings() {
   const [showPassword, setShowPassword] = useState(false);
@@ -317,14 +312,10 @@ export function ProfileSettings() {
           <div className="flex items-start gap-6">
             <div className="flex-shrink-0">
               <Label className="text-sm font-medium mb-3 block">Profil Fotoğrafı</Label>
-              <ImageUpload 
-                imageType={IMAGE_TYPES.USER_AVATAR} 
-                value={profilePicture || userProfile?.profilePicture || null}
-                onChange={handleProfilePictureChange} 
-                disabled={updateProfileImagesMutation.isPending} 
-                loading={updateProfileImagesMutation.isPending} 
-                variant="avatar" 
-              />
+              {/* TODO: Image upload component will be added */}
+              <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center">
+                <span className="text-gray-500">Avatar</span>
+              </div>
             </div>
             <div className="flex-1">
               <div className="text-sm text-muted-foreground mt-8">
@@ -337,14 +328,10 @@ export function ProfileSettings() {
           {/* Profil Banner */}
           <div>
             <Label className="text-sm font-medium mb-3 block">Profil Banner</Label>
-            <ImageUpload 
-              imageType={IMAGE_TYPES.USER_BANNER} 
-              value={profileBanner || userProfile?.profileBanner || null}
-              onChange={handleProfileBannerChange} 
-              disabled={updateProfileImagesMutation.isPending} 
-              loading={updateProfileImagesMutation.isPending} 
-              variant="default" 
-            />
+            {/* TODO: Image upload component will be added */}
+            <div className="w-64 h-32 bg-gray-200 rounded-lg flex items-center justify-center">
+              <span className="text-gray-500">Banner</span>
+            </div>
             <p className="text-xs text-muted-foreground mt-2">
               Banner görseliniz profilinizin üst kısmında görüntülenecektir. Maksimum 5MB
             </p>

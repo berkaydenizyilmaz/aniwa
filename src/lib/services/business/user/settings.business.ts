@@ -16,9 +16,6 @@ import {
   updateUserSettingsDB,
   createUserSettingsDB
 } from '@/lib/services/db/userProfileSettings.db';
-import { uploadImage, deleteImagesByEntity } from '@/lib/services/image/upload.service';
-import { extractPublicId } from '@/lib/services/image/naming.service';
-import { IMAGE_TYPES } from '@/lib/constants/image.constants';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
@@ -223,31 +220,9 @@ export async function updateProfileImagesBusiness(
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
 
-    // Görsel yükleme işlemleri
+    // TODO: Image upload will be implemented
     let profilePictureUrl = user.profilePicture;
     let profileBannerUrl = user.profileBanner;
-
-    if (data.profilePicture) {
-      // Sadece eski avatarı sil
-      if (user.profilePicture) {
-        const publicId = extractPublicId(user.profilePicture);
-        if (publicId) await deleteImagesByEntity(publicId, 'user');
-      }
-      // Yeni görseli yükle
-      const uploadResult = await uploadImage(data.profilePicture, IMAGE_TYPES.USER_AVATAR, userId);
-      profilePictureUrl = uploadResult.secureUrl;
-    }
-
-    if (data.profileBanner) {
-      // Sadece eski banner'ı sil
-      if (user.profileBanner) {
-        const publicId = extractPublicId(user.profileBanner);
-        if (publicId) await deleteImagesByEntity(publicId, 'user');
-      }
-      // Yeni banner'ı yükle
-      const uploadResult = await uploadImage(data.profileBanner, IMAGE_TYPES.USER_BANNER, userId);
-      profileBannerUrl = uploadResult.secureUrl;
-    }
 
     // Güncelleme
     await updateUserDB(

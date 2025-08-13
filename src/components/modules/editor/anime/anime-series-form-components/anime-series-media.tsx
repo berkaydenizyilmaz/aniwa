@@ -8,8 +8,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { ImageUpload } from '@/components/ui/image-upload';
-import { IMAGE_TYPES } from '@/lib/constants/image.constants';
 import { CreateAnimeSeriesInput, UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 
 interface AnimeSeriesMediaProps {
@@ -29,13 +27,10 @@ export function AnimeSeriesMedia({ isPending }: AnimeSeriesMediaProps) {
           <FormItem>
             <FormLabel>Kapak Görseli</FormLabel>
             <FormControl>
-              <ImageUpload
-                imageType={IMAGE_TYPES.ANIME_COVER}
-                value={field.value || null}
-                onChange={field.onChange}
-                disabled={isPending}
-                variant="default"
-              />
+              {/* TODO: Image upload component will be added */}
+              <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                <span className="text-gray-500">Cover Image</span>
+              </div>
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -50,13 +45,10 @@ export function AnimeSeriesMedia({ isPending }: AnimeSeriesMediaProps) {
           <FormItem>
             <FormLabel>Banner Görseli</FormLabel>
             <FormControl>
-              <ImageUpload
-                imageType={IMAGE_TYPES.ANIME_BANNER}
-                value={field.value || null}
-                onChange={field.onChange}
-                disabled={isPending}
-                variant="default"
-              />
+              {/* TODO: Image upload component will be added */}
+              <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                <span className="text-gray-500">Banner Image</span>
+              </div>
             </FormControl>
             <FormMessage />
           </FormItem>
