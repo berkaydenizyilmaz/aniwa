@@ -9,7 +9,7 @@ export const updateUsernameSchema = z.object({
 });
 
 export const updateBioSchema = z.object({
-  bio: z.string().max(500, 'Biyografi en fazla 500 karakter olabilir'),
+  bio: z.string().max(500, 'Biyografi en fazla 500 karakter olabilir').nullable(),
 });
 
 export const updatePasswordSchema = z.object({
@@ -21,8 +21,8 @@ export const updatePasswordSchema = z.object({
 });
 
 export const updateProfileImagesSchema = z.object({
-  profilePicture: z.instanceof(File).optional().nullable(),
-  profileBanner: z.instanceof(File).optional().nullable(),
+  profilePicture: z.string().nullable(),
+  profileBanner: z.string().nullable(),
 });
 
 // General Settings - Ayrı şemalar
