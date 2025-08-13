@@ -172,6 +172,7 @@ export function GeneralSettings() {
       {
         onSuccess: () => {
           updateSetting('themePreference', value as Theme);
+          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -183,6 +184,7 @@ export function GeneralSettings() {
       {
         onSuccess: () => {
           updateSetting('titleLanguagePreference', value as TitleLanguage);
+          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -194,6 +196,7 @@ export function GeneralSettings() {
       {
         onSuccess: () => {
           updateSetting('scoreFormat', value as ScoreFormat);
+          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -205,6 +208,7 @@ export function GeneralSettings() {
       {
         onSuccess: () => {
           updateSetting('displayAdultContent', checked);
+          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -216,6 +220,7 @@ export function GeneralSettings() {
       {
         onSuccess: () => {
           updateSetting('autoTrackOnAniwaListAdd', checked);
+          refreshSettings(); // Store'u güncelle
         }
       }
     );

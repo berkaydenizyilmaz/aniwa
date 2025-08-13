@@ -24,7 +24,7 @@ import { useSettingsStore } from '@/lib/stores/settings.store';
 import { useSession } from 'next-auth/react';
 
 export function NotificationSettings() {
-  const { settings, updateSetting } = useSettingsStore();
+  const { settings, updateSetting, refreshSettings } = useSettingsStore();
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 
@@ -73,6 +73,7 @@ export function NotificationSettings() {
       {
         onSuccess: () => {
           updateSetting('receiveNotificationOnNewFollow', checked);
+          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -88,6 +89,7 @@ export function NotificationSettings() {
       {
         onSuccess: () => {
           updateSetting('receiveNotificationOnEpisodeAiring', checked);
+          refreshSettings(); // Store'u güncelle
         }
       }
     );
@@ -103,6 +105,7 @@ export function NotificationSettings() {
       {
         onSuccess: () => {
           updateSetting('receiveNotificationOnNewMediaPart', checked);
+          refreshSettings(); // Store'u güncelle
         }
       }
     );
