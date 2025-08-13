@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
+import { useEffect } from 'react';
 import { getUserSettingsAction, getUserProfileAction } from '@/lib/actions/user/settings.actions';
 import { useSettingsStore } from '@/lib/stores/settings.store';
 import { GetUserSettingsResponse, GetUserProfileResponse } from '@/lib/types/api/settings.api';
@@ -27,20 +28,26 @@ export function useSettings() {
   });
 
   // Store'u güncelle
-  if (settingsQuery.data && 'success' in settingsQuery.data && settingsQuery.data.success) {
-    setSettings(settingsQuery.data.data as GetUserSettingsResponse);
-  }
+  useEffect(() => {
+    if (settingsQuery.data && 'success' in settingsQuery.data && settingsQuery.data.success) {
+      setSettings(settingsQuery.data.data as GetUserSettingsResponse);
+    }
+  }, [settingsQuery.data, setSettings]);
 
-  if (profileQuery.data && 'success' in profileQuery.data && profileQuery.data.success) {
-    setProfile(profileQuery.data.data as GetUserProfileResponse);
-  }
+  useEffect(() => {
+    if (profileQuery.data && 'success' in profileQuery.data && profileQuery.data.success) {
+      setProfile(profileQuery.data.data as GetUserProfileResponse);
+    }
+  }, [profileQuery.data, setProfile]);
 
   // Loading state'i güncelle
-  if (settingsQuery.isLoading || profileQuery.isLoading) {
-    setLoading(true);
-  } else {
-    setLoading(false);
-  }
+  useEffect(() => {
+    if (settingsQuery.isLoading || profileQuery.isLoading) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [settingsQuery.isLoading, profileQuery.isLoading, setLoading]);
 
   return {
     settings: settingsQuery.data?.success ? settingsQuery.data.data : null,
