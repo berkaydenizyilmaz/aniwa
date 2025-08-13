@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeSyncProvider } from "@/components/providers/theme-sync-provider";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -35,9 +36,11 @@ export default function RootLayout({
         >
           <AuthSessionProvider>
             <QueryProvider>
-              <main className="relative min-h-screen pb-20 md:pb-0">
-                {children}
-              </main>
+              <ThemeSyncProvider>
+                <main className="relative min-h-screen pb-20 md:pb-0">
+                  {children}
+                </main>
+              </ThemeSyncProvider>
             </QueryProvider>
           </AuthSessionProvider>
         </ThemeProvider>
