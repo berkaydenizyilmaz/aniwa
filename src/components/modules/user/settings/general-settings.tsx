@@ -49,7 +49,7 @@ import { ANIME } from '@/lib/constants/anime.constants';
 import { USER } from '@/lib/constants/user.constants';
 
 export function GeneralSettings() {
-  const { settings, updateSetting } = useSettingsStore();
+  const { settings, updateSetting, refreshSettings } = useSettingsStore();
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 

@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { UserProfileSettings } from '@prisma/client';
+import { getUserSettingsAction } from '@/lib/actions/user/settings.actions';
 
 interface SettingsState {
   // State
@@ -18,6 +19,7 @@ interface SettingsState {
     key: K,
     value: UserProfileSettings[K]
   ) => void;
+  refreshSettings: () => Promise<void>;
   reset: () => void;
 }
 
@@ -43,6 +45,17 @@ export const useSettingsStore = create<SettingsState>()(
               [key]: value,
             },
           });
+        }
+      },
+
+      refreshSettings: async () => {
+        try {
+          const result = await getUserSettingsAction();
+          if (result && 'success' in result && result.success) {
+            set({ settings: result.data as UserProfileSettings });
+          }
+        } catch (error) {
+          console.error('Failed to refresh settings:', error);
         }
       },
 
