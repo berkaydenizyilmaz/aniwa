@@ -34,16 +34,12 @@ import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Eye, EyeOff } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
 
 export function ProfileSettings() {
   const [showPassword, setShowPassword] = useState(false);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [profileBanner, setProfileBanner] = useState<File | null>(null);
-
-  // Settings hook'u kullan
-  const { data: userData } = useSettings();
   const { settings, updateSetting, userProfile } = useSettingsStore();
   const { data: session, update: updateSession } = useSession();
   const queryClient = useQueryClient();

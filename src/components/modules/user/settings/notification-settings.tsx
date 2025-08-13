@@ -9,10 +9,8 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 import { Loading } from '@/components/ui/loading';
 import { updateNotificationSettingsAction } from '@/lib/actions/user/settings.actions';
@@ -22,13 +20,10 @@ import {
 } from '@/lib/schemas/settings.schema';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
 import { useSession } from 'next-auth/react';
 
 export function NotificationSettings() {
-  // Settings hook'u kullan
-  const { data: userData } = useSettings();
   const { settings, updateSetting } = useSettingsStore();
   const { data: session } = useSession();
   const queryClient = useQueryClient();

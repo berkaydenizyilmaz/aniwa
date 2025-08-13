@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 import { Loading } from '@/components/ui/loading';
 import { 
@@ -44,14 +43,11 @@ import {
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProfileVisibility } from '@prisma/client';
-import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
 import { useSession } from 'next-auth/react';
 import { USER } from '@/lib/constants/user.constants';
 
 export function PrivacySettings() {
-  // Settings hook'u kullan
-  const { data: userData } = useSettings();
   const { settings, updateSetting } = useSettingsStore();
   const { data: session } = useSession();
   const queryClient = useQueryClient();

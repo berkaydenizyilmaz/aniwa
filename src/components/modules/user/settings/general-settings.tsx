@@ -9,7 +9,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from '@/components/ui/form';
 import {
   Select,
@@ -43,15 +43,12 @@ import {
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Theme, TitleLanguage, ScoreFormat } from '@prisma/client';
-import { useSettings } from '@/lib/hooks/use-settings';
 import { useSettingsStore } from '@/lib/stores/settings.store';
 import { useSession } from 'next-auth/react';
 import { ANIME } from '@/lib/constants/anime.constants';
 import { USER } from '@/lib/constants/user.constants';
 
 export function GeneralSettings() {
-  // Settings hook'u kullan
-  const { data: userData } = useSettings();
   const { settings, updateSetting } = useSettingsStore();
   const { data: session } = useSession();
   const queryClient = useQueryClient();
