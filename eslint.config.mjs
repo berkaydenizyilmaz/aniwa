@@ -10,7 +10,7 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next", "next/typescript"),
+  ...compat.extends("eslint-config-next"),
 ];
 
 export default eslintConfig;
