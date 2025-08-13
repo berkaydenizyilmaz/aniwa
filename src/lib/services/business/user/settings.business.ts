@@ -22,7 +22,6 @@ import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
 import { ApiResponse } from '@/lib/types/api';
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import {
   // Profile Settings
