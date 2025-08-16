@@ -82,16 +82,30 @@ export function ImageUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Kategori konfigürasyonu al
-  const config = IMAGE_PRESET_CONFIGS[category];
-  if (!config) {
-    throw new Error(`Unsupported image category: ${category}`);
-  }
+  const getConfigKey = (cat: ImageCategory): keyof typeof IMAGE_PRESET_CONFIGS => {
+    switch (cat) {
+      case 'user-profile':
+        return 'USER_PROFILE';
+      case 'user-banner':
+        return 'USER_BANNER';
+      case 'anime-cover':
+        return 'ANIME_COVER';
+      case 'anime-banner':
+        return 'ANIME_BANNER';
+      case 'episode-thumbnail':
+        return 'EPISODE_THUMBNAIL';
+      default:
+        throw new Error(`Unsupported image category: ${cat}`);
+    }
+  };
+
+  const config = IMAGE_PRESET_CONFIGS[getConfigKey(category)];
   
   // File validation
   const validateFile = useCallback((file: File): string | null => {
     // Format kontrolü
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
-    if (!fileExtension || !config.allowedFormats.includes(fileExtension)) {
+    if (!fileExtension || !config.allowedFormats.includes(fileExtension as any)) {
       return `Desteklenen formatlar: ${config.allowedFormats.join(', ')}`;
     }
     
