@@ -23,6 +23,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { ImageUpload } from '@/components/ui/image-upload';
+import { useImageUpload } from '@/lib/hooks/use-image-upload';
 
 export function ProfileSettings() {
   const { profile, isLoading } = useSettings();
@@ -31,6 +33,30 @@ export function ProfileSettings() {
     updateBioMutation,
     updatePasswordMutation
   } = useSettingsMutations();
+
+  // Profile picture upload
+  const profilePictureUpload = useImageUpload({
+    category: 'user-profile',
+    onUploadComplete: (file, url) => {
+      // TODO: Implement profile picture update mutation
+      console.log('Profile picture uploaded:', { file, url });
+    },
+    onError: (error) => {
+      console.error('Profile picture upload error:', error);
+    }
+  });
+
+  // Profile banner upload
+  const profileBannerUpload = useImageUpload({
+    category: 'user-banner',
+    onUploadComplete: (file, url) => {
+      // TODO: Implement profile banner update mutation
+      console.log('Profile banner uploaded:', { file, url });
+    },
+    onError: (error) => {
+      console.error('Profile banner upload error:', error);
+    }
+  });
 
   // Username form
   const usernameForm = useForm<UpdateUsernameInput>({
@@ -62,8 +88,12 @@ export function ProfileSettings() {
     if (profile) {
       usernameForm.reset({ username: (profile as GetUserProfileResponse).username });
       bioForm.reset({ bio: (profile as GetUserProfileResponse).bio || '' });
+      
+      // Set existing image URLs
+      profilePictureUpload.setExistingUrl((profile as GetUserProfileResponse).profilePicture);
+      profileBannerUpload.setExistingUrl((profile as GetUserProfileResponse).profileBanner);
     }
-  }, [profile, usernameForm, bioForm]);
+  }, [profile, usernameForm, bioForm, profilePictureUpload, profileBannerUpload]);
 
   // Username submit
   const onUsernameSubmit = async (data: UpdateUsernameInput) => {
