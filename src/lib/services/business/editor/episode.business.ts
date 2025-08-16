@@ -22,6 +22,11 @@ import { ApiResponse } from '@/lib/types/api/index';
 import { BusinessError, DatabaseError, NotFoundError } from '@/lib/errors';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
+import { 
+  uploadImageBusiness, 
+  deleteImageBusiness, 
+  createImageUploadContext
+} from '@/lib/services/business/shared/image.business';
 
 // Episode oluşturma
 export async function createEpisodeBusiness(
@@ -50,20 +55,39 @@ export async function createEpisodeBusiness(
     }
 
     const { thumbnailImageFile, ...formData } = data;
-    // TODO: Image upload will be implemented
-    let thumbnailImageUrl;
-
+    
+    // Önce episode'u oluştur
     const result = await createEpisodeDB({
       mediaPart: { connect: { id: formData.mediaPartId } },
       episodeNumber: formData.episodeNumber,
       title: formData.title,
       description: formData.description,
-      thumbnailImage: thumbnailImageUrl,
+      thumbnailImage: null,
       airDate: formData.airDate,
       duration: formData.duration,
       isFiller: formData.isFiller,
       fillerNotes: formData.fillerNotes,
     });
+
+    // Image yükleme (episode ID'si ile)
+    let thumbnailImageUrl;
+
+    if (thumbnailImageFile) {
+      const thumbnailUpload = await uploadImageBusiness(
+        createImageUploadContext('episode-thumbnail', result.id, userId),
+        thumbnailImageFile,
+        userId
+      );
+      if (thumbnailUpload.success && thumbnailUpload.data) {
+        thumbnailImageUrl = thumbnailUpload.data.secureUrl;
+        
+        // Episode'u thumbnail ile güncelle
+        await updateEpisodeDB(
+          { id: result.id },
+          { thumbnailImage: thumbnailImageUrl }
+        );
+      }
+    }
 
     // Başarılı oluşturma logu
     await logger.info(
@@ -238,8 +262,24 @@ export async function updateEpisodeBusiness(
     }
 
     const { thumbnailImageFile, ...formData } = data;
-    // TODO: Image upload will be implemented
-    let uploadResult;
+    
+    // Image yükleme
+    let thumbnailImageUrl = existingEpisode.thumbnailImage;
+
+    if (thumbnailImageFile) {
+      const thumbnailUpload = await uploadImageBusiness(
+        createImageUploadContext('episode-thumbnail', id, userId),
+        thumbnailImageFile,
+        userId,
+        {
+          deleteOld: true,
+          oldImageUrl: existingEpisode.thumbnailImage
+        }
+      );
+      if (thumbnailUpload.success && thumbnailUpload.data) {
+        thumbnailImageUrl = thumbnailUpload.data.secureUrl;
+      }
+    }
 
     const result = await updateEpisodeDB(
       { id },
@@ -247,7 +287,7 @@ export async function updateEpisodeBusiness(
         ...(formData.episodeNumber && { episodeNumber: formData.episodeNumber }),
         ...(formData.title && { title: formData.title }),
         ...(formData.description !== undefined && { description: formData.description }),
-        ...(uploadResult?.thumbnailImage && { thumbnailImage: uploadResult.thumbnailImage.secureUrl }),
+        ...(thumbnailImageUrl && { thumbnailImage: thumbnailImageUrl }),
         ...(formData.airDate && { airDate: formData.airDate }),
         ...(formData.duration && { duration: formData.duration }),
         ...(formData.isFiller !== undefined && { isFiller: formData.isFiller }),
@@ -262,7 +302,7 @@ export async function updateEpisodeBusiness(
         episodeId: result.id,
         mediaPartId: result.mediaPartId,
         episodeNumber: result.episodeNumber,
-        hasThumbnail: !!uploadResult?.thumbnailImage
+        hasThumbnail: !!thumbnailImageUrl
       },
       userId
     );

@@ -49,6 +49,11 @@ import {
   GetAnimeSeriesRelationsResponse,
   GetAnimeSeriesWithRelationsResponse,
 } from '@/lib/types/api/anime.api';
+import { 
+  uploadImageBusiness, 
+  deleteImageBusiness, 
+  createImageUploadContext
+} from '@/lib/services/business/shared/image.business';
 
 // Anime serisi oluşturma
 export async function createAnimeSeriesBusiness(
@@ -59,10 +64,7 @@ export async function createAnimeSeriesBusiness(
     // Image'ları data'dan çıkar
     const { coverImageFile, bannerImageFile, ...formData } = data;
     
-    // TODO: Image upload will be implemented
-    let coverImageUrl, bannerImageUrl;
-
-    // Anime serisi oluştur
+    // Önce anime serisini oluştur
     const result = await createAnimeSeriesDB({
       title: formData.title,
       englishTitle: formData.englishTitle,
@@ -78,10 +80,46 @@ export async function createAnimeSeriesBusiness(
       isAdult: formData.isAdult,
       trailer: formData.trailer || null,
       synonyms: formData.synonyms || [],
-      // Resim URL'leri
-      coverImage: coverImageUrl,
-      bannerImage: bannerImageUrl,
+      // Resim URL'leri başlangıçta null
+      coverImage: null,
+      bannerImage: null,
     });
+
+    // Image yüklemeleri (anime ID'si ile)
+    let coverImageUrl, bannerImageUrl;
+
+    if (coverImageFile) {
+      const coverUpload = await uploadImageBusiness(
+        createImageUploadContext('anime-cover', result.id, userId),
+        coverImageFile,
+        userId
+      );
+      if (coverUpload.success && coverUpload.data) {
+        coverImageUrl = coverUpload.data.secureUrl;
+      }
+    }
+
+    if (bannerImageFile) {
+      const bannerUpload = await uploadImageBusiness(
+        createImageUploadContext('anime-banner', result.id, userId),
+        bannerImageFile,
+        userId
+      );
+      if (bannerUpload.success && bannerUpload.data) {
+        bannerImageUrl = bannerUpload.data.secureUrl;
+      }
+    }
+
+    // Eğer image upload başarılıysa, anime'yi güncelle
+    if (coverImageUrl || bannerImageUrl) {
+      await updateAnimeSeriesDB(
+        { id: result.id },
+        {
+          coverImage: coverImageUrl || undefined,
+          bannerImage: bannerImageUrl || undefined,
+        }
+      );
+    }
 
     // İlişkileri oluştur
     if (data.genres && data.genres.length > 0) {
@@ -307,8 +345,42 @@ export async function updateAnimeSeriesBusiness(
       throw new NotFoundError('Anime serisi bulunamadı');
     }
 
-    // TODO: Image upload will be implemented
-    let coverImageUrl, bannerImageUrl;
+    // Image'ları data'dan çıkar
+    const { coverImageFile, bannerImageFile, ...formData } = data;
+    
+    // Image yüklemeleri
+    let coverImageUrl = existingAnime.coverImage;
+    let bannerImageUrl = existingAnime.bannerImage;
+
+    if (coverImageFile) {
+      const coverUpload = await uploadImageBusiness(
+        createImageUploadContext('anime-cover', id, userId),
+        coverImageFile,
+        userId,
+        {
+          deleteOld: true,
+          oldImageUrl: existingAnime.coverImage
+        }
+      );
+      if (coverUpload.success && coverUpload.data) {
+        coverImageUrl = coverUpload.data.secureUrl;
+      }
+    }
+
+    if (bannerImageFile) {
+      const bannerUpload = await uploadImageBusiness(
+        createImageUploadContext('anime-banner', id, userId),
+        bannerImageFile,
+        userId,
+        {
+          deleteOld: true,
+          oldImageUrl: existingAnime.bannerImage
+        }
+      );
+      if (bannerUpload.success && bannerUpload.data) {
+        bannerImageUrl = bannerUpload.data.secureUrl;
+      }
+    }
 
     // Anime serisi güncelle
     const result = await updateAnimeSeriesDB({ id }, {
