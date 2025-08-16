@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 import { ImageCategory } from '@/lib/types/cloudinary';
+import { uploadProfileImageAction } from '@/lib/actions/user/settings.actions';
 
 export interface UseImageUploadOptions {
   /**
@@ -107,16 +108,33 @@ export function useImageUpload(options: UseImageUploadOptions): UseImageUploadRe
         });
       }, 200);
       
-      // TODO: Implement actual upload logic here
-      // For now, simulate upload
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Complete progress
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-      
-      // Simulate successful upload URL
-      const uploadedUrl = `https://res.cloudinary.com/aniwa/image/upload/v1234567890/${category}/uploaded-image.jpg`;
+      // Real upload implementation
+      if (category === 'user-profile' || category === 'user-banner') {
+        // Create FormData for server action
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('imageType', category === 'user-profile' ? 'profile' : 'banner');
+        
+        // Call server action
+        const result = await uploadProfileImageAction(formData);
+        
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+        
+        if (!result?.success || !result?.data?.secureUrl) {
+          throw new Error(result?.error || 'Upload failed');
+        }
+        
+        const uploadedUrl = result.data.secureUrl;
+      } else {
+        // For other categories, still simulate for now
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+        
+        const uploadedUrl = `https://res.cloudinary.com/aniwa/image/upload/v1234567890/${category}/uploaded-image.jpg`;
+      }
       
       // Call completion callback
       onUploadComplete?.(selectedFile, uploadedUrl);

@@ -28,7 +28,9 @@ import {
   updateBioBusiness,
   updatePasswordBusiness,
   updateProfileImagesBusiness,
-  getUserProfileBusiness
+  getUserProfileBusiness,
+  uploadUserProfileImageBusiness,
+  deleteUserProfileImageBusiness
 } from '@/lib/services/business/user/settings/profile-settings.business';
 import { 
   updateThemePreferenceSchema,
@@ -438,6 +440,53 @@ export async function getUserProfileAction(): Promise<ServerActionResponse> {
   } catch (error) {
     handleServerActionError(error, {
       actionName: 'getUserProfileAction',
+      userId: session?.user.id
+    });
+  }
+}
+
+// ===== IMAGE UPLOAD ACTIONS =====
+
+export async function uploadProfileImageAction(formData: FormData): Promise<ServerActionResponse> {
+  const session = await getServerSession(authConfig);
+  
+  try {
+    const file = formData.get('file') as File;
+    const imageType = formData.get('imageType') as 'profile' | 'banner';
+    
+    if (!file || !imageType) {
+      throw new Error('Dosya ve görsel tipi gerekli');
+    }
+    
+    const result = await uploadUserProfileImageBusiness(session.user.id, file, imageType);
+    
+    revalidatePath(ROUTES.PAGES.SETTINGS);
+    return {
+      success: true,
+      data: result.data
+    };
+  } catch (error) {
+    handleServerActionError(error, {
+      actionName: 'uploadProfileImageAction',
+      userId: session?.user.id
+    });
+  }
+}
+
+export async function deleteProfileImageAction(data: { imageType: 'profile' | 'banner' }): Promise<ServerActionResponse> {
+  const session = await getServerSession(authConfig);
+  
+  try {
+    const result = await deleteUserProfileImageBusiness(session.user.id, data.imageType);
+    
+    revalidatePath(ROUTES.PAGES.SETTINGS);
+    return {
+      success: true,
+      data: result.data
+    };
+  } catch (error) {
+    handleServerActionError(error, {
+      actionName: 'deleteProfileImageAction',
       userId: session?.user.id
     });
   }
