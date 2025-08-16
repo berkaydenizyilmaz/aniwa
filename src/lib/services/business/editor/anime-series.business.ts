@@ -54,6 +54,8 @@ import {
   deleteImageBusiness, 
   createImageUploadContext
 } from '@/lib/services/business/shared/image.business';
+import { findAllAnimeMediaPartsDB } from '@/lib/services/db/mediaPart.db';
+import { findEpisodesByMediaPartIdDB } from '@/lib/services/db/episode.db';
 
 // Anime serisi oluşturma
 export async function createAnimeSeriesBusiness(
@@ -495,10 +497,118 @@ export async function deleteAnimeSeriesBusiness(
       throw new NotFoundError('Anime serisi bulunamadı');
     }
 
-    // Anime serisi sil
-    await deleteAnimeSeriesDB({ id });
+    // Önce görselleri sil (varsa) 
+    const imagePromises = [];
+    
+    if (existingAnimeSeries.coverImage) {
+      imagePromises.push(
+        deleteImageBusiness(
+          createImageUploadContext('anime-cover', id, userId),
+          userId,
+          existingAnimeSeries.coverImage
+        ).catch(error => {
+          logger.warn(
+            EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+            'Anime serisi silme sırasında cover image silinemedi',
+            { 
+              animeSeriesId: id,
+              coverImage: existingAnimeSeries.coverImage,
+              error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+            },
+            userId
+          );
+        })
+      );
+    }
+    
+    if (existingAnimeSeries.bannerImage) {
+      imagePromises.push(
+        deleteImageBusiness(
+          createImageUploadContext('anime-banner', id, userId),
+          userId,
+          existingAnimeSeries.bannerImage
+        ).catch(error => {
+          logger.warn(
+            EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+            'Anime serisi silme sırasında banner image silinemedi',
+            { 
+              animeSeriesId: id,
+              bannerImage: existingAnimeSeries.bannerImage,
+              error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+            },
+            userId
+          );
+        })
+      );
+    }
 
-    // TODO: Image deletion will be implemented
+    // Anime'ye ait tüm episode thumbnail'larını da sil
+    try {
+      // Anime'nin media part'larını bul
+      const mediaParts = await findAllAnimeMediaPartsDB({ seriesId: id }, 0, 1000);
+      
+      // Her media part için episode'ları bul ve thumbnail'larını sil
+      for (const mediaPart of mediaParts) {
+        try {
+          const episodes = await findEpisodesByMediaPartIdDB(mediaPart.id);
+          
+          for (const episode of episodes) {
+            if (episode.thumbnailImage) {
+              imagePromises.push(
+                deleteImageBusiness(
+                  createImageUploadContext('episode-thumbnail', episode.id, userId),
+                  userId,
+                  episode.thumbnailImage
+                ).catch(error => {
+                  logger.warn(
+                    EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+                    'Anime series silme sırasında episode thumbnail silinemedi',
+                    { 
+                      animeSeriesId: id,
+                      mediaPartId: mediaPart.id,
+                      episodeId: episode.id,
+                      thumbnailImage: episode.thumbnailImage,
+                      error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+                    },
+                    userId
+                  );
+                })
+              );
+            }
+          }
+        } catch (episodeError) {
+          // Episode bulma hatası
+          await logger.warn(
+            EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+            'Media part episode\'ları bulunamadı',
+            { 
+              animeSeriesId: id,
+              mediaPartId: mediaPart.id,
+              error: episodeError instanceof Error ? episodeError.message : 'Bilinmeyen hata'
+            },
+            userId
+          );
+        }
+      }
+      
+    } catch (error) {
+      // Episode cleanup hatası anime silmeyi engellemesin
+      await logger.warn(
+        EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+        'Anime serisi silme sırasında episode thumbnail cleanup hatası',
+        { 
+          animeSeriesId: id,
+          error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+        },
+        userId
+      );
+    }
+
+    // Görsellerin silinmesini bekle (hata olsa bile devam et)
+    await Promise.allSettled(imagePromises);
+
+    // Anime serisi sil (Prisma cascade delete ile episode'lar da silinir)
+    await deleteAnimeSeriesDB({ id });
 
     // Başarılı silme logu
     await logger.info(

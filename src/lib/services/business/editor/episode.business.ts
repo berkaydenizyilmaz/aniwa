@@ -338,9 +338,31 @@ export async function deleteEpisodeBusiness(
       throw new NotFoundError('Episode bulunamadı');
     }
 
-    await deleteEpisodeDB({ id });
+    // Önce görseli sil (varsa)
+    if (existingEpisode.thumbnailImage) {
+      try {
+        await deleteImageBusiness(
+          createImageUploadContext('episode-thumbnail', id, userId),
+          userId,
+          existingEpisode.thumbnailImage
+        );
+      } catch (imageError) {
+        // Image silme hatası episode silmeyi engellemesin, sadece logla
+        await logger.warn(
+          EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+          'Episode silme sırasında thumbnail silinemedi',
+          { 
+            episodeId: id,
+            thumbnailImage: existingEpisode.thumbnailImage,
+            error: imageError instanceof Error ? imageError.message : 'Bilinmeyen hata'
+          },
+          userId
+        );
+      }
+    }
 
-    // TODO: Image deletion will be implemented
+    // Episode'u sil
+    await deleteEpisodeDB({ id });
 
     await logger.info(
       EVENTS.EDITOR.EPISODE_DELETED,

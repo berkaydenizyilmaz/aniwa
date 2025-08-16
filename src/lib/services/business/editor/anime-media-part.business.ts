@@ -20,6 +20,11 @@ import { logger } from '@/lib/utils/logger';
 import { EVENTS } from '@/lib/constants/events.constants';
 import { ApiResponse } from '@/lib/types/api';
 import { 
+  deleteImageBusiness, 
+  createImageUploadContext
+} from '@/lib/services/business/shared/image.business';
+import { findEpisodesByMediaPartIdDB } from '@/lib/services/db/episode.db';
+import { 
   CreateAnimeMediaPartResponse, 
   GetAnimeMediaPartResponse, 
   GetAnimeMediaPartsResponse, 
@@ -307,10 +312,53 @@ export async function deleteAnimeMediaPartBusiness(
       throw new NotFoundError('Anime medya parçası bulunamadı');
     }
 
-    // Anime medya parçası sil
-    await deleteAnimeMediaPartDB({ id });
+    // Önce media part'a ait episode thumbnail'larını sil
+    try {
+      const episodes = await findEpisodesByMediaPartIdDB(id);
+      
+      const imagePromises = [];
+      for (const episode of episodes) {
+        if (episode.thumbnailImage) {
+          imagePromises.push(
+            deleteImageBusiness(
+              createImageUploadContext('episode-thumbnail', episode.id, userId),
+              userId,
+              episode.thumbnailImage
+            ).catch(error => {
+              logger.warn(
+                EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+                'Media part silme sırasında episode thumbnail silinemedi',
+                { 
+                  mediaPartId: id,
+                  episodeId: episode.id,
+                  thumbnailImage: episode.thumbnailImage,
+                  error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+                },
+                userId
+              );
+            })
+          );
+        }
+      }
+      
+      // Tüm thumbnail'ların silinmesini bekle (hata olsa bile devam et)
+      await Promise.allSettled(imagePromises);
+      
+    } catch (error) {
+      // Episode cleanup hatası media part silmeyi engellemesin
+      await logger.warn(
+        EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+        'Media part silme sırasında episode thumbnail cleanup hatası',
+        { 
+          mediaPartId: id,
+          error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+        },
+        userId
+      );
+    }
 
-    // TODO: Image deletion will be implemented
+    // Media part'ı sil (Prisma cascade delete ile episode'lar da silinir)
+    await deleteAnimeMediaPartDB({ id });
 
     // Başarılı silme logu
     await logger.info(
