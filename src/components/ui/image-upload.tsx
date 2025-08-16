@@ -1,11 +1,8 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react';
-import Image from 'next/image';
+import { Upload, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-
 import { ImageCategory } from '@/lib/types/cloudinary';
 import { IMAGE_PRESET_CONFIGS } from '@/lib/constants/cloudinary.constants';
 
@@ -46,7 +43,7 @@ export interface ImageUploadProps {
   disabled?: boolean;
   
   /**
-   * Klasör adı (opsiyonel override)
+   * CSS class name
    */
   className?: string;
   
@@ -56,7 +53,7 @@ export interface ImageUploadProps {
   placeholder?: string;
   
   /**
-   * Show progress during upload
+   * Show progress indicator
    */
   showProgress?: boolean;
 }
@@ -74,10 +71,6 @@ export function ImageUpload({
   showProgress = true,
 }: ImageUploadProps) {
   const [isDragOver, setIsDragOver] = useState(false);
-  // Upload progress tracking (controlled by parent via showProgress)
-  const isUploading = showProgress;
-  // Progress will be managed by parent component mutation state
-  const [previewUrl, setPreviewUrl] = useState<string | null>(value || null);
   const [error, setError] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -130,15 +123,10 @@ export function ImageUpload({
     
     setError(null);
     
-    // Create preview URL
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    
     // Call onChange with file
     onChange(file);
     
-    // Simulate upload progress if needed
-    // Just call onChange, parent will handle upload
+    // Notify parent that upload started
     onUploadStart?.();
   }, [validateFile, onChange, onUploadStart, onUploadError]);
   
@@ -161,31 +149,11 @@ export function ImageUpload({
     
     if (disabled) return;
     
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      handleFileSelect(files[0]);
-    }
-  }, [disabled, handleFileSelect]);
-  
-  // Handle input change
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+    const files = e.dataTransfer.files;
     if (files && files.length > 0) {
       handleFileSelect(files[0]);
     }
-  }, [handleFileSelect]);
-  
-  // Handle remove
-  const handleRemove = useCallback(() => {
-    setPreviewUrl(null);
-    setError(null);
-    onChange(null);
-    
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  }, [onChange]);
+  }, [handleFileSelect, disabled]);
   
   // Handle click to open file dialog
   const handleClick = useCallback(() => {
@@ -194,128 +162,83 @@ export function ImageUpload({
     }
   }, [disabled]);
   
+  // Handle file input change
+  const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      handleFileSelect(files[0]);
+    }
+  }, [handleFileSelect]);
+  
+  const isUploading = showProgress;
+
   return (
-    <div className={cn('space-y-2', className)}>
-      {/* Upload Area */}
+    <div className={cn('w-full', className)}>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={config.allowedFormats.map(format => `.${format}`).join(',')}
+        onChange={handleFileInputChange}
+        className="hidden"
+        disabled={disabled}
+      />
+      
       <div
         onClick={handleClick}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          'relative border-2 border-dashed rounded-lg transition-colors duration-200',
+          'relative border-2 border-dashed rounded-lg transition-colors duration-200 min-h-20',
           'hover:bg-muted/50 cursor-pointer',
           isDragOver && 'border-primary bg-primary/5',
           error && 'border-destructive',
           disabled && 'opacity-50 cursor-not-allowed hover:bg-transparent',
-          previewUrl ? 'border-solid' : 'border-muted-foreground/25'
+          'border-muted-foreground/25'
         )}
       >
-        {/* Preview Image */}
-        {previewUrl && (
-          <div className="relative">
-            <Image
-              src={previewUrl}
-              alt="Preview"
-              className="w-full h-48 object-cover rounded-lg"
-              width={config.dimensions.width}
-              height={config.dimensions.height}
-              unoptimized={previewUrl.startsWith('blob:')}
-            />
-            
-            {/* Remove Button */}
-            {!disabled && (
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                className="absolute top-2 right-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemove();
-                }}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-            
-            {/* Upload Progress Overlay */}
-            {isUploading && showProgress && (
-              <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
-                <div className="bg-white p-4 rounded-lg space-y-2 min-w-48">
-                  <div className="text-sm font-medium text-center">
-                    Yükleniyor...
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {/* Upload Placeholder */}
-        {!previewUrl && (
-          <div className="p-8 text-center">
-            <div className="mx-auto w-12 h-12 mb-4">
-              {isDragOver ? (
-                <Upload className="w-full h-full text-primary" />
-              ) : (
-                <ImageIcon className="w-full h-full text-muted-foreground" />
-              )}
+        {/* Upload Area */}
+        <div className="p-4 text-center">
+          {/* Upload Status */}
+          {isUploading ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+              <span className="text-sm font-medium">Yükleniyor...</span>
             </div>
-            
-            <div className="space-y-2">
-              <p className="text-sm font-medium">
-                {placeholder || (
-                  isDragOver 
-                    ? 'Dosyayı bırak' 
-                    : 'Dosya seç veya sürükle'
+          ) : (
+            <div className="flex items-center justify-center space-x-3">
+              {/* Upload Icon */}
+              <div className="w-6 h-6 flex-shrink-0">
+                {isDragOver ? (
+                  <Upload className="w-full h-full text-primary" />
+                ) : (
+                  <ImageIcon className="w-full h-full text-muted-foreground" />
                 )}
-              </p>
+              </div>
               
-              <p className="text-xs text-muted-foreground">
-                Maksimum: {Math.round(config.maxSizeBytes / (1024 * 1024))}MB
-              </p>
-              
-              <p className="text-xs text-muted-foreground">
-                Desteklenen formatlar: {config.allowedFormats.join(', ')}
-              </p>
-              
-              {config.dimensions && (
-                <p className="text-xs text-muted-foreground">
-                  Önerilen boyut: {config.dimensions.width}x{config.dimensions.height}
+              {/* Upload Text */}
+              <div className="text-left">
+                <p className="text-sm font-medium">
+                  {placeholder || (
+                    isDragOver 
+                      ? 'Dosyayı bırak' 
+                      : 'Dosya seç veya sürükle'
+                  )}
                 </p>
-              )}
+                <p className="text-xs text-muted-foreground">
+                  {config.allowedFormats.join(', ').toUpperCase()} • Max {Math.round(config.maxSizeBytes / (1024 * 1024))}MB
+                </p>
+              </div>
             </div>
-          </div>
-        )}
-        
-        {/* Hidden File Input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={config.allowedFormats.map(f => `.${f}`).join(',')}
-          onChange={handleInputChange}
-          className="hidden"
-          disabled={disabled}
-        />
+          )}
+        </div>
       </div>
       
       {/* Error Message */}
       {error && (
-        <div className="flex items-center gap-2 text-destructive text-sm">
-          <AlertCircle className="h-4 w-4" />
-          {error}
-        </div>
-      )}
-      
-      {/* Current Value Info */}
-      {value && !previewUrl && (
-        <div className="text-xs text-muted-foreground">
-          Mevcut dosya mevcut
-        </div>
+        <p className="mt-2 text-sm text-destructive flex items-center">
+          <span>{error}</span>
+        </p>
       )}
     </div>
   );
