@@ -1,7 +1,7 @@
 // Cloudinary transformation operations
 
 import { CloudinaryTransformation, ImageDimensions } from '@/lib/types/cloudinary';
-import { RESPONSIVE_DIMENSIONS } from '@/lib/constants/cloudinary.constants';
+import { RESPONSIVE_DIMENSIONS, RESPONSIVE_BREAKPOINTS, RESPONSIVE_SIZES, THUMBNAIL_SETTINGS } from '@/lib/constants/cloudinary.constants';
 
 // Build transformation URL for existing image
 export const buildTransformationUrl = (
@@ -95,14 +95,14 @@ export const generateSrcSet = (
 
 // Generate sizes attribute for responsive images
 export const generateSizes = (category: 'USER_PROFILE' | 'ANIME_COVER'): string => {
-  switch (category) {
-    case 'USER_PROFILE':
-      return '(max-width: 640px) 100px, (max-width: 768px) 200px, 400px';
-    case 'ANIME_COVER':
-      return '(max-width: 640px) 150px, (max-width: 768px) 300px, 600px';
-    default:
-      return '100vw';
+  const breakpoints = RESPONSIVE_BREAKPOINTS;
+  const sizes = RESPONSIVE_SIZES[category];
+  
+  if (!sizes) {
+    return '100vw';
   }
+  
+  return `(max-width: ${breakpoints.MOBILE}px) ${sizes.MOBILE}px, (max-width: ${breakpoints.TABLET}px) ${sizes.TABLET}px, ${sizes.DESKTOP}px`;
 };
 
 // Create optimized image URL for specific use case
@@ -132,7 +132,7 @@ export const createOptimizedImageUrl = (
 // Create thumbnail URL
 export const createThumbnailUrl = (
   baseUrl: string,
-  size: number = 150
+  size: number = THUMBNAIL_SETTINGS.DEFAULT_SIZE
 ): string => {
   return createOptimizedImageUrl(baseUrl, {
     width: size,
@@ -147,11 +147,11 @@ export const createThumbnailUrl = (
 // Create blurred placeholder URL
 export const createPlaceholderUrl = (
   baseUrl: string,
-  blur: number = 1000
+  blur: number = THUMBNAIL_SETTINGS.PLACEHOLDER.BLUR
 ): string => {
   const transformation: CloudinaryTransformation = {
-    width: 50,
-    height: 50,
+    width: THUMBNAIL_SETTINGS.PLACEHOLDER.SIZE,
+    height: THUMBNAIL_SETTINGS.PLACEHOLDER.SIZE,
     crop: 'fill',
     quality: 30,
     format: 'auto',

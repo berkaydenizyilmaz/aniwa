@@ -137,6 +137,42 @@ export const IMAGE_QUALITY = {
   AUTO: 'auto',
 } as const;
 
+// Responsive breakpoints for image sizes
+export const RESPONSIVE_BREAKPOINTS = {
+  MOBILE: 640,
+  TABLET: 768,
+  DESKTOP: 1024,
+} as const;
+
+// Responsive sizes configuration
+export const RESPONSIVE_SIZES = {
+  USER_PROFILE: {
+    MOBILE: 100,
+    TABLET: 200,
+    DESKTOP: 400,
+  },
+  ANIME_COVER: {
+    MOBILE: 150,
+    TABLET: 300,
+    DESKTOP: 600,
+  },
+} as const;
+
+// Thumbnail and placeholder settings
+export const THUMBNAIL_SETTINGS = {
+  DEFAULT_SIZE: 150,
+  PLACEHOLDER: {
+    SIZE: 50,
+    BLUR: 1000,
+  },
+} as const;
+
+// Cloudinary API limits
+export const CLOUDINARY_LIMITS = {
+  MAX_RESULTS_PER_QUERY: 500,
+  MAX_DELETE_BATCH_SIZE: 100,
+} as const;
+
 // Preset configurations for different image types
 export const IMAGE_PRESET_CONFIGS = {
   USER_PROFILE: {

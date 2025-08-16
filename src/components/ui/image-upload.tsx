@@ -240,8 +240,8 @@ export function ImageUpload({
               src={previewUrl}
               alt="Preview"
               className="w-full h-48 object-cover rounded-lg"
-              width={400}
-              height={192}
+              width={config.dimensions.width}
+              height={config.dimensions.height}
               unoptimized={previewUrl.startsWith('blob:')}
             />
             

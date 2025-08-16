@@ -2,7 +2,7 @@
 
 import { getCloudinaryInstance } from './config';
 import { DeleteImageResult, ImageCategory } from '@/lib/types/cloudinary';
-import { CLOUDINARY_ERROR_MESSAGES } from '@/lib/constants/cloudinary.constants';
+import { CLOUDINARY_ERROR_MESSAGES, CLOUDINARY_LIMITS } from '@/lib/constants/cloudinary.constants';
 import { BusinessError } from '@/lib/errors/index';
 
 // Get public ID from secure URL
@@ -154,7 +154,7 @@ export const deleteImagesByFolder = async (folderPath: string): Promise<DeleteIm
     const listResult = await cloudinary.api.resources({
       type: 'upload',
       prefix: folderPath,
-      max_results: 500, // Cloudinary limit
+      max_results: CLOUDINARY_LIMITS.MAX_RESULTS_PER_QUERY,
     });
 
     if (listResult.resources.length === 0) {
@@ -167,8 +167,8 @@ export const deleteImagesByFolder = async (folderPath: string): Promise<DeleteIm
     // Extract public IDs
     const publicIds = listResult.resources.map((resource: { public_id: string }) => resource.public_id);
 
-    // Delete all images in batches (Cloudinary supports up to 100 per batch)
-    const batchSize = 100;
+    // Delete all images in batches
+    const batchSize = CLOUDINARY_LIMITS.MAX_DELETE_BATCH_SIZE;
     const deletePromises = [];
 
     for (let i = 0; i < publicIds.length; i += batchSize) {
