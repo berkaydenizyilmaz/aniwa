@@ -28,7 +28,6 @@ export interface CloudinaryUploadOptions {
   folder: string;
   public_id?: string;
   transformation?: CloudinaryTransformation[];
-  upload_preset?: string;
   resource_type?: 'auto' | 'image' | 'video' | 'raw';
   quality?: 'auto' | number;
   format?: 'auto' | 'webp' | 'avif' | 'jpg' | 'png';
@@ -95,7 +94,6 @@ export interface SignedUploadData {
   timestamp: number;
   api_key: string;
   folder: string;
-  upload_preset: string;
   public_id?: string;
 }
 

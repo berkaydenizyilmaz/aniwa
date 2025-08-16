@@ -13,7 +13,6 @@ import {
 import { 
   CLOUDINARY_FOLDERS, 
   IMAGE_PRESET_CONFIGS, 
-  UPLOAD_PRESETS,
   CLOUDINARY_ERROR_MESSAGES 
 } from '@/lib/constants/cloudinary.constants';
 import { BusinessError } from '@/lib/errors/index';
@@ -56,12 +55,7 @@ const getPublicId = (category: ImageCategory, entityId: string): string => {
   }
 };
 
-// Get upload preset based on environment
-const getUploadPreset = (): string => {
-  return process.env.NODE_ENV === 'production' 
-    ? UPLOAD_PRESETS.PRODUCTION 
-    : UPLOAD_PRESETS.DEVELOPMENT;
-};
+
 
 // Validate file before upload
 const validateFile = (file: File, category: ImageCategory): void => {
@@ -91,7 +85,7 @@ export const generateSignedUploadParams = async (
     const cloudinary = getCloudinaryInstance();
     const folder = getFolderPath(context.category, context.entityId);
     const publicId = getPublicId(context.category, context.entityId);
-    const uploadPreset = getUploadPreset();
+
     
     const timestamp = Math.round(Date.now() / 1000);
     
@@ -99,7 +93,6 @@ export const generateSignedUploadParams = async (
       timestamp,
       folder,
       public_id: publicId,
-      upload_preset: uploadPreset,
       overwrite: true,
       unique_filename: false,
     };
@@ -114,7 +107,6 @@ export const generateSignedUploadParams = async (
       timestamp,
       api_key: process.env.CLOUDINARY_API_KEY!,
       folder,
-      upload_preset: uploadPreset,
       public_id: publicId,
     };
   } catch (error) {
@@ -136,7 +128,6 @@ export const uploadImageToCloudinary = async (
     const cloudinary = getCloudinaryInstance();
     const folder = getFolderPath(context.category, context.entityId);
     const publicId = getPublicId(context.category, context.entityId);
-    const uploadPreset = getUploadPreset();
     
     // Get transformation config for the category
     const categoryKey = context.category.toUpperCase().replace('-', '_') as keyof typeof IMAGE_PRESET_CONFIGS;
@@ -150,7 +141,6 @@ export const uploadImageToCloudinary = async (
     const uploadOptions: CloudinaryUploadOptions = {
       folder,
       public_id: publicId,
-      upload_preset: uploadPreset,
       resource_type: 'auto',
       quality: 'auto',
       format: 'auto',
@@ -215,7 +205,7 @@ export const uploadImageFromUrl = async (
     const cloudinary = getCloudinaryInstance();
     const folder = getFolderPath(context.category, context.entityId);
     const publicId = getPublicId(context.category, context.entityId);
-    const uploadPreset = getUploadPreset();
+
     
     // Get transformation config for the category
     const categoryKey = context.category.toUpperCase().replace('-', '_') as keyof typeof IMAGE_PRESET_CONFIGS;
@@ -225,7 +215,7 @@ export const uploadImageFromUrl = async (
     const uploadOptions: CloudinaryUploadOptions = {
       folder,
       public_id: publicId,
-      upload_preset: uploadPreset,
+
       resource_type: 'auto',
       quality: 'auto',
       format: 'auto',

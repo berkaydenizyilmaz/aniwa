@@ -129,12 +129,6 @@ export const ALLOWED_IMAGE_FORMATS = [
   'avif',
 ] as const;
 
-// Upload presets for different environments
-export const UPLOAD_PRESETS = {
-  DEVELOPMENT: 'aniwa_dev_uploads',
-  PRODUCTION: 'aniwa_uploads',
-} as const;
-
 // Image quality settings
 export const IMAGE_QUALITY = {
   HIGH: 90,
