@@ -3,7 +3,7 @@
 'use server';
 
 import { getServerSession } from 'next-auth';
-import { authConfig } from '@/lib/auth/auth.config';
+import { authConfig } from '@/lib/services/auth/auth.config';
 import { revalidatePath } from 'next/cache';
 import { 
   updateThemePreferenceBusiness,

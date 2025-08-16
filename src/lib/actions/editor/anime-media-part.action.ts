@@ -17,7 +17,7 @@ import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
 import { ROUTES } from '@/lib/constants/routes.constants';
 import { getServerSession } from 'next-auth';
-import { authConfig } from '@/lib/auth/auth.config';
+import { authConfig } from '@/lib/services/auth/auth.config';
 
 // Anime medya parçası oluşturma
 export async function createAnimeMediaPartAction(

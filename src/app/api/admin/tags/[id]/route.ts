@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authConfig } from '@/lib/auth/auth.config';
+import { authConfig } from '@/lib/services/auth/auth.config';
 import { updateTagSchema } from '@/lib/schemas/tag.schema';
 import { getTagBusiness, updateTagBusiness, deleteTagBusiness } from '@/lib/services/business/admin/tag.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';

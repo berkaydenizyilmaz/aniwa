@@ -4,7 +4,7 @@
 
 import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
-import { authConfig } from '@/lib/auth/auth.config';
+import { authConfig } from '@/lib/services/auth/auth.config';
 import { 
   createEpisodeBusiness, 
   getEpisodeBusiness, 

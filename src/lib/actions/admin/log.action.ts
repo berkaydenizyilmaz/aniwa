@@ -7,7 +7,7 @@ import {
 } from '@/lib/services/business/admin/log.business';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
 import { getServerSession } from 'next-auth';
-import { authConfig } from '@/lib/auth/auth.config';
+import { authConfig } from '@/lib/services/auth/auth.config';
 
 // Log listesi getirme
 export async function getLogsAction(filters?: LogFilters): Promise<ServerActionResponse> {

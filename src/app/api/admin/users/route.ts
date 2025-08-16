@@ -3,7 +3,7 @@ import { userFiltersSchema } from '@/lib/schemas/user.schema';
 import { getUsersBusiness } from '@/lib/services/business/admin/user.business';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 import { getServerSession } from 'next-auth';
-import { authConfig } from '@/lib/auth/auth.config';
+import { authConfig } from '@/lib/services/auth/auth.config';
 
 // Tüm kullanıcıları listele (GET)
 export async function GET(request: NextRequest) {
