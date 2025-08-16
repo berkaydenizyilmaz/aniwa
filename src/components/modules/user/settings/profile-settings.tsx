@@ -152,6 +152,7 @@ export function ProfileSettings() {
             }}
             disabled={uploadProfileImageMutation.isPending}
             placeholder="Profil resminizi seçin"
+            showProgress={uploadProfileImageMutation.isPending}
           />
           {(profile as GetUserProfileResponse)?.profilePicture && (
             <Button
@@ -180,6 +181,7 @@ export function ProfileSettings() {
             }}
             disabled={uploadProfileImageMutation.isPending}
             placeholder="Profil banner'ınızı seçin"
+            showProgress={uploadProfileImageMutation.isPending}
           />
           {(profile as GetUserProfileResponse)?.profileBanner && (
             <Button

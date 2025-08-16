@@ -5,7 +5,7 @@ import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+
 import { ImageCategory } from '@/lib/types/cloudinary';
 import { IMAGE_PRESET_CONFIGS } from '@/lib/constants/cloudinary.constants';
 
@@ -74,8 +74,9 @@ export function ImageUpload({
   showProgress = true,
 }: ImageUploadProps) {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  // Upload progress tracking (controlled by parent via showProgress)
+  const isUploading = showProgress;
+  // Progress will be managed by parent component mutation state
   const [previewUrl, setPreviewUrl] = useState<string | null>(value || null);
   const [error, setError] = useState<string | null>(null);
   
@@ -137,30 +138,9 @@ export function ImageUpload({
     onChange(file);
     
     // Simulate upload progress if needed
-    if (showProgress) {
-      setIsUploading(true);
-      setUploadProgress(0);
-      onUploadStart?.();
-      
-      // Simulate progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90; // Stop at 90%, real upload will complete
-          }
-          return prev + 10;
-        });
-      }, 100);
-      
-      // Complete after 2 seconds (simulation)
-      setTimeout(() => {
-        setUploadProgress(100);
-        setIsUploading(false);
-        onUploadComplete?.(url);
-      }, 2000);
-    }
-  }, [validateFile, onChange, onUploadStart, onUploadComplete, onUploadError, showProgress]);
+    // Just call onChange, parent will handle upload
+    onUploadStart?.();
+  }, [validateFile, onChange, onUploadStart, onUploadError]);
   
   // Handle drag events
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -199,8 +179,6 @@ export function ImageUpload({
   const handleRemove = useCallback(() => {
     setPreviewUrl(null);
     setError(null);
-    setUploadProgress(0);
-    setIsUploading(false);
     onChange(null);
     
     // Reset file input
@@ -268,9 +246,8 @@ export function ImageUpload({
                   <div className="text-sm font-medium text-center">
                     Yükleniyor...
                   </div>
-                  <Progress value={uploadProgress} className="w-full" />
-                  <div className="text-xs text-muted-foreground text-center">
-                    %{uploadProgress}
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
                 </div>
               </div>
