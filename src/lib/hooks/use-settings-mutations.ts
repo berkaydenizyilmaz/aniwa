@@ -19,7 +19,9 @@ import {
   updateUsernameAction,
   updateBioAction,
   updatePasswordAction,
-  updateProfileImagesAction
+  updateProfileImagesAction,
+  uploadProfileImageAction,
+  deleteProfileImageAction
 } from '@/lib/actions/user/settings.actions';
 import { 
   UpdateThemePreferenceInput,
@@ -275,6 +277,36 @@ export function useSettingsMutations() {
     },
   });
 
+  const uploadProfileImageMutation = useMutation({
+    mutationFn: (formData: FormData) => uploadProfileImageAction(formData),
+    onSuccess: (response) => {
+      if (response.success) {
+        toast.success('Görsel başarıyla yüklendi');
+        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'profile'] });
+        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
+      }
+    },
+    onError: (error) => {
+      console.error('Profile image upload error:', error);
+      toast.error(error.message || 'Görsel yüklenemedi');
+    },
+  });
+
+  const deleteProfileImageMutation = useMutation({
+    mutationFn: (data: { imageType: 'profile' | 'banner' }) => deleteProfileImageAction(data),
+    onSuccess: (response) => {
+      if (response.success) {
+        toast.success('Görsel silindi');
+        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'profile'] });
+        queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
+      }
+    },
+    onError: (error) => {
+      console.error('Profile image delete error:', error);
+      toast.error(error.message || 'Görsel silinemedi');
+    },
+  });
+
   return {
     // General Settings
     updateThemeMutation,
@@ -298,5 +330,7 @@ export function useSettingsMutations() {
     updateBioMutation,
     updatePasswordMutation,
     updateProfileImagesMutation,
+    uploadProfileImageMutation,
+    deleteProfileImageMutation,
   };
 }

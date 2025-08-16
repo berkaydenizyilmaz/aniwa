@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Loading } from '@/components/ui/loading';
 import { GetUserProfileResponse } from '@/lib/types/api/settings.api';
 import { updateUsernameSchema, updateBioSchema, updatePasswordSchema, type UpdateUsernameInput, type UpdateBioInput, type UpdatePasswordInput } from '@/lib/schemas/settings.schema';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -24,39 +24,20 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { ImageUpload } from '@/components/ui/image-upload';
-import { useImageUpload } from '@/lib/hooks/use-image-upload';
 
 export function ProfileSettings() {
   const { profile, isLoading } = useSettings();
   const { 
     updateUsernameMutation,
     updateBioMutation,
-    updatePasswordMutation
+    updatePasswordMutation,
+    uploadProfileImageMutation,
+    deleteProfileImageMutation
   } = useSettingsMutations();
 
-  // Profile picture upload
-  const profilePictureUpload = useImageUpload({
-    category: 'user-profile',
-    onUploadComplete: (file, url) => {
-      // TODO: Implement profile picture update mutation
-      console.log('Profile picture uploaded:', { file, url });
-    },
-    onError: (error) => {
-      console.error('Profile picture upload error:', error);
-    }
-  });
-
-  // Profile banner upload
-  const profileBannerUpload = useImageUpload({
-    category: 'user-banner',
-    onUploadComplete: (file, url) => {
-      // TODO: Implement profile banner update mutation
-      console.log('Profile banner uploaded:', { file, url });
-    },
-    onError: (error) => {
-      console.error('Profile banner upload error:', error);
-    }
-  });
+  // Image upload states
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
 
   // Username form
   const usernameForm = useForm<UpdateUsernameInput>({
@@ -88,12 +69,8 @@ export function ProfileSettings() {
     if (profile) {
       usernameForm.reset({ username: (profile as GetUserProfileResponse).username });
       bioForm.reset({ bio: (profile as GetUserProfileResponse).bio || '' });
-      
-      // Set existing image URLs
-      profilePictureUpload.setExistingUrl((profile as GetUserProfileResponse).profilePicture);
-      profileBannerUpload.setExistingUrl((profile as GetUserProfileResponse).profileBanner);
     }
-  }, [profile, usernameForm, bioForm, profilePictureUpload, profileBannerUpload]);
+  }, [profile, usernameForm, bioForm]);
 
   // Username submit
   const onUsernameSubmit = async (data: UpdateUsernameInput) => {
@@ -113,6 +90,18 @@ export function ProfileSettings() {
   const onPasswordSubmit = async (data: UpdatePasswordInput) => {
     updatePasswordMutation.mutate(data);
     passwordForm.reset();
+  };
+
+  // Image upload handlers
+  const handleImageUpload = (file: File, imageType: 'profile' | 'banner') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('imageType', imageType);
+    uploadProfileImageMutation.mutate(formData);
+  };
+
+  const handleImageDelete = (imageType: 'profile' | 'banner') => {
+    deleteProfileImageMutation.mutate({ imageType });
   };
 
   if (isLoading) {
@@ -147,6 +136,62 @@ export function ProfileSettings() {
           <p className="text-sm text-muted-foreground">
             E-posta adresi güvenlik nedeniyle değiştirilemez
           </p>
+        </div>
+
+        {/* Profil Resmi */}
+        <div className="space-y-2">
+          <Label>Profil Resmi</Label>
+          <ImageUpload
+            category="user-profile"
+            value={(profile as GetUserProfileResponse)?.profilePicture}
+            onChange={(file) => {
+              setProfileImageFile(file);
+              if (file) {
+                handleImageUpload(file, 'profile');
+              }
+            }}
+            disabled={uploadProfileImageMutation.isPending}
+            placeholder="Profil resminizi seçin"
+          />
+          {(profile as GetUserProfileResponse)?.profilePicture && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleImageDelete('profile')}
+              disabled={deleteProfileImageMutation.isPending}
+            >
+              Profil Resmini Sil
+            </Button>
+          )}
+        </div>
+
+        {/* Profil Banner */}
+        <div className="space-y-2">
+          <Label>Profil Banner</Label>
+          <ImageUpload
+            category="user-banner"
+            value={(profile as GetUserProfileResponse)?.profileBanner}
+            onChange={(file) => {
+              setBannerImageFile(file);
+              if (file) {
+                handleImageUpload(file, 'banner');
+              }
+            }}
+            disabled={uploadProfileImageMutation.isPending}
+            placeholder="Profil banner'ınızı seçin"
+          />
+          {(profile as GetUserProfileResponse)?.profileBanner && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleImageDelete('banner')}
+              disabled={deleteProfileImageMutation.isPending}
+            >
+              Banner&apos;ı Sil
+            </Button>
+          )}
         </div>
 
         {/* Kullanıcı Adı */}
