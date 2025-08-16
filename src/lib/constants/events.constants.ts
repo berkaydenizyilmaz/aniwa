@@ -180,5 +180,13 @@ export const EVENTS = {
     
     // General System
     UNEXPECTED_ERROR: 'system_unexpected_error',
+    
+    // Image Operations
+    IMAGE_UPLOADED: 'system_image_uploaded',
+    IMAGE_DELETED: 'system_image_deleted',
+    IMAGE_UPLOAD_FAILED: 'system_image_upload_failed',
+    IMAGE_DELETE_FAILED: 'system_image_delete_failed',
+    BATCH_IMAGE_UPLOAD_PARTIAL_FAILURE: 'system_batch_image_upload_partial_failure',
+    BATCH_IMAGE_UPLOAD_FAILED: 'system_batch_image_upload_failed',
   },
 } as const; 
