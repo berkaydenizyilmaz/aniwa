@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { Upload, Image as ImageIcon } from 'lucide-react';
+import { Upload, Image as ImageIcon, User, Monitor } from 'lucide-react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { ImageCategory } from '@/lib/types/cloudinary';
 import { IMAGE_PRESET_CONFIGS } from '@/lib/constants/cloudinary.constants';
@@ -94,6 +95,38 @@ export function ImageUpload({
   };
 
   const config = IMAGE_PRESET_CONFIGS[getConfigKey(category)];
+  
+  // Kategori bazlı UI ayarları
+  const getUIConfig = (cat: ImageCategory) => {
+    switch (cat) {
+      case 'user-profile':
+        return {
+          height: 'h-24',
+          icon: User,
+          showCurrentImage: true,
+          imageSize: 'w-16 h-16',
+          layout: 'vertical' as const,
+        };
+      case 'user-banner':
+        return {
+          height: 'h-20',
+          icon: Monitor,
+          showCurrentImage: true,
+          imageSize: 'w-20 h-12',
+          layout: 'horizontal' as const,
+        };
+      default:
+        return {
+          height: 'h-20',
+          icon: ImageIcon,
+          showCurrentImage: false,
+          imageSize: 'w-16 h-16',
+          layout: 'horizontal' as const,
+        };
+    }
+  };
+
+  const uiConfig = getUIConfig(category);
   
   // File validation
   const validateFile = useCallback((file: File): string | null => {
@@ -189,35 +222,67 @@ export function ImageUpload({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          'relative border-2 border-dashed rounded-lg transition-colors duration-200 min-h-20',
+          'relative border-2 border-dashed rounded-lg transition-colors duration-200',
+          uiConfig.height,
           'hover:bg-muted/50 cursor-pointer',
           isDragOver && 'border-primary bg-primary/5',
           error && 'border-destructive',
           disabled && 'opacity-50 cursor-not-allowed hover:bg-transparent',
-          'border-muted-foreground/25'
+          value ? 'border-solid border-muted-foreground/50' : 'border-muted-foreground/25'
         )}
       >
         {/* Upload Area */}
-        <div className="p-4 text-center">
+        <div className="p-4 h-full flex items-center justify-center">
           {/* Upload Status */}
           {isUploading ? (
             <div className="flex items-center justify-center space-x-2">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
               <span className="text-sm font-medium">Yükleniyor...</span>
             </div>
+          ) : uiConfig.showCurrentImage && value ? (
+            // Mevcut resim gösterimi
+            <div className={cn(
+              'flex items-center space-x-3',
+              uiConfig.layout === 'vertical' ? 'flex-col space-x-0 space-y-2' : ''
+            )}>
+              {/* Mevcut Resim */}
+              <div className={cn('relative overflow-hidden rounded-lg flex-shrink-0', uiConfig.imageSize)}>
+                <Image
+                  src={value}
+                  alt="Mevcut görsel"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+              
+              {/* Upload Text */}
+              <div className={cn('text-left', uiConfig.layout === 'vertical' ? 'text-center' : '')}>
+                <p className="text-sm font-medium">
+                  {placeholder || 'Değiştir'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {config.allowedFormats.join(', ').toUpperCase()}
+                </p>
+              </div>
+            </div>
           ) : (
-            <div className="flex items-center justify-center space-x-3">
+            // Upload alanı
+            <div className={cn(
+              'flex items-center space-x-3',
+              uiConfig.layout === 'vertical' ? 'flex-col space-x-0 space-y-2' : ''
+            )}>
               {/* Upload Icon */}
-              <div className="w-6 h-6 flex-shrink-0">
+              <div className="w-8 h-8 flex-shrink-0">
                 {isDragOver ? (
                   <Upload className="w-full h-full text-primary" />
                 ) : (
-                  <ImageIcon className="w-full h-full text-muted-foreground" />
+                  <uiConfig.icon className="w-full h-full text-muted-foreground" />
                 )}
               </div>
               
               {/* Upload Text */}
-              <div className="text-left">
+              <div className={cn('text-left', uiConfig.layout === 'vertical' ? 'text-center' : '')}>
                 <p className="text-sm font-medium">
                   {placeholder || (
                     isDragOver 
