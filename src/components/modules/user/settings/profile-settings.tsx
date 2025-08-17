@@ -140,7 +140,7 @@ export function ProfileSettings() {
 
         {/* Profil Resmi ve Banner */}
         <div className="space-y-4">
-          <div className="flex items-start justify-center gap-12 max-w-3xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center md:items-start justify-center gap-8 md:gap-12 max-w-3xl mx-auto overflow-hidden">
             {/* Profil Resmi - Avatar Görünümü */}
             <div className="space-y-2">
               <Label>Profil Resmi</Label>
@@ -162,7 +162,7 @@ export function ProfileSettings() {
             </div>
 
             {/* Profil Banner - Banner Görünümü */}
-            <div className="space-y-2">
+            <div className="space-y-2 w-full md:w-[450px]">
               <Label>Profil Banner</Label>
               <ImageUpload
                 category="USER_BANNER"

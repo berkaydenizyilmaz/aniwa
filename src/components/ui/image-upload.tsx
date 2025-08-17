@@ -128,7 +128,7 @@ export function ImageUpload({
   const isDeleting = showDeleteProgress;
 
   return (
-    <div className={cn('w-full', className)}>
+    <div className={cn(uiConfig.size, className)}>
       <input
         ref={fileInputRef}
         type="file"
@@ -163,7 +163,7 @@ export function ImageUpload({
               <p className="text-sm font-medium text-primary">Yükleniyor...</p>
             </div>
           </div>
-        ) : value ? (
+                ) : value ? (
           // Image Display State
           <div className="relative w-full h-full border-2 border-dashed border-muted-foreground/40 rounded-xl">
             <Image
@@ -174,44 +174,28 @@ export function ImageUpload({
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             
-            {/* Hover Overlay with Actions */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            {/* Fixed Delete Button - All Sizes */}
+            {onDelete && (
               <Button
                 type="button"
                 size="icon"
-                variant="secondary"
+                variant="destructive"
                 onClick={(e) => {
                   e.stopPropagation();
-                  fileInputRef.current?.click();
+                  if (!isDeleting) {
+                    onDelete();
+                  }
                 }}
-                className="w-10 h-10 bg-white/90 hover:bg-white rounded-full"
+                disabled={isDeleting}
+                className="absolute top-2 right-2 w-8 h-8 md:w-10 md:h-10 rounded-full z-10"
               >
-                <Edit3 className="w-4 h-4 text-gray-700" />
+                {isDeleting ? (
+                  <div className="animate-spin rounded-full h-3 w-3 md:h-4 md:w-4 border-2 border-white/30 border-t-white"></div>
+                ) : (
+                  <X className="w-3 h-3 md:w-4 md:h-4" />
+                )}
               </Button>
-              {onDelete && (
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="destructive"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!isDeleting) {
-                      onDelete();
-                    }
-                  }}
-                  disabled={isDeleting}
-                  className="w-10 h-10 rounded-full"
-                >
-                  {isDeleting ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>
-                  ) : (
-                    <X className="w-4 h-4" />
-                  )}
-                </Button>
-              )}
-            </div>
-            </div>
+            )}
           </div>
         ) : (
           // Empty Upload State
