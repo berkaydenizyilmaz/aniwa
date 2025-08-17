@@ -138,9 +138,9 @@ export function GeneralSettings() {
               <SelectValue placeholder="Başlık dili seçin" />
             </SelectTrigger>
             <SelectContent>
-                      <SelectItem value={TitleLanguage.ROMAJI}>{ANIME_DOMAIN.TITLE_LANGUAGE_LABELS.ROMAJI}</SelectItem>
-        <SelectItem value={TitleLanguage.ENGLISH}>{ANIME_DOMAIN.TITLE_LANGUAGE_LABELS.ENGLISH}</SelectItem>
-        <SelectItem value={TitleLanguage.NATIVE}>{ANIME_DOMAIN.TITLE_LANGUAGE_LABELS.NATIVE}</SelectItem>
+                      <SelectItem value={TitleLanguage.ROMAJI}>{ANIME_DOMAIN.UI.TITLE_LANGUAGE_LABELS.ROMAJI}</SelectItem>
+        <SelectItem value={TitleLanguage.ENGLISH}>{ANIME_DOMAIN.UI.TITLE_LANGUAGE_LABELS.ENGLISH}</SelectItem>
+        <SelectItem value={TitleLanguage.NATIVE}>{ANIME_DOMAIN.UI.TITLE_LANGUAGE_LABELS.NATIVE}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -157,9 +157,9 @@ export function GeneralSettings() {
               <SelectValue placeholder="Puanlama formatı seçin" />
             </SelectTrigger>
             <SelectContent>
-                      <SelectItem value={ScoreFormat.POINT_100}>{USER_DOMAIN.SCORE_FORMAT_LABELS.POINT_100} puanlık sistem</SelectItem>
-        <SelectItem value={ScoreFormat.POINT_10}>{USER_DOMAIN.SCORE_FORMAT_LABELS.POINT_10} puanlık sistem</SelectItem>
-        <SelectItem value={ScoreFormat.POINT_5}>{USER_DOMAIN.SCORE_FORMAT_LABELS.POINT_5} puanlık sistem</SelectItem>
+                      <SelectItem value={ScoreFormat.POINT_100}>{USER_DOMAIN.UI.SCORE_FORMAT_LABELS.POINT_100} puanlık sistem</SelectItem>
+        <SelectItem value={ScoreFormat.POINT_10}>{USER_DOMAIN.UI.SCORE_FORMAT_LABELS.POINT_10} puanlık sistem</SelectItem>
+        <SelectItem value={ScoreFormat.POINT_5}>{USER_DOMAIN.UI.SCORE_FORMAT_LABELS.POINT_5} puanlık sistem</SelectItem>
             </SelectContent>
           </Select>
         </div>

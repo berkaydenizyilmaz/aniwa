@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 
 export function PrivacySettings() {
   const { settings, isLoading } = useSettings();
-  const { 
+  const {
     updateProfileVisibilityMutation,
     updateAllowFollowsMutation,
     updateShowAnimeListMutation,
@@ -119,9 +119,9 @@ export function PrivacySettings() {
               <SelectValue placeholder="Profil görünürlüğü seçin" />
             </SelectTrigger>
             <SelectContent>
-                      <SelectItem value={ProfileVisibility.PUBLIC}>{USER_DOMAIN.PROFILE_VISIBILITY_LABELS.PUBLIC}</SelectItem>
-        <SelectItem value={ProfileVisibility.FOLLOWERS_ONLY}>{USER_DOMAIN.PROFILE_VISIBILITY_LABELS.FOLLOWERS_ONLY}</SelectItem>
-        <SelectItem value={ProfileVisibility.PRIVATE}>{USER_DOMAIN.PROFILE_VISIBILITY_LABELS.PRIVATE}</SelectItem>
+              <SelectItem value={ProfileVisibility.PUBLIC}>{USER_DOMAIN.UI.PROFILE_VISIBILITY_LABELS.PUBLIC}</SelectItem>
+              <SelectItem value={ProfileVisibility.FOLLOWERS_ONLY}>{USER_DOMAIN.UI.PROFILE_VISIBILITY_LABELS.FOLLOWERS_ONLY}</SelectItem>
+              <SelectItem value={ProfileVisibility.PRIVATE}>{USER_DOMAIN.UI.PROFILE_VISIBILITY_LABELS.PRIVATE}</SelectItem>
             </SelectContent>
           </Select>
         </div>

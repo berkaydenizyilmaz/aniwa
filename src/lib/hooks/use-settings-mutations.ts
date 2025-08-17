@@ -3,7 +3,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
-import { useSettingsStore } from '@/lib/stores/settings.store';
 import { 
   updateThemePreferenceAction,
   updateTitleLanguagePreferenceAction,
@@ -44,7 +43,6 @@ import {
 export function useSettingsMutations() {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
-  const { updateSetting, updateProfileField } = useSettingsStore();
 
   // ===== GENERAL SETTINGS MUTATIONS =====
 
@@ -53,9 +51,7 @@ export function useSettingsMutations() {
     onSuccess: (response) => {
       if (response.success) {
         toast.success('Tema tercihi güncellendi');
-        // Store'u güncelle
-        updateSetting('themePreference', response.data.themePreference);
-        // Cache'i invalidate et
+        // Cache'i invalidate et - yeni veri çekilecek
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
       }
     },
@@ -70,7 +66,6 @@ export function useSettingsMutations() {
     onSuccess: (response) => {
       if (response.success) {
         toast.success('Başlık dili tercihi güncellendi');
-        updateSetting('titleLanguagePreference', response.data.titleLanguagePreference);
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
       }
     },
@@ -85,7 +80,6 @@ export function useSettingsMutations() {
     onSuccess: (response) => {
       if (response.success) {
         toast.success('Puanlama formatı güncellendi');
-        updateSetting('scoreFormat', response.data.scoreFormat);
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
       }
     },
@@ -100,7 +94,6 @@ export function useSettingsMutations() {
     onSuccess: (response) => {
       if (response.success) {
         toast.success('Yetişkin içerik ayarı güncellendi');
-        updateSetting('displayAdultContent', response.data.displayAdultContent);
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
       }
     },
@@ -115,7 +108,6 @@ export function useSettingsMutations() {
     onSuccess: (response) => {
       if (response.success) {
         toast.success('Otomatik takip ayarı güncellendi');
-        updateSetting('autoTrackOnAniwaListAdd', response.data.autoTrackOnAniwaListAdd);
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
       }
     },
@@ -132,7 +124,6 @@ export function useSettingsMutations() {
     onSuccess: (response) => {
       if (response.success) {
         toast.success('Profil görünürlüğü güncellendi');
-        updateSetting('profileVisibility', response.data.profileVisibility);
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
       }
     },
@@ -147,7 +138,6 @@ export function useSettingsMutations() {
     onSuccess: (response) => {
       if (response.success) {
         toast.success('Takip izinleri güncellendi');
-        updateSetting('allowFollows', response.data.allowFollows);
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
       }
     },
@@ -162,7 +152,6 @@ export function useSettingsMutations() {
     onSuccess: (response) => {
       if (response.success) {
         toast.success('Anime listesi gösterme ayarı güncellendi');
-        updateSetting('showAnimeList', response.data.showAnimeList);
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
       }
     },
@@ -177,7 +166,6 @@ export function useSettingsMutations() {
     onSuccess: (response) => {
       if (response.success) {
         toast.success('Favori animeleri gösterme ayarı güncellendi');
-        updateSetting('showFavouriteAnimeSeries', response.data.showFavouriteAnimeSeries);
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
       }
     },
@@ -192,7 +180,6 @@ export function useSettingsMutations() {
     onSuccess: (response) => {
       if (response.success) {
         toast.success('Özel listeleri gösterme ayarı güncellendi');
-        updateSetting('showCustomLists', response.data.showCustomLists);
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'settings'] });
       }
     },
@@ -240,7 +227,6 @@ export function useSettingsMutations() {
     onSuccess: (response) => {
       if (response.success) {
         toast.success('Biyografi güncellendi');
-        updateProfileField('bio', response.data.bio);
         queryClient.invalidateQueries({ queryKey: ['user', session?.user?.id, 'profile'] });
       }
     },

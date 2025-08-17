@@ -174,7 +174,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
                                 isSelected ? 'text-primary' : 'text-muted-foreground'
                               }`}
                             >
-                              {USER_DOMAIN.ROLE_LABELS[role]}
+                              {USER_DOMAIN.UI.ROLE_LABELS[role]}
                             </FormLabel>
                           </div>
                         );

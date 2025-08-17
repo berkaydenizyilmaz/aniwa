@@ -73,7 +73,7 @@ export function AnimeSeriesFilters({ onSearch, onTypeChange, onStatusChange, onA
               <SelectItem value="all">Tüm Tipler</SelectItem>
               {Object.values(AnimeType).map((type) => (
                 <SelectItem key={type} value={type}>
-                  {ANIME_DOMAIN.TYPE_LABELS[type]}
+                  {ANIME_DOMAIN.UI.TYPE_LABELS[type]}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -90,7 +90,7 @@ export function AnimeSeriesFilters({ onSearch, onTypeChange, onStatusChange, onA
               <SelectItem value="all">Tüm Durumlar</SelectItem>
               {Object.values(AnimeStatus).map((status) => (
                 <SelectItem key={status} value={status}>
-                  {ANIME_DOMAIN.STATUS_LABELS[status]}
+                  {ANIME_DOMAIN.UI.STATUS_LABELS[status]}
                 </SelectItem>
               ))}
             </SelectContent>

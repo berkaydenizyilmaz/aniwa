@@ -31,7 +31,7 @@ import { type AnimeFilters } from '@/lib/schemas/anime.schema';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Tablo item tipi
-type AnimeSeriesTableItem = GetAnimeSeriesListResponse['animeSeries'][0];
+type AnimeSeriesTableItem = GetAnimeSeriesListResponse['data'][0];
 
 interface AnimeSeriesTableProps {
   onEdit?: (animeSeries: AnimeSeries) => void;
@@ -193,7 +193,7 @@ export function AnimeSeriesTable({ onEdit, onMediaParts, searchTerm = '', select
     );
   }
 
-  const animeSeries = data?.animeSeries || [];
+  const animeSeries = data?.data || [];
   const totalPages = data?.totalPages || 1;
   const totalAnimeSeries = data?.total || 0;
 
@@ -247,13 +247,13 @@ export function AnimeSeriesTable({ onEdit, onMediaParts, searchTerm = '', select
                     <div className="font-medium">{animeSeries.title}</div>
                   </TableCell>
                   <TableCell>
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ANIME_DOMAIN.TYPE_COLORS[animeSeries.type]}`}>
-                  {ANIME_DOMAIN.TYPE_LABELS[animeSeries.type]}
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ANIME_DOMAIN.UI.TYPE_COLORS[animeSeries.type]}`}>
+                  {ANIME_DOMAIN.UI.TYPE_LABELS[animeSeries.type]}
                     </span>
                   </TableCell>
                   <TableCell>
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ANIME_DOMAIN.STATUS_COLORS[animeSeries.status]}`}>
-                  {ANIME_DOMAIN.STATUS_LABELS[animeSeries.status]}
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ANIME_DOMAIN.UI.STATUS_COLORS[animeSeries.status]}`}>
+                  {ANIME_DOMAIN.UI.STATUS_LABELS[animeSeries.status]}
                     </span>
                   </TableCell>
                   <TableCell>
