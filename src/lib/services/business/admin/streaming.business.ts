@@ -90,16 +90,7 @@ export async function getStreamingPlatformBusiness(
       throw new NotFoundError('Streaming platform bulunamadı');
     }
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.ADMIN.STREAMING_PLATFORM_RETRIEVED,
-      'Streaming platform detayı görüntülendi',
-      {
-        platformId: streamingPlatform.id,
-        name: streamingPlatform.name
-      },
-      userId
-    );
+
 
     return {
       success: true,
@@ -144,18 +135,7 @@ export async function getStreamingPlatformsBusiness(
 
     const totalPages = Math.ceil(total / limit);
 
-    // Başarılı listeleme logu
-    await logger.info(
-      EVENTS.ADMIN.STREAMING_PLATFORMS_RETRIEVED,
-      'Streaming platform listesi görüntülendi',
-      {
-        total,
-        page,
-        limit,
-        totalPages
-      },
-      userId
-    );
+
 
     return {
       success: true,

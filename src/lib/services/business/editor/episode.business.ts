@@ -134,15 +134,7 @@ export async function getEpisodeBusiness(
       throw new NotFoundError('Episode bulunamadı');
     }
 
-    await logger.info(
-      EVENTS.EDITOR.EPISODE_RETRIEVED,
-      'Episode başarıyla getirildi',
-      { 
-        episodeId: episode.id,
-        mediaPartId: episode.mediaPartId
-      },
-      userId
-    );
+
 
     return { success: true, data: episode };
   } catch (error) {
@@ -185,18 +177,7 @@ export async function getEpisodeListBusiness(
 
     const totalPages = Math.ceil(total / limit);
 
-    await logger.info(
-      EVENTS.EDITOR.EPISODE_LIST_RETRIEVED,
-      'Episode listesi başarıyla getirildi',
-      { 
-        mediaPartId,
-        count: episodes.length,
-        total,
-        page,
-        limit
-      },
-      userId
-    );
+
 
     return {
       success: true,

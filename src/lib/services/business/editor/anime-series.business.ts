@@ -198,19 +198,7 @@ export async function getAnimeSeriesBusiness(
       throw new NotFoundError('Anime serisi bulunamadı');
     }
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.EDITOR.ANIME_SERIES_RETRIEVED,
-      'Anime serisi başarıyla getirildi',
-      { 
-        animeSeriesId: animeSeries.id, 
-        aniwaPublicId: animeSeries.aniwaPublicId,
-        title: animeSeries.title,
-        type: animeSeries.type,
-        status: animeSeries.status
-      },
-      userId
-    );
+
 
     return {
       success: true,
@@ -292,18 +280,7 @@ export async function getAnimeSeriesListBusiness(
     
     const totalPages = Math.ceil(total / limit);
 
-    // Başarılı listeleme logu
-    await logger.info(
-      EVENTS.EDITOR.ANIME_SERIES_LIST_RETRIEVED,
-      'Anime serileri listelendi',
-      { 
-        filters,
-        total,
-        page,
-        limit
-      },
-      userId
-    );
+
 
     return {
       success: true,
@@ -656,17 +633,7 @@ export async function getAnimeSeriesRelationsBusiness(
       findAllTagsDB()
     ]);
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.EDITOR.ANIME_SERIES_RELATIONS_RETRIEVED,
-      'Anime serisi ilişkileri başarıyla getirildi',
-      { 
-        genresCount: genres.length,
-        studiosCount: studios.length,
-        tagsCount: tags.length
-      },
-      userId
-    );
+
 
     return {
       success: true,
@@ -723,20 +690,7 @@ export async function getAnimeSeriesWithRelationsBusiness(
       throw new NotFoundError('Anime serisi bulunamadı');
     }
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.EDITOR.ANIME_SERIES_WITH_RELATIONS_RETRIEVED,
-      'Anime serisi ilişkilerle birlikte başarıyla getirildi',
-      { 
-        animeSeriesId: animeSeries.id, 
-        aniwaPublicId: animeSeries.aniwaPublicId,
-        title: animeSeries.title,
-        genresCount: (animeSeries as GetAnimeSeriesWithRelationsResponse).animeGenres?.length || 0,
-        studiosCount: (animeSeries as GetAnimeSeriesWithRelationsResponse).animeStudios?.length || 0,
-        tagsCount: (animeSeries as GetAnimeSeriesWithRelationsResponse).animeTags?.length || 0
-      },
-      userId
-    );
+
 
     return {
       success: true,

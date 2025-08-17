@@ -64,18 +64,7 @@ export async function getUsersBusiness(
 
     const totalPages = Math.ceil(total / limit);
 
-    // Başarılı listeleme logu
-    await logger.info(
-      EVENTS.ADMIN.USERS_RETRIEVED,
-      'Kullanıcı listesi görüntülendi',
-      { 
-        total,
-        page,
-        limit,
-        totalPages
-      },
-      userId
-    );
+
 
     return {
       success: true,
@@ -116,16 +105,7 @@ export async function getUserBusiness(
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.ADMIN.USER_RETRIEVED,
-      'Kullanıcı detayı görüntülendi',
-      { 
-        userId: user.id, 
-        username: user.username
-      },
-      userId
-    );
+
 
     return {
       success: true,

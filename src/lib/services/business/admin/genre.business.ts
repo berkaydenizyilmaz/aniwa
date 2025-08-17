@@ -100,17 +100,7 @@ export async function getGenreBusiness(
       throw new NotFoundError('Genre bulunamadı');
     }
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.ADMIN.GENRE_RETRIEVED,
-      'Genre başarıyla getirildi',
-      { 
-        genreId: genre.id, 
-        name: genre.name, 
-        slug: genre.slug
-      },
-      userId
-    );
+
 
     return {
       success: true,
@@ -160,16 +150,7 @@ export async function getGenresBusiness(
     const paginatedGenres = filteredGenres.slice(skip, skip + limit);
     const totalPages = Math.ceil(total / limit);
 
-    // Başarılı listeleme logu
-    await logger.info(
-      EVENTS.ADMIN.GENRES_RETRIEVED,
-      'Genre\'ler listelendi',
-      { 
-        filters,
-        total
-      },
-      userId
-    );
+
 
     return {
       success: true,

@@ -49,17 +49,7 @@ export async function getLogBusiness(
       throw new NotFoundError('Log bulunamadı');
     }
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.ADMIN.LOG_RETRIEVED,
-      'Log detayı görüntülendi',
-      { 
-        logId: log.id, 
-        event: log.event,
-        level: log.level
-      },
-      userId
-    );
+
 
     return {
       success: true,
@@ -145,18 +135,7 @@ export async function getLogsBusiness(
 
     const totalPages = Math.ceil(total / limit);
 
-    // Başarılı listeleme logu
-    await logger.info(
-      EVENTS.ADMIN.LOGS_RETRIEVED,
-      'Log listesi görüntülendi',
-      { 
-        total,
-        page,
-        limit,
-        totalPages
-      },
-      userId
-    );
+
 
     return {
       success: true,

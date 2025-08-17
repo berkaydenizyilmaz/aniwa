@@ -260,13 +260,7 @@ export async function getUserSettingsBusiness(
     // Kullanıcı ayarlarını bul
     const userSettings = await findUserSettingsDB(userId);
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.USER.SETTINGS_RETRIEVED,
-      'Kullanıcı ayarları görüntülendi',
-      { userId },
-      userId
-    );
+
 
     return {
       success: true,

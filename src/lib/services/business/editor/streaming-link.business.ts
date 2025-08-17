@@ -98,15 +98,7 @@ export async function getStreamingLinkBusiness(
       throw new NotFoundError('Streaming link bulunamadı');
     }
 
-    await logger.info(
-      EVENTS.EDITOR.STREAMING_LINK_RETRIEVED,
-      'Streaming link başarıyla getirildi',
-      { 
-        streamingLinkId: streamingLink.id,
-        episodeId: streamingLink.episodeId
-      },
-      userId
-    );
+
 
     return { success: true, data: streamingLink };
   } catch (error) {
@@ -152,18 +144,7 @@ export async function getStreamingLinksByEpisodeBusiness(
 
     const totalPages = Math.ceil(total / limit);
 
-    await logger.info(
-      EVENTS.EDITOR.STREAMING_LINKS_RETRIEVED,
-      'Episode streaming link\'leri başarıyla getirildi',
-      { 
-        episodeId,
-        count: streamingLinks.length,
-        total,
-        page,
-        limit
-      },
-      userId
-    );
+
 
     return {
       success: true,
@@ -203,14 +184,7 @@ export async function getStreamingPlatformsBusiness(
   try {
     const platforms = await findAllStreamingPlatformsDB();
     
-    await logger.info(
-      EVENTS.EDITOR.STREAMING_PLATFORMS_RETRIEVED,
-      'Streaming platform\'ları başarıyla getirildi',
-      { 
-        count: platforms.length
-      },
-      userId
-    );
+
 
     return {
       success: true,

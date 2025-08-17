@@ -102,16 +102,7 @@ export async function getStudioBusiness(
       throw new NotFoundError('Stüdyo bulunamadı');
     }
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.ADMIN.STUDIO_RETRIEVED,
-      'Stüdyo detayı görüntülendi',
-      { 
-        studioId: studio.id, 
-        name: studio.name
-      },
-      userId
-    );
+
 
     return {
       success: true,
@@ -163,18 +154,7 @@ export async function getStudiosBusiness(
     const paginatedStudios = studios.slice(skip, skip + limit);
     const totalPages = Math.ceil(total / limit);
 
-    // Başarılı listeleme logu
-    await logger.info(
-      EVENTS.ADMIN.STUDIOS_RETRIEVED,
-      'Stüdyo listesi görüntülendi',
-      { 
-        total,
-        page,
-        limit,
-        totalPages
-      },
-      userId
-    );
+
 
     return {
       success: true,

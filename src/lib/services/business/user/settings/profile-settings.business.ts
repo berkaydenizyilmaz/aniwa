@@ -452,13 +452,7 @@ export async function getUserProfileBusiness(
       throw new NotFoundError('Kullanıcı bulunamadı');
     }
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.USER.SETTINGS_RETRIEVED,
-      'Kullanıcı profili görüntülendi',
-      { userId },
-      userId
-    );
+
 
     return {
       success: true,

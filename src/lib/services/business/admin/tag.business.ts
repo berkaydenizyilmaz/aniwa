@@ -104,16 +104,7 @@ export async function getTagBusiness(
       throw new NotFoundError('Tag bulunamadı');
     }
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.ADMIN.TAG_RETRIEVED,
-      'Tag detayı görüntülendi',
-      { 
-        tagId: tag.id, 
-        name: tag.name
-      },
-      userId
-    );
+
 
     return {
       success: true,
@@ -174,18 +165,7 @@ export async function getTagsBusiness(
     const paginatedTags = tags.slice(skip, skip + limit);
     const totalPages = Math.ceil(total / limit);
 
-    // Başarılı listeleme logu
-    await logger.info(
-      EVENTS.ADMIN.TAGS_RETRIEVED,
-      'Tag listesi görüntülendi',
-      { 
-        total,
-        page,
-        limit,
-        totalPages
-      },
-      userId
-    );
+
 
     return {
       success: true,

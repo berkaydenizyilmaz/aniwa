@@ -115,18 +115,7 @@ export async function getAnimeMediaPartBusiness(
       throw new NotFoundError('Anime medya parçası bulunamadı');
     }
 
-    // Başarılı getirme logu
-    await logger.info(
-      EVENTS.EDITOR.ANIME_MEDIA_PART_RETRIEVED,
-      'Anime medya parçası başarıyla getirildi',
-      { 
-        mediaPartId: mediaPart.id, 
-        seriesId: mediaPart.seriesId,
-        title: mediaPart.title,
-        episodes: mediaPart.episodes,
-      },
-      userId
-    );
+
 
     return {
       success: true,
@@ -186,19 +175,7 @@ export async function getAnimeMediaPartListBusiness(
     
     const totalPages = Math.ceil(total / limit);
 
-    // Başarılı listeleme logu
-    await logger.info(
-      EVENTS.EDITOR.ANIME_MEDIA_PART_RETRIEVED,
-      'Anime medya parçaları listelendi',
-      { 
-        seriesId,
-        filters,
-        total,
-        page,
-        limit
-      },
-      userId
-    );
+
 
     return {
       success: true,
