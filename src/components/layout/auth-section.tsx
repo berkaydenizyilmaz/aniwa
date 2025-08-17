@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { LogOut } from 'lucide-react'
+import { LogOut, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { ROUTES } from '@/lib/constants/routes.constants'
@@ -35,7 +35,7 @@ export function AuthSection() {
   if (status === 'loading') {
     return (
       <div className="flex items-center space-x-2">
-        <Skeleton className="h-10 w-10 rounded-full" />
+        <Skeleton className="h-12 w-12 rounded-lg" />
       </div>
     )
   }
@@ -61,13 +61,14 @@ export function AuthSection() {
     <div className="flex items-center space-x-2">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className="cursor-pointer">
+          <div className="cursor-pointer flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Avatar className="h-12 w-12 rounded-lg">
               <AvatarImage src={session.user?.profilePicture || ''} alt={session.user?.username || ''} className="object-cover" />
               <AvatarFallback className="bg-muted text-sm rounded-lg">
                 {session.user?.username?.charAt(0).toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="glass-card w-48" align="center" forceMount>
