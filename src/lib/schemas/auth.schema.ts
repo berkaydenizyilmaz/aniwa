@@ -1,15 +1,15 @@
 import { z } from 'zod';
-import { AUTH } from '@/lib/constants/auth.constants';
+import { AUTH_DOMAIN } from '@/lib/constants/domains/auth';
 
 // Kullanıcı kaydı şeması
 export const registerSchema = z.object({
   email: z.string().email('Geçerli bir e-posta adresi girin'),
   username: z.string()
-    .min(AUTH.USERNAME.MIN_LENGTH, 'Kullanıcı adı gerekli')
-    .max(AUTH.USERNAME.MAX_LENGTH, 'Kullanıcı adı çok uzun')
-    .regex(AUTH.USERNAME.REGEX, 'Kullanıcı adı sadece harf ve rakam içerebilir'),
+    .min(AUTH_DOMAIN.VALIDATION.USERNAME.MIN_LENGTH, 'Kullanıcı adı gerekli')
+    .max(AUTH_DOMAIN.VALIDATION.USERNAME.MAX_LENGTH, 'Kullanıcı adı çok uzun')
+    .regex(AUTH_DOMAIN.VALIDATION.USERNAME.REGEX, 'Kullanıcı adı sadece harf ve rakam içerebilir'),
   password: z.string()
-    .min(AUTH.PASSWORD.MIN_LENGTH, 'Şifre en az 6 karakter olmalı'),
+    .min(AUTH_DOMAIN.VALIDATION.PASSWORD.MIN_LENGTH, 'Şifre en az 6 karakter olmalı'),
   confirmPassword: z.string().min(1, 'Şifre tekrarı gerekli')
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Şifreler eşleşmiyor",
@@ -19,9 +19,9 @@ export const registerSchema = z.object({
 // Kullanıcı girişi şeması
 export const loginSchema = z.object({
   username: z.string()
-    .min(AUTH.USERNAME.MIN_LENGTH, 'Kullanıcı adı gerekli'),
+    .min(AUTH_DOMAIN.VALIDATION.USERNAME.MIN_LENGTH, 'Kullanıcı adı gerekli'),
   password: z.string()
-    .min(AUTH.PASSWORD.MIN_LENGTH, `Şifre en az ${AUTH.PASSWORD.MIN_LENGTH} karakter olmalı`)
+    .min(AUTH_DOMAIN.VALIDATION.PASSWORD.MIN_LENGTH, `Şifre en az ${AUTH_DOMAIN.VALIDATION.PASSWORD.MIN_LENGTH} karakter olmalı`)
 });
 
 // Şifre sıfırlama isteği şeması
@@ -33,7 +33,7 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Token gerekli'),
   password: z.string()
-    .min(AUTH.PASSWORD.MIN_LENGTH, `Şifre en az ${AUTH.PASSWORD.MIN_LENGTH} karakter olmalı`),
+    .min(AUTH_DOMAIN.VALIDATION.PASSWORD.MIN_LENGTH, `Şifre en az ${AUTH_DOMAIN.VALIDATION.PASSWORD.MIN_LENGTH} karakter olmalı`),
   confirmPassword: z.string().min(1, 'Şifre tekrarı gerekli')
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Şifreler eşleşmiyor",

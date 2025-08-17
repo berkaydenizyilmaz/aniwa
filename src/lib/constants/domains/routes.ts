@@ -1,6 +1,7 @@
-// Route sabitleri - Sayfa ve API endpoint'leri
+// Routes domain constants - Route sabitleri
 
-export const ROUTES = {
+export const ROUTES_DOMAIN = {
+  // Pages
   PAGES: {
     HOME: '/',
     
@@ -45,6 +46,7 @@ export const ROUTES = {
     },
   },
   
+  // API
   API: {
     // Auth API'leri
     AUTH: {
@@ -80,7 +82,6 @@ export const ROUTES = {
     EDITOR: {
     },
   },
-  
   
   // Middleware için route grupları
   MIDDLEWARE: {

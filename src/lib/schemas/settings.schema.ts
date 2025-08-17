@@ -2,14 +2,14 @@
 
 import { z } from 'zod';
 import { Theme, TitleLanguage, ScoreFormat, ProfileVisibility } from '@prisma/client';
-import { AUTH } from '@/lib/constants/auth.constants';
+import { AUTH_DOMAIN } from '@/lib/constants/domains/auth';
 
 // Profile Settings - Ayrı şemalar
 export const updateUsernameSchema = z.object({
   username: z.string()
-    .min(AUTH.USERNAME.MIN_LENGTH, 'Kullanıcı adı en az 3 karakter olmalı')
-    .max(AUTH.USERNAME.MAX_LENGTH, 'Kullanıcı adı en fazla 50 karakter olabilir')
-    .regex(AUTH.USERNAME.REGEX, 'Kullanıcı adı sadece harf ve rakam içerebilir'),
+    .min(AUTH_DOMAIN.VALIDATION.USERNAME.MIN_LENGTH, 'Kullanıcı adı en az 3 karakter olmalı')
+    .max(AUTH_DOMAIN.VALIDATION.USERNAME.MAX_LENGTH, 'Kullanıcı adı en fazla 50 karakter olabilir')
+    .regex(AUTH_DOMAIN.VALIDATION.USERNAME.REGEX, 'Kullanıcı adı sadece harf ve rakam içerebilir'),
 });
 
 export const updateBioSchema = z.object({
@@ -20,9 +20,9 @@ export const updateBioSchema = z.object({
 
 export const updatePasswordSchema = z.object({
   newPassword: z.string()
-    .min(AUTH.PASSWORD.MIN_LENGTH, 'Parola en az 6 karakter olmalı'),
+    .min(AUTH_DOMAIN.VALIDATION.PASSWORD.MIN_LENGTH, 'Parola en az 6 karakter olmalı'),
   confirmPassword: z.string()
-    .min(AUTH.PASSWORD.MIN_LENGTH, 'Parola en az 6 karakter olmalı'),
+    .min(AUTH_DOMAIN.VALIDATION.PASSWORD.MIN_LENGTH, 'Parola en az 6 karakter olmalı'),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: 'Parolalar eşleşmiyor',
   path: ['confirmPassword'],

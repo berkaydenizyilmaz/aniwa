@@ -12,15 +12,14 @@ export const createLogSchema = z.object({
   userId: z.string().optional(),
 });
 
+import { baseFiltersSchema } from './shared/base';
+
 // Log filtreleme şeması
-export const logFiltersSchema = z.object({
+export const logFiltersSchema = baseFiltersSchema.extend({
   level: z.nativeEnum(LogLevel).optional(),
   event: z.string().optional(),
-  search: z.string().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
-  page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(100).default(50),
 });
 
 // Tip türetmeleri

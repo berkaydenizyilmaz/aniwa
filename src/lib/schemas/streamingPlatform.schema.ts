@@ -1,26 +1,22 @@
 // StreamingPlatform validasyon şemaları
 
 import { z } from 'zod';
-import { STREAMING } from '@/lib/constants/streaming.constants';
+import { baseNameSchema, baseUrlSchema, baseFiltersSchema } from './shared/base';
 
 // Platform oluşturma şeması
 export const createStreamingPlatformSchema = z.object({
-  name: z.string().min(STREAMING.PLATFORM.NAME.MIN_LENGTH, 'Platform adı gerekli').max(STREAMING.PLATFORM.NAME.MAX_LENGTH, 'Platform adı çok uzun'),
-  baseUrl: z.string().url('Geçerli bir URL girin').max(STREAMING.PLATFORM.BASE_URL.MAX_LENGTH, 'URL çok uzun'),
+  name: baseNameSchema,
+  baseUrl: baseUrlSchema,
 });
 
 // Platform güncelleme şeması
 export const updateStreamingPlatformSchema = z.object({
-  name: z.string().min(STREAMING.PLATFORM.NAME.MIN_LENGTH, 'Platform adı gerekli').max(STREAMING.PLATFORM.NAME.MAX_LENGTH, 'Platform adı çok uzun').optional(),
-  baseUrl: z.string().url('Geçerli bir URL girin').max(STREAMING.PLATFORM.BASE_URL.MAX_LENGTH, 'URL çok uzun').optional(),
+  name: baseNameSchema.optional(),
+  baseUrl: baseUrlSchema.optional(),
 });
 
 // Platform filtreleme şeması
-export const streamingPlatformFiltersSchema = z.object({
-  search: z.string().optional(),
-  page: z.number().min(STREAMING.PAGINATION.MIN_PAGE).default(STREAMING.PAGINATION.MIN_PAGE),
-  limit: z.number().min(STREAMING.PAGINATION.MIN_PAGE).max(STREAMING.PAGINATION.MAX_LIMIT).default(STREAMING.PAGINATION.DEFAULT_LIMIT),
-});
+export const streamingPlatformFiltersSchema = baseFiltersSchema;
 
 // Tip türetmeleri
 export type CreateStreamingPlatformInput = z.infer<typeof createStreamingPlatformSchema>;

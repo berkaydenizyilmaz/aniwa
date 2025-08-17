@@ -1,6 +1,6 @@
-// Log event sabitleri - Katmanlara göre organize edilmiş
+// Events domain constants - Log event sabitleri
 
-export const EVENTS = {
+export const EVENTS_DOMAIN = {
   // Auth Events
   AUTH: {
     USER_REGISTERED: 'user_registered',
@@ -161,7 +161,7 @@ export const EVENTS = {
     EPISODE_DELETE_FAILED: 'editor_episode_delete_failed',
   },
   
-  // System Events - Katmanlara göre organize
+  // System Events
   SYSTEM: {
     // External Services
     EMAIL_SEND_FAILED: 'system_email_send_failed',
@@ -189,4 +189,4 @@ export const EVENTS = {
     BATCH_IMAGE_UPLOAD_PARTIAL_FAILURE: 'system_batch_image_upload_partial_failure',
     BATCH_IMAGE_UPLOAD_FAILED: 'system_batch_image_upload_failed',
   },
-} as const; 
+} as const;
