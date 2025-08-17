@@ -42,7 +42,7 @@ export function LogFilters({ onSearch, onLevelChange, onStartDateChange, onEndDa
 
   const handleLevelChange = (level: string) => {
     setSelectedLevel(level);
-    onLevelChange?.(level === 'all' ? '' : level);
+    onLevelChange?.(level);
   };
 
   const handleStartDateChange = (date: string) => {

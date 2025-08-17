@@ -79,6 +79,8 @@ export async function getLogsBusiness(
   filters?: GetLogsRequest
 ): Promise<ApiResponse<GetLogsResponse>> {
   try {
+    console.log('Business filters:', filters); // Debug için
+    
     const page = filters?.page || 1;
     const limit = filters?.limit || 50;
     const skip = (page - 1) * limit;
