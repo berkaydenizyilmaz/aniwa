@@ -75,7 +75,7 @@ export function UserFilters({ onSearch, onRoleChange, onBannedChange, onAddNew }
               <SelectItem value="all">Tüm Roller</SelectItem>
               {Object.values(UserRole).map((role) => (
                 <SelectItem key={role} value={role}>
-                  {USER_DOMAIN.ROLE_LABELS[role]}
+                  {USER_DOMAIN.UI.ROLE_LABELS[role]}
                 </SelectItem>
               ))}
             </SelectContent>

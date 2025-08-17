@@ -78,7 +78,7 @@ export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoile
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tüm Kategoriler</SelectItem>
-                              {Object.entries(MASTER_DATA_DOMAIN.TAG_CATEGORY_LABELS).map(([key, label]) => (
+              {Object.entries(MASTER_DATA_DOMAIN.UI.TAG_CATEGORY_LABELS).map(([key, label]) => (
                 <SelectItem key={key} value={key}>
                   {label}
                 </SelectItem>

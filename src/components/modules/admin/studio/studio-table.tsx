@@ -175,10 +175,10 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                                     studio.isAnimationStudio
-                  ? MASTER_DATA_DOMAIN.STUDIO_TYPE_COLORS.ANIMATION
-                  : MASTER_DATA_DOMAIN.STUDIO_TYPE_COLORS.PRODUCTION
+                  ? MASTER_DATA_DOMAIN.UI.STUDIO_TYPE_COLORS.ANIMATION
+                  : MASTER_DATA_DOMAIN.UI.STUDIO_TYPE_COLORS.PRODUCTION
               }`}>
-                {studio.isAnimationStudio ? MASTER_DATA_DOMAIN.STUDIO_TYPE_LABELS.ANIMATION : MASTER_DATA_DOMAIN.STUDIO_TYPE_LABELS.PRODUCTION}
+                {studio.isAnimationStudio ? MASTER_DATA_DOMAIN.UI.STUDIO_TYPE_LABELS.ANIMATION : MASTER_DATA_DOMAIN.UI.STUDIO_TYPE_LABELS.PRODUCTION}
                   </span>
                 </TableCell>
                 <TableCell>

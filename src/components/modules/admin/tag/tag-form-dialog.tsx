@@ -178,7 +178,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.entries(MASTER_DATA_DOMAIN.TAG_CATEGORY_LABELS).map(([key, label]) => (
+                      {Object.entries(MASTER_DATA_DOMAIN.UI.TAG_CATEGORY_LABELS).map(([key, label]) => (
                         <SelectItem key={key} value={key}>
                           {label}
                         </SelectItem>

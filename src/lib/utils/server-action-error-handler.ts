@@ -1,7 +1,7 @@
 import { ZodError } from 'zod';
 import { BusinessError, DatabaseError } from '@/lib/errors';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 
 // Server Action error response type
 export type ServerActionErrorResponse = {
@@ -59,7 +59,7 @@ export function handleServerActionError(
 
   // Beklenmedik hata - logla
   logger.error(
-    EVENTS.SYSTEM.ACTION_ERROR,
+    EVENTS_DOMAIN.SYSTEM.ACTION_ERROR,
     'Server Action seviyesinde beklenmedik hata',
     {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',

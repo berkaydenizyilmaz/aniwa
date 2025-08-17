@@ -1,7 +1,7 @@
 // Rate limit utility - @upstash/ratelimit kullanarak
 import { Ratelimit } from '@upstash/ratelimit';
 import { kv } from '@vercel/kv';
-import { RATE_LIMIT } from '@/lib/constants';
+import { SHARED_SYSTEM } from '@/lib/constants';
 
 // Rate limit sonucu tipi
 export interface RateLimitResult {
@@ -15,7 +15,7 @@ export interface RateLimitResult {
 // Rate limiter instance'ı oluştur
 const rateLimiter = new Ratelimit({
   redis: kv,
-  limiter: Ratelimit.slidingWindow(RATE_LIMIT.API.GENERAL.MAX_REQUESTS, `${RATE_LIMIT.API.GENERAL.WINDOW_MS}ms`),
+  limiter: Ratelimit.slidingWindow(SHARED_SYSTEM.RATE_LIMIT.API.GENERAL.MAX_REQUESTS, `${SHARED_SYSTEM.RATE_LIMIT.API.GENERAL.WINDOW_MS}ms`),
   analytics: true,
   prefix: 'rate_limit:api:general',
 });
