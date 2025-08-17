@@ -29,13 +29,13 @@ export const SHARED_SYSTEM = {
   LOG: {
     LEVEL_LABELS: {
       INFO: 'Bilgi',
-      WARNING: 'Uyarı',
+      WARN: 'Uyarı',
       ERROR: 'Hata',
       DEBUG: 'Hata Ayıklama',
     },
     LEVEL_COLORS: {
       INFO: 'text-blue-600',
-      WARNING: 'text-yellow-600',
+      WARN: 'text-yellow-600',
       ERROR: 'text-red-600',
       DEBUG: 'text-gray-600',
     },
