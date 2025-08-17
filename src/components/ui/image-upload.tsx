@@ -36,7 +36,11 @@ export function ImageUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const config = IMAGE_PRESET_CONFIGS[category];
+  const config = IMAGE_PRESET_CONFIGS[category === 'USER_PROFILE' ? 'USER_PROFILE' : 
+                                     category === 'USER_BANNER' ? 'USER_BANNER' :
+                                     category === 'ANIME_COVER' ? 'ANIME_COVER' :
+                                     category === 'ANIME_BANNER' ? 'ANIME_BANNER' :
+                                     category === 'EPISODE_THUMBNAIL' ? 'EPISODE_THUMBNAIL' : 'DEFAULT'];
 
   // Kategori bazlı UI ayarları
   const getUIConfig = (cat: ImageCategory) => {
@@ -58,6 +62,33 @@ export function ImageUpload({
           iconSize: 'w-6 h-6',
           title: 'Profil Banner',
           description: 'Profil banner\'ınızı seçin',
+        };
+      case 'ANIME_COVER':
+        return {
+          size: 'w-32 h-48',
+          aspectRatio: 'aspect-[2/3]',
+          icon: ImageIcon,
+          iconSize: 'w-6 h-6',
+          title: 'Anime Kapak',
+          description: 'Anime kapak görselini seçin',
+        };
+      case 'ANIME_BANNER':
+        return {
+          size: 'w-full h-32',
+          aspectRatio: 'aspect-[3/1]',
+          icon: Monitor,
+          iconSize: 'w-5 h-5',
+          title: 'Anime Banner',
+          description: 'Anime banner görselini seçin',
+        };
+      case 'EPISODE_THUMBNAIL':
+        return {
+          size: 'w-64 h-36',
+          aspectRatio: 'aspect-[16/9]',
+          icon: ImageIcon,
+          iconSize: 'w-5 h-5',
+          title: 'Episode Thumbnail',
+          description: 'Episode thumbnail seçin',
         };
       default:
         return {

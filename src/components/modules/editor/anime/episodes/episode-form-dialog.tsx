@@ -27,6 +27,7 @@ import { toast } from 'sonner';
 import { Episode } from '@prisma/client';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ImageUpload } from '@/components/ui/image-upload';
 
 interface EpisodeFormDialogProps {
   open: boolean;
@@ -233,10 +234,14 @@ export function EpisodeFormDialog({ open, onOpenChange, mediaPartId, episode, on
                   <FormItem>
                     <FormLabel>Thumbnail</FormLabel>
                     <FormControl>
-                      {/* TODO: Image upload component will be added */}
-                      <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <span className="text-gray-500">Thumbnail</span>
-                      </div>
+                      <ImageUpload
+                        category="EPISODE_THUMBNAIL"
+                        value={field.value ? URL.createObjectURL(field.value) : undefined}
+                        onChange={(file) => field.onChange(file)}
+                        disabled={createMutation.isPending || updateMutation.isPending}
+                        placeholder="Episode thumbnail seçin"
+                        showProgress={createMutation.isPending || updateMutation.isPending}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
