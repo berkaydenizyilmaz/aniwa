@@ -49,6 +49,7 @@ export const authConfig: NextAuthOptions = {
           username: user.username,
           email: user.email,
           roles: user.roles,
+          profilePicture: user.profilePicture,
         };
       }
     })
@@ -60,14 +61,16 @@ export const authConfig: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user && 'username' in user && 'roles' in user) {
-        const u = user as { username: string; roles: string[] };
+        const u = user as { username: string; roles: string[]; profilePicture?: string };
         token.username = u.username;
         token.roles = u.roles;
+        token.profilePicture = u.profilePicture;
       }
       // Client-side update() çağrıları
       if (trigger === 'update' && session?.user) {
         if (session.user.username) token.username = session.user.username;
         if (session.user.roles) token.roles = session.user.roles;
+        if (session.user.profilePicture) token.profilePicture = session.user.profilePicture;
       }
       return token;
     },
@@ -76,6 +79,7 @@ export const authConfig: NextAuthOptions = {
         session.user.id = token.sub!;
         session.user.username = token.username as string;
         session.user.roles = token.roles as string[];
+        session.user.profilePicture = token.profilePicture as string | undefined;
       }
       return session;
     }

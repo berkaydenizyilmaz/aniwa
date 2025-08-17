@@ -40,9 +40,9 @@ export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="cursor-pointer flex items-center space-x-2 w-full">
-          <Avatar className="h-5 w-5 flex-shrink-0">
-            <AvatarImage src={session.user?.image || ''} alt={session.user?.username || ''} />
-            <AvatarFallback className="bg-muted text-xs">
+          <Avatar className="h-8 w-8 flex-shrink-0 rounded-lg">
+            <AvatarImage src={session.user?.profilePicture || ''} alt={session.user?.username || ''} className="object-cover" />
+            <AvatarFallback className="bg-muted text-xs rounded-lg">
               {session.user?.username?.charAt(0).toUpperCase() || 'A'}
             </AvatarFallback>
           </Avatar>

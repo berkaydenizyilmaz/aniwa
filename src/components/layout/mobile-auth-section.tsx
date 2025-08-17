@@ -76,9 +76,9 @@ export function MobileAuthSection() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="cursor-pointer">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={session.user?.image || ''} alt={session.user?.username || ''} />
-            <AvatarFallback className="bg-muted text-xs">
+          <Avatar className="h-10 w-10 rounded-lg">
+            <AvatarImage src={session.user?.profilePicture || ''} alt={session.user?.username || ''} className="object-cover" />
+            <AvatarFallback className="bg-muted text-xs rounded-lg">
               {session.user?.username?.charAt(0).toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
