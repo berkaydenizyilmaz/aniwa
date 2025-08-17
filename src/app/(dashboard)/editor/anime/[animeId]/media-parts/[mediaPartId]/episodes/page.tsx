@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { EpisodeTable } from '@/components/modules/editor/anime/episodes/episode-table';
 import { EpisodeFormDialog } from '@/components/modules/editor/anime/episodes/episode-form-dialog';
 import { Episode } from '@prisma/client';
-import { ROUTES_DOMAIN } from '@/lib/constants';
+import { ROUTES_DOMAIN } from '@/lib/constants/domains/routes';
 
 interface EpisodesPageProps {
   params: Promise<{
@@ -32,7 +32,7 @@ export default function EpisodesPage({ params }: EpisodesPageProps) {
 
   const handleStreamingLinks = (episode: Episode) => {
     // Streaming link sayfasına yönlendir
-    router.push(ROUTES.PAGES.EDITOR.STREAMING_LINKS
+    router.push(ROUTES_DOMAIN.PAGES.EDITOR.STREAMING_LINKS
       .replace(':animeId', animeId)
       .replace(':mediaPartId', mediaPartId)
       .replace(':episodeId', episode.id));
@@ -53,7 +53,7 @@ export default function EpisodesPage({ params }: EpisodesPageProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Link href={ROUTES.PAGES.EDITOR.MEDIA_PARTS.replace(':animeId', animeId)}>
+          <Link href={ROUTES_DOMAIN.PAGES.EDITOR.MEDIA_PARTS.replace(':animeId', animeId)}>
             <Button
               variant="ghost"
               size="sm"

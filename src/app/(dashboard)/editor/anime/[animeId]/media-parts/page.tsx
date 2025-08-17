@@ -31,7 +31,7 @@ export default function MediaPartsPage({ params }: MediaPartsPageProps) {
 
   const handleEpisodes = (mediaPart: AnimeMediaPart) => {
     // Episode sayfasına yönlendir
-    const episodeRoute = ROUTES.PAGES.EDITOR.EPISODES
+    const episodeRoute = ROUTES_DOMAIN.PAGES.EDITOR.EPISODES
       .replace(':animeId', animeId)
       .replace(':mediaPartId', mediaPart.id);
     router.push(episodeRoute);
@@ -52,7 +52,7 @@ export default function MediaPartsPage({ params }: MediaPartsPageProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Link href={ROUTES.PAGES.EDITOR.ANIME}>
+          <Link href={ROUTES_DOMAIN.PAGES.EDITOR.ANIME}>
             <Button
               variant="ghost"
               size="sm"

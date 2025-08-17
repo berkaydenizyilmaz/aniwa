@@ -7,7 +7,7 @@ import { StreamingLinkTable } from '@/components/modules/editor/anime/streaming-
 import { StreamingLinkFormDialog } from '@/components/modules/editor/anime/streaming-links/streaming-link-form-dialog';
 import { StreamingLink } from '@prisma/client';
 import Link from 'next/link';
-import { ROUTES_DOMAIN } from '@/lib/constants';
+import { ROUTES_DOMAIN } from '@/lib/constants/domains/routes';
 
 interface StreamingLinksPageProps {
   params: Promise<{
@@ -44,7 +44,7 @@ export default function StreamingLinksPage({ params }: StreamingLinksPageProps) 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href={ROUTES.PAGES.EDITOR.EPISODES.replace(':animeId', animeId)
+          <Link href={ROUTES_DOMAIN.PAGES.EDITOR.EPISODES.replace(':animeId', animeId)
             .replace(':mediaPartId', mediaPartId)}>
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -52,7 +52,7 @@ export default function StreamingLinksPage({ params }: StreamingLinksPageProps) 
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold">İzleme Link'leri</h1>
+            <h1 className="text-2xl font-bold">İzleme Linkleri</h1>
             <p className="text-muted-foreground">Bölüm için izleme linklerini yönetin</p>
           </div>
         </div>
