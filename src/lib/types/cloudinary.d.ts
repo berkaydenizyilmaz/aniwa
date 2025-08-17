@@ -75,11 +75,11 @@ export type AllowedImageFormat = typeof import('@/lib/constants/cloudinary.const
 
 // Image category types for folder organization
 export type ImageCategory = 
-  | 'user-profile' 
-  | 'user-banner' 
-  | 'anime-cover' 
-  | 'anime-banner' 
-  | 'episode-thumbnail';
+  | 'USER_PROFILE' 
+  | 'USER_BANNER' 
+  | 'ANIME_COVER' 
+  | 'ANIME_BANNER' 
+  | 'EPISODE_THUMBNAIL';
 
 // Upload context for different entities
 export interface UploadContext {

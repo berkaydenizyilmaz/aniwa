@@ -1,209 +1,131 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
-import { Upload, Image as ImageIcon, User, Monitor } from 'lucide-react';
+import React, { useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { ImageCategory } from '@/lib/types/cloudinary';
+import { User, Monitor, ImageIcon, Upload, X, Edit3 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { IMAGE_PRESET_CONFIGS } from '@/lib/constants/cloudinary.constants';
+import type { ImageCategory } from '@/lib/types/cloudinary';
 
-export interface ImageUploadProps {
-  /**
-   * Image kategorisi - size limits ve format restrictions için kullanılır
-   */
+interface ImageUploadProps {
   category: ImageCategory;
-  
-  /**
-   * Mevcut image URL'i (edit durumunda)
-   */
   value?: string | null;
-  
-  /**
-   * Image değiştiğinde çağrılır
-   */
   onChange: (file: File | null) => void;
-  
-  /**
-   * Upload işlemi sırasında çağrılır
-   */
-  onUploadStart?: () => void;
-  
-  /**
-   * Upload tamamlandığında çağrılır
-   */
-  onUploadComplete?: (url: string) => void;
-  
-  /**
-   * Upload hatası olduğunda çağrılır
-   */
-  onUploadError?: (error: string) => void;
-  
-  /**
-   * Component'in disabled durumu
-   */
+  onDelete?: () => void;
   disabled?: boolean;
-  
-  /**
-   * CSS class name
-   */
-  className?: string;
-  
-  /**
-   * Placeholder text
-   */
   placeholder?: string;
-  
-  /**
-   * Show progress indicator
-   */
   showProgress?: boolean;
+  showDeleteProgress?: boolean;
+  className?: string;
+  error?: string;
 }
 
 export function ImageUpload({
   category,
   value,
   onChange,
-  onUploadStart,
-  onUploadComplete,
-  onUploadError,
+  onDelete,
   disabled = false,
-  className,
   placeholder,
-  showProgress = true,
+  showProgress = false,
+  showDeleteProgress = false,
+  className,
+  error,
 }: ImageUploadProps) {
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // Kategori konfigürasyonu al
-  const getConfigKey = (cat: ImageCategory): keyof typeof IMAGE_PRESET_CONFIGS => {
-    switch (cat) {
-      case 'user-profile':
-        return 'USER_PROFILE';
-      case 'user-banner':
-        return 'USER_BANNER';
-      case 'anime-cover':
-        return 'ANIME_COVER';
-      case 'anime-banner':
-        return 'ANIME_BANNER';
-      case 'episode-thumbnail':
-        return 'EPISODE_THUMBNAIL';
-      default:
-        throw new Error(`Unsupported image category: ${cat}`);
-    }
-  };
+  const [isDragOver, setIsDragOver] = useState(false);
 
-  const config = IMAGE_PRESET_CONFIGS[getConfigKey(category)];
-  
+  const config = IMAGE_PRESET_CONFIGS[category];
+
   // Kategori bazlı UI ayarları
   const getUIConfig = (cat: ImageCategory) => {
     switch (cat) {
-      case 'user-profile':
+      case 'USER_PROFILE':
         return {
-          height: 'h-24',
+          size: 'w-40 h-40',
+          aspectRatio: 'aspect-square',
           icon: User,
-          showCurrentImage: true,
-          imageSize: 'w-16 h-16',
-          layout: 'vertical' as const,
+          iconSize: 'w-8 h-8',
+          title: 'Profil Resmi',
+          description: 'Profil resminizi seçin',
         };
-      case 'user-banner':
+      case 'USER_BANNER':
         return {
-          height: 'h-20',
+          size: 'w-full h-40',
+          aspectRatio: 'aspect-[3/1]',
           icon: Monitor,
-          showCurrentImage: true,
-          imageSize: 'w-20 h-12',
-          layout: 'horizontal' as const,
+          iconSize: 'w-6 h-6',
+          title: 'Profil Banner',
+          description: 'Profil banner\'ınızı seçin',
         };
       default:
         return {
-          height: 'h-20',
+          size: 'w-40 h-40',
+          aspectRatio: 'aspect-square',
           icon: ImageIcon,
-          showCurrentImage: false,
-          imageSize: 'w-16 h-16',
-          layout: 'horizontal' as const,
+          iconSize: 'w-8 h-8',
+          title: 'Görsel',
+          description: 'Görsel seçin',
         };
     }
   };
 
   const uiConfig = getUIConfig(category);
-  
-  // File validation
-  const validateFile = useCallback((file: File): string | null => {
-    // Format kontrolü
-    const fileExtension = file.name.split('.').pop()?.toLowerCase();
-    if (!fileExtension || !config.allowedFormats.includes(fileExtension as any)) {
-      return `Desteklenen formatlar: ${config.allowedFormats.join(', ')}`;
-    }
-    
-    // Size kontrolü
-    if (file.size > config.maxSizeBytes) {
-      const maxSizeMB = config.maxSizeBytes / (1024 * 1024);
-      return `Dosya boyutu ${maxSizeMB}MB'dan büyük olamaz`;
-    }
-    
-    return null;
-  }, [config]);
-  
-  // Handle file selection
+
   const handleFileSelect = useCallback((file: File) => {
-    const validationError = validateFile(file);
-    if (validationError) {
-      setError(validationError);
-      onUploadError?.(validationError);
-      return;
+    if (file) {
+      onChange(file);
     }
-    
-    setError(null);
-    
-    // Call onChange with file
-    onChange(file);
-    
-    // Notify parent that upload started
-    onUploadStart?.();
-  }, [validateFile, onChange, onUploadStart, onUploadError]);
-  
-  // Handle drag events
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  }, [onChange]);
+
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleClick = () => {
+    if (!disabled) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     if (!disabled) {
       setIsDragOver(true);
     }
-  }, [disabled]);
-  
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-  }, []);
-  
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
     
     if (disabled) return;
-    
-    const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      handleFileSelect(files[0]);
+
+    const files = Array.from(e.dataTransfer.files);
+    const imageFile = files.find(file => 
+      config.allowedFormats.some(format => 
+        file.name.toLowerCase().endsWith(format.toLowerCase())
+      )
+    );
+
+    if (imageFile) {
+      if (imageFile.size <= config.maxSizeBytes) {
+        handleFileSelect(imageFile);
+      }
     }
-  }, [handleFileSelect, disabled]);
-  
-  // Handle click to open file dialog
-  const handleClick = useCallback(() => {
-    if (!disabled && fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  }, [disabled]);
-  
-  // Handle file input change
-  const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      handleFileSelect(files[0]);
-    }
-  }, [handleFileSelect]);
-  
+  };
+
   const isUploading = showProgress;
+  const isDeleting = showDeleteProgress;
 
   return (
     <div className={cn('w-full', className)}>
@@ -215,90 +137,131 @@ export function ImageUpload({
         className="hidden"
         disabled={disabled}
       />
-      
+
       <div
         onClick={handleClick}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          'relative border-2 border-dashed rounded-lg transition-colors duration-200',
-          uiConfig.height,
-          'hover:bg-muted/50 cursor-pointer',
-          isDragOver && 'border-primary bg-primary/5',
-          error && 'border-destructive',
-          disabled && 'opacity-50 cursor-not-allowed hover:bg-transparent',
-          value ? 'border-solid border-muted-foreground/50' : 'border-muted-foreground/25'
+          'relative group cursor-pointer transition-all duration-300',
+          uiConfig.size,
+          uiConfig.aspectRatio,
+          'rounded-xl overflow-hidden',
+          isDragOver && 'scale-105',
+          disabled && 'opacity-50 cursor-not-allowed',
+          error && 'ring-2 ring-destructive'
         )}
       >
-        {/* Upload Area */}
-        <div className="p-4 h-full flex items-center justify-center">
-          {/* Upload Status */}
-          {isUploading ? (
-            <div className="flex items-center justify-center space-x-2">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
-              <span className="text-sm font-medium">Yükleniyor...</span>
-            </div>
-          ) : uiConfig.showCurrentImage && value ? (
-            // Mevcut resim gösterimi
-            <div className={cn(
-              'flex items-center space-x-3',
-              uiConfig.layout === 'vertical' ? 'flex-col space-x-0 space-y-2' : ''
-            )}>
-              {/* Mevcut Resim */}
-              <div className={cn('relative overflow-hidden rounded-lg flex-shrink-0', uiConfig.imageSize)}>
-                <Image
-                  src={value}
-                  alt="Mevcut görsel"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
+        {isUploading ? (
+          // Loading State
+          <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center">
+            <div className="flex flex-col items-center space-y-3">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary/30 border-t-primary"></div>
               </div>
-              
-              {/* Upload Text */}
-              <div className={cn('text-left', uiConfig.layout === 'vertical' ? 'text-center' : '')}>
-                <p className="text-sm font-medium">
-                  {placeholder || 'Değiştir'}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {config.allowedFormats.join(', ').toUpperCase()}
-                </p>
-              </div>
+              <p className="text-sm font-medium text-primary">Yükleniyor...</p>
             </div>
-          ) : (
-            // Upload alanı
-            <div className={cn(
-              'flex items-center space-x-3',
-              uiConfig.layout === 'vertical' ? 'flex-col space-x-0 space-y-2' : ''
-            )}>
-              {/* Upload Icon */}
-              <div className="w-8 h-8 flex-shrink-0">
+          </div>
+        ) : value ? (
+          // Image Display State
+          <div className="relative w-full h-full border-2 border-dashed border-muted-foreground/40 rounded-xl">
+            <Image
+              src={value}
+              alt={uiConfig.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+            
+            {/* Hover Overlay with Actions */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <Button
+                type="button"
+                size="icon"
+                variant="secondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
+                className="w-10 h-10 bg-white/90 hover:bg-white rounded-full"
+              >
+                <Edit3 className="w-4 h-4 text-gray-700" />
+              </Button>
+              {onDelete && (
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="destructive"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isDeleting) {
+                      onDelete();
+                    }
+                  }}
+                  disabled={isDeleting}
+                  className="w-10 h-10 rounded-full"
+                >
+                  {isDeleting ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>
+                  ) : (
+                    <X className="w-4 h-4" />
+                  )}
+                </Button>
+              )}
+            </div>
+            </div>
+          </div>
+        ) : (
+          // Empty Upload State
+          <div className={cn(
+            'w-full h-full flex flex-col items-center justify-center text-center',
+            uiConfig.size === 'w-40 h-40' ? 'p-3' : 'p-4',
+            'bg-gradient-to-br from-muted/20 to-muted/40',
+            'border-2 border-dashed border-muted-foreground/40',
+            'hover:border-primary/60 hover:bg-gradient-to-br hover:from-primary/10 hover:to-primary/20',
+            'transition-all duration-300'
+          )}>
+            <div className="mb-3">
+              <div className={cn(
+                'w-12 h-12 rounded-full flex items-center justify-center',
+                'bg-muted/60 text-muted-foreground',
+                'group-hover:bg-primary/20 group-hover:text-primary',
+                'transition-all duration-300'
+              )}>
                 {isDragOver ? (
-                  <Upload className="w-full h-full text-primary" />
+                  <Upload className={uiConfig.iconSize} />
                 ) : (
-                  <uiConfig.icon className="w-full h-full text-muted-foreground" />
+                  <uiConfig.icon className={uiConfig.iconSize} />
                 )}
               </div>
-              
-              {/* Upload Text */}
-              <div className={cn('text-left', uiConfig.layout === 'vertical' ? 'text-center' : '')}>
-                <p className="text-sm font-medium">
-                  {placeholder || (
-                    isDragOver 
-                      ? 'Dosyayı bırak' 
-                      : 'Dosya seç veya sürükle'
-                  )}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {config.allowedFormats.join(', ').toUpperCase()} • Max {Math.round(config.maxSizeBytes / (1024 * 1024))}MB
-                </p>
-              </div>
             </div>
-          )}
-        </div>
+            
+            <div className="space-y-1">
+              <p className={cn(
+                'font-medium text-foreground',
+                uiConfig.size === 'w-40 h-40' ? 'text-xs' : 'text-sm'
+              )}>
+                {placeholder || uiConfig.description}
+              </p>
+              <p className={cn(
+                'text-muted-foreground',
+                uiConfig.size === 'w-40 h-40' ? 'text-[10px]' : 'text-xs'
+              )}>
+                Tıklayın veya sürükleyip bırakın
+              </p>
+              <p className={cn(
+                'text-muted-foreground/70',
+                uiConfig.size === 'w-40 h-40' ? 'text-[10px]' : 'text-xs'
+              )}>
+                {config.allowedFormats.slice(0, 3).join(', ').toUpperCase()} • {Math.round(config.maxSizeBytes / (1024 * 1024))}MB max
+              </p>
+            </div>
+          </div>
+        )}
       </div>
-      
+
       {/* Error Message */}
       {error && (
         <p className="mt-2 text-sm text-destructive flex items-center">

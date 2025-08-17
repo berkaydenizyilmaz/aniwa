@@ -138,62 +138,48 @@ export function ProfileSettings() {
           </p>
         </div>
 
-        {/* Profil Resmi */}
-        <div className="space-y-2">
-          <Label>Profil Resmi</Label>
-          <ImageUpload
-            category="user-profile"
-            value={(profile as GetUserProfileResponse)?.profilePicture}
-            onChange={(file) => {
-              setProfileImageFile(file);
-              if (file) {
-                handleImageUpload(file, 'profile');
-              }
-            }}
-            disabled={uploadProfileImageMutation.isPending}
-            placeholder="Profil resminizi seçin"
-            showProgress={uploadProfileImageMutation.isPending}
-          />
-          {(profile as GetUserProfileResponse)?.profilePicture && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleImageDelete('profile')}
-              disabled={deleteProfileImageMutation.isPending}
-            >
-              Profil Resmini Sil
-            </Button>
-          )}
-        </div>
+        {/* Profil Resmi ve Banner */}
+        <div className="space-y-4">
+          <div className="flex items-start justify-center gap-12 max-w-3xl mx-auto">
+            {/* Profil Resmi - Avatar Görünümü */}
+            <div className="space-y-2">
+              <Label>Profil Resmi</Label>
+              <ImageUpload
+                category="USER_PROFILE"
+                value={(profile as GetUserProfileResponse)?.profilePicture}
+                onChange={(file) => {
+                  setProfileImageFile(file);
+                  if (file) {
+                    handleImageUpload(file, 'profile');
+                  }
+                }}
+                onDelete={() => handleImageDelete('profile')}
+                disabled={uploadProfileImageMutation.isPending}
+                placeholder="Profil resminizi seçin"
+                showProgress={uploadProfileImageMutation.isPending}
+                showDeleteProgress={deleteProfileImageMutation.isPending}
+              />
+            </div>
 
-        {/* Profil Banner */}
-        <div className="space-y-2">
-          <Label>Profil Banner</Label>
-          <ImageUpload
-            category="user-banner"
-            value={(profile as GetUserProfileResponse)?.profileBanner}
-            onChange={(file) => {
-              setBannerImageFile(file);
-              if (file) {
-                handleImageUpload(file, 'banner');
-              }
-            }}
-            disabled={uploadProfileImageMutation.isPending}
-            placeholder="Profil banner'ınızı seçin"
-            showProgress={uploadProfileImageMutation.isPending}
-          />
-          {(profile as GetUserProfileResponse)?.profileBanner && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleImageDelete('banner')}
-              disabled={deleteProfileImageMutation.isPending}
-            >
-              Banner&apos;ı Sil
-            </Button>
-          )}
+            {/* Profil Banner - Banner Görünümü */}
+            <div className="space-y-2">
+              <Label>Profil Banner</Label>
+              <ImageUpload
+                category="USER_BANNER"
+                value={(profile as GetUserProfileResponse)?.profileBanner}
+                onChange={(file) => {
+                  setBannerImageFile(file);
+                  if (file) {
+                    handleImageUpload(file, 'banner');
+                  }
+                }}
+                onDelete={() => handleImageDelete('banner')}
+                disabled={uploadProfileImageMutation.isPending}
+                placeholder="Profil banner'ınızı seçin"
+                showProgress={uploadProfileImageMutation.isPending}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Kullanıcı Adı */}
