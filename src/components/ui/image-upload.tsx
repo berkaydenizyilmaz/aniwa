@@ -165,14 +165,14 @@ export function ImageUpload({
           </div>
                 ) : value ? (
           // Image Display State
-          <div className="relative w-full h-full border-2 border-dashed border-muted-foreground/40 rounded-xl">
-            <Image
-              src={value}
-              alt={uiConfig.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
+          <div className="relative w-full h-full border-2 border-dashed border-muted-foreground/40 rounded-xl hover:border-primary/60 hover:shadow-md transition-all duration-300 cursor-pointer group">
+                          <Image
+                src={value}
+                alt={uiConfig.title}
+                fill
+                className="object-cover transition-all duration-300 group-hover:scale-105 group-hover:opacity-80"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
             
             {/* Fixed Delete Button - All Sizes */}
             {onDelete && (
@@ -187,12 +187,12 @@ export function ImageUpload({
                   }
                 }}
                 disabled={isDeleting}
-                className="absolute top-2 right-2 w-8 h-8 md:w-10 md:h-10 rounded-full z-10"
+                className="absolute top-2 right-2 w-6 h-6 md:w-8 md:h-8 rounded-full z-10"
               >
                 {isDeleting ? (
-                  <div className="animate-spin rounded-full h-3 w-3 md:h-4 md:w-4 border-2 border-white/30 border-t-white"></div>
+                  <div className="animate-spin rounded-full h-2.5 w-2.5 md:h-3 md:w-3 border-2 border-white/30 border-t-white"></div>
                 ) : (
-                  <X className="w-3 h-3 md:w-4 md:h-4" />
+                  <X className="w-2.5 h-2.5 md:h-3 md:w-3" />
                 )}
               </Button>
             )}
