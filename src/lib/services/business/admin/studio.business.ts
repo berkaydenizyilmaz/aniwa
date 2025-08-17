@@ -18,7 +18,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { 
   CreateStudioResponse, 
@@ -58,7 +58,7 @@ export async function createStudioBusiness(
 
     // Başarılı oluşturma logu
     await logger.info(
-      EVENTS.ADMIN.STUDIO_CREATED,
+      EVENTS_DOMAIN.ADMIN.STUDIO_CREATED,
       'Stüdyo başarıyla oluşturuldu',
       { 
         studioId: result.id, 
@@ -81,7 +81,7 @@ export async function createStudioBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Stüdyo oluşturma sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', name: data.name },
       userId
@@ -116,7 +116,7 @@ export async function getStudioBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Stüdyo getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', studioId: id },
       userId
@@ -159,7 +159,7 @@ export async function getStudiosBusiness(
     return {
       success: true,
       data: {
-        studios: paginatedStudios,
+        data: paginatedStudios,
         total,
         page,
         limit,
@@ -174,7 +174,7 @@ export async function getStudiosBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Stüdyo listeleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
       userId
@@ -226,7 +226,7 @@ export async function updateStudioBusiness(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.ADMIN.STUDIO_UPDATED,
+      EVENTS_DOMAIN.ADMIN.STUDIO_UPDATED,
       'Stüdyo başarıyla güncellendi',
       { 
         studioId: result.id, 
@@ -251,7 +251,7 @@ export async function updateStudioBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Stüdyo güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', studioId: id, data },
       userId
@@ -278,7 +278,7 @@ export async function deleteStudioBusiness(
 
     // Başarılı silme logu
     await logger.info(
-      EVENTS.ADMIN.STUDIO_DELETED,
+      EVENTS_DOMAIN.ADMIN.STUDIO_DELETED,
       'Stüdyo başarıyla silindi',
       { 
         studioId: id, 
@@ -298,7 +298,7 @@ export async function deleteStudioBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Stüdyo silme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', studioId: id },
       userId

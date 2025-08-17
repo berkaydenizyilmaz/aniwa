@@ -28,7 +28,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Tablo item tipi
-type StreamingLinkTableItem = GetStreamingLinksResponse['streamingLinks'][0];
+type StreamingLinkTableItem = GetStreamingLinksResponse['data'][0];
 
 interface StreamingLinkTableProps {
   episodeId: string;
@@ -173,7 +173,7 @@ export function StreamingLinkTable({ episodeId, onEdit, onCreateNew, refreshKey 
     );
   }
 
-  if (!data || data.streamingLinks.length === 0) {
+  if (!data || data.data.length === 0) {
     return (
       <div className="glass-card p-6 text-center">
         <p className="text-muted-foreground mb-4">Henüz izleme linki bulunmuyor</p>
@@ -194,7 +194,7 @@ export function StreamingLinkTable({ episodeId, onEdit, onCreateNew, refreshKey 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.streamingLinks.map((streamingLink) => (
+            {data.data.map((streamingLink) => (
               <TableRow key={streamingLink.id}>
                 <TableCell>
                   <div className="font-medium">{streamingLink.platform.name}</div>

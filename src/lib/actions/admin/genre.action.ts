@@ -10,7 +10,7 @@ import {
 } from '@/lib/services/business/admin/genre.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/services/auth/auth.config';
 
@@ -27,7 +27,7 @@ export async function createGenreAction(data: CreateGenreInput): Promise<ServerA
     const result = await createGenreBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.GENRES);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.GENRES);
 
     return {
       success: true,
@@ -102,7 +102,7 @@ export async function updateGenreAction(id: string, data: UpdateGenreInput): Pro
     const result = await updateGenreBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.GENRES);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.GENRES);
 
     return {
       success: true,
@@ -127,7 +127,7 @@ export async function deleteGenreAction(id: string): Promise<ServerActionRespons
     await deleteGenreBusiness(id, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.GENRES);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.GENRES);
 
     return {
       success: true,

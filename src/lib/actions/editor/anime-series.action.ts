@@ -14,12 +14,12 @@ import {
   getAnimeSeriesBusiness,
   updateAnimeSeriesBusiness, 
   deleteAnimeSeriesBusiness,
-  getAnimeSeriesRelationsBusiness,
+  getAnimeSeriesRelationsBusiness,  
   getAnimeSeriesWithRelationsBusiness
 } from '@/lib/services/business/editor/anime-series.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/services/auth/auth.config';
 
@@ -38,7 +38,7 @@ export async function createAnimeSeriesAction(
     const result = await createAnimeSeriesBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
+    revalidatePath(ROUTES_DOMAIN.PAGES.EDITOR.ANIME);
 
     return {
       success: true,
@@ -116,7 +116,7 @@ export async function updateAnimeSeriesAction(
     const result = await updateAnimeSeriesBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
+    revalidatePath(ROUTES_DOMAIN.PAGES.EDITOR.ANIME);
 
     return {
       success: true,
@@ -141,7 +141,7 @@ export async function deleteAnimeSeriesAction(id: string): Promise<ServerActionR
     await deleteAnimeSeriesBusiness(id, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
+    revalidatePath(ROUTES_DOMAIN.PAGES.EDITOR.ANIME);
 
     return {
       success: true,

@@ -17,11 +17,11 @@ import {
 import { findAnimeSeriesByIdDB } from '@/lib/services/db/anime.db';
 import { Prisma } from '@prisma/client';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { 
   deleteImageBusiness, 
-  createImageUploadContext
+  createEpisodeThumbnailUploadContext
 } from '@/lib/services/business/shared/image.business';
 import { findEpisodesByMediaPartIdDB } from '@/lib/services/db/episode.db';
 import { 
@@ -71,7 +71,7 @@ export async function createAnimeMediaPartBusiness(
 
     // Başarılı oluşturma logu
     await logger.info(
-      EVENTS.EDITOR.ANIME_MEDIA_PART_CREATED,
+      EVENTS_DOMAIN.EDITOR.ANIME_MEDIA_PART_CREATED,
       'Anime medya parçası başarıyla oluşturuldu',
       { 
         mediaPartId: result.id, 
@@ -94,7 +94,7 @@ export async function createAnimeMediaPartBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime medya parçası oluşturma sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', title: data.title },
       userId
@@ -129,7 +129,7 @@ export async function getAnimeMediaPartBusiness(
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime medya parçası getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', mediaPartId: id },
       userId
@@ -180,7 +180,7 @@ export async function getAnimeMediaPartListBusiness(
     return {
       success: true,
       data: {
-        mediaParts,
+        data: mediaParts,
         total,
         page,
         limit,
@@ -195,7 +195,7 @@ export async function getAnimeMediaPartListBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime medya parçaları listeleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', seriesId, filters },
       userId
@@ -243,7 +243,7 @@ export async function updateAnimeMediaPartBusiness(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.EDITOR.ANIME_MEDIA_PART_UPDATED,
+      EVENTS_DOMAIN.EDITOR.ANIME_MEDIA_PART_UPDATED,
       'Anime medya parçası başarıyla güncellendi',
       { 
         mediaPartId: result.id, 
@@ -267,7 +267,7 @@ export async function updateAnimeMediaPartBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime medya parçası güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', mediaPartId: id, data },
       userId
@@ -298,12 +298,12 @@ export async function deleteAnimeMediaPartBusiness(
         if (episode.thumbnailImage) {
           imagePromises.push(
             deleteImageBusiness(
-              createImageUploadContext('episode-thumbnail', episode.id, userId),
+              createEpisodeThumbnailUploadContext(episode.id, userId),
               userId,
               episode.thumbnailImage
             ).catch(error => {
               logger.warn(
-                EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+                EVENTS_DOMAIN.SYSTEM.IMAGE_DELETE_FAILED,
                 'Media part silme sırasında episode thumbnail silinemedi',
                 { 
                   mediaPartId: id,
@@ -324,7 +324,7 @@ export async function deleteAnimeMediaPartBusiness(
     } catch (error) {
       // Episode cleanup hatası media part silmeyi engellemesin
       await logger.warn(
-        EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+        EVENTS_DOMAIN.SYSTEM.IMAGE_DELETE_FAILED,
         'Media part silme sırasında episode thumbnail cleanup hatası',
         { 
           mediaPartId: id,
@@ -339,7 +339,7 @@ export async function deleteAnimeMediaPartBusiness(
 
     // Başarılı silme logu
     await logger.info(
-      EVENTS.EDITOR.ANIME_MEDIA_PART_DELETED,
+      EVENTS_DOMAIN.EDITOR.ANIME_MEDIA_PART_DELETED,
       'Anime medya parçası başarıyla silindi',
       { 
         mediaPartId: existingMediaPart.id, 
@@ -359,7 +359,7 @@ export async function deleteAnimeMediaPartBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime medya parçası silme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', mediaPartId: id },
       userId

@@ -1,33 +1,32 @@
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 import { BusinessError, DatabaseError } from '@/lib/errors';
-import { ERROR_CODES } from '@/lib/constants/error.constants';
+import { SHARED_SYSTEM, EVENTS_DOMAIN } from '@/lib/constants';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
 
 // HTTP status kodlarını belirle
 function getHttpStatus(errorCode: string): number {
   switch (errorCode) {
     // 4XX Client Errors
-    case ERROR_CODES.VALIDATION_ERROR:
+    case SHARED_SYSTEM.ERROR_CODES.VALIDATION_ERROR:
       return 400;
-    case ERROR_CODES.UNAUTHORIZED:
+    case SHARED_SYSTEM.ERROR_CODES.UNAUTHORIZED:
       return 401;
-    case ERROR_CODES.NOT_FOUND:
+    case SHARED_SYSTEM.ERROR_CODES.NOT_FOUND:
       return 404;
-    case ERROR_CODES.CONFLICT:
+    case SHARED_SYSTEM.ERROR_CODES.CONFLICT:
       return 409;
-    case ERROR_CODES.RATE_LIMIT_EXCEEDED:
+    case SHARED_SYSTEM.ERROR_CODES.RATE_LIMIT_EXCEEDED:
       return 429;
     
     // 5XX Server Errors
-    case ERROR_CODES.EXTERNAL_SERVICE_ERROR:
+    case SHARED_SYSTEM.ERROR_CODES.EXTERNAL_SERVICE_ERROR:
       return 502;
     
     // Genel hatalar
-    case ERROR_CODES.INVALID_TOKEN:
-    case ERROR_CODES.USER_BANNED:
-    case ERROR_CODES.UNKNOWN_ERROR:
+    case SHARED_SYSTEM.ERROR_CODES.INVALID_TOKEN:
+    case SHARED_SYSTEM.ERROR_CODES.USER_BANNED:
+    case SHARED_SYSTEM.ERROR_CODES.UNKNOWN_ERROR:
     default:
       return 400;
   }
@@ -75,7 +74,7 @@ export function handleApiError(error: unknown, context?: { endpoint?: string; me
   
   // Beklenmedik hata - logla
   logger.error(
-    EVENTS.SYSTEM.API_ERROR,
+    EVENTS_DOMAIN.SYSTEM.API_ERROR,
     'API seviyesinde beklenmedik hata',
     {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',

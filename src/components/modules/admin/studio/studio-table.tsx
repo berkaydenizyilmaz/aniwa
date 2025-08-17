@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Studio } from '@prisma/client';
-import { MASTER_DATA } from '@/lib/constants/masterData.constants';
+import { MASTER_DATA_DOMAIN } from '@/lib/constants';
 import { getStudiosAction, deleteStudioAction } from '@/lib/actions/admin/studio.action';
 import { toast } from 'sonner';
 import { GetStudiosResponse } from '@/lib/types/api/studio.api';
@@ -168,17 +168,17 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
             </TableRow>
           </TableHeader>
           <TableBody>
-            {studiosData?.studios.map((studio) => (
+            {studiosData?.data.map((studio) => (
               <TableRow key={studio.id}>
                 <TableCell>{studio.name}</TableCell>
                 <TableCell className="text-muted-foreground">{studio.slug}</TableCell>
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${
-                    studio.isAnimationStudio 
-                      ? MASTER_DATA.STUDIO_TYPE_COLORS.ANIMATION
-                      : MASTER_DATA.STUDIO_TYPE_COLORS.PRODUCTION
-                  }`}>
-                    {studio.isAnimationStudio ? MASTER_DATA.STUDIO_TYPE_LABELS.ANIMATION : MASTER_DATA.STUDIO_TYPE_LABELS.PRODUCTION}
+                                    studio.isAnimationStudio
+                  ? MASTER_DATA_DOMAIN.STUDIO_TYPE_COLORS.ANIMATION
+                  : MASTER_DATA_DOMAIN.STUDIO_TYPE_COLORS.PRODUCTION
+              }`}>
+                {studio.isAnimationStudio ? MASTER_DATA_DOMAIN.STUDIO_TYPE_LABELS.ANIMATION : MASTER_DATA_DOMAIN.STUDIO_TYPE_LABELS.PRODUCTION}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -206,7 +206,7 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
           </TableBody>
         </Table>
 
-        {(!studiosData?.studios || studiosData.studios.length === 0) && (
+        {(!studiosData?.data || studiosData.data.length === 0) && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun stüdyo bulunamadı.' : 'Henüz stüdyo bulunmuyor.'}
           </div>

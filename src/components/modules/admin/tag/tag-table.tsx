@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { MASTER_DATA } from '@/lib/constants/masterData.constants';
+import { MASTER_DATA_DOMAIN } from '@/lib/constants';
 import { type TagFilters } from '@/lib/schemas/tag.schema';
 
 interface TagTableProps {
@@ -108,7 +108,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
     const pages = [];
     const maxVisiblePages = 5;
     const totalPages = tagsData?.totalPages || 1;
-    
+
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -136,7 +136,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
         pages.push(totalPages);
       }
     }
-    
+
     return pages;
   };
 
@@ -175,24 +175,24 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tagsData?.tags.map((tag) => (
+            {tagsData?.data.map((tag) => (
               <TableRow key={tag.id}>
                 <TableCell>{tag.name}</TableCell>
                 <TableCell className="text-muted-foreground">{tag.slug}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${tag.category ? MASTER_DATA.TAG_CATEGORY_COLORS[tag.category] : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'}`}>
-                    {tag.category ? MASTER_DATA.TAG_CATEGORY_LABELS[tag.category] || tag.category : '-'}
+                  <span className={`px-2 py-1 rounded-full text-xs ${tag.category ? MASTER_DATA_DOMAIN.UI.TAG_CATEGORY_COLORS[tag.category] : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'}`}>
+                    {tag.category ? MASTER_DATA_DOMAIN.UI.TAG_CATEGORY_LABELS[tag.category] || tag.category : '-'}
                   </span>
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
                     {tag.isAdult && (
-                      <span className={`px-2 py-1 rounded-full text-xs ${MASTER_DATA.TAG_PROPERTY_COLORS.ADULT}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs ${MASTER_DATA_DOMAIN.UI.TAG_PROPERTY_COLORS.ADULT}`}>
                         Yetişkin
                       </span>
                     )}
                     {tag.isSpoiler && (
-                      <span className={`px-2 py-1 rounded-full text-xs ${MASTER_DATA.TAG_PROPERTY_COLORS.SPOILER}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs ${MASTER_DATA_DOMAIN.UI.TAG_PROPERTY_COLORS.SPOILER}`}>
                         Spoiler
                       </span>
                     )}
@@ -223,7 +223,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
           </TableBody>
         </Table>
 
-        {(!tagsData?.tags || tagsData.tags.length === 0) && (
+        {(!tagsData?.data || tagsData.data.length === 0) && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun etiket bulunamadı.' : 'Henüz etiket bulunmuyor.'}
           </div>
@@ -235,7 +235,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
             <div className="text-sm text-muted-foreground">
               Toplam {tagsData.total} etiket, {currentPage}. sayfa / {tagsData.totalPages} sayfa
             </div>
-            
+
             <div className="flex items-center gap-2">
               {/* İlk sayfa */}
               <Button
@@ -246,7 +246,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
               >
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
-              
+
               {/* Önceki sayfa */}
               <Button
                 variant="outline"
@@ -256,7 +256,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              
+
               {/* Sayfa numaraları */}
               <div className="flex items-center gap-1">
                 {getPageNumbers().map((page, index) => (
@@ -277,7 +277,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
                   </div>
                 ))}
               </div>
-              
+
               {/* Sonraki sayfa */}
               <Button
                 variant="outline"
@@ -287,7 +287,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
-              
+
               {/* Son sayfa */}
               <Button
                 variant="outline"

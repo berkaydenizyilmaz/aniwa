@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Log, LogLevel } from '@prisma/client';
-import { LOG } from '@/lib/constants/log.constants';
 import { getLogsAction } from '@/lib/actions/admin/log.action';
 import { toast } from 'sonner';
 import { GetLogsResponse } from '@/lib/types/api/log.api';
@@ -25,6 +24,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useQuery } from '@tanstack/react-query';
+import { SHARED_SYSTEM } from '@/lib/constants/shared/system';
 
 interface LogTableProps {
   searchTerm?: string;
@@ -80,7 +80,7 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
     toast.error(error.message || 'Loglar yüklenirken bir hata oluştu');
   }
 
-  const logs = data?.logs || [];
+  const logs = data?.data || [];
   const totalPages = data?.totalPages || 1;
   const totalLogs = data?.total || 0;
 
@@ -89,11 +89,11 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
   };
 
   const getLevelLabel = (level: LogLevel) => {
-    return LOG.LEVEL_LABELS[level];
+    return SHARED_SYSTEM.LOG.LEVEL_LABELS[level];
   };
 
   const getLevelColor = (level: LogLevel) => {
-    return LOG.LEVEL_COLORS[level];
+    return SHARED_SYSTEM.LOG.LEVEL_COLORS[level];
   };
 
   const handleViewMetadata = (log: Log & { user?: { id: string; username: string; email: string } | null }) => {

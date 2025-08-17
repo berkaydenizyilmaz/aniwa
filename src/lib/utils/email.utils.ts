@@ -1,7 +1,6 @@
 // Email gönderme utility'si - Resend kullanarak
 import { Resend } from 'resend';
-import { ROUTES } from '@/lib/constants/routes.constants';
-import { AUTH } from '@/lib/constants/auth.constants';
+import { ROUTES, AUTH } from '@/lib/constants';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 

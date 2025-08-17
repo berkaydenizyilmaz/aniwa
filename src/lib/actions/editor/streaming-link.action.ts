@@ -16,7 +16,7 @@ import {
 } from '@/lib/services/business/editor/streaming-link.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/services/auth/auth.config';
 
@@ -35,7 +35,7 @@ export async function createStreamingLinkAction(
     const result = await createStreamingLinkBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
+    revalidatePath(ROUTES_DOMAIN.PAGES.EDITOR.ANIME);
 
     return {
       success: true,
@@ -136,7 +136,7 @@ export async function updateStreamingLinkAction(
     const result = await updateStreamingLinkBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
+    revalidatePath(ROUTES_DOMAIN.PAGES.EDITOR.ANIME);
 
     return {
       success: true,
@@ -161,7 +161,7 @@ export async function deleteStreamingLinkAction(id: string): Promise<ServerActio
     const result = await deleteStreamingLinkBusiness(id, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.EDITOR.ANIME);
+    revalidatePath(ROUTES_DOMAIN.PAGES.EDITOR.ANIME);
 
     return {
       success: true,

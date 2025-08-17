@@ -71,15 +71,10 @@ export interface DeleteImageResult {
 }
 
 // Image format type based on allowed formats constant
-export type AllowedImageFormat = typeof import('@/lib/constants/cloudinary.constants').ALLOWED_IMAGE_FORMATS[number];
+export type AllowedImageFormat = typeof import('@/lib/constants/domains/cloudinary').CLOUDINARY_DOMAIN.ALLOWED_FORMATS[number];
 
 // Image category types for folder organization
-export type ImageCategory = 
-  | 'USER_PROFILE' 
-  | 'USER_BANNER' 
-  | 'ANIME_COVER' 
-  | 'ANIME_BANNER' 
-  | 'EPISODE_THUMBNAIL';
+export type ImageCategory = typeof import('@/lib/constants/domains/cloudinary').CLOUDINARY_DOMAIN.CATEGORIES[keyof typeof import('@/lib/constants/domains/cloudinary').CLOUDINARY_DOMAIN.CATEGORIES];
 
 // Upload context for different entities
 export interface UploadContext {

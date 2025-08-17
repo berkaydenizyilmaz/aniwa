@@ -1,7 +1,7 @@
 // Rate limit utility - @upstash/ratelimit kullanarak
 import { Ratelimit } from '@upstash/ratelimit';
 import { kv } from '@vercel/kv';
-import { RATE_LIMIT } from '@/lib/constants/rate-limit.constants';
+import { RATE_LIMIT } from '@/lib/constants';
 
 // Rate limit sonucu tipi
 export interface RateLimitResult {

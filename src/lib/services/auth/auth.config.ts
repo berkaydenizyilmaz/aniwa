@@ -2,8 +2,7 @@ import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { ROUTES } from '@/lib/constants/routes.constants';
-import { AUTH } from '@/lib/constants/auth.constants';
+import { ROUTES_DOMAIN, AUTH_DOMAIN } from '@/lib/constants';
 
 export const authConfig: NextAuthOptions = {
   providers: [
@@ -56,7 +55,7 @@ export const authConfig: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: AUTH.SESSION.MAX_AGE,
+    maxAge: AUTH_DOMAIN.BUSINESS.SESSION.MAX_AGE,
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {
@@ -85,6 +84,6 @@ export const authConfig: NextAuthOptions = {
     }
   },
   pages: {
-    signIn: ROUTES.PAGES.AUTH.LOGIN
+        signIn: ROUTES_DOMAIN.PAGES.AUTH.LOGIN
   },
 };

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { User, Monitor, ImageIcon, Upload, X, Edit3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { IMAGE_PRESET_CONFIGS } from '@/lib/constants/cloudinary.constants';
+import { IMAGE_PRESET_CONFIGS } from '@/lib/constants';
 import type { ImageCategory } from '@/lib/types/cloudinary';
 
 interface ImageUploadProps {

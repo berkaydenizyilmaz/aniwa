@@ -1,7 +1,7 @@
 import { ZodError } from 'zod';
 import { BusinessError, DatabaseError } from '@/lib/errors';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS } from '@/lib/constants';
 
 // Server Action error response type
 export type ServerActionErrorResponse = {

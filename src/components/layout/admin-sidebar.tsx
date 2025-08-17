@@ -11,8 +11,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { AdminAuthSection } from './admin-auth-section';
-import { ROUTES } from '@/lib/constants/routes.constants';
-import { ADMIN_NAVIGATION_ITEMS } from '@/lib/constants/menu.constants';
+import { ROUTES_DOMAIN, NAVIGATION_DOMAIN } from '@/lib/constants';
 import { 
   Home,
   Menu,
@@ -56,7 +55,7 @@ export function AdminSidebar() {
             {/* Header */}
             <div className={`flex items-center border-b ${isCollapsed ? 'justify-center p-2' : 'justify-between p-4'}`}>
               {!isCollapsed && (
-                <Link href={ROUTES.PAGES.ADMIN.DASHBOARD} className="flex items-center space-x-2">
+                <Link href={ROUTES_DOMAIN.PAGES.ADMIN.DASHBOARD} className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold text-base">A</span>
                   </div>
@@ -80,7 +79,7 @@ export function AdminSidebar() {
 
             {/* Navigation */}
             <nav className={`flex-1 space-y-3 ${isCollapsed ? 'py-2' : 'p-4'}`}>
-              {ADMIN_NAVIGATION_ITEMS.map((item) => {
+              {NAVIGATION_DOMAIN.MENU.ADMIN_NAVIGATION_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
                 
@@ -126,7 +125,7 @@ export function AdminSidebar() {
               <Tooltip delayDuration={300} open={isCollapsed ? undefined : false}>
                 <TooltipTrigger asChild>
                   <Link
-                    href={ROUTES.PAGES.HOME}
+                    href={ROUTES_DOMAIN.PAGES.HOME}
                     className={`
                       flex items-center rounded-lg
                       text-muted-foreground hover:text-foreground hover:bg-accent/50
@@ -171,7 +170,7 @@ export function AdminSidebar() {
           <div className="flex flex-col h-full">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
-              <Link href={ROUTES.PAGES.ADMIN.DASHBOARD} className="flex items-center space-x-2">
+              <Link href={ROUTES_DOMAIN.PAGES.ADMIN.DASHBOARD} className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-base">A</span>
                 </div>
@@ -189,7 +188,7 @@ export function AdminSidebar() {
 
             {/* Navigation */}
             <nav className="flex-1 p-4 space-y-2">
-              {ADMIN_NAVIGATION_ITEMS.map((item) => {
+              {NAVIGATION_DOMAIN.MENU.ADMIN_NAVIGATION_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
                 
@@ -218,7 +217,7 @@ export function AdminSidebar() {
             <div className="p-4 border-t space-y-2">
               {/* Ana Sayfaya Dön */}
               <Link
-                href={ROUTES.PAGES.HOME}
+                href={ROUTES_DOMAIN.PAGES.HOME}
                 onClick={() => setIsMobileOpen(false)}
                 className={`
                   flex items-center space-x-3 px-3 py-2 rounded-lg

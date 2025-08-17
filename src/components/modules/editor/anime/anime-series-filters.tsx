@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Search, Plus, Filter } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { AnimeType, AnimeStatus } from '@prisma/client';
-import { ANIME } from '@/lib/constants/anime.constants';
+import { ANIME_DOMAIN } from '@/lib/constants';
 import {
   Select,
   SelectContent,
@@ -73,7 +73,7 @@ export function AnimeSeriesFilters({ onSearch, onTypeChange, onStatusChange, onA
               <SelectItem value="all">Tüm Tipler</SelectItem>
               {Object.values(AnimeType).map((type) => (
                 <SelectItem key={type} value={type}>
-                  {ANIME.TYPE_LABELS[type]}
+                  {ANIME_DOMAIN.TYPE_LABELS[type]}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -90,7 +90,7 @@ export function AnimeSeriesFilters({ onSearch, onTypeChange, onStatusChange, onA
               <SelectItem value="all">Tüm Durumlar</SelectItem>
               {Object.values(AnimeStatus).map((status) => (
                 <SelectItem key={status} value={status}>
-                  {ANIME.STATUS_LABELS[status]}
+                  {ANIME_DOMAIN.STATUS_LABELS[status]}
                 </SelectItem>
               ))}
             </SelectContent>

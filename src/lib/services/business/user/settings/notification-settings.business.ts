@@ -10,7 +10,7 @@ import {
   createUserSettingsDB
 } from '@/lib/services/db/userProfileSettings.db';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { UpdateNotificationSettingsResponse } from '@/lib/types/api/settings.api';
 
@@ -39,7 +39,7 @@ export async function updateNotificationSettingsBusiness(
     }
 
     await logger.info(
-      EVENTS.USER.NOTIFICATION_SETTINGS_UPDATED,
+      EVENTS_DOMAIN.USER.NOTIFICATION_SETTINGS_UPDATED,
       'Kullanıcı bildirim ayarları güncellendi',
       { userId, settings: notificationSettings },
       userId
@@ -55,7 +55,7 @@ export async function updateNotificationSettingsBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Bildirim ayarları güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );

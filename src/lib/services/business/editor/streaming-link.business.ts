@@ -22,7 +22,7 @@ import {
 import { ApiResponse } from '@/lib/types/api/index';
 import { BusinessError, DatabaseError, NotFoundError } from '@/lib/errors';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { StreamingLink } from '@prisma/client';
 
 // Streaming Link oluşturma
@@ -51,7 +51,7 @@ export async function createStreamingLinkBusiness(
 
     // Başarılı oluşturma logu
     await logger.info(
-      EVENTS.EDITOR.STREAMING_LINK_CREATED,
+      EVENTS_DOMAIN.EDITOR.STREAMING_LINK_CREATED,
       'Streaming link başarıyla oluşturuldu',
       { 
         streamingLinkId: result.id,
@@ -70,7 +70,7 @@ export async function createStreamingLinkBusiness(
     }
     
     await logger.error(
-      EVENTS.EDITOR.STREAMING_LINK_CREATE_FAILED,
+      EVENTS_DOMAIN.EDITOR.STREAMING_LINK_CREATE_FAILED,
       'Streaming link oluşturma hatası',
       { 
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -108,7 +108,7 @@ export async function getStreamingLinkBusiness(
     }
     
     await logger.error(
-      EVENTS.EDITOR.STREAMING_LINK_RETRIEVE_FAILED,
+      EVENTS_DOMAIN.EDITOR.STREAMING_LINK_RETRIEVE_FAILED,
       'Streaming link getirme hatası',
       { 
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -149,7 +149,7 @@ export async function getStreamingLinksByEpisodeBusiness(
     return {
       success: true,
       data: {
-        streamingLinks: streamingLinksWithPlatform,
+        data: streamingLinksWithPlatform,
         total,
         page,
         limit,
@@ -163,7 +163,7 @@ export async function getStreamingLinksByEpisodeBusiness(
     }
     
     await logger.error(
-      EVENTS.EDITOR.STREAMING_LINKS_RETRIEVE_FAILED,
+      EVENTS_DOMAIN.EDITOR.STREAMING_LINKS_RETRIEVE_FAILED,
       'Episode streaming link\'leri getirme hatası',
       { 
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -199,7 +199,7 @@ export async function getStreamingPlatformsBusiness(
     }
     
     await logger.error(
-      EVENTS.EDITOR.STREAMING_PLATFORMS_RETRIEVE_FAILED,
+      EVENTS_DOMAIN.EDITOR.STREAMING_PLATFORMS_RETRIEVE_FAILED,
       'Streaming platform\'ları getirme hatası',
       { 
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -239,7 +239,7 @@ export async function updateStreamingLinkBusiness(
     );
 
     await logger.info(
-      EVENTS.EDITOR.STREAMING_LINK_UPDATED,
+      EVENTS_DOMAIN.EDITOR.STREAMING_LINK_UPDATED,
       'Streaming link başarıyla güncellendi',
       { 
         streamingLinkId: result.id,
@@ -258,7 +258,7 @@ export async function updateStreamingLinkBusiness(
     }
     
     await logger.error(
-      EVENTS.EDITOR.STREAMING_LINK_UPDATE_FAILED,
+      EVENTS_DOMAIN.EDITOR.STREAMING_LINK_UPDATE_FAILED,
       'Streaming link güncelleme hatası',
       { 
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -284,7 +284,7 @@ export async function deleteStreamingLinkBusiness(
     await deleteStreamingLinkDB({ id });
 
     await logger.info(
-      EVENTS.EDITOR.STREAMING_LINK_DELETED,
+      EVENTS_DOMAIN.EDITOR.STREAMING_LINK_DELETED,
       'Streaming link başarıyla silindi',
       { 
         streamingLinkId: id,
@@ -302,7 +302,7 @@ export async function deleteStreamingLinkBusiness(
     }
     
     await logger.error(
-      EVENTS.EDITOR.STREAMING_LINK_DELETE_FAILED,
+      EVENTS_DOMAIN.EDITOR.STREAMING_LINK_DELETE_FAILED,
       'Streaming link silme hatası',
       { 
         error: error instanceof Error ? error.message : 'Unknown error',

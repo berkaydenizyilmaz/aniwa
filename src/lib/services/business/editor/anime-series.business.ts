@@ -36,7 +36,7 @@ import {
 } from '@/lib/services/db/tag.db';
 import { Prisma } from '@prisma/client';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { 
   CreateAnimeSeriesResponse, 
@@ -52,7 +52,9 @@ import {
 import { 
   uploadImageBusiness, 
   deleteImageBusiness, 
-  createImageUploadContext
+  createAnimeCoverUploadContext,
+  createAnimeBannerUploadContext,
+  createEpisodeThumbnailUploadContext
 } from '@/lib/services/business/shared/image.business';
 import { findAllAnimeMediaPartsDB } from '@/lib/services/db/mediaPart.db';
 import { findEpisodesByMediaPartIdDB } from '@/lib/services/db/episode.db';
@@ -92,7 +94,7 @@ export async function createAnimeSeriesBusiness(
 
     if (coverImageFile) {
       const coverUpload = await uploadImageBusiness(
-        createImageUploadContext('anime-cover', result.id, userId),
+        createAnimeCoverUploadContext(result.id, userId),
         coverImageFile,
         userId
       );
@@ -103,7 +105,7 @@ export async function createAnimeSeriesBusiness(
 
     if (bannerImageFile) {
       const bannerUpload = await uploadImageBusiness(
-        createImageUploadContext('anime-banner', result.id, userId),
+        createAnimeBannerUploadContext(result.id, userId),
         bannerImageFile,
         userId
       );
@@ -150,7 +152,7 @@ export async function createAnimeSeriesBusiness(
 
     // Başarılı oluşturma logu
     await logger.info(
-      EVENTS.EDITOR.ANIME_SERIES_CREATED,
+      EVENTS_DOMAIN.EDITOR.ANIME_SERIES_CREATED,
       'Anime serisi başarıyla oluşturuldu',
       { 
         animeSeriesId: result.id, 
@@ -177,7 +179,7 @@ export async function createAnimeSeriesBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime serisi oluşturma sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', title: data.title },
       userId
@@ -213,7 +215,7 @@ export async function getAnimeSeriesBusiness(
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime serisi getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', animeSeriesId: id },
       userId
@@ -285,7 +287,7 @@ export async function getAnimeSeriesListBusiness(
     return {
       success: true,
       data: {
-        animeSeries,
+        data: animeSeries,
         total,
         page,
         limit,
@@ -301,7 +303,7 @@ export async function getAnimeSeriesListBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime serileri listeleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
       userId
@@ -333,7 +335,7 @@ export async function updateAnimeSeriesBusiness(
 
     if (coverImageFile) {
       const coverUpload = await uploadImageBusiness(
-        createImageUploadContext('anime-cover', id, userId),
+        createAnimeCoverUploadContext(id, userId),
         coverImageFile,
         userId,
         {
@@ -348,7 +350,7 @@ export async function updateAnimeSeriesBusiness(
 
     if (bannerImageFile) {
       const bannerUpload = await uploadImageBusiness(
-        createImageUploadContext('anime-banner', id, userId),
+        createAnimeBannerUploadContext(id, userId),
         bannerImageFile,
         userId,
         {
@@ -424,7 +426,7 @@ export async function updateAnimeSeriesBusiness(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.EDITOR.ANIME_SERIES_UPDATED,
+      EVENTS_DOMAIN.EDITOR.ANIME_SERIES_UPDATED,
       'Anime serisi başarıyla güncellendi',
       { 
         animeSeriesId: result.id, 
@@ -452,7 +454,7 @@ export async function updateAnimeSeriesBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime serisi güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', animeSeriesId: id, data },
       userId
@@ -480,12 +482,12 @@ export async function deleteAnimeSeriesBusiness(
     if (existingAnimeSeries.coverImage) {
       imagePromises.push(
         deleteImageBusiness(
-          createImageUploadContext('anime-cover', id, userId),
+          createAnimeCoverUploadContext(id, userId),
           userId,
           existingAnimeSeries.coverImage
         ).catch(error => {
           logger.warn(
-            EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+            EVENTS_DOMAIN.SYSTEM.IMAGE_DELETE_FAILED,
             'Anime serisi silme sırasında cover image silinemedi',
             { 
               animeSeriesId: id,
@@ -501,12 +503,12 @@ export async function deleteAnimeSeriesBusiness(
     if (existingAnimeSeries.bannerImage) {
       imagePromises.push(
         deleteImageBusiness(
-          createImageUploadContext('anime-banner', id, userId),
+          createAnimeBannerUploadContext(id, userId),
           userId,
           existingAnimeSeries.bannerImage
         ).catch(error => {
           logger.warn(
-            EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+            EVENTS_DOMAIN.SYSTEM.IMAGE_DELETE_FAILED,
             'Anime serisi silme sırasında banner image silinemedi',
             { 
               animeSeriesId: id,
@@ -533,12 +535,12 @@ export async function deleteAnimeSeriesBusiness(
             if (episode.thumbnailImage) {
               imagePromises.push(
                 deleteImageBusiness(
-                  createImageUploadContext('episode-thumbnail', episode.id, userId),
+                  createEpisodeThumbnailUploadContext(episode.id, userId),
                   userId,
                   episode.thumbnailImage
                 ).catch(error => {
                   logger.warn(
-                    EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+                    EVENTS_DOMAIN.SYSTEM.IMAGE_DELETE_FAILED,
                     'Anime series silme sırasında episode thumbnail silinemedi',
                     { 
                       animeSeriesId: id,
@@ -556,7 +558,7 @@ export async function deleteAnimeSeriesBusiness(
         } catch (episodeError) {
           // Episode bulma hatası
           await logger.warn(
-            EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+            EVENTS_DOMAIN.SYSTEM.IMAGE_DELETE_FAILED,
             'Media part episode\'ları bulunamadı',
             { 
               animeSeriesId: id,
@@ -571,7 +573,7 @@ export async function deleteAnimeSeriesBusiness(
     } catch (error) {
       // Episode cleanup hatası anime silmeyi engellemesin
       await logger.warn(
-        EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+        EVENTS_DOMAIN.SYSTEM.IMAGE_DELETE_FAILED,
         'Anime serisi silme sırasında episode thumbnail cleanup hatası',
         { 
           animeSeriesId: id,
@@ -589,7 +591,7 @@ export async function deleteAnimeSeriesBusiness(
 
     // Başarılı silme logu
     await logger.info(
-      EVENTS.EDITOR.ANIME_SERIES_DELETED,
+      EVENTS_DOMAIN.EDITOR.ANIME_SERIES_DELETED,
       'Anime serisi başarıyla silindi',
       { 
         animeSeriesId: existingAnimeSeries.id, 
@@ -611,7 +613,7 @@ export async function deleteAnimeSeriesBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime serisi silme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', animeSeriesId: id },
       userId
@@ -652,7 +654,7 @@ export async function getAnimeSeriesRelationsBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime serisi ilişkileri getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata' },
       userId
@@ -705,7 +707,7 @@ export async function getAnimeSeriesWithRelationsBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime serisi ilişkilerle getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', animeSeriesId: id },
       userId

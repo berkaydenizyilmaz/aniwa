@@ -32,7 +32,7 @@ import { createTagAction, updateTagAction } from '@/lib/actions/admin/tag.action
 import { createTagSchema, updateTagSchema, type CreateTagInput, type UpdateTagInput } from '@/lib/schemas/tag.schema';
 import { toast } from 'sonner';
 import { Tag, TagCategory } from '@prisma/client';
-import { MASTER_DATA } from '@/lib/constants/masterData.constants';
+import { MASTER_DATA_DOMAIN } from '@/lib/constants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 
@@ -178,7 +178,7 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.entries(MASTER_DATA.TAG_CATEGORY_LABELS).map(([key, label]) => (
+                      {Object.entries(MASTER_DATA_DOMAIN.TAG_CATEGORY_LABELS).map(([key, label]) => (
                         <SelectItem key={key} value={key}>
                           {label}
                         </SelectItem>

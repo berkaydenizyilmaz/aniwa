@@ -65,7 +65,7 @@ import {
   type UpdateProfileImagesInput
 } from '@/lib/schemas/settings.schema';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 
 // ===== GENERAL SETTINGS ACTIONS =====
 
@@ -78,7 +78,7 @@ export async function updateThemePreferenceAction(
     const validatedData = updateThemePreferenceSchema.parse(data);
     const result = await updateThemePreferenceBusiness(session.user.id, validatedData.themePreference);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -100,7 +100,7 @@ export async function updateTitleLanguagePreferenceAction(
     const validatedData = updateTitleLanguagePreferenceSchema.parse(data);
     const result = await updateTitleLanguagePreferenceBusiness(session.user.id, validatedData.titleLanguagePreference);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -122,7 +122,7 @@ export async function updateScoreFormatAction(
     const validatedData = updateScoreFormatSchema.parse(data);
     const result = await updateScoreFormatBusiness(session.user.id, validatedData.scoreFormat);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -144,7 +144,7 @@ export async function updateDisplayAdultContentAction(
     const validatedData = updateDisplayAdultContentSchema.parse(data);
     const result = await updateDisplayAdultContentBusiness(session.user.id, validatedData.displayAdultContent);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -166,7 +166,7 @@ export async function updateAutoTrackOnAniwaListAddAction(
     const validatedData = updateAutoTrackOnAniwaListAddSchema.parse(data);
     const result = await updateAutoTrackOnAniwaListAddBusiness(session.user.id, validatedData.autoTrackOnAniwaListAdd);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -190,7 +190,7 @@ export async function updateProfileVisibilityAction(
     const validatedData = updateProfileVisibilitySchema.parse(data);
     const result = await updateProfileVisibilityBusiness(session.user.id, validatedData.profileVisibility);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -212,7 +212,7 @@ export async function updateAllowFollowsAction(
     const validatedData = updateAllowFollowsSchema.parse(data);
     const result = await updateAllowFollowsBusiness(session.user.id, validatedData.allowFollows);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -234,7 +234,7 @@ export async function updateShowAnimeListAction(
     const validatedData = updateShowAnimeListSchema.parse(data);
     const result = await updateShowAnimeListBusiness(session.user.id, validatedData.showAnimeList);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -256,7 +256,7 @@ export async function updateShowFavouriteAnimeSeriesAction(
     const validatedData = updateShowFavouriteAnimeSeriesSchema.parse(data);
     const result = await updateShowFavouriteAnimeSeriesBusiness(session.user.id, validatedData.showFavouriteAnimeSeries);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -278,7 +278,7 @@ export async function updateShowCustomListsAction(
     const validatedData = updateShowCustomListsSchema.parse(data);
     const result = await updateShowCustomListsBusiness(session.user.id, validatedData.showCustomLists);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -306,7 +306,7 @@ export async function updateNotificationSettingsAction(
       receiveNotificationOnNewMediaPart: validatedData.receiveNotificationOnNewMediaPart
     });
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -330,7 +330,7 @@ export async function updateUsernameAction(
     const validatedData = updateUsernameSchema.parse(data);
     const result = await updateUsernameBusiness(session.user.id, validatedData.username);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -352,7 +352,7 @@ export async function updateBioAction(
     const validatedData = updateBioSchema.parse(data);
     const result = await updateBioBusiness(session.user.id, validatedData.bio);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -374,7 +374,7 @@ export async function updatePasswordAction(
     const validatedData = updatePasswordSchema.parse(data);
     const result = await updatePasswordBusiness(session.user.id, validatedData.newPassword);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -396,7 +396,7 @@ export async function updateProfileImagesAction(
     const validatedData = updateProfileImagesSchema.parse(data);
     const result = await updateProfileImagesBusiness(session.user.id, validatedData.profilePicture, validatedData.profileBanner);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -460,7 +460,7 @@ export async function uploadProfileImageAction(formData: FormData): Promise<Serv
     
     const result = await uploadUserProfileImageBusiness(session.user.id, file, imageType);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data
@@ -479,7 +479,7 @@ export async function deleteProfileImageAction(data: { imageType: 'profile' | 'b
   try {
     const result = await deleteUserProfileImageBusiness(session.user.id, data.imageType);
     
-    revalidatePath(ROUTES.PAGES.SETTINGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.SETTINGS);
     return {
       success: true,
       data: result.data

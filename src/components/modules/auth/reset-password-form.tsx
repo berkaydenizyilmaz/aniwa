@@ -17,7 +17,7 @@ import {
 import { resetPasswordSchema, type ResetPasswordInput } from '@/lib/schemas/auth.schema';
 import { resetPassword } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 import { useMutation } from '@tanstack/react-query';
 
 export function ResetPasswordForm() {
@@ -41,7 +41,7 @@ export function ResetPasswordForm() {
       setToken(tokenFromUrl);
     } else {
       toast.error('Şifre sıfırlama linki geçersiz.');
-      router.push(ROUTES.PAGES.AUTH.FORGOT_PASSWORD);
+              router.push(ROUTES_DOMAIN.PAGES.AUTH.FORGOT_PASSWORD);
     }
   }, [searchParams, router]);
 
@@ -64,7 +64,7 @@ export function ResetPasswordForm() {
     },
     onSuccess: () => {
       toast.success('Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.');
-      router.push(ROUTES.PAGES.AUTH.LOGIN);
+              router.push(ROUTES_DOMAIN.PAGES.AUTH.LOGIN);
     },
     onError: (error) => {
       console.error('Reset password error:', error);

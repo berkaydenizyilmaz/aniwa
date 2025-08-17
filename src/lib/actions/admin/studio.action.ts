@@ -10,7 +10,7 @@ import {
 } from '@/lib/services/business/admin/studio.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/services/auth/auth.config';
 
@@ -27,7 +27,7 @@ export async function createStudioAction(data: CreateStudioInput): Promise<Serve
     const result = await createStudioBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.STUDIOS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.STUDIOS);
 
     return {
       success: true,
@@ -102,7 +102,7 @@ export async function updateStudioAction(id: string, data: UpdateStudioInput): P
     const result = await updateStudioBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.STUDIOS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.STUDIOS);
 
     return {
       success: true,
@@ -127,7 +127,7 @@ export async function deleteStudioAction(id: string): Promise<ServerActionRespon
     await deleteStudioBusiness(id, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.STUDIOS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.STUDIOS);
 
     return {
       success: true,

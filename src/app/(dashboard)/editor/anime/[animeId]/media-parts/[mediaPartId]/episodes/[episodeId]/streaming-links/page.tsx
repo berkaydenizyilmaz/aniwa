@@ -7,7 +7,7 @@ import { StreamingLinkTable } from '@/components/modules/editor/anime/streaming-
 import { StreamingLinkFormDialog } from '@/components/modules/editor/anime/streaming-links/streaming-link-form-dialog';
 import { StreamingLink } from '@prisma/client';
 import Link from 'next/link';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 
 interface StreamingLinksPageProps {
   params: Promise<{

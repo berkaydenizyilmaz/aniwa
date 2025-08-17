@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { EpisodeTable } from '@/components/modules/editor/anime/episodes/episode-table';
 import { EpisodeFormDialog } from '@/components/modules/editor/anime/episodes/episode-form-dialog';
 import { Episode } from '@prisma/client';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 
 interface EpisodesPageProps {
   params: Promise<{

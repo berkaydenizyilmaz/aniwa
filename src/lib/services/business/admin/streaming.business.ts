@@ -12,7 +12,7 @@ import {
 } from '@/lib/services/db/streamingPlatform.db';
 import { Prisma } from '@prisma/client';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import {
   CreateStreamingPlatformRequest,
@@ -44,7 +44,7 @@ export async function createStreamingPlatformBusiness(
 
     // Başarılı oluşturma logu
     await logger.info(
-      EVENTS.ADMIN.STREAMING_PLATFORM_CREATED,
+      EVENTS_DOMAIN.ADMIN.STREAMING_PLATFORM_CREATED,
       'Streaming platform başarıyla oluşturuldu',
       {
         platformId: result.id,
@@ -65,7 +65,7 @@ export async function createStreamingPlatformBusiness(
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Streaming platform oluşturma sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -104,7 +104,7 @@ export async function getStreamingPlatformBusiness(
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Streaming platform getirme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -140,7 +140,7 @@ export async function getStreamingPlatformsBusiness(
     return {
       success: true,
       data: {
-        platforms,
+        data: platforms,
         total,
         page,
         limit,
@@ -155,7 +155,7 @@ export async function getStreamingPlatformsBusiness(
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Streaming platform listeleme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -199,7 +199,7 @@ export async function updateStreamingPlatformBusiness(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.ADMIN.STREAMING_PLATFORM_UPDATED,
+      EVENTS_DOMAIN.ADMIN.STREAMING_PLATFORM_UPDATED,
       'Streaming platform başarıyla güncellendi',
       {
         platformId: updatedPlatform.id,
@@ -221,7 +221,7 @@ export async function updateStreamingPlatformBusiness(
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Streaming platform güncelleme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',
@@ -252,7 +252,7 @@ export async function deleteStreamingPlatformBusiness(
 
     // Başarılı silme logu
     await logger.info(
-      EVENTS.ADMIN.STREAMING_PLATFORM_DELETED,
+      EVENTS_DOMAIN.ADMIN.STREAMING_PLATFORM_DELETED,
       'Streaming platform başarıyla silindi',
       {
         platformId: id,
@@ -273,7 +273,7 @@ export async function deleteStreamingPlatformBusiness(
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Streaming platform silme sırasında beklenmedik hata',
       {
         error: error instanceof Error ? error.message : 'Bilinmeyen hata',

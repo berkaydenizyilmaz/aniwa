@@ -1,6 +1,6 @@
 // Business error sınıfları
 
-import { ERROR_CODES } from '../constants/error.constants';
+import { SHARED_SYSTEM } from '@/lib/constants';
 
 // Temel business error sınıfı
 export class BusinessError extends Error {
@@ -9,7 +9,7 @@ export class BusinessError extends Error {
 
     constructor(
         message: string,
-        code: string = ERROR_CODES.UNKNOWN_ERROR,
+        code: string = SHARED_SYSTEM.ERROR_CODES.UNKNOWN_ERROR,
         details?: Record<string, unknown>
     ) {
         super(message);
@@ -27,7 +27,7 @@ export class BusinessError extends Error {
 // HTTP 404 - Kaynak bulunamadı
 export class NotFoundError extends BusinessError {
     constructor(message: string, details?: Record<string, unknown>) {
-        super(message, ERROR_CODES.NOT_FOUND, details);
+        super(message, SHARED_SYSTEM.ERROR_CODES.NOT_FOUND, details);
         this.name = 'NotFoundError';
     }
 }
@@ -35,7 +35,7 @@ export class NotFoundError extends BusinessError {
 // HTTP 401/403 - Yetkilendirme hatası
 export class UnauthorizedError extends BusinessError {
     constructor(message: string, details?: Record<string, unknown>) {
-        super(message, ERROR_CODES.UNAUTHORIZED, details);
+        super(message, SHARED_SYSTEM.ERROR_CODES.UNAUTHORIZED, details);
         this.name = 'UnauthorizedError';
     }
 }
@@ -43,7 +43,7 @@ export class UnauthorizedError extends BusinessError {
 // HTTP 409 - Çakışma hatası
 export class ConflictError extends BusinessError {
     constructor(message: string, details?: Record<string, unknown>) {
-        super(message, ERROR_CODES.CONFLICT, details);
+        super(message, SHARED_SYSTEM.ERROR_CODES.CONFLICT, details);
         this.name = 'ConflictError';
     }
 }
@@ -51,7 +51,7 @@ export class ConflictError extends BusinessError {
 // HTTP 429 - Rate limit hatası
 export class RateLimitExceededError extends BusinessError {
     constructor(message: string, details?: Record<string, unknown>) {
-        super(message, ERROR_CODES.RATE_LIMIT_EXCEEDED, details);
+        super(message, SHARED_SYSTEM.ERROR_CODES.RATE_LIMIT_EXCEEDED, details);
         this.name = 'RateLimitExceededError';
     }
 }
@@ -59,7 +59,7 @@ export class RateLimitExceededError extends BusinessError {
 // HTTP 400 - Geçersiz token
 export class InvalidTokenError extends BusinessError {
     constructor(message: string, details?: Record<string, unknown>) {
-        super(message, ERROR_CODES.INVALID_TOKEN, details);
+        super(message, SHARED_SYSTEM.ERROR_CODES.INVALID_TOKEN, details);
         this.name = 'InvalidTokenError';
     }
 }
@@ -67,7 +67,7 @@ export class InvalidTokenError extends BusinessError {
 // HTTP 403 - Yasaklı kullanıcı
 export class BannedUserError extends BusinessError {
     constructor(message: string, details?: Record<string, unknown>) {
-        super(message, ERROR_CODES.USER_BANNED, details);
+        super(message, SHARED_SYSTEM.ERROR_CODES.USER_BANNED, details);
         this.name = 'BannedUserError';
     }
 }
@@ -75,7 +75,7 @@ export class BannedUserError extends BusinessError {
 // HTTP 502 - Dış servis hatası
 export class ExternalServiceError extends BusinessError {
     constructor(message: string, details?: Record<string, unknown>) {
-        super(message, ERROR_CODES.EXTERNAL_SERVICE_ERROR, details);
+        super(message, SHARED_SYSTEM.ERROR_CODES.EXTERNAL_SERVICE_ERROR, details);
         this.name = 'ExternalServiceError';
     }
 }
@@ -83,7 +83,7 @@ export class ExternalServiceError extends BusinessError {
 // HTTP 500 - Veritabanı hatası (genel)
 export class DatabaseError extends BusinessError {
     constructor(message: string, details?: Record<string, unknown>) {
-        super(message, ERROR_CODES.DATABASE_ERROR, details);
+        super(message, SHARED_SYSTEM.ERROR_CODES.DATABASE_ERROR, details);
         this.name = 'DatabaseError';
     }
 }

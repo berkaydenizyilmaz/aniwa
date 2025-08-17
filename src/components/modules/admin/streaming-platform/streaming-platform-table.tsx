@@ -165,7 +165,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
             </TableRow>
           </TableHeader>
           <TableBody>
-            {platformsData?.platforms.map((streamingPlatform) => (
+            {platformsData?.data.map((streamingPlatform) => (
               <TableRow key={streamingPlatform.id}>
                 <TableCell>{streamingPlatform.name}</TableCell>
                 <TableCell className="text-muted-foreground">{streamingPlatform.baseUrl}</TableCell>
@@ -194,7 +194,7 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
           </TableBody>
         </Table>
 
-        {(!platformsData?.platforms || platformsData.platforms.length === 0) && (
+        {(!platformsData?.data || platformsData.data.length === 0) && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun izleme platformu bulunamadı.' : 'Henüz izleme platformu bulunmuyor.'}
           </div>

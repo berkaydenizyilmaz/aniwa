@@ -2,20 +2,16 @@
 
 import { StreamingPlatform } from '@prisma/client';
 import { CreateStreamingPlatformInput, UpdateStreamingPlatformInput, StreamingPlatformFilters } from '@/lib/schemas/streamingPlatform.schema';
+import { PaginatedResponse, CrudResponses } from '../shared';
 
-// Prisma tipini direkt kullan (küçük model)
-export type CreateStreamingPlatformResponse = StreamingPlatform;
-export type GetStreamingPlatformResponse = StreamingPlatform;
-export type UpdateStreamingPlatformResponse = StreamingPlatform;
+// CRUD response types
+export type StreamingPlatformCrudResponses = CrudResponses<StreamingPlatform>;
+export type CreateStreamingPlatformResponse = StreamingPlatformCrudResponses['Create'];
+export type GetStreamingPlatformResponse = StreamingPlatformCrudResponses['Get'];
+export type UpdateStreamingPlatformResponse = StreamingPlatformCrudResponses['Update'];
 
-// Sadece özel response için interface
-export interface GetStreamingPlatformsResponse {
-  platforms: StreamingPlatform[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+// Paginated response type
+export type GetStreamingPlatformsResponse = PaginatedResponse<StreamingPlatform>;
 
 // API istek tipleri
 export type CreateStreamingPlatformRequest = CreateStreamingPlatformInput;

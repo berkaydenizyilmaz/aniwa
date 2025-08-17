@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Search, Plus, Filter } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
-import { USER } from '@/lib/constants/user.constants';
+import { USER_DOMAIN } from '@/lib/constants';
 import { UserRole } from '@prisma/client';
 import {
   Select,
@@ -75,7 +75,7 @@ export function UserFilters({ onSearch, onRoleChange, onBannedChange, onAddNew }
               <SelectItem value="all">Tüm Roller</SelectItem>
               {Object.values(UserRole).map((role) => (
                 <SelectItem key={role} value={role}>
-                  {USER.ROLE_LABELS[role]}
+                  {USER_DOMAIN.ROLE_LABELS[role]}
                 </SelectItem>
               ))}
             </SelectContent>

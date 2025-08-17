@@ -18,7 +18,7 @@ import {
 import { Prisma, UserRole } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { 
   GetUsersResponse, 
@@ -69,7 +69,7 @@ export async function getUsersBusiness(
     return {
       success: true,
       data: {
-        users,
+        data: users,
         total,
         page,
         limit,
@@ -84,7 +84,7 @@ export async function getUsersBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı listeleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
       userId
@@ -119,7 +119,7 @@ export async function getUserBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id },
       userId
@@ -173,7 +173,7 @@ export async function updateUserBusiness(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.ADMIN.USER_UPDATED,
+      EVENTS_DOMAIN.ADMIN.USER_UPDATED,
       'Kullanıcı başarıyla güncellendi',
       { 
         userId: result.id, 
@@ -195,7 +195,7 @@ export async function updateUserBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id, data },
       userId
@@ -226,7 +226,7 @@ export async function banUserBusiness(
 
     // Başarılı yasaklama logu
     await logger.info(
-      EVENTS.ADMIN.USER_BANNED,
+      EVENTS_DOMAIN.ADMIN.USER_BANNED,
       'Kullanıcı başarıyla yasaklandı',
       { 
         userId: result.id, 
@@ -247,7 +247,7 @@ export async function banUserBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı yasaklama sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id },
       userId
@@ -278,7 +278,7 @@ export async function unbanUserBusiness(
 
     // Başarılı yasak kaldırma logu
     await logger.info(
-      EVENTS.ADMIN.USER_UNBANNED,
+      EVENTS_DOMAIN.ADMIN.USER_UNBANNED,
       'Kullanıcı yasağı başarıyla kaldırıldı',
       { 
         userId: result.id, 
@@ -299,7 +299,7 @@ export async function unbanUserBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı yasak kaldırma sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id },
       userId
@@ -331,7 +331,7 @@ export async function deleteUserBusiness(
 
     // Başarılı silme logu
     await logger.info(
-      EVENTS.ADMIN.USER_DELETED,
+      EVENTS_DOMAIN.ADMIN.USER_DELETED,
       'Kullanıcı başarıyla silindi',
       { 
         userId: id, 
@@ -351,7 +351,7 @@ export async function deleteUserBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı silme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId: id },
       userId

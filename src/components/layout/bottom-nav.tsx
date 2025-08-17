@@ -4,14 +4,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { MobileAuthSection } from './mobile-auth-section'
-import { BOTTOM_NAVIGATION_ITEMS } from '@/lib/constants/menu.constants'
+import { NAVIGATION_DOMAIN } from '@/lib/constants'
 
 export function BottomNav() {
   const pathname = usePathname()
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t flex">
-      {BOTTOM_NAVIGATION_ITEMS.map((item) => {
+      {NAVIGATION_DOMAIN.MENU.BOTTOM_NAVIGATION_ITEMS.map((item) => {
         const Icon = item.icon
         const isActive = pathname === item.href
         

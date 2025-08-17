@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AnimeType, AnimeStatus, Season, Source, CountryOfOrigin } from '@prisma/client';
-import { ANIME } from '@/lib/constants/anime.constants';
+import { ANIME_DOMAIN } from '@/lib/constants';
 import { CreateAnimeSeriesInput, UpdateAnimeSeriesInput } from '@/lib/schemas/anime.schema';
 
 export function AnimeSeriesBasicInfo() {
@@ -125,7 +125,7 @@ export function AnimeSeriesBasicInfo() {
                 <SelectContent>
                   {Object.values(AnimeType).map((type) => (
                     <SelectItem key={type} value={type}>
-                      {ANIME.TYPE_LABELS[type]}
+                      {ANIME_DOMAIN.UI.TYPE_LABELS[type]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -158,7 +158,7 @@ export function AnimeSeriesBasicInfo() {
                 <SelectContent>
                   {Object.values(AnimeStatus).map((status) => (
                     <SelectItem key={status} value={status}>
-                      {ANIME.STATUS_LABELS[status]}
+                      {ANIME_DOMAIN.UI.STATUS_LABELS[status]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -190,7 +190,7 @@ export function AnimeSeriesBasicInfo() {
                   <SelectItem value="none">Sezon yok</SelectItem>
                   {Object.values(Season).map((season) => (
                     <SelectItem key={season} value={season}>
-                      {ANIME.SEASON_LABELS[season]}
+                      {ANIME_DOMAIN.UI.SEASON_LABELS[season]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -261,7 +261,7 @@ export function AnimeSeriesBasicInfo() {
                 <SelectItem value="none">Kaynak yok</SelectItem>
                 {Object.values(Source).map((source) => (
                   <SelectItem key={source} value={source}>
-                    {ANIME.SOURCE_LABELS[source]}
+                    {ANIME_DOMAIN.UI.SOURCE_LABELS[source]}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -292,7 +292,7 @@ export function AnimeSeriesBasicInfo() {
                   <SelectItem value="none">Ülke yok</SelectItem>
                   {Object.values(CountryOfOrigin).map((country) => (
                     <SelectItem key={country} value={country}>
-                      {ANIME.COUNTRY_OF_ORIGIN_LABELS[country]}
+                      {ANIME_DOMAIN.UI.COUNTRY_OF_ORIGIN_LABELS[country]}
                     </SelectItem>
                   ))}
                 </SelectContent>

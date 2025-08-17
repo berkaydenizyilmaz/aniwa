@@ -9,6 +9,9 @@ export * from './api';
 // Business types
 export * from './db';
 
+// Shared types
+export * from './shared';
+
 // Other types
 export * from './cloudinary';
 export * from './image';

@@ -14,10 +14,9 @@ import { prisma } from '@/lib/prisma';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { sendPasswordResetEmail } from '@/lib/utils/email.utils';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN, AUTH_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { RegisterResponse, RegisterRequest } from '@/lib/types/api/auth.api';
-import { AUTH } from '@/lib/constants/auth.constants';
 import crypto from 'crypto';
 
 // Kullanıcı kaydı
@@ -43,7 +42,7 @@ export async function registerUserBusiness(data: RegisterRequest): Promise<ApiRe
     }
 
     // Şifreyi hashle
-    const passwordHash = await bcrypt.hash(data.password, AUTH.BCRYPT_SALT_ROUNDS);
+    const passwordHash = await bcrypt.hash(data.password, AUTH_DOMAIN.BUSINESS.BCRYPT_SALT_ROUNDS);
 
     // Transaction ile kullanıcı ve ayarları oluştur
     const result = await prisma.$transaction(async (tx) => {
@@ -65,7 +64,7 @@ export async function registerUserBusiness(data: RegisterRequest): Promise<ApiRe
 
     // Başarılı kayıt logu
     await logger.info(
-      EVENTS.AUTH.USER_REGISTERED,
+      EVENTS_DOMAIN.AUTH.USER_REGISTERED,
       'Kullanıcı başarıyla kayıt oldu',
       { username: result.username, email: result.email },
       result.id
@@ -88,7 +87,7 @@ export async function registerUserBusiness(data: RegisterRequest): Promise<ApiRe
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı kaydı sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
     );
@@ -123,7 +122,7 @@ export async function forgotPasswordBusiness(email: string): Promise<ApiResponse
 
     // Başarılı istek logu
     await logger.info(
-      EVENTS.AUTH.PASSWORD_RESET_REQUESTED,
+      EVENTS_DOMAIN.AUTH.PASSWORD_RESET_REQUESTED,
       'Şifre sıfırlama isteği gönderildi',
       { email },
       user.id
@@ -139,7 +138,7 @@ export async function forgotPasswordBusiness(email: string): Promise<ApiResponse
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Şifre sıfırlama isteği sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', email }
     );
@@ -168,7 +167,7 @@ export async function resetPasswordBusiness(token: string, newPassword: string):
     }
 
     // Yeni şifreyi hashle
-    const passwordHash = await bcrypt.hash(newPassword, AUTH.BCRYPT_SALT_ROUNDS);
+    const passwordHash = await bcrypt.hash(newPassword, AUTH_DOMAIN.BUSINESS.BCRYPT_SALT_ROUNDS);
 
     // Şifreyi güncelle ve token'ı sil
     await prisma.$transaction(async (tx) => {
@@ -178,7 +177,7 @@ export async function resetPasswordBusiness(token: string, newPassword: string):
 
     // Başarılı sıfırlama logu
     await logger.info(
-      EVENTS.AUTH.PASSWORD_RESET_COMPLETED,
+      EVENTS_DOMAIN.AUTH.PASSWORD_RESET_COMPLETED,
       'Şifre başarıyla sıfırlandı',
       { email: user.email },
       user.id
@@ -194,7 +193,7 @@ export async function resetPasswordBusiness(token: string, newPassword: string):
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Şifre sıfırlama sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', token }
     );

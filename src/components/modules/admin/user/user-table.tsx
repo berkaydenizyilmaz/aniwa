@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { User, UserRole } from '@prisma/client';
-import { USER } from '@/lib/constants/user.constants';
+import { USER_DOMAIN } from '@/lib/constants';
 import { getUsersAction, deleteUserAction } from '@/lib/actions/admin/user.action';
 import { toast } from 'sonner';
 import { GetUsersResponse } from '@/lib/types/api/user.api';
@@ -173,7 +173,7 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
     );
   }
 
-  const users = data?.users || [];
+  const users = data?.data || [];
   const totalPages = data?.totalPages || 1;
   const totalUsers = data?.total || 0;
 
@@ -196,13 +196,13 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
                 <TableCell>{user.username}</TableCell>
                 <TableCell className="text-muted-foreground">{user.email}</TableCell>
                 <TableCell className="text-muted-foreground">
-                  {user.roles?.map(role => USER.ROLE_LABELS[role]).join(', ') || '-'}
+                  {user.roles?.map(role => USER_DOMAIN.UI.ROLE_LABELS[role]).join(', ') || '-'}
                 </TableCell>
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${
-                    user.isBanned 
-                      ? USER.BAN_STATUS_COLORS.BANNED
-                      : USER.BAN_STATUS_COLORS.ACTIVE
+                            user.isBanned
+          ? USER_DOMAIN.UI.BAN_STATUS_COLORS.BANNED
+          : USER_DOMAIN.UI.BAN_STATUS_COLORS.ACTIVE
                   }`}>
                     {user.isBanned ? 'Yasaklı' : 'Aktif'}
                   </span>

@@ -1,6 +1,7 @@
 // Settings API response types
 
 import { UserProfileSettings, User } from '@prisma/client';
+import { CrudResponses } from '../shared';
 
 // General Settings API Types
 export interface UpdateThemePreferenceResponse {

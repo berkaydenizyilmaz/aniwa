@@ -10,7 +10,7 @@ import {
 } from '@/lib/services/business/admin/streaming.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/services/auth/auth.config';
 
@@ -27,7 +27,7 @@ export async function createStreamingPlatformAction(data: CreateStreamingPlatfor
     const result = await createStreamingPlatformBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.STREAMING_PLATFORMS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.STREAMING_PLATFORMS);
 
     return {
       success: true,
@@ -102,7 +102,7 @@ export async function updateStreamingPlatformAction(id: string, data: UpdateStre
     const result = await updateStreamingPlatformBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.STREAMING_PLATFORMS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.STREAMING_PLATFORMS);
 
     return {
       success: true,
@@ -127,7 +127,7 @@ export async function deleteStreamingPlatformAction(id: string): Promise<ServerA
     const result = await deleteStreamingPlatformBusiness(id, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.STREAMING_PLATFORMS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.STREAMING_PLATFORMS);
 
     return {
       success: true,

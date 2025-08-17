@@ -21,11 +21,11 @@ import {
 import { ApiResponse } from '@/lib/types/api/index';
 import { BusinessError, DatabaseError, NotFoundError } from '@/lib/errors';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { 
   uploadImageBusiness, 
   deleteImageBusiness, 
-  createImageUploadContext
+  createEpisodeThumbnailUploadContext
 } from '@/lib/services/business/shared/image.business';
 
 // Episode oluşturma
@@ -74,7 +74,7 @@ export async function createEpisodeBusiness(
 
     if (thumbnailImageFile) {
       const thumbnailUpload = await uploadImageBusiness(
-        createImageUploadContext('episode-thumbnail', result.id, userId),
+        createEpisodeThumbnailUploadContext(result.id, userId),
         thumbnailImageFile,
         userId
       );
@@ -91,7 +91,7 @@ export async function createEpisodeBusiness(
 
     // Başarılı oluşturma logu
     await logger.info(
-      EVENTS.EDITOR.EPISODE_CREATED,
+      EVENTS_DOMAIN.EDITOR.EPISODE_CREATED,
       'Episode başarıyla oluşturuldu',
       { 
         episodeId: result.id,
@@ -110,7 +110,7 @@ export async function createEpisodeBusiness(
     }
     
     await logger.error(
-      EVENTS.EDITOR.EPISODE_CREATE_FAILED,
+      EVENTS_DOMAIN.EDITOR.EPISODE_CREATE_FAILED,
       'Episode oluşturma hatası',
       { 
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -144,7 +144,7 @@ export async function getEpisodeBusiness(
     }
     
     await logger.error(
-      EVENTS.EDITOR.EPISODE_RETRIEVE_FAILED,
+      EVENTS_DOMAIN.EDITOR.EPISODE_RETRIEVE_FAILED,
       'Episode getirme hatası',
       { 
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -182,7 +182,7 @@ export async function getEpisodeListBusiness(
     return {
       success: true,
       data: {
-        episodes,
+        data: episodes,
         total,
         page,
         limit,
@@ -196,7 +196,7 @@ export async function getEpisodeListBusiness(
     }
     
     await logger.error(
-      EVENTS.EDITOR.EPISODE_LIST_RETRIEVE_FAILED,
+      EVENTS_DOMAIN.EDITOR.EPISODE_LIST_RETRIEVE_FAILED,
       'Episode listesi getirme hatası',
       { 
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -249,7 +249,7 @@ export async function updateEpisodeBusiness(
 
     if (thumbnailImageFile) {
       const thumbnailUpload = await uploadImageBusiness(
-        createImageUploadContext('episode-thumbnail', id, userId),
+        createEpisodeThumbnailUploadContext(id, userId),
         thumbnailImageFile,
         userId,
         {
@@ -277,7 +277,7 @@ export async function updateEpisodeBusiness(
     );
 
     await logger.info(
-      EVENTS.EDITOR.EPISODE_UPDATED,
+      EVENTS_DOMAIN.EDITOR.EPISODE_UPDATED,
       'Episode başarıyla güncellendi',
       { 
         episodeId: result.id,
@@ -296,7 +296,7 @@ export async function updateEpisodeBusiness(
     }
     
     await logger.error(
-      EVENTS.EDITOR.EPISODE_UPDATE_FAILED,
+      EVENTS_DOMAIN.EDITOR.EPISODE_UPDATE_FAILED,
       'Episode güncelleme hatası',
       { 
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -323,14 +323,14 @@ export async function deleteEpisodeBusiness(
     if (existingEpisode.thumbnailImage) {
       try {
         await deleteImageBusiness(
-          createImageUploadContext('episode-thumbnail', id, userId),
+          createEpisodeThumbnailUploadContext(id, userId),
           userId,
           existingEpisode.thumbnailImage
         );
       } catch (imageError) {
         // Image silme hatası episode silmeyi engellemesin, sadece logla
         await logger.warn(
-          EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+          EVENTS_DOMAIN.SYSTEM.IMAGE_DELETE_FAILED,
           'Episode silme sırasında thumbnail silinemedi',
           { 
             episodeId: id,
@@ -346,7 +346,7 @@ export async function deleteEpisodeBusiness(
     await deleteEpisodeDB({ id });
 
     await logger.info(
-      EVENTS.EDITOR.EPISODE_DELETED,
+      EVENTS_DOMAIN.EDITOR.EPISODE_DELETED,
       'Episode başarıyla silindi',
       { 
         episodeId: id,
@@ -364,7 +364,7 @@ export async function deleteEpisodeBusiness(
     }
     
     await logger.error(
-      EVENTS.EDITOR.EPISODE_DELETE_FAILED,
+      EVENTS_DOMAIN.EDITOR.EPISODE_DELETE_FAILED,
       'Episode silme hatası',
       { 
         error: error instanceof Error ? error.message : 'Unknown error',

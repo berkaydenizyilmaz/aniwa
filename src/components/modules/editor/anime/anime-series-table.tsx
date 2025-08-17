@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Layers } from 'lucide-react';
 import { AnimeSeries, AnimeType, AnimeStatus } from '@prisma/client';
-import { ANIME } from '@/lib/constants/anime.constants';
+import { ANIME_DOMAIN } from '@/lib/constants';
 import { getAnimeSeriesListAction, deleteAnimeSeriesAction } from '@/lib/actions/editor/anime-series.action';
 import { toast } from 'sonner';
 import { GetAnimeSeriesListResponse } from '@/lib/types/api/anime.api';
@@ -247,13 +247,13 @@ export function AnimeSeriesTable({ onEdit, onMediaParts, searchTerm = '', select
                     <div className="font-medium">{animeSeries.title}</div>
                   </TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ANIME.TYPE_COLORS[animeSeries.type]}`}>
-                      {ANIME.TYPE_LABELS[animeSeries.type]}
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ANIME_DOMAIN.TYPE_COLORS[animeSeries.type]}`}>
+                  {ANIME_DOMAIN.TYPE_LABELS[animeSeries.type]}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ANIME.STATUS_COLORS[animeSeries.status]}`}>
-                      {ANIME.STATUS_LABELS[animeSeries.status]}
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ANIME_DOMAIN.STATUS_COLORS[animeSeries.status]}`}>
+                  {ANIME_DOMAIN.STATUS_LABELS[animeSeries.status]}
                     </span>
                   </TableCell>
                   <TableCell>

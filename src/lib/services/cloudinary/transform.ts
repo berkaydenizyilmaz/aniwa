@@ -1,7 +1,7 @@
 // Cloudinary transformation operations
 
 import { CloudinaryTransformation, ImageDimensions } from '@/lib/types/cloudinary';
-import { RESPONSIVE_DIMENSIONS, RESPONSIVE_BREAKPOINTS, RESPONSIVE_SIZES, THUMBNAIL_SETTINGS } from '@/lib/constants/cloudinary.constants';
+import { CLOUDINARY_DOMAIN } from '@/lib/constants';
 
 // Build transformation URL for existing image
 export const buildTransformationUrl = (
@@ -55,7 +55,7 @@ export const generateResponsiveUrls = (
   baseUrl: string,
   category: 'USER_PROFILE' | 'ANIME_COVER'
 ): Array<{ url: string; width: number; height: number }> => {
-  const dimensions = RESPONSIVE_DIMENSIONS[category];
+  const dimensions = CLOUDINARY_DOMAIN.RESPONSIVE_DIMENSIONS[category];
   
   if (!dimensions) {
     return [{ url: baseUrl, width: 0, height: 0 }];
@@ -66,7 +66,7 @@ export const generateResponsiveUrls = (
       width,
       height,
       crop: 'fill',
-      gravity: category === 'USER_PROFILE' ? 'face' : 'center',
+      gravity: category === CLOUDINARY_DOMAIN.CATEGORIES.USER_PROFILE ? 'face' : 'center',
       quality: 'auto',
       format: 'auto',
       fetch_format: 'auto',
@@ -95,8 +95,8 @@ export const generateSrcSet = (
 
 // Generate sizes attribute for responsive images
 export const generateSizes = (category: 'USER_PROFILE' | 'ANIME_COVER'): string => {
-  const breakpoints = RESPONSIVE_BREAKPOINTS;
-  const sizes = RESPONSIVE_SIZES[category];
+  const breakpoints = CLOUDINARY_DOMAIN.BREAKPOINTS;
+  const sizes = CLOUDINARY_DOMAIN.RESPONSIVE_SIZES[category];
   
   if (!sizes) {
     return '100vw';
@@ -132,7 +132,7 @@ export const createOptimizedImageUrl = (
 // Create thumbnail URL
 export const createThumbnailUrl = (
   baseUrl: string,
-  size: number = THUMBNAIL_SETTINGS.DEFAULT_SIZE
+  size: number = CLOUDINARY_DOMAIN.THUMBNAIL.DEFAULT_SIZE
 ): string => {
   return createOptimizedImageUrl(baseUrl, {
     width: size,
@@ -147,11 +147,11 @@ export const createThumbnailUrl = (
 // Create blurred placeholder URL
 export const createPlaceholderUrl = (
   baseUrl: string,
-  blur: number = THUMBNAIL_SETTINGS.PLACEHOLDER.BLUR
+  blur: number = CLOUDINARY_DOMAIN.THUMBNAIL.PLACEHOLDER.BLUR
 ): string => {
   const transformation: CloudinaryTransformation = {
-    width: THUMBNAIL_SETTINGS.PLACEHOLDER.SIZE,
-    height: THUMBNAIL_SETTINGS.PLACEHOLDER.SIZE,
+    width: CLOUDINARY_DOMAIN.THUMBNAIL.PLACEHOLDER.SIZE,
+    height: CLOUDINARY_DOMAIN.THUMBNAIL.PLACEHOLDER.SIZE,
     crop: 'fill',
     quality: 30,
     format: 'auto',

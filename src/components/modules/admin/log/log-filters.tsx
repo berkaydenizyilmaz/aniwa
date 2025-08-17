@@ -14,7 +14,7 @@ import { Search, RefreshCw, Filter, Calendar } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useQueryClient } from '@tanstack/react-query';
 import { LogLevel } from '@prisma/client';
-import { LOG } from '@/lib/constants/log.constants';
+import { LOG_DOMAIN } from '@/lib/constants';
 
 interface LogFiltersProps {
   onSearch?: (search: string) => void;
@@ -84,7 +84,7 @@ export function LogFilters({ onSearch, onLevelChange, onStartDateChange, onEndDa
               <SelectItem value="all">Tüm Seviyeler</SelectItem>
               {Object.values(LogLevel).map((level) => (
                 <SelectItem key={level} value={level}>
-                  {LOG.LEVEL_LABELS[level]}
+                  {LOG_DOMAIN.LEVEL_LABELS[level]}
                 </SelectItem>
               ))}
             </SelectContent>

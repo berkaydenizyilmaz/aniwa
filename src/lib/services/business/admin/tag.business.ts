@@ -18,7 +18,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { 
   CreateTagResponse, 
@@ -61,7 +61,7 @@ export async function createTagBusiness(
 
     // Başarılı oluşturma logu
     await logger.info(
-      EVENTS.ADMIN.TAG_CREATED,
+      EVENTS_DOMAIN.ADMIN.TAG_CREATED,
       'Tag başarıyla oluşturuldu',
       { 
         tagId: result.id, 
@@ -83,7 +83,7 @@ export async function createTagBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Tag oluşturma sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', name: data.name },
       userId
@@ -118,7 +118,7 @@ export async function getTagBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Tag getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', tagId: id },
       userId
@@ -170,7 +170,7 @@ export async function getTagsBusiness(
     return {
       success: true,
       data: {
-        tags: paginatedTags,
+        data: paginatedTags,
         total,
         page,
         limit,
@@ -185,7 +185,7 @@ export async function getTagsBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Tag listeleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
       userId
@@ -240,7 +240,7 @@ export async function updateTagBusiness(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.ADMIN.TAG_UPDATED,
+      EVENTS_DOMAIN.ADMIN.TAG_UPDATED,
       'Tag başarıyla güncellendi',
       { 
         tagId: result.id, 
@@ -264,7 +264,7 @@ export async function updateTagBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Tag güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', tagId: id, data },
       userId
@@ -291,7 +291,7 @@ export async function deleteTagBusiness(
 
     // Başarılı silme logu
     await logger.info(
-      EVENTS.ADMIN.TAG_DELETED,
+      EVENTS_DOMAIN.ADMIN.TAG_DELETED,
       'Tag başarıyla silindi',
       { 
         tagId: id, 
@@ -311,7 +311,7 @@ export async function deleteTagBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Tag silme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', tagId: id },
       userId

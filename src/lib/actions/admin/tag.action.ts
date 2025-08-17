@@ -10,7 +10,7 @@ import {
 } from '@/lib/services/business/admin/tag.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/services/auth/auth.config';
 
@@ -27,7 +27,7 @@ export async function createTagAction(data: CreateTagInput): Promise<ServerActio
     const result = await createTagBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.TAGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.TAGS);
 
     return {
       success: true,
@@ -102,7 +102,7 @@ export async function updateTagAction(id: string, data: UpdateTagInput): Promise
     const result = await updateTagBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.TAGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.TAGS);
 
     return {
       success: true,
@@ -127,7 +127,7 @@ export async function deleteTagAction(id: string): Promise<ServerActionResponse>
     const result = await deleteTagBusiness(id, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.TAGS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.TAGS);
 
     return {
       success: true,

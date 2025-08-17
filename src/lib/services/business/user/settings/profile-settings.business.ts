@@ -14,11 +14,10 @@ import {
 } from '@/lib/services/db/user.db';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN, AUTH_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { AUTH } from '@/lib/constants/auth.constants';
 import { 
   GetUserProfileResponse,
   UpdateUsernameResponse,
@@ -30,7 +29,8 @@ import {
   uploadImageBusiness, 
   deleteImageBusiness, 
   getImageUrlsBusiness,
-  createImageUploadContext
+  createUserProfileUploadContext,
+  createUserBannerUploadContext
 } from '@/lib/services/business/shared/image.business';
 import { ImageUrlsResult } from '@/lib/types/image';
 
@@ -70,7 +70,7 @@ export async function updateUsernameBusiness(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.USER.USERNAME_UPDATED,
+      EVENTS_DOMAIN.USER.USERNAME_UPDATED,
       'Kullanıcı adı güncellendi',
       { userId, newUsername: username },
       userId
@@ -86,7 +86,7 @@ export async function updateUsernameBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı adı güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -115,7 +115,7 @@ export async function updateBioBusiness(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.USER.BIO_UPDATED,
+      EVENTS_DOMAIN.USER.BIO_UPDATED,
       'Kullanıcı biyografisi güncellendi',
       { userId },
       userId
@@ -131,7 +131,7 @@ export async function updateBioBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Biyografi güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -153,7 +153,7 @@ export async function updatePasswordBusiness(
     }
 
     // Yeni parolayı hash'le ve kaydet
-    const passwordHash = await bcrypt.hash(newPassword, AUTH.BCRYPT_SALT_ROUNDS);
+    const passwordHash = await bcrypt.hash(newPassword, AUTH_DOMAIN.BUSINESS.BCRYPT_SALT_ROUNDS);
     await updateUserDB(
       { id: userId },
       { passwordHash }
@@ -161,7 +161,7 @@ export async function updatePasswordBusiness(
     
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.USER.PASSWORD_UPDATED,
+      EVENTS_DOMAIN.USER.PASSWORD_UPDATED,
       'Kullanıcı parolası güncellendi',
       { userId },
       userId
@@ -177,7 +177,7 @@ export async function updatePasswordBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Parola güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -204,11 +204,9 @@ export async function uploadUserProfileImageBusiness(
     
     // Generic image upload business'ı kullan
     const uploadResult = await uploadImageBusiness(
-      createImageUploadContext(
-        imageType === 'profile' ? 'user-profile' : 'user-banner',
-        userId,
-        userId
-      ),
+      imageType === 'profile' 
+        ? createUserProfileUploadContext(userId, userId)
+        : createUserBannerUploadContext(userId, userId),
       file,
       userId,
       {
@@ -230,7 +228,7 @@ export async function uploadUserProfileImageBusiness(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.USER.PROFILE_IMAGES_UPDATED,
+      EVENTS_DOMAIN.USER.PROFILE_IMAGES_UPDATED,
       `Kullanıcı ${imageType === 'profile' ? 'profil resmi' : 'banner'} güncellendi`,
       { 
         userId, 
@@ -252,7 +250,7 @@ export async function uploadUserProfileImageBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       `Kullanıcı ${imageType === 'profile' ? 'profil resmi' : 'banner'} yükleme sırasında beklenmedik hata`,
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId, imageType }
     );
@@ -285,11 +283,9 @@ export async function deleteUserProfileImageBusiness(
 
     // Generic image delete business'ı kullan
     const deleteResult = await deleteImageBusiness(
-      createImageUploadContext(
-        imageType === 'profile' ? 'user-profile' : 'user-banner',
-        userId,
-        userId
-      ),
+      imageType === 'profile' 
+        ? createUserProfileUploadContext(userId, userId)
+        : createUserBannerUploadContext(userId, userId),
       userId,
       currentImageUrl
     );
@@ -307,7 +303,7 @@ export async function deleteUserProfileImageBusiness(
 
     // Başarılı silme logu
     await logger.info(
-      EVENTS.USER.PROFILE_IMAGES_UPDATED,
+      EVENTS_DOMAIN.USER.PROFILE_IMAGES_UPDATED,
       `Kullanıcı ${imageType === 'profile' ? 'profil resmi' : 'banner'} silindi`,
       { userId, imageType },
       userId
@@ -323,7 +319,7 @@ export async function deleteUserProfileImageBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       `Kullanıcı ${imageType === 'profile' ? 'profil resmi' : 'banner'} silme sırasında beklenmedik hata`,
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId, imageType }
     );
@@ -350,7 +346,7 @@ export async function getUserImageUrlsBusiness(
     let profileBannerUrls = null;
 
     if (user.profilePicture) {
-      const profilePictureResult = await getImageUrlsBusiness(user.profilePicture, 'user-profile', {
+      const profilePictureResult = await getImageUrlsBusiness(user.profilePicture, 'USER_PROFILE', {
         includeThumbnail: true,
         includeResponsive: true,
         thumbnailSize: 100
@@ -359,7 +355,7 @@ export async function getUserImageUrlsBusiness(
     }
 
     if (user.profileBanner) {
-      const profileBannerResult = await getImageUrlsBusiness(user.profileBanner, 'user-banner', {
+      const profileBannerResult = await getImageUrlsBusiness(user.profileBanner, 'USER_BANNER', {
         includeThumbnail: true,
         includeResponsive: false,
         optimizedWidth: 1200,
@@ -383,7 +379,7 @@ export async function getUserImageUrlsBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı görsel URL\'leri getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -416,7 +412,7 @@ export async function updateProfileImagesBusiness(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.USER.PROFILE_IMAGES_UPDATED,
+      EVENTS_DOMAIN.USER.PROFILE_IMAGES_UPDATED,
       'Kullanıcı profil görselleri güncellendi',
       { userId },
       userId
@@ -432,7 +428,7 @@ export async function updateProfileImagesBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Profil görselleri güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -464,7 +460,7 @@ export async function getUserProfileBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı profili getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );

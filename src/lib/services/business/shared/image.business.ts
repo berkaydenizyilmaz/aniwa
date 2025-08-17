@@ -14,7 +14,7 @@ import {
   createThumbnailUrl 
 } from '@/lib/services/cloudinary/transform';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN, CLOUDINARY_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { 
   UploadContext, 
@@ -42,7 +42,7 @@ export async function uploadImageBusiness(
       try {
         await deleteCloudinaryImageByUrl(options.oldImageUrl);
         await logger.info(
-          EVENTS.SYSTEM.IMAGE_DELETED,
+          EVENTS_DOMAIN.SYSTEM.IMAGE_DELETED,
           'Eski görsel başarıyla silindi',
           { 
             category: context.category, 
@@ -54,7 +54,7 @@ export async function uploadImageBusiness(
       } catch (deleteError) {
         // Log warning but don't fail the upload
         await logger.warn(
-          EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+          EVENTS_DOMAIN.SYSTEM.IMAGE_DELETE_FAILED,
           'Eski görsel silinirken hata oluştu ama yüklemeye devam ediliyor',
           { 
             category: context.category, 
@@ -79,7 +79,7 @@ export async function uploadImageBusiness(
 
     // Log successful upload
     await logger.info(
-      EVENTS.SYSTEM.IMAGE_UPLOADED,
+      EVENTS_DOMAIN.SYSTEM.IMAGE_UPLOADED,
       'Görsel başarıyla yüklendi',
       { 
         category: context.category, 
@@ -104,7 +104,7 @@ export async function uploadImageBusiness(
     };
   } catch (error) {
     await logger.error(
-      EVENTS.SYSTEM.IMAGE_UPLOAD_FAILED,
+      EVENTS_DOMAIN.SYSTEM.IMAGE_UPLOAD_FAILED,
       'Görsel yükleme sırasında hata',
       { 
         category: context.category, 
@@ -121,7 +121,7 @@ export async function uploadImageBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Görsel yükleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -153,7 +153,7 @@ export async function deleteImageBusiness(
 
     // Log successful deletion
     await logger.info(
-      EVENTS.SYSTEM.IMAGE_DELETED,
+      EVENTS_DOMAIN.SYSTEM.IMAGE_DELETED,
       'Görsel başarıyla silindi',
       { 
         category: context.category, 
@@ -170,7 +170,7 @@ export async function deleteImageBusiness(
     };
   } catch (error) {
     await logger.error(
-      EVENTS.SYSTEM.IMAGE_DELETE_FAILED,
+      EVENTS_DOMAIN.SYSTEM.IMAGE_DELETE_FAILED,
       'Görsel silme sırasında hata',
       { 
         category: context.category, 
@@ -186,7 +186,7 @@ export async function deleteImageBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Görsel silme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -229,8 +229,8 @@ export async function getImageUrlsBusiness(
 
     // Generate responsive URLs if requested
     if (includeResponsive) {
-      const responsiveCategory = category === 'user-profile' ? 'USER_PROFILE' 
-        : category === 'anime-cover' ? 'ANIME_COVER' 
+      const responsiveCategory = category === CLOUDINARY_DOMAIN.CATEGORIES.USER_PROFILE ? CLOUDINARY_DOMAIN.CATEGORIES.USER_PROFILE 
+        : category === CLOUDINARY_DOMAIN.CATEGORIES.ANIME_COVER ? CLOUDINARY_DOMAIN.CATEGORIES.ANIME_COVER 
         : null;
 
       if (responsiveCategory) {
@@ -244,7 +244,7 @@ export async function getImageUrlsBusiness(
     };
   } catch (error) {
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Görsel URL\'leri oluşturma sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', imageUrl, category }
     );
@@ -273,6 +273,22 @@ export function createImageUploadContext(
     userId
   };
 }
+
+// Helper functions for specific image categories
+export const createUserProfileUploadContext = (entityId: string, userId?: string) =>
+  createImageUploadContext(CLOUDINARY_DOMAIN.CATEGORIES.USER_PROFILE, entityId, userId);
+
+export const createUserBannerUploadContext = (entityId: string, userId?: string) =>
+  createImageUploadContext(CLOUDINARY_DOMAIN.CATEGORIES.USER_BANNER, entityId, userId);
+
+export const createAnimeCoverUploadContext = (entityId: string, userId?: string) =>
+  createImageUploadContext(CLOUDINARY_DOMAIN.CATEGORIES.ANIME_COVER, entityId, userId);
+
+export const createAnimeBannerUploadContext = (entityId: string, userId?: string) =>
+  createImageUploadContext(CLOUDINARY_DOMAIN.CATEGORIES.ANIME_BANNER, entityId, userId);
+
+export const createEpisodeThumbnailUploadContext = (entityId: string, userId?: string) =>
+  createImageUploadContext(CLOUDINARY_DOMAIN.CATEGORIES.EPISODE_THUMBNAIL, entityId, userId);
 
 // Batch upload multiple images
 export async function uploadMultipleImagesBusiness(
@@ -309,7 +325,7 @@ export async function uploadMultipleImagesBusiness(
 
     if (errors.length > 0) {
       await logger.warn(
-        EVENTS.SYSTEM.BATCH_IMAGE_UPLOAD_PARTIAL_FAILURE,
+        EVENTS_DOMAIN.SYSTEM.BATCH_IMAGE_UPLOAD_PARTIAL_FAILURE,
         'Toplu görsel yükleme kısmen başarısız',
         { 
           successCount: results.length,
@@ -326,7 +342,7 @@ export async function uploadMultipleImagesBusiness(
     };
   } catch (error) {
     await logger.error(
-      EVENTS.SYSTEM.BATCH_IMAGE_UPLOAD_FAILED,
+      EVENTS_DOMAIN.SYSTEM.BATCH_IMAGE_UPLOAD_FAILED,
       'Toplu görsel yükleme tamamen başarısız',
       { 
         uploadCount: uploads.length,

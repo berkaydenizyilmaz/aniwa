@@ -2,20 +2,16 @@
 
 import { Tag } from '@prisma/client';
 import { CreateTagInput, UpdateTagInput, TagFilters } from '@/lib/schemas/tag.schema';
+import { PaginatedResponse, CrudResponses } from '../shared';
 
-// Prisma Tag tipini direkt kullan (küçük model)
-export type CreateTagResponse = Tag;
-export type GetTagResponse = Tag;
-export type UpdateTagResponse = Tag;
+// CRUD response types
+export type TagCrudResponses = CrudResponses<Tag>;
+export type CreateTagResponse = TagCrudResponses['Create'];
+export type GetTagResponse = TagCrudResponses['Get'];
+export type UpdateTagResponse = TagCrudResponses['Update'];
 
-// Sadece özel response için interface
-export interface GetTagsResponse {
-  tags: Tag[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+// Paginated response type
+export type GetTagsResponse = PaginatedResponse<Tag>;
 
 // Tag API istek tipleri
 export type CreateTagRequest = CreateTagInput;

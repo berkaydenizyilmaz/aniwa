@@ -12,7 +12,7 @@ import {
   createLogDB
 } from '@/lib/services/db/log.db';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { 
   GetLogResponse, 
@@ -63,7 +63,7 @@ export async function getLogBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Log getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', logId: id },
       userId
@@ -140,7 +140,7 @@ export async function getLogsBusiness(
     return {
       success: true,
       data: {
-        logs,
+        data: logs,
         total,
         page,
         limit,
@@ -155,7 +155,7 @@ export async function getLogsBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Log listeleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
       userId

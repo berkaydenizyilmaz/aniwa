@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Search, Plus, Filter } from 'lucide-react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
-import { MASTER_DATA } from '@/lib/constants/masterData.constants';
+import { MASTER_DATA_DOMAIN } from '@/lib/constants';
 
 interface TagFiltersProps {
   onSearch?: (search: string) => void;
@@ -78,7 +78,7 @@ export function TagFilters({ onSearch, onCategoryChange, onAdultChange, onSpoile
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tüm Kategoriler</SelectItem>
-              {Object.entries(MASTER_DATA.TAG_CATEGORY_LABELS).map(([key, label]) => (
+                              {Object.entries(MASTER_DATA_DOMAIN.TAG_CATEGORY_LABELS).map(([key, label]) => (
                 <SelectItem key={key} value={key}>
                   {label}
                 </SelectItem>

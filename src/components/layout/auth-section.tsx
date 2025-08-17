@@ -13,9 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { LogOut, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
-import { ROUTES } from '@/lib/constants/routes.constants'
-import { ADMIN_MENU_ITEMS, AUTH_MENU_ITEMS } from '@/lib/constants/menu.constants'
-import { USER } from '@/lib/constants/user.constants'
+import { ROUTES_DOMAIN, NAVIGATION_DOMAIN, USER_DOMAIN } from '@/lib/constants'
 import { useMutation } from '@tanstack/react-query'
 import { UserRole } from '@prisma/client'
 
@@ -25,7 +23,7 @@ export function AuthSection() {
   // Sign out mutation
   const signOutMutation = useMutation({
     mutationFn: async () => {
-      await signOut({ callbackUrl: ROUTES.PAGES.HOME });
+      await signOut({ callbackUrl: ROUTES_DOMAIN.PAGES.HOME });
     },
     onError: (error) => {
       console.error('Çıkış yapılırken bir hata oluştu:', error);
@@ -44,10 +42,10 @@ export function AuthSection() {
     return (
       <div className="flex items-center space-x-2">
         <Button variant="ghost" size="sm" asChild>
-          <Link href={ROUTES.PAGES.AUTH.LOGIN}>Giriş Yap</Link>
+          <Link href={ROUTES_DOMAIN.PAGES.AUTH.LOGIN}>Giriş Yap</Link>
         </Button>
         <Button size="sm" asChild>
-          <Link href={ROUTES.PAGES.AUTH.REGISTER}>Kayıt Ol</Link>
+          <Link href={ROUTES_DOMAIN.PAGES.AUTH.REGISTER}>Kayıt Ol</Link>
         </Button>
       </div>
     )
@@ -72,7 +70,7 @@ export function AuthSection() {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="glass-card w-48" align="center" forceMount>
-          {AUTH_MENU_ITEMS.map((item) => {
+          {NAVIGATION_DOMAIN.MENU.AUTH_MENU_ITEMS.map((item) => {
             const Icon = item.icon
             return (
               <DropdownMenuItem key={item.label} asChild>
@@ -84,7 +82,7 @@ export function AuthSection() {
             )
           })}
           <DropdownMenuSeparator />
-          {ADMIN_MENU_ITEMS
+          {NAVIGATION_DOMAIN.MENU.ADMIN_MENU_ITEMS
             .filter((item) => 
               session.user.roles.includes(item.role) || 
               session.user.roles.includes(UserRole.ADMIN)

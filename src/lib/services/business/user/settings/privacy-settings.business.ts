@@ -10,7 +10,7 @@ import {
   createUserSettingsDB
 } from '@/lib/services/db/userProfileSettings.db';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { ProfileVisibility } from '@prisma/client';
 import { 
@@ -42,7 +42,7 @@ export async function updateProfileVisibilityBusiness(
     }
 
     await logger.info(
-      EVENTS.USER.PROFILE_VISIBILITY_UPDATED,
+      EVENTS_DOMAIN.USER.PROFILE_VISIBILITY_UPDATED,
       'Kullanıcı profil görünürlüğü güncellendi',
       { userId, visibility: profileVisibility },
       userId
@@ -58,7 +58,7 @@ export async function updateProfileVisibilityBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Profil görünürlüğü güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -88,7 +88,7 @@ export async function updateAllowFollowsBusiness(
     }
 
     await logger.info(
-      EVENTS.USER.ALLOW_FOLLOWS_UPDATED,
+      EVENTS_DOMAIN.USER.ALLOW_FOLLOWS_UPDATED,
       'Kullanıcı takip izinleri güncellendi',
       { userId, allowFollows },
       userId
@@ -104,7 +104,7 @@ export async function updateAllowFollowsBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Takip izinleri güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -134,7 +134,7 @@ export async function updateShowAnimeListBusiness(
     }
 
     await logger.info(
-      EVENTS.USER.SHOW_ANIME_LIST_UPDATED,
+      EVENTS_DOMAIN.USER.SHOW_ANIME_LIST_UPDATED,
       'Kullanıcı anime listesi gösterme ayarı güncellendi',
       { userId, showAnimeList },
       userId
@@ -150,7 +150,7 @@ export async function updateShowAnimeListBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Anime listesi gösterme ayarı güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -180,7 +180,7 @@ export async function updateShowFavouriteAnimeSeriesBusiness(
     }
 
     await logger.info(
-      EVENTS.USER.SHOW_FAVOURITE_ANIME_UPDATED,
+      EVENTS_DOMAIN.USER.SHOW_FAVOURITE_ANIME_UPDATED,
       'Kullanıcı favori animeleri gösterme ayarı güncellendi',
       { userId, showFavouriteAnimeSeries },
       userId
@@ -196,7 +196,7 @@ export async function updateShowFavouriteAnimeSeriesBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Favori animeleri gösterme ayarı güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -226,7 +226,7 @@ export async function updateShowCustomListsBusiness(
     }
 
     await logger.info(
-      EVENTS.USER.SHOW_CUSTOM_LISTS_UPDATED,
+      EVENTS_DOMAIN.USER.SHOW_CUSTOM_LISTS_UPDATED,
       'Kullanıcı özel listeleri gösterme ayarı güncellendi',
       { userId, showCustomLists },
       userId
@@ -242,7 +242,7 @@ export async function updateShowCustomListsBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Özel listeleri gösterme ayarı güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );

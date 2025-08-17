@@ -2,20 +2,16 @@
 
 import { Studio } from '@prisma/client';
 import { CreateStudioInput, UpdateStudioInput, StudioFilters } from '@/lib/schemas/studio.schema';
+import { PaginatedResponse, CrudResponses } from '../shared';
 
-// Prisma Studio tipini direkt kullan (küçük model)
-export type CreateStudioResponse = Studio;
-export type GetStudioResponse = Studio;
-export type UpdateStudioResponse = Studio;
+// CRUD response types
+export type StudioCrudResponses = CrudResponses<Studio>;
+export type CreateStudioResponse = StudioCrudResponses['Create'];
+export type GetStudioResponse = StudioCrudResponses['Get'];
+export type UpdateStudioResponse = StudioCrudResponses['Update'];
 
-// Sadece özel response için interface
-export interface GetStudiosResponse {
-  studios: Studio[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+// Paginated response type
+export type GetStudiosResponse = PaginatedResponse<Studio>;
 
 // Studio API istek tipleri
 export type CreateStudioRequest = CreateStudioInput;

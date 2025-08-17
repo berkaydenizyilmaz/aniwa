@@ -5,7 +5,7 @@ import {
   createRateLimitResponse, 
   addRateLimitHeaders 
 } from '@/lib/utils/rate-limit.utils';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
@@ -47,13 +47,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // Giriş yapan kullanıcıların erişemeyeceği sayfa kontrolü
-  if (ROUTES.MIDDLEWARE.GUEST_ONLY.PAGES.includes(pathname as typeof ROUTES.MIDDLEWARE.GUEST_ONLY.PAGES[number])) {
+  if (ROUTES_DOMAIN.MIDDLEWARE.GUEST_ONLY.PAGES.includes(pathname as typeof ROUTES_DOMAIN.MIDDLEWARE.GUEST_ONLY.PAGES[number])) {
     try {
       const token = await getToken({ req: request });
       
       if (token) {
         // Giriş yapmış kullanıcı, anasayfaya yönlendir
-        return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, request.url));
+        return NextResponse.redirect(new URL(ROUTES_DOMAIN.PAGES.HOME, request.url));
       }
     } catch (error) {
       console.error('Auth check error:', error);
@@ -61,7 +61,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Giriş yapan kullanıcıların erişemeyeceği API kontrolü
-  if (ROUTES.MIDDLEWARE.GUEST_ONLY.API.includes(pathname as typeof ROUTES.MIDDLEWARE.GUEST_ONLY.API[number])) {
+  if (ROUTES_DOMAIN.MIDDLEWARE.GUEST_ONLY.API.includes(pathname as typeof ROUTES_DOMAIN.MIDDLEWARE.GUEST_ONLY.API[number])) {
     try {
       const token = await getToken({ req: request });
       
@@ -87,13 +87,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // Giriş yapmamış kullanıcıların erişemeyeceği sayfa kontrolü
-  if (ROUTES.MIDDLEWARE.AUTH_REQUIRED.PAGES.includes(pathname as typeof ROUTES.MIDDLEWARE.AUTH_REQUIRED.PAGES[number])) {
+  if (ROUTES_DOMAIN.MIDDLEWARE.AUTH_REQUIRED.PAGES.includes(pathname as typeof ROUTES_DOMAIN.MIDDLEWARE.AUTH_REQUIRED.PAGES[number])) {
     try {
       const token = await getToken({ req: request });
       
       if (!token) {
         // Giriş yapmamış kullanıcı, giriş sayfasına yönlendir
-        return NextResponse.redirect(new URL(ROUTES.PAGES.AUTH.LOGIN, request.url));
+        return NextResponse.redirect(new URL(ROUTES_DOMAIN.PAGES.AUTH.LOGIN, request.url));
       }
     } catch (error) {
       console.error('Auth check error:', error);
@@ -101,7 +101,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Giriş yapmamış kullanıcıların erişemeyeceği API kontrolü
-  if (ROUTES.MIDDLEWARE.AUTH_REQUIRED.API.includes(pathname as typeof ROUTES.MIDDLEWARE.AUTH_REQUIRED.API[number])) {
+  if (ROUTES_DOMAIN.MIDDLEWARE.AUTH_REQUIRED.API.includes(pathname as typeof ROUTES_DOMAIN.MIDDLEWARE.AUTH_REQUIRED.API[number])) {
     try {
       const token = await getToken({ req: request });
       
@@ -127,8 +127,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Admin yetkisi kontrolü
-  if (ROUTES.MIDDLEWARE.ADMIN_ONLY.PAGES.includes(pathname as typeof ROUTES.MIDDLEWARE.ADMIN_ONLY.PAGES[number]) ||
-      ROUTES.MIDDLEWARE.ADMIN_ONLY.API.includes(pathname as typeof ROUTES.MIDDLEWARE.ADMIN_ONLY.API[number])) {
+  if (ROUTES_DOMAIN.MIDDLEWARE.ADMIN_ONLY.PAGES.includes(pathname as typeof ROUTES_DOMAIN.MIDDLEWARE.ADMIN_ONLY.PAGES[number]) ||
+      ROUTES_DOMAIN.MIDDLEWARE.ADMIN_ONLY.API.includes(pathname as typeof ROUTES_DOMAIN.MIDDLEWARE.ADMIN_ONLY.API[number])) {
     try {
       const token = await getToken({ req: request });
       
@@ -144,7 +144,7 @@ export async function middleware(request: NextRequest) {
             { status: 401, headers: { 'Content-Type': 'application/json' } }
           );
         } else {
-          return NextResponse.redirect(new URL(ROUTES.PAGES.AUTH.LOGIN, request.url));
+          return NextResponse.redirect(new URL(ROUTES_DOMAIN.PAGES.AUTH.LOGIN, request.url));
         }
       }
       
@@ -160,7 +160,7 @@ export async function middleware(request: NextRequest) {
             { status: 403, headers: { 'Content-Type': 'application/json' } }
           );
         } else {
-          return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, request.url));
+          return NextResponse.redirect(new URL(ROUTES_DOMAIN.PAGES.HOME, request.url));
         }
       }
     } catch (error) {
@@ -169,8 +169,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Editör yetkisi kontrolü
-  if (ROUTES.MIDDLEWARE.EDITOR_ONLY.PAGES.includes(pathname as typeof ROUTES.MIDDLEWARE.EDITOR_ONLY.PAGES[number]) ||
-      ROUTES.MIDDLEWARE.EDITOR_ONLY.API.includes(pathname as typeof ROUTES.MIDDLEWARE.EDITOR_ONLY.API[number])) {
+  if (ROUTES_DOMAIN.MIDDLEWARE.EDITOR_ONLY.PAGES.includes(pathname as typeof ROUTES_DOMAIN.MIDDLEWARE.EDITOR_ONLY.PAGES[number]) ||
+      ROUTES_DOMAIN.MIDDLEWARE.EDITOR_ONLY.API.includes(pathname as typeof ROUTES_DOMAIN.MIDDLEWARE.EDITOR_ONLY.API[number])) {
     try {
       const token = await getToken({ req: request });
       
@@ -186,7 +186,7 @@ export async function middleware(request: NextRequest) {
             { status: 401, headers: { 'Content-Type': 'application/json' } }
           );
         } else {
-          return NextResponse.redirect(new URL(ROUTES.PAGES.AUTH.LOGIN, request.url));
+          return NextResponse.redirect(new URL(ROUTES_DOMAIN.PAGES.AUTH.LOGIN, request.url));
         }
       }
       
@@ -202,7 +202,7 @@ export async function middleware(request: NextRequest) {
             { status: 403, headers: { 'Content-Type': 'application/json' } }
           );
         } else {
-          return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, request.url));
+          return NextResponse.redirect(new URL(ROUTES_DOMAIN.PAGES.HOME, request.url));
         }
       }
     } catch (error) {
@@ -211,8 +211,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Moderatör yetkisi kontrolü
-  if (ROUTES.MIDDLEWARE.MODERATOR_ONLY.PAGES.includes(pathname as typeof ROUTES.MIDDLEWARE.MODERATOR_ONLY.PAGES[number]) ||
-      ROUTES.MIDDLEWARE.MODERATOR_ONLY.API.includes(pathname as typeof ROUTES.MIDDLEWARE.MODERATOR_ONLY.API[number])) {
+  if (ROUTES_DOMAIN.MIDDLEWARE.MODERATOR_ONLY.PAGES.includes(pathname as typeof ROUTES_DOMAIN.MIDDLEWARE.MODERATOR_ONLY.PAGES[number]) ||
+      ROUTES_DOMAIN.MIDDLEWARE.MODERATOR_ONLY.API.includes(pathname as typeof ROUTES_DOMAIN.MIDDLEWARE.MODERATOR_ONLY.API[number])) {
     try {
       const token = await getToken({ req: request });
       
@@ -228,7 +228,7 @@ export async function middleware(request: NextRequest) {
             { status: 401, headers: { 'Content-Type': 'application/json' } }
           );
         } else {
-          return NextResponse.redirect(new URL(ROUTES.PAGES.AUTH.LOGIN, request.url));
+          return NextResponse.redirect(new URL(ROUTES_DOMAIN.PAGES.AUTH.LOGIN, request.url));
         }
       }
       
@@ -244,7 +244,7 @@ export async function middleware(request: NextRequest) {
             { status: 403, headers: { 'Content-Type': 'application/json' } }
           );
         } else {
-          return NextResponse.redirect(new URL(ROUTES.PAGES.HOME, request.url));
+          return NextResponse.redirect(new URL(ROUTES_DOMAIN.PAGES.HOME, request.url));
         }
       }
     } catch (error) {

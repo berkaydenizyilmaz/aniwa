@@ -19,7 +19,7 @@ import {
   type UpdateEpisodeInput
 } from '@/lib/schemas/anime.schema';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 
 // Episode oluşturma
 export async function createEpisodeAction(
@@ -36,7 +36,7 @@ export async function createEpisodeAction(
     const result = await createEpisodeBusiness(validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.EDITOR.EPISODES);
+    revalidatePath(ROUTES_DOMAIN.PAGES.EDITOR.EPISODES);
 
     return {
       success: true,
@@ -117,7 +117,7 @@ export async function updateEpisodeAction(
     const result = await updateEpisodeBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.EDITOR.EPISODES);
+    revalidatePath(ROUTES_DOMAIN.PAGES.EDITOR.EPISODES);
 
     return {
       success: true,
@@ -144,7 +144,7 @@ export async function deleteEpisodeAction(
     const result = await deleteEpisodeBusiness(id, session!.user.id);
     
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.EDITOR.EPISODES);
+    revalidatePath(ROUTES_DOMAIN.PAGES.EDITOR.EPISODES);
 
     return {
       success: true,

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Loading } from '@/components/ui/loading';
 import { ProfileVisibility, UserProfileSettings } from '@prisma/client';
-import { USER } from '@/lib/constants/user.constants';
+import { USER_DOMAIN } from '@/lib/constants';
 import { useEffect, useState } from 'react';
 
 export function PrivacySettings() {
@@ -119,9 +119,9 @@ export function PrivacySettings() {
               <SelectValue placeholder="Profil görünürlüğü seçin" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ProfileVisibility.PUBLIC}>{USER.PROFILE_VISIBILITY_LABELS.PUBLIC}</SelectItem>
-              <SelectItem value={ProfileVisibility.FOLLOWERS_ONLY}>{USER.PROFILE_VISIBILITY_LABELS.FOLLOWERS_ONLY}</SelectItem>
-              <SelectItem value={ProfileVisibility.PRIVATE}>{USER.PROFILE_VISIBILITY_LABELS.PRIVATE}</SelectItem>
+                      <SelectItem value={ProfileVisibility.PUBLIC}>{USER_DOMAIN.PROFILE_VISIBILITY_LABELS.PUBLIC}</SelectItem>
+        <SelectItem value={ProfileVisibility.FOLLOWERS_ONLY}>{USER_DOMAIN.PROFILE_VISIBILITY_LABELS.FOLLOWERS_ONLY}</SelectItem>
+        <SelectItem value={ProfileVisibility.PRIVATE}>{USER_DOMAIN.PROFILE_VISIBILITY_LABELS.PRIVATE}</SelectItem>
             </SelectContent>
           </Select>
         </div>

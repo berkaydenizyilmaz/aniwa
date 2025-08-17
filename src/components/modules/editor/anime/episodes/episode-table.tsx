@@ -29,7 +29,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Tablo item tipi
-type EpisodeTableItem = GetEpisodeListResponse['episodes'][0];
+type EpisodeTableItem = GetEpisodeListResponse['data'][0];
 
 interface EpisodeTableProps {
   mediaPartId: string;
@@ -187,7 +187,7 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
     );
   }
 
-  if (!data || data.episodes.length === 0) {
+  if (!data || data.data.length === 0) {
     return (
       <div className="glass-card p-6 text-center">
         <p className="text-muted-foreground">Henüz bölüm bulunmuyor</p>
@@ -212,7 +212,7 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.episodes.map((episode) => (
+            {data.data.map((episode) => (
               <TableRow key={episode.id}>
                 <TableCell>
                   {episode.thumbnailImage ? (

@@ -11,25 +11,25 @@ import {
   AllowedImageFormat
 } from '@/lib/types/cloudinary';
 import { 
-  CLOUDINARY_FOLDERS, 
+  CLOUDINARY_DOMAIN,
   IMAGE_PRESET_CONFIGS, 
   CLOUDINARY_ERROR_MESSAGES 
-} from '@/lib/constants/cloudinary.constants';
+} from '@/lib/constants/domains/cloudinary';
 import { BusinessError } from '@/lib/errors/index';
 
 // Get folder path based on image category and entity ID
 const getFolderPath = (category: ImageCategory, entityId: string): string => {
   switch (category) {
-    case 'user-profile':
-      return `${CLOUDINARY_FOLDERS.USERS.PROFILES}/${entityId}`;
-    case 'user-banner':
-      return `${CLOUDINARY_FOLDERS.USERS.BANNERS}/${entityId}`;
-    case 'anime-cover':
-      return `${CLOUDINARY_FOLDERS.ANIME.SERIES.COVERS}/${entityId}`;
-    case 'anime-banner':
-      return `${CLOUDINARY_FOLDERS.ANIME.SERIES.BANNERS}/${entityId}`;
-    case 'episode-thumbnail':
-      return `${CLOUDINARY_FOLDERS.ANIME.EPISODES.THUMBNAILS}/${entityId}`;
+    case CLOUDINARY_DOMAIN.CATEGORIES.USER_PROFILE:
+      return `${CLOUDINARY_DOMAIN.FOLDERS.USERS.PROFILES}/${entityId}`;
+    case CLOUDINARY_DOMAIN.CATEGORIES.USER_BANNER:
+      return `${CLOUDINARY_DOMAIN.FOLDERS.USERS.BANNERS}/${entityId}`;
+    case CLOUDINARY_DOMAIN.CATEGORIES.ANIME_COVER:
+      return `${CLOUDINARY_DOMAIN.FOLDERS.ANIME.SERIES.COVERS}/${entityId}`;
+    case CLOUDINARY_DOMAIN.CATEGORIES.ANIME_BANNER:
+      return `${CLOUDINARY_DOMAIN.FOLDERS.ANIME.SERIES.BANNERS}/${entityId}`;
+    case CLOUDINARY_DOMAIN.CATEGORIES.EPISODE_THUMBNAIL:
+      return `${CLOUDINARY_DOMAIN.FOLDERS.ANIME.EPISODES.THUMBNAILS}/${entityId}`;
     default:
       throw new BusinessError(`Desteklenmeyen görsel kategorisi: ${category}`);
   }
@@ -40,15 +40,15 @@ const getPublicId = (category: ImageCategory, entityId: string): string => {
   const folder = getFolderPath(category, entityId);
   
   switch (category) {
-    case 'user-profile':
+    case CLOUDINARY_DOMAIN.CATEGORIES.USER_PROFILE:
       return `${folder}/avatar`;
-    case 'user-banner':
+    case CLOUDINARY_DOMAIN.CATEGORIES.USER_BANNER:
       return `${folder}/banner`;
-    case 'anime-cover':
+    case CLOUDINARY_DOMAIN.CATEGORIES.ANIME_COVER:
       return `${folder}/cover`;
-    case 'anime-banner':
+    case CLOUDINARY_DOMAIN.CATEGORIES.ANIME_BANNER:
       return `${folder}/banner`;
-    case 'episode-thumbnail':
+    case CLOUDINARY_DOMAIN.CATEGORIES.EPISODE_THUMBNAIL:
       return `${folder}/thumbnail`;
     default:
       throw new BusinessError(`Desteklenmeyen görsel kategorisi: ${category}`);
@@ -59,14 +59,14 @@ const getPublicId = (category: ImageCategory, entityId: string): string => {
 
 // Validate file before upload
 const validateFile = (file: File, category: ImageCategory): void => {
-  const config = IMAGE_PRESET_CONFIGS[category.toUpperCase().replace('-', '_') as keyof typeof IMAGE_PRESET_CONFIGS];
+  const config = IMAGE_PRESET_CONFIGS[category as keyof typeof IMAGE_PRESET_CONFIGS];
   
   if (!config) {
     throw new BusinessError(CLOUDINARY_ERROR_MESSAGES.INVALID_FORMAT);
   }
 
   // Check file size
-  if (file.size > config.maxSizeBytes) {
+  if (file.size > config.sizeLimit) {
     throw new BusinessError(CLOUDINARY_ERROR_MESSAGES.FILE_TOO_LARGE);
   }
 

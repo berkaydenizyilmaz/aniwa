@@ -28,7 +28,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Tablo item tipi
-type MediaPartTableItem = GetAnimeMediaPartsResponse['mediaParts'][0];
+type MediaPartTableItem = GetAnimeMediaPartsResponse['data'][0];
 
 interface MediaPartTableProps {
   seriesId: string;
@@ -175,7 +175,7 @@ export function MediaPartTable({ seriesId, onEdit, onEpisodes, refreshKey }: Med
     );
   }
 
-  const mediaParts = data?.mediaParts || [];
+  const mediaParts = data?.data || [];
   const totalPages = data?.totalPages || 1;
   const totalMediaParts = data?.total || 0;
 

@@ -17,7 +17,7 @@ import {
 import { loginSchema, type LoginInput } from '@/lib/schemas/auth.schema';
 import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 
 export function LoginForm() {
   const router = useRouter();
@@ -47,7 +47,7 @@ export function LoginForm() {
     },
     onSuccess: () => {
       toast.success('Başarıyla giriş yaptınız!');
-      router.push(ROUTES.PAGES.HOME);
+              router.push(ROUTES_DOMAIN.PAGES.HOME);
       router.refresh();
     },
     onError: (error) => {

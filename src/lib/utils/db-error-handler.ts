@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { DatabaseError, DatabaseConnectionError, DatabaseQueryError } from '@/lib/errors/business-error';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 
 // DB error handler
 export function handleDatabaseError(
@@ -11,7 +11,7 @@ export function handleDatabaseError(
 ): never {
   // Log hatayı
   logger.error(
-    EVENTS.SYSTEM.DATABASE_ERROR,
+    EVENTS_DOMAIN.SYSTEM.DATABASE_ERROR,
     `${operation} sırasında veritabanı hatası`,
     { 
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',

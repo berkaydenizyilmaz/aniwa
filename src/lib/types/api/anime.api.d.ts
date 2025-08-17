@@ -12,11 +12,13 @@ import {
   UpdateStreamingLinkInput,
   AnimeFilters 
 } from '@/lib/schemas/anime.schema';
+import { PaginatedResponse, CrudResponses } from '../shared';
 
 // Anime Series API response tipleri
-export type CreateAnimeSeriesResponse = AnimeSeries;
-export type GetAnimeSeriesResponse = AnimeSeries;
-export type UpdateAnimeSeriesResponse = AnimeSeries;
+export type AnimeSeriesCrudResponses = CrudResponses<AnimeSeries>;
+export type CreateAnimeSeriesResponse = AnimeSeriesCrudResponses['Create'];
+export type GetAnimeSeriesResponse = AnimeSeriesCrudResponses['Get'];
+export type UpdateAnimeSeriesResponse = AnimeSeriesCrudResponses['Update'];
 
 // Anime Series ilişkilerle birlikte response tipi
 export interface GetAnimeSeriesWithRelationsResponse extends AnimeSeries {
@@ -39,48 +41,32 @@ export interface GetAnimeSeriesRelationsResponse {
 }
 
 // Anime Media Part API response tipleri
-export type CreateAnimeMediaPartResponse = AnimeMediaPart;
-export type GetAnimeMediaPartResponse = AnimeMediaPart;
-export type UpdateAnimeMediaPartResponse = AnimeMediaPart;
+export type AnimeMediaPartCrudResponses = CrudResponses<AnimeMediaPart>;
+export type CreateAnimeMediaPartResponse = AnimeMediaPartCrudResponses['Create'];
+export type GetAnimeMediaPartResponse = AnimeMediaPartCrudResponses['Get'];
+export type UpdateAnimeMediaPartResponse = AnimeMediaPartCrudResponses['Update'];
 
 // Episode API response tipleri
-export type CreateEpisodeResponse = Episode;
-export type GetEpisodeResponse = Episode;
-export type UpdateEpisodeResponse = Episode;
+export type EpisodeCrudResponses = CrudResponses<Episode>;
+export type CreateEpisodeResponse = EpisodeCrudResponses['Create'];
+export type GetEpisodeResponse = EpisodeCrudResponses['Get'];
+export type UpdateEpisodeResponse = EpisodeCrudResponses['Update'];
 
 // Episode listesi response tipi
-export interface GetEpisodeListResponse {
-  episodes: Episode[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+export type GetEpisodeListResponse = PaginatedResponse<Episode>;
 
 // Anime Series listesi response tipi
-export interface GetAnimeSeriesListResponse {
-  animeSeries: Array<{
-    id: string;
-    aniwaPublicId: number;
-    title: string;
-    type: AnimeType;
-    status: AnimeStatus;
-    coverImage?: string;
-  }>;
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+export type GetAnimeSeriesListResponse = PaginatedResponse<{
+  id: string;
+  aniwaPublicId: number;
+  title: string;
+  type: AnimeType;
+  status: AnimeStatus;
+  coverImage?: string;
+}>;
 
 // Anime Media Part listesi response tipi
-export interface GetAnimeMediaPartsResponse {
-  mediaParts: AnimeMediaPart[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+export type GetAnimeMediaPartsResponse = PaginatedResponse<AnimeMediaPart>;
 
 // Anime Series detay response tipi (MediaPart'larla birlikte)
 export interface GetAnimeSeriesDetailResponse extends AnimeSeries {
@@ -88,20 +74,15 @@ export interface GetAnimeSeriesDetailResponse extends AnimeSeries {
 }
 
 // Streaming Link API response tipleri
-export type CreateStreamingLinkResponse = StreamingLink;
-export type GetStreamingLinkResponse = StreamingLink;
-export type UpdateStreamingLinkResponse = StreamingLink;
+export type StreamingLinkCrudResponses = CrudResponses<StreamingLink>;
+export type CreateStreamingLinkResponse = StreamingLinkCrudResponses['Create'];
+export type GetStreamingLinkResponse = StreamingLinkCrudResponses['Get'];
+export type UpdateStreamingLinkResponse = StreamingLinkCrudResponses['Update'];
 
 // Streaming Link listesi response tipi
-export interface GetStreamingLinksResponse {
-  streamingLinks: Array<StreamingLink & {
-    platform: StreamingPlatform;
-  }>;
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+export type GetStreamingLinksResponse = PaginatedResponse<StreamingLink & {
+  platform: StreamingPlatform;
+}>;
 
 // Streaming Platform listesi response tipi
 export interface GetStreamingPlatformsResponse {

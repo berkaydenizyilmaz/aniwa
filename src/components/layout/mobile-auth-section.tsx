@@ -12,8 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { User, LogOut, LogIn, UserPlus } from 'lucide-react'  
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
-import { ROUTES } from '@/lib/constants/routes.constants'
-import { ADMIN_MENU_ITEMS, AUTH_MENU_ITEMS } from '@/lib/constants/menu.constants'
+import { ROUTES_DOMAIN, NAVIGATION_DOMAIN } from '@/lib/constants'
 import { useMutation } from '@tanstack/react-query'
 import { UserRole } from '@prisma/client'
 
@@ -23,7 +22,7 @@ export function MobileAuthSection() {
   // Sign out mutation
   const signOutMutation = useMutation({
     mutationFn: async () => {
-      await signOut({ callbackUrl: ROUTES.PAGES.HOME });
+      await signOut({ callbackUrl: ROUTES_DOMAIN.PAGES.HOME });
     },
     onError: (error) => {
       console.error('Çıkış yapılırken bir hata oluştu:', error);
@@ -52,13 +51,13 @@ export function MobileAuthSection() {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="glass-card w-48" align="end" side="top" forceMount>
           <DropdownMenuItem asChild>
-            <Link href={ROUTES.PAGES.AUTH.LOGIN} className="cursor-pointer group">
+            <Link href={ROUTES_DOMAIN.PAGES.AUTH.LOGIN} className="cursor-pointer group">
               <LogIn className="mr-2 h-4 w-4 group-hover:text-foreground" />
               <span>Giriş Yap</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href={ROUTES.PAGES.AUTH.REGISTER} className="cursor-pointer group">
+            <Link href={ROUTES_DOMAIN.PAGES.AUTH.REGISTER} className="cursor-pointer group">
               <UserPlus className="mr-2 h-4 w-4 group-hover:text-foreground" />
               <span>Kayıt Ol</span>
             </Link>
@@ -85,7 +84,7 @@ export function MobileAuthSection() {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="glass-card w-48" align="end" side="top" forceMount>
-        {AUTH_MENU_ITEMS.map((item) => {
+        {NAVIGATION_DOMAIN.MENU.AUTH_MENU_ITEMS.map((item) => {
           const Icon = item.icon
           return (
             <DropdownMenuItem key={item.label} asChild>
@@ -97,7 +96,7 @@ export function MobileAuthSection() {
           )
         })}
         <DropdownMenuSeparator />
-        {ADMIN_MENU_ITEMS
+        {NAVIGATION_DOMAIN.MENU.ADMIN_MENU_ITEMS
           .filter((item) => 
             session.user.roles.includes(item.role) || 
             session.user.roles.includes(UserRole.ADMIN)

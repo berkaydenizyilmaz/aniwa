@@ -2,7 +2,7 @@
 
 import { getCloudinaryInstance } from './config';
 import { DeleteImageResult, ImageCategory } from '@/lib/types/cloudinary';
-import { CLOUDINARY_ERROR_MESSAGES, CLOUDINARY_LIMITS } from '@/lib/constants/cloudinary.constants';
+import { CLOUDINARY_DOMAIN } from '@/lib/constants/domains/cloudinary';
 import { BusinessError } from '@/lib/errors/index';
 
 // Get public ID from secure URL
@@ -36,16 +36,16 @@ const getPublicIdFromUrl = (secureUrl: string): string => {
 // Get public ID for image category and entity
 const getPublicIdForEntity = (category: ImageCategory, entityId: string): string => {
   switch (category) {
-    case 'user-profile':
-      return `aniwa/users/profiles/${entityId}/avatar`;
-    case 'user-banner':
-      return `aniwa/users/banners/${entityId}/banner`;
-    case 'anime-cover':
-      return `aniwa/anime/series/covers/${entityId}/cover`;
-    case 'anime-banner':
-      return `aniwa/anime/series/banners/${entityId}/banner`;
-    case 'episode-thumbnail':
-      return `aniwa/anime/episodes/thumbnails/${entityId}/thumbnail`;
+    case CLOUDINARY_DOMAIN.CATEGORIES.USER_PROFILE:
+      return `${CLOUDINARY_DOMAIN.FOLDERS.USERS.PROFILES}/${entityId}/avatar`;
+    case CLOUDINARY_DOMAIN.CATEGORIES.USER_BANNER:
+      return `${CLOUDINARY_DOMAIN.FOLDERS.USERS.BANNERS}/${entityId}/banner`;
+    case CLOUDINARY_DOMAIN.CATEGORIES.ANIME_COVER:
+      return `${CLOUDINARY_DOMAIN.FOLDERS.ANIME.SERIES.COVERS}/${entityId}/cover`;
+    case CLOUDINARY_DOMAIN.CATEGORIES.ANIME_BANNER:
+      return `${CLOUDINARY_DOMAIN.FOLDERS.ANIME.SERIES.BANNERS}/${entityId}/banner`;
+    case CLOUDINARY_DOMAIN.CATEGORIES.EPISODE_THUMBNAIL:
+      return `${CLOUDINARY_DOMAIN.FOLDERS.ANIME.EPISODES.THUMBNAILS}/${entityId}/thumbnail`;
     default:
       throw new BusinessError(`Desteklenmeyen görsel kategorisi: ${category}`);
   }
@@ -67,7 +67,7 @@ export const deleteImageByPublicId = async (publicId: string): Promise<DeleteIma
     
     return {
       success: false,
-      error: CLOUDINARY_ERROR_MESSAGES.DELETE_FAILED,
+      error: CLOUDINARY_DOMAIN.ERROR_MESSAGES.DELETE_FAILED,
     };
   }
 };
@@ -86,7 +86,7 @@ export const deleteImageByUrl = async (secureUrl: string): Promise<DeleteImageRe
     
     return {
       success: false,
-      error: CLOUDINARY_ERROR_MESSAGES.DELETE_FAILED,
+      error: CLOUDINARY_DOMAIN.ERROR_MESSAGES.DELETE_FAILED,
     };
   }
 };
@@ -108,7 +108,7 @@ export const deleteImageByEntity = async (
     
     return {
       success: false,
-      error: CLOUDINARY_ERROR_MESSAGES.DELETE_FAILED,
+      error: CLOUDINARY_DOMAIN.ERROR_MESSAGES.DELETE_FAILED,
     };
   }
 };
@@ -128,7 +128,7 @@ export const deleteMultipleImages = async (publicIds: string[]): Promise<DeleteI
       } catch (error) {
         return {
           success: false,
-          error: CLOUDINARY_ERROR_MESSAGES.DELETE_FAILED,
+          error: CLOUDINARY_DOMAIN.ERROR_MESSAGES.DELETE_FAILED,
         };
       }
     });
@@ -140,7 +140,7 @@ export const deleteMultipleImages = async (publicIds: string[]): Promise<DeleteI
     // Return failure for all if batch operation fails
     return publicIds.map(() => ({
       success: false,
-      error: CLOUDINARY_ERROR_MESSAGES.DELETE_FAILED,
+      error: CLOUDINARY_DOMAIN.ERROR_MESSAGES.DELETE_FAILED,
     }));
   }
 };
@@ -154,7 +154,7 @@ export const deleteImagesByFolder = async (folderPath: string): Promise<DeleteIm
     const listResult = await cloudinary.api.resources({
       type: 'upload',
       prefix: folderPath,
-      max_results: CLOUDINARY_LIMITS.MAX_RESULTS_PER_QUERY,
+      max_results: CLOUDINARY_DOMAIN.LIMITS.MAX_RESULTS_PER_QUERY,
     });
 
     if (listResult.resources.length === 0) {
@@ -168,7 +168,7 @@ export const deleteImagesByFolder = async (folderPath: string): Promise<DeleteIm
     const publicIds = listResult.resources.map((resource: { public_id: string }) => resource.public_id);
 
     // Delete all images in batches
-    const batchSize = CLOUDINARY_LIMITS.MAX_DELETE_BATCH_SIZE;
+    const batchSize = CLOUDINARY_DOMAIN.LIMITS.MAX_DELETE_BATCH_SIZE;
     const deletePromises = [];
 
     for (let i = 0; i < publicIds.length; i += batchSize) {
@@ -189,7 +189,7 @@ export const deleteImagesByFolder = async (folderPath: string): Promise<DeleteIm
     
     return {
       success: false,
-      error: CLOUDINARY_ERROR_MESSAGES.DELETE_FAILED,
+      error: CLOUDINARY_DOMAIN.ERROR_MESSAGES.DELETE_FAILED,
     };
   }
 };
@@ -218,7 +218,7 @@ export const deleteFolder = async (folderPath: string): Promise<DeleteImageResul
     
     return {
       success: false,
-      error: CLOUDINARY_ERROR_MESSAGES.DELETE_FAILED,
+      error: CLOUDINARY_DOMAIN.ERROR_MESSAGES.DELETE_FAILED,
     };
   }
 };

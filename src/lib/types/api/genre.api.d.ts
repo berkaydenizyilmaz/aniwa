@@ -2,20 +2,16 @@
 
 import { Genre } from '@prisma/client';
 import { CreateGenreInput, UpdateGenreInput, GenreFilters } from '@/lib/schemas/genre.schema';
+import { PaginatedResponse, CrudResponses } from '../shared';
 
-// Prisma Genre tipini direkt kullan (küçük model)
-export type CreateGenreResponse = Genre;
-export type GetGenreResponse = Genre;
-export type UpdateGenreResponse = Genre;
+// CRUD response types
+export type GenreCrudResponses = CrudResponses<Genre>;
+export type CreateGenreResponse = GenreCrudResponses['Create'];
+export type GetGenreResponse = GenreCrudResponses['Get'];
+export type UpdateGenreResponse = GenreCrudResponses['Update'];
 
-// Sadece özel response için interface
-export interface GetGenresResponse {
-  genres: Genre[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+// Paginated response type
+export type GetGenresResponse = PaginatedResponse<Genre>;
 
 // Genre API istek tipleri
 export type CreateGenreRequest = CreateGenreInput;

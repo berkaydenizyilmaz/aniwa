@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { MediaPartTable } from '@/components/modules/editor/anime/media-part/media-part-table';
 import { MediaPartFormDialog } from '@/components/modules/editor/anime/media-part/media-part-form-dialog';
 import { AnimeMediaPart } from '@prisma/client';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 
 interface MediaPartsPageProps {
   params: Promise<{

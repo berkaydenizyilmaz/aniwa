@@ -10,7 +10,7 @@ import {
   createUserSettingsDB
 } from '@/lib/services/db/userProfileSettings.db';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { Theme, TitleLanguage, ScoreFormat } from '@prisma/client';
 import { 
@@ -43,7 +43,7 @@ export async function updateThemePreferenceBusiness(
     }
 
     await logger.info(
-      EVENTS.USER.THEME_UPDATED,
+      EVENTS_DOMAIN.USER.THEME_UPDATED,
       'Kullanıcı tema tercihi güncellendi',
       { userId, theme: themePreference },
       userId
@@ -59,7 +59,7 @@ export async function updateThemePreferenceBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Tema tercihi güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -89,7 +89,7 @@ export async function updateTitleLanguagePreferenceBusiness(
     }
 
     await logger.info(
-      EVENTS.USER.TITLE_LANGUAGE_UPDATED,
+      EVENTS_DOMAIN.USER.TITLE_LANGUAGE_UPDATED,
       'Kullanıcı başlık dili tercihi güncellendi',
       { userId, language: titleLanguagePreference },
       userId
@@ -105,7 +105,7 @@ export async function updateTitleLanguagePreferenceBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Başlık dili tercihi güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -135,7 +135,7 @@ export async function updateScoreFormatBusiness(
     }
 
     await logger.info(
-      EVENTS.USER.SCORE_FORMAT_UPDATED,
+      EVENTS_DOMAIN.USER.SCORE_FORMAT_UPDATED,
       'Kullanıcı puanlama formatı güncellendi',
       { userId, format: scoreFormat },
       userId
@@ -151,7 +151,7 @@ export async function updateScoreFormatBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Puanlama formatı güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -181,7 +181,7 @@ export async function updateDisplayAdultContentBusiness(
     }
 
     await logger.info(
-      EVENTS.USER.ADULT_CONTENT_UPDATED,
+      EVENTS_DOMAIN.USER.ADULT_CONTENT_UPDATED,
       'Kullanıcı yetişkin içerik ayarı güncellendi',
       { userId, displayAdultContent },
       userId
@@ -197,7 +197,7 @@ export async function updateDisplayAdultContentBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Yetişkin içerik ayarı güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -227,7 +227,7 @@ export async function updateAutoTrackOnAniwaListAddBusiness(
     }
 
     await logger.info(
-      EVENTS.USER.AUTO_TRACK_UPDATED,
+      EVENTS_DOMAIN.USER.AUTO_TRACK_UPDATED,
       'Kullanıcı otomatik takip ayarı güncellendi',
       { userId, autoTrack: autoTrackOnAniwaListAdd },
       userId
@@ -243,7 +243,7 @@ export async function updateAutoTrackOnAniwaListAddBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Otomatik takip ayarı güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );
@@ -272,7 +272,7 @@ export async function getUserSettingsBusiness(
     }
     
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Kullanıcı ayarları getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', userId }
     );

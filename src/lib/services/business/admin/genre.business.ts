@@ -18,7 +18,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
-import { EVENTS } from '@/lib/constants/events.constants';
+import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
 import { 
   CreateGenreResponse, 
@@ -57,7 +57,7 @@ export async function createGenreBusiness(
 
     // Başarılı oluşturma logu
     await logger.info(
-      EVENTS.ADMIN.GENRE_CREATED,
+      EVENTS_DOMAIN.ADMIN.GENRE_CREATED,
       'Genre başarıyla oluşturuldu',
       { 
         genreId: result.id, 
@@ -79,7 +79,7 @@ export async function createGenreBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Genre oluşturma sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', name: data.name },
       userId
@@ -114,7 +114,7 @@ export async function getGenreBusiness(
 
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Genre getirme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id },
       userId
@@ -155,7 +155,7 @@ export async function getGenresBusiness(
     return {
       success: true,
       data: {
-        genres: paginatedGenres,
+        data: paginatedGenres,
         total,
         page,
         limit,
@@ -170,7 +170,7 @@ export async function getGenresBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Genre listeleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', filters },
       userId
@@ -221,7 +221,7 @@ export async function updateGenreBusiness(
 
     // Başarılı güncelleme logu
     await logger.info(
-      EVENTS.ADMIN.GENRE_UPDATED,
+      EVENTS_DOMAIN.ADMIN.GENRE_UPDATED,
       'Genre başarıyla güncellendi',
       { 
         genreId: result.id, 
@@ -245,7 +245,7 @@ export async function updateGenreBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Genre güncelleme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id, data },
       userId
@@ -272,7 +272,7 @@ export async function deleteGenreBusiness(
 
     // Başarılı silme logu
     await logger.info(
-      EVENTS.ADMIN.GENRE_DELETED,
+      EVENTS_DOMAIN.ADMIN.GENRE_DELETED,
       'Genre başarıyla silindi',
       { 
         genreId: existingGenre.id, 
@@ -291,7 +291,7 @@ export async function deleteGenreBusiness(
     
     // Beklenmedik hata logu
     await logger.error(
-      EVENTS.SYSTEM.BUSINESS_ERROR,
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
       'Genre silme sırasında beklenmedik hata',
       { error: error instanceof Error ? error.message : 'Bilinmeyen hata', genreId: id },
       userId

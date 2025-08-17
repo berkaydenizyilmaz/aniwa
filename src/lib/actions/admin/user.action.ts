@@ -11,7 +11,7 @@ import {
 } from '@/lib/services/business/admin/user.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/services/auth/auth.config';
 
@@ -75,7 +75,7 @@ export async function updateUserAction(id: string, data: UpdateUserInput): Promi
     const result = await updateUserBusiness(id, validatedData, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.USERS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.USERS);
 
     return {
       success: true,
@@ -100,7 +100,7 @@ export async function banUserAction(id: string): Promise<ServerActionResponse> {
     const result = await banUserBusiness(id, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.USERS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.USERS);
 
     return {
       success: true,
@@ -125,7 +125,7 @@ export async function unbanUserAction(id: string): Promise<ServerActionResponse>
     const result = await unbanUserBusiness(id, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.USERS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.USERS);
 
     return {
       success: true,
@@ -150,7 +150,7 @@ export async function deleteUserAction(id: string): Promise<ServerActionResponse
     await deleteUserBusiness(id, session!.user.id);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.ADMIN.USERS);
+    revalidatePath(ROUTES_DOMAIN.PAGES.ADMIN.USERS);
 
     return {
       success: true,

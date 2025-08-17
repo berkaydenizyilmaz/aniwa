@@ -10,7 +10,7 @@ import {
 } from '@/lib/services/business/auth.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 
 export async function registerUser(data: RegisterInput): Promise<ServerActionResponse> {
   try {
@@ -21,7 +21,7 @@ export async function registerUser(data: RegisterInput): Promise<ServerActionRes
     const result = await registerUserBusiness(validatedData);
 
     // Cache'i temizle
-    revalidatePath(ROUTES.PAGES.HOME);
+    revalidatePath(ROUTES_DOMAIN.PAGES.HOME);
 
     return {
       success: true,

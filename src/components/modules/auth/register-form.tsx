@@ -16,7 +16,7 @@ import {
 import { registerSchema, type RegisterInput } from '@/lib/schemas/auth.schema';
 import { registerUser } from '@/lib/actions/auth.action';
 import { toast } from 'sonner';
-import { ROUTES } from '@/lib/constants/routes.constants';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 import { useMutation } from '@tanstack/react-query';
 
 export function RegisterForm() {
@@ -45,7 +45,7 @@ export function RegisterForm() {
     },
     onSuccess: () => {
       toast.success('Hesabınız oluşturuldu! Giriş yapabilirsiniz.');
-      router.push(ROUTES.PAGES.AUTH.LOGIN);
+              router.push(ROUTES_DOMAIN.PAGES.AUTH.LOGIN);
     },
     onError: (error) => {
       console.error('Register error:', error);

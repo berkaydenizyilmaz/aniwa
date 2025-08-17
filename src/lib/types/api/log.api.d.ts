@@ -2,9 +2,10 @@
 
 import { Log } from '@prisma/client';
 import { CreateLogInput, LogFilters } from '@/lib/schemas/log.schema';
+import { PaginatedResponse, CrudResponses } from '../shared';
 
-// Prisma Log tipini direkt kullan (küçük model)
-export type GetLogResponse = Log & {
+// Log with user info type
+export type LogWithUser = Log & {
   user?: {
     id: string;
     username: string;
@@ -12,20 +13,12 @@ export type GetLogResponse = Log & {
   } | null;
 };
 
-// Sadece özel response için interface
-export interface GetLogsResponse {
-  logs: (Log & {
-    user?: {
-      id: string;
-      username: string;
-      email: string;
-    } | null;
-  })[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+// CRUD response types
+export type LogCrudResponses = CrudResponses<LogWithUser>;
+export type GetLogResponse = LogCrudResponses['Get'];
+
+// Paginated response type
+export type GetLogsResponse = PaginatedResponse<LogWithUser>;
 
 // Log API istek tipleri
 export type CreateLogRequest = CreateLogInput;

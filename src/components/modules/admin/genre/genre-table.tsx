@@ -164,7 +164,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {genresData?.genres.map((genre) => (
+            {genresData?.data.map((genre) => (
               <TableRow key={genre.id}>
                 <TableCell>{genre.name}</TableCell>
                 <TableCell className="text-muted-foreground">{genre.slug}</TableCell>
@@ -193,7 +193,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
           </TableBody>
         </Table>
 
-        {(!genresData?.genres || genresData.genres.length === 0) && (
+        {(!genresData?.data || genresData.data.length === 0) && (
           <div className="p-8 text-center text-muted-foreground">
             {searchTerm ? 'Arama kriterlerine uygun tür bulunamadı.' : 'Henüz tür bulunmuyor.'}
           </div>
