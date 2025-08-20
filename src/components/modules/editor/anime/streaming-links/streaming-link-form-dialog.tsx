@@ -26,7 +26,7 @@ import { StreamingLink } from '@prisma/client';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { GetStreamingPlatformsResponse } from '@/lib/types/api/anime.api';
+import { GetStreamingLinkResponse, GetStreamingPlatformsResponse } from '@/lib/types/api/anime.api';
 import { queryKeys } from '@/lib/constants/query-keys';
 
 interface StreamingLinkFormDialogProps {
@@ -50,7 +50,7 @@ export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streami
   // Platform'ları getir
   const { data: platformsData, isLoading: isLoadingPlatforms } = useQuery({
     queryKey: queryKeys.masterData.streamingPlatform.all,
-    queryFn: () => getStreamingPlatformsAction({}),
+    queryFn: () => getStreamingPlatformsAction(),
   });
 
   const form = useForm<CreateStreamingLinkInput | UpdateStreamingLinkInput>({
@@ -66,12 +66,12 @@ export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streami
   useEffect(() => {
     if (!open) return;
 
-    if (streamingLinkData && streamingLink) {
+    if (streamingLinkData?.success && streamingLinkData.data && streamingLink) {
       // Edit mode - mevcut verileri doldur
       form.reset({
         episodeId: episodeId,
-        platformId: streamingLinkData.platformId,
-        url: streamingLinkData.url,
+        platformId: (streamingLinkData.data as GetStreamingLinkResponse).platformId,
+        url: (streamingLinkData.data as GetStreamingLinkResponse).url,
       });
     } else {
       // Create mode - temiz form
@@ -163,7 +163,7 @@ export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streami
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {platformsData?.platforms?.map((platform) => (
+                        {platformsData?.success && (platformsData.data as any[])?.map((platform) => (
                           <SelectItem key={platform.id} value={platform.id}>
                             {platform.name}
                           </SelectItem>
