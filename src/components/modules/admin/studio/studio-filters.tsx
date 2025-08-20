@@ -10,13 +10,13 @@ import { useDebounce } from '@/lib/hooks/use-debounce';
 
 interface StudioFiltersProps {
   onSearch?: (search: string) => void;
-  onStudioTypeChange?: (isAnimationStudio: boolean | null) => void;
+  onStudioTypeChange?: (studioType: string | null) => void;
   onAddNew?: () => void;
 }
 
 export function StudioFilters({ onSearch, onStudioTypeChange, onAddNew }: StudioFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStudioType, setSelectedStudioType] = useState<boolean | null>(null);
+  const [selectedStudioType, setSelectedStudioType] = useState<string | null>(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   // Debounced search term değiştiğinde onSearch'ü çağır
@@ -28,9 +28,9 @@ export function StudioFilters({ onSearch, onStudioTypeChange, onAddNew }: Studio
     setSearchTerm(value);
   };
 
-  const handleStudioTypeChange = (isAnimationStudio: boolean | null) => {
-    setSelectedStudioType(isAnimationStudio);
-    onStudioTypeChange?.(isAnimationStudio);
+  const handleStudioTypeChange = (studioType: string | null) => {
+    setSelectedStudioType(studioType);
+    onStudioTypeChange?.(studioType);
   };
 
   return (
@@ -52,9 +52,8 @@ export function StudioFilters({ onSearch, onStudioTypeChange, onAddNew }: Studio
           <div className="flex items-center space-x-2">
             <Checkbox
               id="animation-studio-filter"
-              checked={selectedStudioType === true}
-              onCheckedChange={(checked) => handleStudioTypeChange(checked ? true : null)}
-
+              checked={selectedStudioType === 'animation'}
+              onCheckedChange={(checked) => handleStudioTypeChange(checked ? 'animation' : null)}
             />
             <Label htmlFor="animation-studio-filter" className="flex items-center gap-1 text-sm">
               Animasyon Stüdyosu

@@ -12,7 +12,7 @@ export default function StudiosPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [selectedStudio, setSelectedStudio] = useState<Studio | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStudioType, setSelectedStudioType] = useState<boolean | null>(null);
+  const [selectedStudioType, setSelectedStudioType] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const handleAddNew = () => {
@@ -34,8 +34,8 @@ export default function StudiosPage() {
     setSearchTerm(search);
   };
 
-  const handleStudioTypeChange = (isAnimationStudio: boolean | null) => {
-    setSelectedStudioType(isAnimationStudio);
+  const handleStudioTypeChange = (studioType: string | null) => {
+    setSelectedStudioType(studioType);
   };
 
   return (
