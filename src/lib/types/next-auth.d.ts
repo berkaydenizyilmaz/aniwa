@@ -6,7 +6,7 @@ import { DefaultSession } from 'next-auth';
 declare module 'next-auth' {
   interface User {
     username: string;
-    role: number; // Bitwise role system
+    roles: string[];
     profilePicture?: string;
   }
 
@@ -15,7 +15,7 @@ declare module 'next-auth' {
       id: string;
       username: string;
       email: string;
-      role: number; // Bitwise role system
+      roles: string[];
       profilePicture?: string;
     } & DefaultSession['user'];
   }
@@ -24,7 +24,7 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     username: string;
-    role: number; // Bitwise role system
+    roles: string[];
     profilePicture?: string;
   }
 } 

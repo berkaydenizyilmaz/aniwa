@@ -17,17 +17,10 @@ export const authConfig: NextAuthOptions = {
           return null;
         }
 
-        // Sadece authentication için gerekli alanları çek
+        // Kullanıcıyı bul
         const user = await prisma.user.findUnique({
           where: { username: credentials.username },
-          select: {
-            id: true,
-            username: true,
-            email: true,
-            passwordHash: true,
-            roles: true, // Bitwise role system - Int field
-            profilePicture: true
-          }
+          include: { userSettings: true }
         });
 
         if (!user || !user.passwordHash) {
@@ -54,7 +47,7 @@ export const authConfig: NextAuthOptions = {
           id: user.id,
           username: user.username,
           email: user.email,
-          role: user.roles, // Bitwise role system
+          roles: user.roles,
           profilePicture: user.profilePicture,
         };
       }
@@ -66,16 +59,16 @@ export const authConfig: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {
-      if (user && 'username' in user && 'role' in user) {
-        const u = user as { username: string; role: number; profilePicture?: string };
+      if (user && 'username' in user && 'roles' in user) {
+        const u = user as { username: string; roles: string[]; profilePicture?: string };
         token.username = u.username;
-        token.role = u.role; // Bitwise role system
+        token.roles = u.roles;
         token.profilePicture = u.profilePicture;
       }
       // Client-side update() çağrıları
       if (trigger === 'update' && session?.user) {
         if (session.user.username) token.username = session.user.username;
-        if (session.user.role) token.role = session.user.role; // Bitwise role system
+        if (session.user.roles) token.roles = session.user.roles;
         if (session.user.profilePicture) token.profilePicture = session.user.profilePicture;
       }
       return token;
@@ -84,7 +77,7 @@ export const authConfig: NextAuthOptions = {
       if (token) {
         session.user.id = token.sub!;
         session.user.username = token.username as string;
-        session.user.role = token.role as number; // Bitwise role system
+        session.user.roles = token.roles as string[];
         session.user.profilePicture = token.profilePicture as string | undefined;
       }
       return session;

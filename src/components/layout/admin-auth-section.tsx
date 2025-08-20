@@ -5,9 +5,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { ROUTES_DOMAIN, NAVIGATION_DOMAIN, UserRole } from '@/lib/constants';
-import { hasRole } from '@/lib/utils/role.utils';
+import { ROUTES_DOMAIN, NAVIGATION_DOMAIN, USER_DOMAIN } from '@/lib/constants';
 import { useMutation } from '@tanstack/react-query';
+import { UserRole } from '@prisma/client';
 
 interface AdminAuthSectionProps {
   isSidebarOpen: boolean;
@@ -64,8 +64,8 @@ export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
         <DropdownMenuSeparator />
                   {NAVIGATION_DOMAIN.MENU.ADMIN_MENU_ITEMS
           .filter((item) =>
-            hasRole(session.user.role, item.role) ||
-            hasRole(session.user.role, UserRole.ADMIN)
+            session.user.roles.includes(item.role) ||
+            session.user.roles.includes(UserRole.ADMIN)
           )
           .map((item) => {
             const Icon = item.icon;

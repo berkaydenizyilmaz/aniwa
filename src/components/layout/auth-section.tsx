@@ -13,9 +13,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { LogOut, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
-import { ROUTES_DOMAIN, NAVIGATION_DOMAIN, UserRole } from '@/lib/constants'
-import { hasRole } from '@/lib/utils/role.utils'
+import { ROUTES_DOMAIN, NAVIGATION_DOMAIN, USER_DOMAIN } from '@/lib/constants'
 import { useMutation } from '@tanstack/react-query'
+import { UserRole } from '@prisma/client'
 
 export function AuthSection() {
   const { data: session, status } = useSession()
@@ -84,8 +84,8 @@ export function AuthSection() {
           <DropdownMenuSeparator />
           {NAVIGATION_DOMAIN.MENU.ADMIN_MENU_ITEMS
             .filter((item) => 
-              hasRole(session.user.role, item.role) || 
-              hasRole(session.user.role, UserRole.ADMIN)
+              session.user.roles.includes(item.role) || 
+              session.user.roles.includes(UserRole.ADMIN)
             )
             .map((item) => {
               const Icon = item.icon

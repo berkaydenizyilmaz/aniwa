@@ -11,6 +11,14 @@ datasource db {
 // ENUM TANIMLARI
 // =============================================================================
 
+// Kullanıcı Rolleri
+enum UserRole {
+  USER
+  MODERATOR
+  EDITOR
+  ADMIN
+}
+
 // Log Seviyeleri
 enum LogLevel {
   ERROR
@@ -167,7 +175,7 @@ model User {
   profilePicture       String?
   profileBanner        String?
   bio                  String?                @db.String
-  roles                Int                    @default(1) // Bitwise role system - USER role default
+  roles                UserRole[]             @default([USER])
   slug                 String                 @unique
   lastLoginAt          DateTime?              // Son giriş zamanı
   usernameChangedAt    DateTime?              // Son username değiştirme zamanı
