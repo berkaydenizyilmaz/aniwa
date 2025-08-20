@@ -29,6 +29,11 @@ export const AUTH_DOMAIN = {
     SESSION: {
       MAX_AGE: 30 * 24 * 60 * 60, // 30 gün
       REFETCH_INTERVAL: 5 * 60, // 5 dakika
+      UPDATE_AGE: 24 * 60 * 60, // 24 saat
+    },
+    COOKIE: {
+      NAME: 'aniwa-session',
+      MAX_AGE: 30 * 24 * 60 * 60, // 30 gün
     },
   },
 

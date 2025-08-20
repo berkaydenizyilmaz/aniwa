@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '@/lib/prisma';
+import { findUserForAuthDB } from '@/lib/services/db/user.db';
 import bcrypt from 'bcryptjs';
 import { ROUTES_DOMAIN, AUTH_DOMAIN } from '@/lib/constants';
 import { UserRole } from '@prisma/client';
@@ -18,11 +19,8 @@ export const authConfig: NextAuthOptions = {
           return null;
         }
 
-        // Kullanıcıyı bul
-        const user = await prisma.user.findUnique({
-          where: { username: credentials.username },
-          include: { userSettings: true }
-        });
+        // Optimize edilmiş kullanıcı bulma
+        const user = await findUserForAuthDB(credentials.username);
 
         if (!user || !user.passwordHash) {
           return null;
@@ -41,7 +39,8 @@ export const authConfig: NextAuthOptions = {
         // Son giriş zamanını güncelle
         await prisma.user.update({
           where: { id: user.id },
-          data: { lastLoginAt: new Date() }
+          data: { lastLoginAt: new Date() },
+          select: { id: true }
         });
 
         return {
@@ -57,6 +56,18 @@ export const authConfig: NextAuthOptions = {
   session: {
     strategy: 'jwt',
     maxAge: AUTH_DOMAIN.BUSINESS.SESSION.MAX_AGE,
+    updateAge: AUTH_DOMAIN.BUSINESS.SESSION.UPDATE_AGE,
+  },
+  cookies: {
+    sessionToken: {
+      name: AUTH_DOMAIN.BUSINESS.COOKIE.NAME,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: AUTH_DOMAIN.BUSINESS.COOKIE.MAX_AGE
+      }
+    }
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {

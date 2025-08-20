@@ -77,6 +77,28 @@ export async function findUserByUsernameDB(
     }
 }
 
+// Auth için optimize edilmiş kullanıcı bulma (sadece gerekli alanlar)
+export async function findUserForAuthDB(
+    username: string,
+    client: PrismaClientOrTransaction = prisma
+): Promise<Pick<User, 'id' | 'username' | 'email' | 'passwordHash' | 'roles' | 'profilePicture'> | null> {
+    try {
+        return await client.user.findUnique({
+            where: { username },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                passwordHash: true,
+                roles: true,
+                profilePicture: true,
+            },
+        });
+    } catch (error) {
+        handleDatabaseError(error, 'Auth için kullanıcı bulma', { username });
+    }
+}
+
 // Slug ile kullanıcı bulur
 export async function findUserBySlugDB(
     slug: string,
