@@ -58,17 +58,6 @@ export const authConfig: NextAuthOptions = {
     maxAge: AUTH_DOMAIN.BUSINESS.SESSION.MAX_AGE,
     updateAge: AUTH_DOMAIN.BUSINESS.SESSION.UPDATE_AGE,
   },
-  cookies: {
-    sessionToken: {
-      name: AUTH_DOMAIN.BUSINESS.COOKIE.NAME,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: AUTH_DOMAIN.BUSINESS.COOKIE.MAX_AGE
-      }
-    }
-  },
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user && 'username' in user && 'roles' in user) {
