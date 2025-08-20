@@ -2,6 +2,14 @@
 
 import { SHARED_VALIDATION } from '../shared/validation';
 
+// Bitwise Role System - Power of 2 değerler
+export enum UserRole {
+  USER = 1,        // 0001
+  MODERATOR = 2,   // 0010
+  EDITOR = 4,      // 0100
+  ADMIN = 8        // 1000
+}
+
 export const AUTH_DOMAIN = {
   // Validation Rules
   VALIDATION: {

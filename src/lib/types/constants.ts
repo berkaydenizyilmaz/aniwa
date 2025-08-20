@@ -1,7 +1,6 @@
 // Constants types - Sabitlerden türetilen tip tanımları
 
 import { ANIME_DOMAIN } from '@/lib/constants/domains/anime';
-import { AUTH_DOMAIN } from '@/lib/constants/domains/auth';
 import { MASTER_DATA_DOMAIN } from '@/lib/constants/domains/masterData';
 import { USER_DOMAIN } from '@/lib/constants/domains/user';
 import { DomainType, DomainStatus, DomainCategory } from './shared';
@@ -18,6 +17,5 @@ export type TagCategory = DomainType<typeof MASTER_DATA_DOMAIN.UI.TAG_CATEGORY_L
 export type StudioType = DomainType<typeof MASTER_DATA_DOMAIN.UI.STUDIO_TYPE_LABELS>;
 
 // User types
-export type UserRole = DomainType<typeof USER_DOMAIN.UI.ROLE_LABELS>;
 export type ProfileVisibility = DomainType<typeof USER_DOMAIN.UI.PROFILE_VISIBILITY_LABELS>;
 export type ScoreFormat = DomainType<typeof USER_DOMAIN.UI.SCORE_FORMAT_LABELS>;

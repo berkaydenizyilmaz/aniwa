@@ -15,7 +15,8 @@ import {
   countUsersDB,
   findAllUsersDB
 } from '@/lib/services/db/user.db';
-import { Prisma, UserRole } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { UserRole } from '@/lib/constants/domains/auth';
 import { createSlug } from '@/lib/utils/slug.utils';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS_DOMAIN } from '@/lib/constants';
@@ -49,7 +50,9 @@ export async function getUsersBusiness(
     }
 
     if (filters?.role) {
-      where.roles = { has: filters.role as UserRole };
+      where.roles = {
+        gte: filters.role // Role değerinden büyük veya eşit olanları getir
+      };
     }
 
     if (filters?.isBanned !== undefined) {

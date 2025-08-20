@@ -1,7 +1,7 @@
 // Navigation domain constants - Menü ve navigasyon sabitleri
 
 import { Crown, Edit, Shield, LayoutDashboard, Home, Play, List, User, Bell, Settings, Building2, FileText, Tv, Hash, BookOpen } from 'lucide-react';
-import { UserRole } from '@prisma/client';
+import { UserRole } from './auth';
 
 export const NAVIGATION_DOMAIN = {
   // Menu items
