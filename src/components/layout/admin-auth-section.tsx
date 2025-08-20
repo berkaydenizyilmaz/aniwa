@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { ROUTES_DOMAIN, NAVIGATION_DOMAIN, USER_DOMAIN } from '@/lib/constants';
 import { useMutation } from '@tanstack/react-query';
 import { UserRole } from '@prisma/client';
+import { hasRole, isAdmin } from '@/lib/utils/role.utils';
 
 interface AdminAuthSectionProps {
   isSidebarOpen: boolean;
@@ -63,21 +64,21 @@ export function AdminAuthSection({ isSidebarOpen }: AdminAuthSectionProps) {
         })}
         <DropdownMenuSeparator />
                   {NAVIGATION_DOMAIN.MENU.ADMIN_MENU_ITEMS
-          .filter((item) =>
-            session.user.roles.includes(item.role) ||
-            session.user.roles.includes(UserRole.ADMIN)
-          )
-          .map((item) => {
-            const Icon = item.icon;
-            return (
-              <DropdownMenuItem key={item.label} asChild>
-                <Link href={item.href} className="group">
-                  <Icon className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
-                  <span>{item.label}</span>
-                </Link>
-              </DropdownMenuItem>
-            );
-          })}
+            .filter((item) => 
+              hasRole(session.user.roles, item.role) || 
+              isAdmin(session.user.roles)
+            )
+            .map((item) => {
+              const Icon = item.icon
+              return (
+                <DropdownMenuItem key={item.label} asChild>
+                  <Link href={item.href} className="group">
+                    <Icon className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
+                    <span>{item.label}</span>
+                  </Link>
+                </DropdownMenuItem>
+              )
+            })}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive group"

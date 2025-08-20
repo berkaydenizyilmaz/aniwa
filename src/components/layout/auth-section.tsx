@@ -16,6 +16,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { ROUTES_DOMAIN, NAVIGATION_DOMAIN, USER_DOMAIN } from '@/lib/constants'
 import { useMutation } from '@tanstack/react-query'
 import { UserRole } from '@prisma/client'
+import { hasRole, isAdmin } from '@/lib/utils/role.utils'
 
 export function AuthSection() {
   const { data: session, status } = useSession()
@@ -84,8 +85,8 @@ export function AuthSection() {
           <DropdownMenuSeparator />
           {NAVIGATION_DOMAIN.MENU.ADMIN_MENU_ITEMS
             .filter((item) => 
-              session.user.roles.includes(item.role) || 
-              session.user.roles.includes(UserRole.ADMIN)
+              hasRole(session.user.roles, item.role) || 
+              isAdmin(session.user.roles)
             )
             .map((item) => {
               const Icon = item.icon

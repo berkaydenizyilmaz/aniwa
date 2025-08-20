@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { ROUTES_DOMAIN, AUTH_DOMAIN } from '@/lib/constants';
+import { UserRole } from '@prisma/client';
 
 export const authConfig: NextAuthOptions = {
   providers: [
@@ -60,7 +61,7 @@ export const authConfig: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user && 'username' in user && 'roles' in user) {
-        const u = user as { username: string; roles: string[]; profilePicture?: string };
+        const u = user as { username: string; roles: UserRole[]; profilePicture?: string };
         token.username = u.username;
         token.roles = u.roles;
         token.profilePicture = u.profilePicture;
@@ -77,7 +78,7 @@ export const authConfig: NextAuthOptions = {
       if (token) {
         session.user.id = token.sub!;
         session.user.username = token.username as string;
-        session.user.roles = token.roles as string[];
+        session.user.roles = token.roles as UserRole[];
         session.user.profilePicture = token.profilePicture as string | undefined;
       }
       return session;

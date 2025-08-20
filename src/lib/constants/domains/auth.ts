@@ -31,4 +31,14 @@ export const AUTH_DOMAIN = {
       REFETCH_INTERVAL: 5 * 60, // 5 dakika
     },
   },
+
+  // Role Hierarchy
+  ROLES: {
+    HIERARCHY: {
+      USER: 1,
+      MODERATOR: 2,
+      EDITOR: 3,
+      ADMIN: 4,
+    } as const,
+  },
 } as const;
