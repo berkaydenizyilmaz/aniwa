@@ -52,22 +52,17 @@ export function MediaPartTable({ seriesId, onEdit, onEpisodes, refreshKey }: Med
   const { data, isLoading: isFetching, error } = useQuery({
     queryKey,
     queryFn: async () => {
-      const filters: MediaPartFilters = {
-        page: currentPage,
-        limit: limit,
-      };
-      
-      const result = await getMediaPartsAction(seriesId, filters);
+      const result = await getAnimeMediaPartListAction(seriesId);
       if (!result.success) {
         throw new Error(result.error || 'Media part\'lar yüklenirken bir hata oluştu');
       }
-      return result.data as GetMediaPartsResponse;
+      return result.data as GetAnimeMediaPartsResponse;
     },
   });
 
   // Silme mutation'ı
   const deleteMutation = useMutation({
-    mutationFn: deleteMediaPartAction,
+    mutationFn: deleteAnimeMediaPartAction,  
     onSuccess: () => {
       toast.success('Media part başarıyla silindi!');
       setDeleteDialogOpen(false);
