@@ -53,16 +53,11 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
   const { data, isLoading: isFetching, error } = useQuery({
     queryKey,
     queryFn: async () => {
-      const filters: EpisodeFilters = {
-        page: currentPage,
-        limit: limit,
-      };
-      
-      const result = await getEpisodesAction(mediaPartId, filters);
+      const result = await getEpisodeListAction(mediaPartId, currentPage, limit);
       if (!result.success) {
         throw new Error(result.error || 'Episode\'lar yüklenirken bir hata oluştu');
       }
-      return result.data as GetEpisodesResponse;
+      return result.data as GetEpisodeListResponse;
     },
   });
 
