@@ -33,7 +33,7 @@ import { queryKeys } from '@/lib/constants/query-keys';
 interface StudioTableProps {
   onEdit?: (studio: Studio) => void;
   searchTerm?: string;
-  selectedStudioType?: boolean | null;
+  selectedStudioType?: string | null;
 }
 
 export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null }: StudioTableProps) {
