@@ -34,6 +34,7 @@ import { toast } from 'sonner';
 import { Tag, TagCategory } from '@prisma/client';
 import { MASTER_DATA_DOMAIN } from '@/lib/constants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 
 interface TagFormDialogProps {
@@ -83,25 +84,27 @@ export function TagFormDialog({ open, onOpenChange, tag, onSuccess }: TagFormDia
     }
   }, [open, tag, form]);
 
-  // Create/Update mutation
+  // Mutation
   const mutation = useMutation({
-    mutationFn: async (data: CreateTagInput | UpdateTagInput) => {
-      if (isEdit && tag) {
+    mutationFn: (data: CreateTagInput | UpdateTagInput) => {
+      if (tag) {
         return updateTagAction(tag.id, data as UpdateTagInput);
-      } else {
-        return createTagAction(data as CreateTagInput);
       }
+      return createTagAction(data as CreateTagInput);
     },
     onSuccess: () => {
-      toast.success(`Etiket başarıyla ${isEdit ? 'güncellendi' : 'oluşturuldu'}!`);
+      toast.success(
+        tag 
+          ? 'Etiket başarıyla güncellendi!' 
+          : 'Etiket başarıyla oluşturuldu!'
+      );
       onOpenChange(false);
-      onSuccess?.();
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.masterData.tag.all });
     },
     onError: (error) => {
-      console.error('Tag form error:', error);
-      toast.error(error.message || `${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
+      console.error('Tag mutation error:', error);
+      toast.error(error.message || 'İşlem başarısız oldu');
     },
   });
 

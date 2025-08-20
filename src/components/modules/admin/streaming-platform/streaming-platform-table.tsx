@@ -28,6 +28,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { type StreamingPlatformFilters } from '@/lib/schemas/streamingPlatform.schema';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 interface StreamingPlatformTableProps {
   onEdit?: (streamingPlatform: StreamingPlatform) => void;
@@ -41,18 +42,23 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
   const [limit] = useState(50);
   const queryClient = useQueryClient();
 
-  // İzleme Platform'larını getir (React Query ile)
+  // Streaming platform'ları getir (React Query ile)
   const { data: platformsData, isLoading } = useQuery({
-    queryKey: ['streaming-platforms', searchTerm, currentPage, limit],
+    queryKey: queryKeys.masterData.streamingPlatform.list({ 
+      search: searchTerm, 
+      page: currentPage, 
+      limit 
+    }),
     queryFn: async () => {
       const filters: StreamingPlatformFilters = {
         page: currentPage,
         limit: limit,
       };
       if (searchTerm) filters.search = searchTerm;
+      
       const result = await getStreamingPlatformsAction(filters);
       if (!result.success) {
-        throw new Error(result.error || 'İzmele platformları yüklenirken bir hata oluştu');
+        throw new Error(result.error || 'Yayın platformları yüklenirken bir hata oluştu');
       }
       return result.data as GetStreamingPlatformsResponse;
     },
@@ -77,11 +83,11 @@ export function StreamingPlatformTable({ onEdit, searchTerm = '' }: StreamingPla
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteStreamingPlatformAction(id),
     onSuccess: () => {
-      toast.success('İzleme platformu başarıyla silindi!');
+      toast.success('Yayın platformu başarıyla silindi!');
       setDeleteDialogOpen(false);
       setSelectedStreamingPlatform(null);
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['streaming-platforms'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.masterData.streamingPlatform.all });
     },
     onError: (error) => {
       console.error('Delete streaming platform error:', error);

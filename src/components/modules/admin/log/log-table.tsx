@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 import { SHARED_SYSTEM } from '@/lib/constants/shared/system';
 
 interface LogTableProps {
@@ -62,9 +63,9 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
     filters.search = searchTerm;
   }
 
-  // Log'ları getir
+  // Log'ları getir (React Query ile)
   const { data, isLoading, error } = useQuery({
-    queryKey: ['logs', filters],
+    queryKey: queryKeys.admin.log.list(filters),
     queryFn: async () => {
       const result = await getLogsAction(filters);
       if (!result.success) {
@@ -72,7 +73,6 @@ export function LogTable({ searchTerm = '', selectedLevel = 'all', selectedStart
       }
       return result.data as GetLogsResponse;
     },
-    staleTime: 30000, // 30 saniye
   });
 
   // Hata durumu

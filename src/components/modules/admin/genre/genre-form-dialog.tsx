@@ -24,6 +24,7 @@ import { createGenreSchema, updateGenreSchema, type CreateGenreInput, type Updat
 import { toast } from 'sonner';
 import { Genre } from '@prisma/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 interface GenreFormDialogProps {
   open: boolean;
@@ -60,25 +61,28 @@ export function GenreFormDialog({ open, onOpenChange, genre, onSuccess }: GenreF
     }
   }, [open, genre, form]);
 
-  // Create/Update mutation
+  // Mutation
   const mutation = useMutation({
-    mutationFn: async (data: CreateGenreInput | UpdateGenreInput) => {
-      if (isEdit && genre) {
-        return updateGenreAction(genre.id, data);
-      } else {
-        return createGenreAction(data);
+    mutationFn: (data: CreateGenreInput | UpdateGenreInput) => {
+      if (genre) {
+        return updateGenreAction(genre.id, data as UpdateGenreInput);
       }
+      return createGenreAction(data as CreateGenreInput);
     },
     onSuccess: () => {
-      toast.success(`Tür başarıyla ${isEdit ? 'güncellendi' : 'oluşturuldu'}!`);
+      toast.success(
+        genre 
+          ? 'Tür başarıyla güncellendi!' 
+          : 'Tür başarıyla oluşturuldu!'
+      );
       onOpenChange(false);
       onSuccess?.();
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['genres'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.masterData.genre.all });
     },
     onError: (error) => {
-      console.error('Genre form error:', error);
-      toast.error(error.message || `${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
+      console.error('Genre mutation error:', error);
+      toast.error(error.message || 'İşlem başarısız oldu');
     },
   });
 

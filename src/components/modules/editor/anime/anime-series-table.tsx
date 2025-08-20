@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { type AnimeFilters } from '@/lib/schemas/anime.schema';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 // Tablo item tipi
 type AnimeSeriesTableItem = GetAnimeSeriesListResponse['data'][0];
@@ -54,7 +55,14 @@ export function AnimeSeriesTable({ onEdit, onMediaParts, searchTerm = '', select
 
   // Anime serilerini getir
   const { data, isLoading: isFetching, error } = useQuery({
-    queryKey,
+    queryKey: queryKeys.anime.series.list({ 
+      search: searchTerm, 
+      type: selectedType, 
+      status: selectedStatus, 
+      page: currentPage, 
+      limit,
+      refreshKey 
+    }),
     queryFn: async () => {
       const filters: AnimeFilters = {
         page: currentPage,
@@ -82,7 +90,7 @@ export function AnimeSeriesTable({ onEdit, onMediaParts, searchTerm = '', select
       setSelectedAnimeSeries(null);
       
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['anime-series'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.anime.series.all });
     },
     onError: (error) => {
       console.error('Delete anime series error:', error);

@@ -6,6 +6,7 @@ import { StudioTable } from "@/components/modules/admin/studio/studio-table";
 import { StudioFormDialog } from "@/components/modules/admin/studio/studio-form-dialog";
 import { Studio } from '@prisma/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function StudiosPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
@@ -26,7 +27,7 @@ export default function StudiosPage() {
 
   const handleSuccess = () => {
     // Query'yi invalidate et
-    queryClient.invalidateQueries({ queryKey: ['studios'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.masterData.studio.all });
   };
 
   const handleSearch = (search: string) => {

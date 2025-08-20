@@ -15,6 +15,7 @@ import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useQueryClient } from '@tanstack/react-query';
 import { LogLevel } from '@prisma/client';
 import { SHARED_SYSTEM } from '@/lib/constants';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 interface LogFiltersProps {
   onSearch?: (search: string) => void;
@@ -56,7 +57,7 @@ export function LogFilters({ onSearch, onLevelChange, onStartDateChange, onEndDa
   };
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ['logs'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.log.all });
   };
 
   return (

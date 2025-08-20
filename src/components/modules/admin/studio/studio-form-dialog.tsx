@@ -25,6 +25,7 @@ import { createStudioSchema, updateStudioSchema, type CreateStudioInput, type Up
 import { toast } from 'sonner';
 import { Studio } from '@prisma/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 
 interface StudioFormDialogProps {
@@ -65,25 +66,28 @@ export function StudioFormDialog({ open, onOpenChange, studio, onSuccess }: Stud
     }
   }, [open, studio, form]);
 
-  // Create/Update mutation
+  // Mutation
   const mutation = useMutation({
-    mutationFn: async (data: CreateStudioInput | UpdateStudioInput) => {
-      if (isEdit && studio) {
+    mutationFn: (data: CreateStudioInput | UpdateStudioInput) => {
+      if (studio) {
         return updateStudioAction(studio.id, data as UpdateStudioInput);
-      } else {
-        return createStudioAction(data as CreateStudioInput);
       }
+      return createStudioAction(data as CreateStudioInput);
     },
     onSuccess: () => {
-      toast.success(`Stüdyo başarıyla ${isEdit ? 'güncellendi' : 'oluşturuldu'}!`);
+      toast.success(
+        studio 
+          ? 'Stüdyo başarıyla güncellendi!' 
+          : 'Stüdyo başarıyla oluşturuldu!'
+      );
       onOpenChange(false);
       onSuccess?.();
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['studios'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.masterData.studio.all });
     },
     onError: (error) => {
-      console.error('Studio form error:', error);
-      toast.error(error.message || `${isEdit ? 'Güncelleme' : 'Oluşturma'} başarısız oldu`);
+      console.error('Studio mutation error:', error);
+      toast.error(error.message || 'İşlem başarısız oldu');
     },
   });
 

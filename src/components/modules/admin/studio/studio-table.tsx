@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { type StudioFilters } from '@/lib/schemas/studio.schema';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 interface StudioTableProps {
   onEdit?: (studio: Studio) => void;
@@ -44,14 +45,20 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
 
   // Studio'ları getir (React Query ile)
   const { data: studiosData, isLoading } = useQuery({
-    queryKey: ['studios', searchTerm, selectedStudioType, currentPage, limit],
+    queryKey: queryKeys.masterData.studio.list({ 
+      search: searchTerm, 
+      type: selectedStudioType, 
+      page: currentPage, 
+      limit 
+    }),
     queryFn: async () => {
       const filters: StudioFilters = {
         page: currentPage,
         limit: limit,
       };
       if (searchTerm) filters.search = searchTerm;
-      if (selectedStudioType !== null) filters.isAnimationStudio = selectedStudioType;
+      if (selectedStudioType && selectedStudioType !== 'all') filters.isAnimationStudio = selectedStudioType === 'animation';
+      
       const result = await getStudiosAction(filters);
       if (!result.success) {
         throw new Error(result.error || 'Stüdyolar yüklenirken bir hata oluştu');
@@ -82,7 +89,7 @@ export function StudioTable({ onEdit, searchTerm = '', selectedStudioType = null
       setDeleteDialogOpen(false);
       setSelectedStudio(null);
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['studios'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.masterData.studio.all });
     },
     onError: (error) => {
       console.error('Delete studio error:', error);

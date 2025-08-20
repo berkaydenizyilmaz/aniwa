@@ -26,6 +26,7 @@ import { createStreamingPlatformSchema, updateStreamingPlatformSchema, type Crea
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { StreamingPlatform } from '@prisma/client';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 interface StreamingPlatformFormDialogProps {
   open: boolean;
@@ -66,25 +67,28 @@ export function StreamingPlatformFormDialog({ open, onOpenChange, platform, onSu
     }
   }, [open, platform, form]);
 
-  // Create/Update mutation
+  // Mutation
   const mutation = useMutation({
-    mutationFn: async (data: CreateStreamingPlatformInput | UpdateStreamingPlatformInput) => {
-      if (isEditing && platform) {
+    mutationFn: (data: CreateStreamingPlatformInput | UpdateStreamingPlatformInput) => {
+      if (platform) {
         return updateStreamingPlatformAction(platform.id, data as UpdateStreamingPlatformInput);
-      } else {
-        return createStreamingPlatformAction(data as CreateStreamingPlatformInput);
       }
+      return createStreamingPlatformAction(data as CreateStreamingPlatformInput);
     },
     onSuccess: () => {
-      toast.success(isEditing ? 'Platform başarıyla güncellendi!' : 'Platform başarıyla oluşturuldu!');
+      toast.success(
+        platform
+          ? 'Yayın platformu başarıyla güncellendi!'
+          : 'Yayın platformu başarıyla oluşturuldu!'
+      );
       onSuccess?.();
       onOpenChange(false);
       form.reset();
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['streaming-platforms'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.masterData.streamingPlatform.all });
     },
     onError: (error) => {
-      console.error('Form submission error:', error);
+      console.error('Streaming platform mutation error:', error);
       toast.error(error.message || 'İşlem başarısız oldu');
     },
   });

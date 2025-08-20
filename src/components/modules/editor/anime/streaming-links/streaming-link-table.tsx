@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 // Tablo item tipi
 type StreamingLinkTableItem = GetStreamingLinksResponse['data'][0];
@@ -45,7 +46,7 @@ export function StreamingLinkTable({ episodeId, onEdit, onCreateNew, refreshKey 
   const queryClient = useQueryClient();
 
   // Query key oluştur
-  const queryKey = ['streaming-links', { episodeId, currentPage, limit, refreshKey }];
+  const queryKey = queryKeys.anime.streamingLink.byEpisodeId(episodeId);
 
   // Streaming link'leri getir
   const { data, isLoading: isFetching, error } = useQuery({
@@ -64,12 +65,12 @@ export function StreamingLinkTable({ episodeId, onEdit, onCreateNew, refreshKey 
   const deleteMutation = useMutation({
     mutationFn: deleteStreamingLinkAction,
     onSuccess: () => {
-      toast.success('İzleme linki başarıyla silindi!');
+      toast.success('Streaming link başarıyla silindi!');
       setDeleteDialogOpen(false);
       setSelectedStreamingLink(null);
       
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['streaming-links'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.anime.streamingLink.all });
     },
     onError: (error) => {
       console.error('Delete streaming link error:', error);

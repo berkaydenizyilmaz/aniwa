@@ -27,6 +27,7 @@ import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { GetStreamingPlatformsResponse } from '@/lib/types/api/anime.api';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 interface StreamingLinkFormDialogProps {
   open: boolean;
@@ -39,32 +40,17 @@ interface StreamingLinkFormDialogProps {
 export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streamingLink, onSuccess }: StreamingLinkFormDialogProps) {
   const queryClient = useQueryClient();
 
-  // Edit mode'da streaming link detaylarını getir
+  // Streaming link verilerini getir
   const { data: streamingLinkData, isLoading: isLoadingStreamingLink } = useQuery({
-    queryKey: ['streaming-link', streamingLink?.id],
-    queryFn: async () => {
-      if (!streamingLink?.id) return null;
-      const result = await getStreamingLinkAction(streamingLink.id);
-      if (!result.success) {
-        throw new Error(result.error || 'Streaming link detayları yüklenirken bir hata oluştu');
-      }
-      return result.data as StreamingLink;
-    },
+    queryKey: queryKeys.anime.streamingLink.byId(streamingLink?.id!),
+    queryFn: () => getStreamingLinkAction(streamingLink?.id!),
     enabled: !!streamingLink?.id,
-    staleTime: 5 * 60 * 1000, // 5 dakika
   });
 
   // Platform'ları getir
   const { data: platformsData, isLoading: isLoadingPlatforms } = useQuery({
-    queryKey: ['streaming-platforms'],
-    queryFn: async () => {
-      const result = await getStreamingPlatformsAction();
-      if (!result.success) {
-        throw new Error(result.error || 'Platform\'lar yüklenirken bir hata oluştu');
-      }
-      return result.data as GetStreamingPlatformsResponse;
-    },
-    staleTime: 5 * 60 * 1000, // 5 dakika
+    queryKey: queryKeys.masterData.streamingPlatform.all,
+    queryFn: () => getStreamingPlatformsAction({}),
   });
 
   const form = useForm<CreateStreamingLinkInput | UpdateStreamingLinkInput>({
@@ -101,10 +87,11 @@ export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streami
   const createMutation = useMutation({
     mutationFn: createStreamingLinkAction,
     onSuccess: () => {
-      toast.success('İzleme linki başarıyla oluşturuldu!');
+      toast.success('Streaming link başarıyla oluşturuldu!');
       onSuccess?.();
       onOpenChange(false);
-      queryClient.invalidateQueries({ queryKey: ['streaming-links'] });
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: queryKeys.anime.streamingLink.all });
     },
     onError: (error) => {
       console.error('Create streaming link error:', error);
@@ -117,10 +104,11 @@ export function StreamingLinkFormDialog({ open, onOpenChange, episodeId, streami
     mutationFn: ({ id, data }: { id: string; data: UpdateStreamingLinkInput }) =>
       updateStreamingLinkAction(id, data),
     onSuccess: () => {
-      toast.success('İzleme linki başarıyla güncellendi!');
+      toast.success('Streaming link başarıyla güncellendi!');
       onSuccess?.();
       onOpenChange(false);
-      queryClient.invalidateQueries({ queryKey: ['streaming-links'] });
+      // Query'yi invalidate et
+      queryClient.invalidateQueries({ queryKey: queryKeys.anime.streamingLink.all });
     },
     onError: (error) => {
       console.error('Update streaming link error:', error);

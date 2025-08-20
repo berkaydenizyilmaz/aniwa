@@ -6,6 +6,7 @@ import { UserTable } from "@/components/modules/admin/user/user-table";
 import { UserFormDialog } from "@/components/modules/admin/user/user-form-dialog";
 import { User } from '@prisma/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function UsersPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
@@ -27,7 +28,7 @@ export default function UsersPage() {
 
   const handleSuccess = () => {
     // Query'yi invalidate et
-    queryClient.invalidateQueries({ queryKey: ['users'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.user.all });
   };
 
   const handleSearch = (search: string) => {

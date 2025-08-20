@@ -6,6 +6,7 @@ import { GenreTable } from "@/components/modules/admin/genre/genre-table";
 import { GenreFormDialog } from "@/components/modules/admin/genre/genre-form-dialog";
 import { Genre } from '@prisma/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function GenresPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
@@ -25,7 +26,7 @@ export default function GenresPage() {
 
   const handleSuccess = () => {
     // Query'yi invalidate et
-    queryClient.invalidateQueries({ queryKey: ['genres'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.masterData.genre.all });
   };
 
   const handleSearch = (search: string) => {

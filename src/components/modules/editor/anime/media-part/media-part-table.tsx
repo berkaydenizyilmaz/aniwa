@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 // Tablo item tipi
 type MediaPartTableItem = GetAnimeMediaPartsResponse['data'][0];
@@ -45,31 +46,35 @@ export function MediaPartTable({ seriesId, onEdit, onEpisodes, refreshKey }: Med
   const queryClient = useQueryClient();
 
   // Query key oluştur
-  const queryKey = ['anime-media-parts', { seriesId, currentPage, limit, refreshKey }];
+  const queryKey = queryKeys.anime.mediaPart.bySeriesId(seriesId);
 
   // Media part'ları getir
   const { data, isLoading: isFetching, error } = useQuery({
     queryKey,
     queryFn: async () => {
-      const result = await getAnimeMediaPartListAction(seriesId);
+      const filters: MediaPartFilters = {
+        page: currentPage,
+        limit: limit,
+      };
+      
+      const result = await getMediaPartsAction(seriesId, filters);
       if (!result.success) {
-        throw new Error(result.error || 'Media part&apos;lar yüklenirken bir hata oluştu');
+        throw new Error(result.error || 'Media part\'lar yüklenirken bir hata oluştu');
       }
-      return result.data as GetAnimeMediaPartsResponse;
+      return result.data as GetMediaPartsResponse;
     },
-    staleTime: 5 * 60 * 1000, // 5 dakika
   });
 
   // Silme mutation'ı
   const deleteMutation = useMutation({
-    mutationFn: deleteAnimeMediaPartAction,
+    mutationFn: deleteMediaPartAction,
     onSuccess: () => {
       toast.success('Media part başarıyla silindi!');
       setDeleteDialogOpen(false);
       setSelectedMediaPart(null);
       
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['anime-media-parts'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.anime.mediaPart.all });
     },
     onError: (error) => {
       console.error('Delete media part error:', error);

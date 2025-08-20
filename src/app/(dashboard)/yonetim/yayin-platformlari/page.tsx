@@ -6,6 +6,7 @@ import { StreamingPlatformTable } from "@/components/modules/admin/streaming-pla
 import { StreamingPlatformFormDialog } from "@/components/modules/admin/streaming-platform/streaming-platform-form-dialog";
 import { StreamingPlatform } from '@prisma/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function StreamingPlatformsPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
@@ -25,7 +26,7 @@ export default function StreamingPlatformsPage() {
 
   const handleSuccess = () => {
     // Query'yi invalidate et
-    queryClient.invalidateQueries({ queryKey: ['streaming-platforms'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.masterData.streamingPlatform.all });
   };
 
   const handleSearch = (search: string) => {

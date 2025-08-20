@@ -6,6 +6,7 @@ import { TagTable } from "@/components/modules/admin/tag/tag-table";
 import { TagFormDialog } from "@/components/modules/admin/tag/tag-form-dialog";
 import { Tag } from '@prisma/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function TagsPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
@@ -28,7 +29,7 @@ export default function TagsPage() {
 
   const handleSuccess = () => {
     // Query'yi invalidate et
-    queryClient.invalidateQueries({ queryKey: ['tags'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.masterData.tag.all });
   };
 
   const handleSearch = (search: string) => {

@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { type UserFilters } from '@/lib/schemas/user.schema';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 interface UserTableProps {
   onEdit?: (user: User) => void;
@@ -44,7 +45,13 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
   const queryClient = useQueryClient();
 
   // Query key oluştur
-  const queryKey = ['users', { searchTerm, selectedRole, selectedBanned, currentPage, limit }];
+  const queryKey = queryKeys.admin.user.list({ 
+    search: searchTerm, 
+    role: selectedRole, 
+    banned: selectedBanned, 
+    page: currentPage, 
+    limit 
+  });
 
   // User'ları getir
   const { data, isLoading: isFetching, error } = useQuery({
@@ -69,18 +76,18 @@ export function UserTable({ onEdit, searchTerm = '', selectedRole = '', selected
 
   // Silme mutation'ı
   const deleteMutation = useMutation({
-    mutationFn: deleteUserAction,
+    mutationFn: (id: string) => deleteUserAction(id),
     onSuccess: () => {
       toast.success('Kullanıcı başarıyla silindi!');
       setDeleteDialogOpen(false);
       setSelectedUser(null);
       
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.user.all });
     },
     onError: (error) => {
       console.error('Delete user error:', error);
-      toast.error(error.message || 'Silme işlemi sırasında bir hata oluştu');
+      toast.error(error.message || 'Silme işlemi başarısız oldu');
     },
   });
 

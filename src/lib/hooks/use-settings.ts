@@ -6,13 +6,14 @@ import { useEffect } from 'react';
 import { getUserSettingsAction, getUserProfileAction } from '@/lib/actions/user/settings.actions';
 import { useSettingsStore } from '@/lib/stores/settings.store';
 import { GetUserSettingsResponse, GetUserProfileResponse } from '@/lib/types/api/settings.api';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export function useSettings() {
   const { data: session } = useSession();
   const { setSettings, setProfile, setLoading } = useSettingsStore();
 
   const settingsQuery = useQuery({
-    queryKey: ['user', session?.user?.id, 'settings'],
+    queryKey: queryKeys.user.settings(session?.user?.id!),
     queryFn: () => getUserSettingsAction(),
     enabled: !!session?.user?.id,
     staleTime: 5 * 60 * 1000, // 5 dakika
@@ -20,7 +21,7 @@ export function useSettings() {
   });
 
   const profileQuery = useQuery({
-    queryKey: ['user', session?.user?.id, 'profile'],
+    queryKey: queryKeys.user.profile(session?.user?.id!),
     queryFn: () => getUserProfileAction(),
     enabled: !!session?.user?.id,
     staleTime: 5 * 60 * 1000, // 5 dakika

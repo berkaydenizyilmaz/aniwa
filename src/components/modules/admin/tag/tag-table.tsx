@@ -29,6 +29,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { MASTER_DATA_DOMAIN } from '@/lib/constants';
 import { type TagFilters } from '@/lib/schemas/tag.schema';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 interface TagTableProps {
   onEdit?: (tag: Tag) => void;
@@ -47,16 +48,24 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
 
   // Tag'leri getir (React Query ile)
   const { data: tagsData, isLoading } = useQuery({
-    queryKey: ['tags', searchTerm, selectedCategory, selectedAdult, selectedSpoiler, currentPage, limit],
+    queryKey: queryKeys.masterData.tag.list({ 
+      search: searchTerm, 
+      category: selectedCategory, 
+      adult: selectedAdult, 
+      spoiler: selectedSpoiler, 
+      page: currentPage, 
+      limit 
+    }),
     queryFn: async () => {
       const filters: TagFilters = {
         page: currentPage,
         limit: limit,
       };
       if (searchTerm) filters.search = searchTerm;
-      if (selectedCategory && selectedCategory !== 'all') filters.category = selectedCategory as TagCategory;
+      if (selectedCategory) filters.category = selectedCategory as TagCategory;
       if (selectedAdult !== null) filters.isAdult = selectedAdult;
       if (selectedSpoiler !== null) filters.isSpoiler = selectedSpoiler;
+      
       const result = await getTagsAction(filters);
       if (!result.success) {
         throw new Error(result.error || 'Etiketler yüklenirken bir hata oluştu');
@@ -87,7 +96,7 @@ export function TagTable({ onEdit, searchTerm = '', selectedCategory = '', selec
       setDeleteDialogOpen(false);
       setSelectedTag(null);
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.masterData.tag.all });
     },
     onError: (error) => {
       console.error('Delete tag error:', error);

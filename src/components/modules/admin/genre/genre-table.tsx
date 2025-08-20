@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { type GenreFilters } from '@/lib/schemas/genre.schema';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 interface GenreTableProps {
   onEdit?: (genre: Genre) => void;
@@ -42,7 +43,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
 
   // Genre'leri getir (React Query ile)
   const { data: genresData, isLoading } = useQuery({
-    queryKey: ['genres', searchTerm, currentPage, limit],
+    queryKey: queryKeys.masterData.genre.list({ search: searchTerm, page: currentPage, limit }),
     queryFn: async () => {
       const filters: GenreFilters = {
         page: currentPage,
@@ -80,7 +81,7 @@ export function GenreTable({ onEdit, searchTerm = '' }: GenreTableProps) {
       setDeleteDialogOpen(false);
       setSelectedGenre(null);
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['genres'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.masterData.genre.all });
     },
     onError: (error) => {
       console.error('Delete genre error:', error);

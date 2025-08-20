@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 // Tablo item tipi
 type EpisodeTableItem = GetEpisodeListResponse['data'][0];
@@ -46,31 +47,35 @@ export function EpisodeTable({ mediaPartId, onEdit, onStreamingLinks, refreshKey
   const queryClient = useQueryClient();
 
   // Query key oluştur
-  const queryKey = ['episodes', { mediaPartId, currentPage, limit, refreshKey }];
+  const queryKey = queryKeys.anime.episode.byMediaPartId(mediaPartId);
 
   // Episode'ları getir
   const { data, isLoading: isFetching, error } = useQuery({
     queryKey,
     queryFn: async () => {
-      const result = await getEpisodeListAction(mediaPartId, currentPage, limit);
+      const filters: EpisodeFilters = {
+        page: currentPage,
+        limit: limit,
+      };
+      
+      const result = await getEpisodesAction(mediaPartId, filters);
       if (!result.success) {
         throw new Error(result.error || 'Episode\'lar yüklenirken bir hata oluştu');
       }
-      return result.data as GetEpisodeListResponse;
+      return result.data as GetEpisodesResponse;
     },
-    staleTime: 5 * 60 * 1000, // 5 dakika
   });
 
   // Silme mutation'ı
   const deleteMutation = useMutation({
     mutationFn: deleteEpisodeAction,
     onSuccess: () => {
-      toast.success('Bölüm başarıyla silindi!');
+      toast.success('Episode başarıyla silindi!');
       setDeleteDialogOpen(false);
       setSelectedEpisode(null);
-
+      
       // Query'yi invalidate et
-      queryClient.invalidateQueries({ queryKey: ['episodes'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.anime.episode.all });
     },
     onError: (error) => {
       console.error('Delete episode error:', error);
