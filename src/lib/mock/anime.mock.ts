@@ -34,7 +34,7 @@ export const mockAnimes: AnimeSeries[] = [
     id: '2',
     aniwaPublicId: 2,
     title: 'Demon Slayer',
-    englishTitle: 'Demon Slayer: Kimetsu no Yaiba',
+    englishTitle: 'Demon Slayer',
     nativeTitle: '鬼滅の刃',
     synonyms: ['Kimetsu no Yaiba'],
     synopsis: 'A family is attacked by demons and only two members survive - Tanjiro and his sister Nezuko, who is turning into a demon slowly.',
