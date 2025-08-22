@@ -67,21 +67,21 @@ export function AnimeListItem({ anime }: AnimeListItemProps) {
           {/* Content */}
           <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between px-3 md:px-6 py-2 md:py-3">
             {/* Sol taraf - Başlıklar, Türler */}
-            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 lg:gap-6 xl:gap-8 mb-2 md:mb-0">
+            <div className="flex flex-col sm:flex-row md:flex-row sm:items-center md:items-center gap-1 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8 mb-2 sm:mb-0 md:mb-0">
               {/* Başlıklar */}
-              <div className="min-w-0 w-full md:w-36 lg:w-32 xl:w-40">
-                <h3 className="font-medium text-gray-900 truncate text-sm md:text-base leading-tight">
+              <div className="min-w-0 w-full sm:w-32 md:w-36 lg:w-32 xl:w-40">
+                <h3 className="font-medium text-gray-900 truncate text-sm sm:text-sm md:text-base leading-tight">
                   {mainTitle}
                 </h3>
                 {subTitle && (
-                  <p className="text-xs md:text-sm text-gray-500 truncate leading-tight">
+                  <p className="text-xs sm:text-xs md:text-sm text-gray-500 truncate leading-tight">
                     {subTitle}
                   </p>
                 )}
               </div>
 
               {/* Türler - Dinamik */}
-              <div className="flex items-center gap-1 md:gap-2 w-full md:w-40 lg:w-44 xl:w-52">
+              <div className="flex items-center gap-1 sm:gap-1 md:gap-2 w-full sm:w-36 md:w-40 lg:w-44 xl:w-52">
                 {/* Mobilde görünen türler (3 tane) */}
                 {animeGenres.slice(0, 3).map((genre) => (
                   <span 
@@ -153,28 +153,28 @@ export function AnimeListItem({ anime }: AnimeListItemProps) {
             </div>
 
             {/* Sağ taraf - Puan, Tip/Bölüm ve Yıl/Durum */}
-            <div className="flex items-center justify-between md:gap-4 lg:gap-6 min-w-0">
+            <div className="flex items-center justify-between sm:gap-2 md:gap-4 lg:gap-6 min-w-0">
               {/* Puan & Popülerlik */}
-              <div className="flex flex-col items-center w-12 md:w-14 lg:w-16 flex-shrink-0">
-                <div className="flex items-center gap-0.5 md:gap-1 text-green-600">
-                  <span className="text-xs md:text-base">⭐</span>
-                  <span className="font-medium text-xs md:text-base">{anime.averageScore?.toFixed(1) || 'N/A'}</span>
+              <div className="flex flex-col items-center w-12 sm:w-12 md:w-14 lg:w-16 flex-shrink-0">
+                <div className="flex items-center gap-0.5 sm:gap-0.5 md:gap-1 text-green-600">
+                  <span className="text-xs sm:text-xs md:text-base">⭐</span>
+                  <span className="font-medium text-xs sm:text-xs md:text-base">{anime.averageScore?.toFixed(1) || 'N/A'}</span>
                 </div>
-                <div className="flex items-center gap-0.5 md:gap-1 text-xs text-gray-500">
+                <div className="flex items-center gap-0.5 sm:gap-0.5 md:gap-1 text-xs text-gray-500">
                   <span className="text-xs">🔥</span>
                   <span className="font-medium text-xs">{anime.popularity?.toLocaleString() || 'N/A'}</span>
                 </div>
               </div>
 
               {/* Tip & Bölüm */}
-              <div className="flex flex-col items-center w-12 md:w-14 lg:w-16 flex-shrink-0">
-                <span className="text-gray-900 text-xs md:text-sm leading-tight text-center">{anime.type === 'TV' ? 'TV Dizisi' : anime.type}</span>
+              <div className="flex flex-col items-center w-12 sm:w-12 md:w-14 lg:w-16 flex-shrink-0">
+                <span className="text-gray-900 text-xs sm:text-xs md:text-sm leading-tight text-center">{anime.type === 'TV' ? 'TV Dizisi' : anime.type}</span>
                 <span className="text-xs text-gray-400 leading-tight text-center">{anime.episodes} bölüm</span>
               </div>
 
               {/* Yıl & Durum */}
-              <div className="flex flex-col items-center w-12 md:w-14 lg:w-16 flex-shrink-0">
-                <span className="text-gray-900 text-xs md:text-sm leading-tight text-center">{anime.seasonYear}</span>
+              <div className="flex flex-col items-center w-12 sm:w-12 md:w-14 lg:w-16 flex-shrink-0">
+                <span className="text-gray-900 text-xs sm:text-xs md:text-sm leading-tight text-center">{anime.seasonYear}</span>
                 <span className="text-xs text-gray-400 leading-tight text-center">{anime.status === 'RELEASING' ? 'Devam Ediyor' : 'Tamamlandı'}</span>
               </div>
             </div>
