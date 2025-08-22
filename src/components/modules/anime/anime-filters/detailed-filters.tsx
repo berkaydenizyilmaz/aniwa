@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { X, Search } from 'lucide-react';
+import { X, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { mockStatuses, mockCountries, mockSources, mockTags } from '@/lib/mock/anime.mock';
 import {
   Tooltip,
@@ -246,15 +246,24 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
       {/* Tag Seçimi */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h4 className="font-medium">Etiketler</h4>
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
             onClick={() => setShowTags(!showTags)}
-            className="text-sm"
+            className="flex items-center gap-2 text-left hover:text-primary transition-colors cursor-pointer"
           >
-            {showTags ? 'Gizle' : 'Göster'} ({selectedTags.length} seçili)
-          </Button>
+            <h4 className="font-medium">
+              {showTags ? 'Etiketleri gizle' : 'Etiketleri göster'}
+            </h4>
+            {showTags ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+            {selectedTags.length > 0 && (
+              <span className="text-sm text-muted-foreground">
+                ({selectedTags.length} seçili)
+              </span>
+            )}
+          </button>
         </div>
         
         {/* Seçili Taglar */}
@@ -324,8 +333,8 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
                                 {tag.name}
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{tag.name} etiketi hakkında açıklama</p>
+                            <TooltipContent className="hidden sm:block max-w-[200px]" side="top" sideOffset={8}>
+                              <p className="line-clamp-4">{(tag as any).description || `${tag.name} etiketi hakkında açıklama`}</p>
                             </TooltipContent>
                           </Tooltip>
                         ))}

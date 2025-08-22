@@ -249,11 +249,11 @@ export const mockSources = [
 // Mock tags for filtering
 export const mockTags = [
   // DEMOGRAPHICS - Hedef Kitle
-  { id: '1', name: 'Shounen', category: 'DEMOGRAPHICS' },
-  { id: '2', name: 'Shoujo', category: 'DEMOGRAPHICS' },
-  { id: '3', name: 'Seinen', category: 'DEMOGRAPHICS' },
-  { id: '4', name: 'Josei', category: 'DEMOGRAPHICS' },
-  { id: '5', name: 'Kids', category: 'DEMOGRAPHICS' },
+  { id: '1', name: 'Shounen', category: 'DEMOGRAPHICS', description: 'Erkek gençler için tasarlanmış anime ve manga türü. Genellikle aksiyon, macera ve büyüme temalarını içerir. Karakterler genellikle güçlü olma, hedeflerine ulaşma ve arkadaşlık değerlerini öğrenme yolculuğunda olur.' },
+  { id: '2', name: 'Shoujo', category: 'DEMOGRAPHICS', description: 'Kız gençler için tasarlanmış anime ve manga türü. Romantik ilişkiler, duygusal gelişim ve kişisel büyüme temalarına odaklanır. Karakterler genellikle aşk, arkadaşlık ve kendini keşfetme süreçlerinde yer alır.' },
+  { id: '3', name: 'Seinen', category: 'DEMOGRAPHICS', description: 'Yetişkin erkekler için tasarlanmış anime ve manga türü. Daha karmaşık hikayeler, olgun temalar ve gerçekçi karakter gelişimi içerir. Genellikle psikolojik derinlik, sosyal konular ve yetişkin yaşamın zorluklarını ele alır.' },
+  { id: '4', name: 'Josei', category: 'DEMOGRAPHICS', description: 'Yetişkin kadınlar için tasarlanmış anime ve manga türü. Romantik ilişkiler, kariyer, aile ve kişisel gelişim gibi yetişkin yaşamın gerçekliklerini yansıtır. Karakterler genellikle 20\'li ve 30\'lu yaşlarda olur.' },
+  { id: '5', name: 'Kids', category: 'DEMOGRAPHICS', description: 'Çocuklar için tasarlanmış anime ve manga türü. Eğitici içerik, basit hikayeler ve pozitif değerler içerir. Şiddet ve karmaşık temalar genellikle bulunmaz, bunun yerine arkadaşlık, aile ve öğrenme temalarına odaklanır.' },
   
   // THEMES - Ana Temalar
   { id: '6', name: 'Friendship', category: 'THEMES' },
