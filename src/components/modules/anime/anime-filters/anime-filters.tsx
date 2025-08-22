@@ -35,7 +35,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
     <div className="space-y-4">
       {/* Temel Filtreler */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-start sm:items-center">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-start sm:items-center flex-1">
           {/* Search - Kısaltılmış */}
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -57,7 +57,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
               setGenre(value);
               handleFilterChange();
             }}>
-              <SelectTrigger className="w-full sm:w-[160px] rounded-sm">
+              <SelectTrigger className="w-full sm:w-[130px] md:w-[110px] rounded-sm">
                 <SelectValue placeholder="Tür" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
@@ -75,7 +75,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
               setYear(value);
               handleFilterChange();
             }}>
-              <SelectTrigger className="w-full sm:w-[140px] rounded-sm">
+              <SelectTrigger className="w-full sm:w-[120px] md:w-[100px] rounded-sm">
                 <SelectValue placeholder="Yıl" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
@@ -93,7 +93,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
               setSeason(value);
               handleFilterChange();
             }}>
-              <SelectTrigger className="w-full sm:w-[140px]">
+              <SelectTrigger className="w-full sm:w-[120px] md:w-[100px]">
                 <SelectValue placeholder="Sezon" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
@@ -111,7 +111,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
               setFormat(value);
               handleFilterChange();
             }}>
-              <SelectTrigger className="w-full sm:w-[140px]">
+              <SelectTrigger className="w-full sm:w-[120px] md:w-[100px]">
                 <SelectValue placeholder="Format" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
@@ -131,7 +131,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
           variant="outline"
           size="icon"
           onClick={() => setShowDetailedFilters(!showDetailedFilters)}
-          className="self-start lg:self-auto"
+          className="self-start lg:self-auto flex-shrink-0"
         >
           <Filter className="h-4 w-4" />
         </Button>
