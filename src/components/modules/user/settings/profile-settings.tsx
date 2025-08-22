@@ -192,10 +192,10 @@ export function ProfileSettings() {
                 <FormItem>
                   <FormLabel>Kullanıcı Adı</FormLabel>
                   <FormControl>
-                    <Input
+                    <Input 
+                      {...field} 
                       placeholder="Kullanıcı adınızı girin"
-                      disabled={updateUsernameMutation.isPending}
-                      {...field}
+                      className="bg-background"
                     />
                   </FormControl>
                   <FormMessage />
@@ -220,14 +220,12 @@ export function ProfileSettings() {
               name="bio"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Biyografi</FormLabel>
+                  <FormLabel>Hakkımda</FormLabel>
                   <FormControl>
-                    <Textarea
+                    <Textarea 
+                      {...field} 
                       placeholder="Kendiniz hakkında kısa bir açıklama yazın"
-                      rows={3}
-                      maxLength={500}
-                      disabled={updateBioMutation.isPending}
-                      {...field}
+                      className="bg-background"
                     />
                   </FormControl>
                   <FormMessage />
@@ -263,6 +261,7 @@ export function ProfileSettings() {
                       type="password"
                       placeholder="Yeni parolanızı girin"
                       disabled={updatePasswordMutation.isPending}
+                      className="bg-background"
                       {...field}
                     />
                   </FormControl>
@@ -281,6 +280,7 @@ export function ProfileSettings() {
                       type="password"
                       placeholder="Yeni parolanızı tekrar girin"
                       disabled={updatePasswordMutation.isPending}
+                      className="bg-background"
                       {...field}
                     />
                   </FormControl>

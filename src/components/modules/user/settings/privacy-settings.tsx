@@ -115,7 +115,7 @@ export function PrivacySettings() {
             onValueChange={(value) => handleProfileVisibilityChange(value as ProfileVisibility)}
             disabled={updateProfileVisibilityMutation.isPending}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-background w-fit">
               <SelectValue placeholder="Profil görünürlüğü seçin" />
             </SelectTrigger>
             <SelectContent>
