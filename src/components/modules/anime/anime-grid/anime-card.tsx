@@ -52,13 +52,13 @@ export function AnimeCard({ anime }: AnimeCardProps) {
     const rect = e.currentTarget.getBoundingClientRect();
     const windowWidth = window.innerWidth;
     
-    // Responsive popup genişlikleri
-    let popupWidth = 288; // w-72 = 288px (mobil)
-    if (windowWidth >= 1024) {
-      popupWidth = 384; // lg:w-96 = 384px (desktop)
-    } else if (windowWidth >= 640) {
-      popupWidth = 320; // sm:w-80 = 320px (tablet)
-    }
+         // Responsive popup genişlikleri - daha küçük
+     let popupWidth = 256; // w-64 = 256px (mobil)
+     if (windowWidth >= 1024) {
+       popupWidth = 320; // lg:w-80 = 320px (desktop)
+     } else if (windowWidth >= 640) {
+       popupWidth = 288; // sm:w-72 = 288px (tablet)
+     }
     
     // Sağ tarafta yer var mı kontrol et
     const spaceOnRight = windowWidth - rect.right - popupWidth - 10;
