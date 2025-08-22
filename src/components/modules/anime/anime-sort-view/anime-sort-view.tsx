@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUpDown, Grid3X3, List, Square } from 'lucide-react';
+import { ArrowUpDown, Grid2X2, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -40,9 +40,9 @@ export function AnimeSortView({
     <div className="flex items-center justify-between py-4 border-b">
       {/* Sıralama */}
       <div className="flex items-center gap-2">
-        <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
         <Select value={sortBy} onValueChange={handleSortChange}>
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-fit border-none shadow-none bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:ring-0 focus-visible:border-none p-0 h-auto outline-none [&>svg:not(.arrow-icon)]:hidden flex items-center gap-2">
+            <ArrowUpDown className="h-4 w-4 text-muted-foreground arrow-icon" />
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -63,7 +63,7 @@ export function AnimeSortView({
           onClick={() => onViewModeChange('card')}
           className="h-8 w-8"
         >
-          <Square className="h-4 w-4" />
+          <Grid2X2 className="h-4 w-4" />
         </Button>
         <Button
           variant={viewMode === 'list' ? 'default' : 'ghost'}
