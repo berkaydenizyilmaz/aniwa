@@ -73,7 +73,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
   };
 
   return (
-    <div className="border rounded-lg p-4 space-y-6">
+    <div className="bg-white dark:bg-gray-900 border rounded-lg p-4 space-y-6">
       <h3 className="font-medium text-lg">Ayrıntılı Filtreler</h3>
       
       {/* Temel Filtreler */}
@@ -85,7 +85,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
             setStatus(value);
             handleFilterChange();
           }}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full bg-background">
               <SelectValue placeholder="Durum" />
             </SelectTrigger>
             <SelectContent>
@@ -106,7 +106,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
             setCountry(value);
             handleFilterChange();
           }}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full bg-background">
               <SelectValue placeholder="Ülke" />
             </SelectTrigger>
             <SelectContent>
@@ -127,7 +127,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
             setSource(value);
             handleFilterChange();
           }}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full bg-background">
               <SelectValue placeholder="Kaynak" />
             </SelectTrigger>
             <SelectContent>
@@ -177,7 +177,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
                   setYearFrom(e.target.value);
                   handleFilterChange();
                 }}
-                className="w-full"
+                className="w-full bg-background"
               />
               <Input
                 placeholder="Bitiş"
@@ -186,7 +186,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
                   setYearTo(e.target.value);
                   handleFilterChange();
                 }}
-                className="w-full"
+                className="w-full bg-background"
               />
             </div>
           </div>
@@ -202,7 +202,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
                   setEpisodesFrom(e.target.value);
                   handleFilterChange();
                 }}
-                className="w-full"
+                className="w-full bg-background"
               />
               <Input
                 placeholder="Max"
@@ -211,7 +211,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
                   setEpisodesTo(e.target.value);
                   handleFilterChange();
                 }}
-                className="w-full"
+                className="w-full bg-background"
               />
             </div>
           </div>
@@ -227,7 +227,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
                   setDurationFrom(e.target.value);
                   handleFilterChange();
                 }}
-                className="w-full"
+                className="w-full bg-background"
               />
               <Input
                 placeholder="Max"
@@ -236,7 +236,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
                   setDurationTo(e.target.value);
                   handleFilterChange();
                 }}
-                className="w-full"
+                className="w-full bg-background"
               />
             </div>
           </div>
@@ -289,7 +289,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
                 placeholder="Etiket ara..."
                 value={tagSearch}
                 onChange={(e) => setTagSearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-background"
               />
             </div>
 
