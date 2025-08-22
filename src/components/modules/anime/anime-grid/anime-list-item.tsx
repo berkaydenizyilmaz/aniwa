@@ -67,9 +67,9 @@ export function AnimeListItem({ anime }: AnimeListItemProps) {
           {/* Content */}
           <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between px-3 md:px-6 py-2 md:py-3">
             {/* Sol taraf - Başlıklar, Türler */}
-            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-6 lg:gap-8 mb-2 md:mb-0">
+            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 lg:gap-6 xl:gap-8 mb-2 md:mb-0">
               {/* Başlıklar */}
-              <div className="min-w-0 w-full md:w-32 lg:w-40">
+              <div className="min-w-0 w-full md:w-36 lg:w-32 xl:w-40">
                 <h3 className="font-medium text-gray-900 truncate text-sm md:text-base leading-tight">
                   {mainTitle}
                 </h3>
@@ -81,7 +81,7 @@ export function AnimeListItem({ anime }: AnimeListItemProps) {
               </div>
 
               {/* Türler - Dinamik */}
-              <div className="flex items-center gap-1 md:gap-2 w-full md:w-44 lg:w-52">
+              <div className="flex items-center gap-1 md:gap-2 w-full md:w-40 lg:w-44 xl:w-52">
                 {/* Mobilde görünen türler (3 tane) */}
                 {animeGenres.slice(0, 3).map((genre) => (
                   <span 
