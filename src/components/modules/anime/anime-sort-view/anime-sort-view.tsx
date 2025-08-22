@@ -37,7 +37,7 @@ export function AnimeSortView({
   };
 
   return (
-    <div className="flex items-center justify-between py-4 border-b">
+    <div className="flex items-center justify-between py-4">
       {/* Sıralama */}
       <div className="flex items-center gap-2">
         <Select value={sortBy} onValueChange={handleSortChange}>
