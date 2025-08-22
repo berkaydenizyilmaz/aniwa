@@ -13,14 +13,14 @@ interface AnimeCardPopupProps {
 }
 
 export function AnimeCardPopup({ anime, isVisible, position }: AnimeCardPopupProps) {
-  if (!isVisible) return null;
-
   // Anime türlerini al
   const animeGenres = useMemo(() => getAnimeGenres(anime.id), [anime.id]);
   
   // Popup'ta maksimum 3 tür göster, kalanları +N ile göster
   const visibleGenres = animeGenres.slice(0, 3);
   const hiddenCount = animeGenres.length - 3;
+
+  if (!isVisible) return null;
 
   return (
     <Card
