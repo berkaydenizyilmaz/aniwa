@@ -5,7 +5,7 @@ export const mockAnimes: AnimeSeries[] = [
   {
     id: '1',
     aniwaPublicId: 1,
-    title: 'Attack on Titan',
+    title: 'Shingeki no Kyojin',
     englishTitle: 'Attack on Titan',
     nativeTitle: '進撃の巨人',
     synonyms: ['Shingeki no Kyojin'],
@@ -33,7 +33,7 @@ export const mockAnimes: AnimeSeries[] = [
   {
     id: '2',
     aniwaPublicId: 2,
-    title: 'Demon Slayer',
+    title: 'Kimetsu no Yaiba',
     englishTitle: 'Demon Slayer',
     nativeTitle: '鬼滅の刃',
     synonyms: ['Kimetsu no Yaiba'],
@@ -117,7 +117,7 @@ export const mockAnimes: AnimeSeries[] = [
   {
     id: '5',
     aniwaPublicId: 5,
-    title: 'My Hero Academia',
+    title: 'Boku no Hero Academia',
     englishTitle: 'My Hero Academia',
     nativeTitle: '僕のヒーローアカデミア',
     synonyms: ['Boku no Hero Academia', 'BNHA'],
