@@ -50,77 +50,80 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
             />
           </div>
 
-          {/* Genres */}
-          <Select value={genre === 'all' ? '' : genre} onValueChange={(value) => {
-            setGenre(value);
-            handleFilterChange();
-          }}>
-            <SelectTrigger className="w-full sm:w-[160px] rounded-sm">
-              <SelectValue placeholder="Tür" />
-            </SelectTrigger>
-            <SelectContent className="max-h-[300px]">
-              <SelectItem value="all">Tümü</SelectItem>
-              {mockGenres.map((genre) => (
-                <SelectItem key={genre.id} value={genre.id}>
-                  {genre.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Selects in pairs on mobile */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 w-full sm:w-auto">
+            {/* Genres */}
+            <Select value={genre === 'all' ? '' : genre} onValueChange={(value) => {
+              setGenre(value);
+              handleFilterChange();
+            }}>
+              <SelectTrigger className="w-full sm:w-[160px] rounded-sm">
+                <SelectValue placeholder="Tür" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                <SelectItem value="all">Tümü</SelectItem>
+                {mockGenres.map((genre) => (
+                  <SelectItem key={genre.id} value={genre.id}>
+                    {genre.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          {/* Year */}
-          <Select value={year === 'all' ? '' : year} onValueChange={(value) => {
-            setYear(value);
-            handleFilterChange();
-          }}>
-            <SelectTrigger className="w-full sm:w-[140px] rounded-sm">
-              <SelectValue placeholder="Yıl" />
-            </SelectTrigger>
-            <SelectContent className="max-h-[300px]">
-              <SelectItem value="all">Tümü</SelectItem>
-              {mockYears.map((yearOption) => (
-                <SelectItem key={yearOption} value={yearOption.toString()}>
-                  {yearOption}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {/* Year */}
+            <Select value={year === 'all' ? '' : year} onValueChange={(value) => {
+              setYear(value);
+              handleFilterChange();
+            }}>
+              <SelectTrigger className="w-full sm:w-[140px] rounded-sm">
+                <SelectValue placeholder="Yıl" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                <SelectItem value="all">Tümü</SelectItem>
+                {mockYears.map((yearOption) => (
+                  <SelectItem key={yearOption} value={yearOption.toString()}>
+                    {yearOption}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          {/* Season */}
-          <Select value={season === 'all' ? '' : season} onValueChange={(value) => {
-            setSeason(value);
-            handleFilterChange();
-          }}>
-            <SelectTrigger className="w-full sm:w-[140px]">
-              <SelectValue placeholder="Sezon" />
-            </SelectTrigger>
-            <SelectContent className="max-h-[300px]">
-              <SelectItem value="all">Tümü</SelectItem>
-              {mockSeasons.map((season) => (
-                <SelectItem key={season.value} value={season.value}>
-                  {season.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {/* Season */}
+            <Select value={season === 'all' ? '' : season} onValueChange={(value) => {
+              setSeason(value);
+              handleFilterChange();
+            }}>
+              <SelectTrigger className="w-full sm:w-[140px]">
+                <SelectValue placeholder="Sezon" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                <SelectItem value="all">Tümü</SelectItem>
+                {mockSeasons.map((season) => (
+                  <SelectItem key={season.value} value={season.value}>
+                    {season.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          {/* Format */}
-          <Select value={format === 'all' ? '' : format} onValueChange={(value) => {
-            setFormat(value);
-            handleFilterChange();
-          }}>
-            <SelectTrigger className="w-full sm:w-[140px]">
-              <SelectValue placeholder="Format" />
-            </SelectTrigger>
-            <SelectContent className="max-h-[300px]">
-              <SelectItem value="all">Tümü</SelectItem>
-              {mockFormats.map((format) => (
-                <SelectItem key={format.value} value={format.value}>
-                  {format.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {/* Format */}
+            <Select value={format === 'all' ? '' : format} onValueChange={(value) => {
+              setFormat(value);
+              handleFilterChange();
+            }}>
+              <SelectTrigger className="w-full sm:w-[140px]">
+                <SelectValue placeholder="Format" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                <SelectItem value="all">Tümü</SelectItem>
+                {mockFormats.map((format) => (
+                  <SelectItem key={format.value} value={format.value}>
+                    {format.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Detailed Filters Button */}

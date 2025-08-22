@@ -8,15 +8,20 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Search } from 'lucide-react';
 import { mockStatuses, mockCountries, mockSources, mockTags } from '@/lib/mock/anime.mock';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface DetailedFiltersProps {
   onFiltersChange: (filters: any) => void;
 }
 
 export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
-  const { settings } = useSettings();
   const [status, setStatus] = useState('all');
   const [country, setCountry] = useState('all');
   const [source, setSource] = useState('all');
@@ -29,6 +34,14 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
   const [showAdult, setShowAdult] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showTags, setShowTags] = useState(false);
+  const [tagSearch, setTagSearch] = useState('');
+
+  const { settings } = useSettings();
+
+  // Filter tags based on search
+  const filteredTags = mockTags.filter(tag => 
+    tag.name.toLowerCase().includes(tagSearch.toLowerCase())
+  );
 
   const handleFilterChange = () => {
     const filters = {
@@ -268,39 +281,60 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
 
         {/* Tag Listesi - Açılır/Kapanır */}
         {showTags && (
-          <div className="max-h-48 overflow-y-auto">
-            {/* Tag Kategorileri */}
-            {Object.entries({
-              DEMOGRAPHICS: { label: 'Hedef Kitle', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-              THEMES: { label: 'Ana Temalar', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
-              CONTENT: { label: 'İçerik Niteliği', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
-              SETTING: { label: 'Ortam', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' },
-              ELEMENTS: { label: 'Spesifik Öğeler', color: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' }
-            }).map(([category, config]) => {
-              const categoryTags = mockTags.filter(tag => tag.category === category);
-              if (categoryTags.length === 0) return null;
-              
-              return (
-                <div key={category} className="mb-4 last:mb-0">
-                  <h5 className="text-sm font-medium text-muted-foreground mb-2 px-1">
-                    {config.label}
-                  </h5>
-                  <div className="flex flex-wrap gap-1">
-                    {categoryTags.map((tag) => (
-                      <Button
-                        key={tag.id}
-                        variant={selectedTags.includes(tag.id) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => handleTagToggle(tag.id)}
-                        className={`h-6 px-2 text-xs min-w-fit ${selectedTags.includes(tag.id) ? config.color : ''}`}
-                      >
-                        {tag.name}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="space-y-4">
+            {/* Tag Arama */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Etiket ara..."
+                value={tagSearch}
+                onChange={(e) => setTagSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            <div className="max-h-48 overflow-y-auto">
+              {/* Tag Kategorileri */}
+              <TooltipProvider>
+                {Object.entries({
+                  DEMOGRAPHICS: { label: 'Hedef Kitle', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
+                  THEMES: { label: 'Ana Temalar', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
+                  CONTENT: { label: 'İçerik Niteliği', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
+                  SETTING: { label: 'Ortam', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' },
+                  ELEMENTS: { label: 'Spesifik Öğeler', color: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' }
+                }).map(([category, config]) => {
+                  const categoryTags = filteredTags.filter(tag => tag.category === category);
+                  if (categoryTags.length === 0) return null;
+                  
+                  return (
+                    <div key={category} className="mb-4 last:mb-0">
+                      <h5 className="text-sm font-medium text-muted-foreground mb-2 px-1">
+                        {config.label}
+                      </h5>
+                      <div className="flex flex-wrap gap-1">
+                        {categoryTags.map((tag) => (
+                          <Tooltip key={tag.id}>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant={selectedTags.includes(tag.id) ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => handleTagToggle(tag.id)}
+                                className={`h-6 px-2 text-xs min-w-fit ${selectedTags.includes(tag.id) ? config.color : ''}`}
+                              >
+                                {tag.name}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{tag.name} etiketi hakkında açıklama</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </TooltipProvider>
+            </div>
           </div>
         )}
       </div>
