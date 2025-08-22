@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockGenres, mockYears, mockSeasons, mockFormats } from '@/lib/mock/anime.mock';
+import { DetailedFilters } from './detailed-filters';
 
 interface AnimeFiltersProps {
   onFiltersChange: (filters: any) => void;
@@ -18,7 +19,6 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
   const [season, setSeason] = useState('all');
   const [format, setFormat] = useState('all');
   const [showDetailedFilters, setShowDetailedFilters] = useState(false);
-
 
   const handleFilterChange = () => {
     const filters = {
@@ -34,10 +34,10 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
   return (
     <div className="space-y-4">
       {/* Temel Filtreler */}
-      <div className="flex items-center justify-between">
-        <div className="flex flex-wrap gap-6 items-center">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-start sm:items-center">
           {/* Search - Kısaltılmış */}
-          <div className="relative w-64">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Anime ara..."
@@ -51,11 +51,11 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
           </div>
 
           {/* Genres */}
-          <Select value={genre === 'all' ? '' : genre}           onValueChange={(value) => {
+          <Select value={genre === 'all' ? '' : genre} onValueChange={(value) => {
             setGenre(value);
             handleFilterChange();
           }}>
-            <SelectTrigger className="w-[160px] rounded-sm">
+            <SelectTrigger className="w-full sm:w-[160px] rounded-sm">
               <SelectValue placeholder="Tür" />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
@@ -73,7 +73,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
             setYear(value);
             handleFilterChange();
           }}>
-            <SelectTrigger className="w-[140px] rounded-sm">
+            <SelectTrigger className="w-full sm:w-[140px] rounded-sm">
               <SelectValue placeholder="Yıl" />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
@@ -91,7 +91,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
             setSeason(value);
             handleFilterChange();
           }}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-full sm:w-[140px]">
               <SelectValue placeholder="Sezon" />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
@@ -109,7 +109,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
             setFormat(value);
             handleFilterChange();
           }}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-full sm:w-[140px]">
               <SelectValue placeholder="Format" />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
@@ -128,6 +128,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
           variant="outline"
           size="icon"
           onClick={() => setShowDetailedFilters(!showDetailedFilters)}
+          className="self-start lg:self-auto"
         >
           <Filter className="h-4 w-4" />
         </Button>
@@ -135,15 +136,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
 
       {/* Ayrıntılı Filtreler */}
       {showDetailedFilters && (
-        <div className="border rounded-lg p-4 space-y-4">
-          <h3 className="font-medium">Ayrıntılı Filtreler</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {/* Burada daha fazla filtre eklenebilir */}
-            <div className="text-sm text-muted-foreground">
-              Daha fazla filtre seçeneği burada olacak...
-            </div>
-          </div>
-        </div>
+        <DetailedFilters onFiltersChange={onFiltersChange} />
       )}
     </div>
   );

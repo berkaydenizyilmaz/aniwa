@@ -217,3 +217,89 @@ export const mockStatuses = [
   { value: 'NOT_YET_RELEASED', label: 'Not Yet Released' },
   { value: 'CANCELLED', label: 'Cancelled' }
 ];
+
+// Mock countries for filtering
+export const mockCountries = [
+  { value: 'JAPAN', label: 'Japonya' },
+  { value: 'SOUTH_KOREA', label: 'Güney Kore' },
+  { value: 'CHINA', label: 'Çin' },
+  { value: 'UNITED_STATES', label: 'Amerika Birleşik Devletleri' },
+  { value: 'UNITED_KINGDOM', label: 'Birleşik Krallık' },
+  { value: 'FRANCE', label: 'Fransa' },
+  { value: 'GERMANY', label: 'Almanya' },
+  { value: 'ITALY', label: 'İtalya' },
+  { value: 'SPAIN', label: 'İspanya' },
+  { value: 'CANADA', label: 'Kanada' }
+];
+
+// Mock sources for filtering
+export const mockSources = [
+  { value: 'MANGA', label: 'Manga' },
+  { value: 'LIGHT_NOVEL', label: 'Light Novel' },
+  { value: 'VISUAL_NOVEL', label: 'Visual Novel' },
+  { value: 'GAME', label: 'Oyun' },
+  { value: 'ORIGINAL', label: 'Orijinal' },
+  { value: 'NOVEL', label: 'Roman' },
+  { value: 'WEB_NOVEL', label: 'Web Novel' },
+  { value: 'BOOK', label: 'Kitap' },
+  { value: 'CARD_GAME', label: 'Kart Oyunu' },
+  { value: 'MUSIC', label: 'Müzik' }
+];
+
+// Mock tags for filtering
+export const mockTags = [
+  // DEMOGRAPHICS - Hedef Kitle
+  { id: '1', name: 'Shounen', category: 'DEMOGRAPHICS' },
+  { id: '2', name: 'Shoujo', category: 'DEMOGRAPHICS' },
+  { id: '3', name: 'Seinen', category: 'DEMOGRAPHICS' },
+  { id: '4', name: 'Josei', category: 'DEMOGRAPHICS' },
+  { id: '5', name: 'Kids', category: 'DEMOGRAPHICS' },
+  
+  // THEMES - Ana Temalar
+  { id: '6', name: 'Friendship', category: 'THEMES' },
+  { id: '7', name: 'Love', category: 'THEMES' },
+  { id: '8', name: 'Revenge', category: 'THEMES' },
+  { id: '9', name: 'Coming of Age', category: 'THEMES' },
+  { id: '10', name: 'Family', category: 'THEMES' },
+  { id: '11', name: 'Betrayal', category: 'THEMES' },
+  { id: '12', name: 'Redemption', category: 'THEMES' },
+  
+  // CONTENT - İçerik Niteliği
+  { id: '13', name: 'Action', category: 'CONTENT' },
+  { id: '14', name: 'Adventure', category: 'CONTENT' },
+  { id: '15', name: 'Comedy', category: 'CONTENT' },
+  { id: '16', name: 'Drama', category: 'CONTENT' },
+  { id: '17', name: 'Fantasy', category: 'CONTENT' },
+  { id: '18', name: 'Horror', category: 'CONTENT' },
+  { id: '19', name: 'Mystery', category: 'CONTENT' },
+  { id: '20', name: 'Psychological', category: 'CONTENT' },
+  { id: '21', name: 'Romance', category: 'CONTENT' },
+  { id: '22', name: 'Sci-Fi', category: 'CONTENT' },
+  { id: '23', name: 'Slice of Life', category: 'CONTENT' },
+  { id: '24', name: 'Sports', category: 'CONTENT' },
+  { id: '25', name: 'Thriller', category: 'CONTENT' },
+  
+  // SETTING - Ortam
+  { id: '26', name: 'School', category: 'SETTING' },
+  { id: '27', name: 'Fantasy World', category: 'SETTING' },
+  { id: '28', name: 'Modern Day', category: 'SETTING' },
+  { id: '29', name: 'Historical', category: 'SETTING' },
+  { id: '30', name: 'Post-Apocalyptic', category: 'SETTING' },
+  { id: '31', name: 'Space', category: 'SETTING' },
+  { id: '32', name: 'Military', category: 'SETTING' },
+  { id: '33', name: 'Urban Fantasy', category: 'SETTING' },
+  
+  // ELEMENTS - Spesifik Öğeler
+  { id: '34', name: 'Magic', category: 'ELEMENTS' },
+  { id: '35', name: 'Martial Arts', category: 'ELEMENTS' },
+  { id: '36', name: 'Mecha', category: 'ELEMENTS' },
+  { id: '37', name: 'Supernatural', category: 'ELEMENTS' },
+  { id: '38', name: 'Vampires', category: 'ELEMENTS' },
+  { id: '39', name: 'Demons', category: 'ELEMENTS' },
+  { id: '40', name: 'Angels', category: 'ELEMENTS' },
+  { id: '41', name: 'Time Travel', category: 'ELEMENTS' },
+  { id: '42', name: 'Reincarnation', category: 'ELEMENTS' },
+  { id: '43', name: 'Isekai', category: 'ELEMENTS' },
+  { id: '44', name: 'Harem', category: 'ELEMENTS' },
+  { id: '45', name: 'Reverse Harem', category: 'ELEMENTS' }
+];
