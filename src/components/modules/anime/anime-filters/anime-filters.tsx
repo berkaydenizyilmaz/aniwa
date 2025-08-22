@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, ChevronsUpDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { mockGenres, mockYears, mockSeasons, mockFormats } from '@/lib/mock/anime.mock';
+import { cn } from '@/lib/utils';
 
 interface AnimeFiltersProps {
   onFiltersChange: (filters: any) => void;
@@ -18,6 +21,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
   const [season, setSeason] = useState('all');
   const [format, setFormat] = useState('all');
   const [showDetailedFilters, setShowDetailedFilters] = useState(false);
+  const [yearOpen, setYearOpen] = useState(false);
 
   const handleFilterChange = () => {
     const filters = {
@@ -34,8 +38,8 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
     <div className="space-y-4">
       {/* Temel Filtreler */}
       <div className="flex flex-wrap gap-4 items-center">
-        {/* Search */}
-        <div className="relative flex-1 min-w-[200px]">
+        {/* Search - Kısaltılmış */}
+        <div className="relative w-64">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             placeholder="Anime ara..."
@@ -56,8 +60,8 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Tür" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tümü</SelectItem>
+          <SelectContent className="max-h-[300px]">
+            <SelectItem value="all">Tür</SelectItem>
             {mockGenres.map((genre) => (
               <SelectItem key={genre.id} value={genre.id}>
                 {genre.name}
@@ -66,23 +70,51 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
           </SelectContent>
         </Select>
 
-        {/* Year */}
-        <Select value={year} onValueChange={(value) => {
-          setYear(value);
-          handleFilterChange();
-        }}>
-          <SelectTrigger className="w-[100px]">
-            <SelectValue placeholder="Yıl" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tümü</SelectItem>
-            {mockYears.map((year) => (
-              <SelectItem key={year} value={year.toString()}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Year - Searchable Combobox */}
+        <Popover open={yearOpen} onOpenChange={setYearOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={yearOpen}
+              className="w-[100px] justify-between"
+            >
+              {year === 'all' ? 'Yıl' : year}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[100px] p-0">
+            <Command>
+              <CommandInput placeholder="Yıl ara..." />
+              <CommandList className="max-h-[300px]">
+                <CommandEmpty>Yıl bulunamadı.</CommandEmpty>
+                <CommandGroup>
+                  <CommandItem
+                    onSelect={() => {
+                      setYear('all');
+                      setYearOpen(false);
+                      handleFilterChange();
+                    }}
+                  >
+                    Yıl
+                  </CommandItem>
+                  {mockYears.map((yearOption) => (
+                    <CommandItem
+                      key={yearOption}
+                      onSelect={() => {
+                        setYear(yearOption.toString());
+                        setYearOpen(false);
+                        handleFilterChange();
+                      }}
+                    >
+                      {yearOption}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
 
         {/* Season */}
         <Select value={season} onValueChange={(value) => {
@@ -92,8 +124,8 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
           <SelectTrigger className="w-[100px]">
             <SelectValue placeholder="Sezon" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tümü</SelectItem>
+          <SelectContent className="max-h-[300px]">
+            <SelectItem value="all">Sezon</SelectItem>
             {mockSeasons.map((season) => (
               <SelectItem key={season.value} value={season.value}>
                 {season.label}
@@ -110,8 +142,8 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
           <SelectTrigger className="w-[100px]">
             <SelectValue placeholder="Format" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tümü</SelectItem>
+          <SelectContent className="max-h-[300px]">
+            <SelectItem value="all">Format</SelectItem>
             {mockFormats.map((format) => (
               <SelectItem key={format.value} value={format.value}>
                 {format.label}
