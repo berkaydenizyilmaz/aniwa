@@ -128,10 +128,10 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
 
         {/* Detailed Filters Button */}
         <Button
-          variant="outline"
+          variant={showDetailedFilters ? "default" : "outline"}
           size="icon"
           onClick={() => setShowDetailedFilters(!showDetailedFilters)}
-          className="self-start lg:self-auto flex-shrink-0"
+          className="self-start"
         >
           <Filter className="h-4 w-4" />
         </Button>
