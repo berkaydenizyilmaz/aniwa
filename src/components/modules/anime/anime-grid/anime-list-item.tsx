@@ -4,6 +4,8 @@ import { AnimeSeries, TitleLanguage, UserProfileSettings } from '@prisma/client'
 import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 import { useSettings } from '@/lib/hooks/use-settings';
+import { getAnimeGenres } from '@/lib/mock/anime.mock';
+import { useMemo } from 'react';
 
 interface AnimeListItemProps {
   anime: AnimeSeries;
@@ -14,6 +16,9 @@ export function AnimeListItem({ anime }: AnimeListItemProps) {
   
   // Kullanıcı tercihini al, yoksa default (romaji)
   const titlePreference = (settings as UserProfileSettings)?.titleLanguagePreference || TitleLanguage.ROMAJI;
+  
+  // Anime türlerini al
+  const animeGenres = useMemo(() => getAnimeGenres(anime.id), [anime.id]);
   
   // Başlık ve alt başlık belirleme fonksiyonu
   const getTitleDisplay = () => {
@@ -62,9 +67,9 @@ export function AnimeListItem({ anime }: AnimeListItemProps) {
           {/* Content */}
           <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between px-3 md:px-6 py-2 md:py-3">
             {/* Sol taraf - Başlıklar, Türler */}
-            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 lg:gap-8 mb-2 md:mb-0">
+            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-6 lg:gap-8 mb-2 md:mb-0">
               {/* Başlıklar */}
-              <div className="min-w-0 w-full md:w-40 lg:w-48">
+              <div className="min-w-0 w-full md:w-32 lg:w-40">
                 <h3 className="font-medium text-gray-900 truncate text-sm md:text-base leading-tight">
                   {mainTitle}
                 </h3>
@@ -75,15 +80,75 @@ export function AnimeListItem({ anime }: AnimeListItemProps) {
                 )}
               </div>
 
-              {/* Türler - Mobilde daha kompakt */}
-              <div className="flex items-center gap-1 md:gap-2 w-full md:w-32 lg:w-40 overflow-hidden">
-                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0">Aksiyon</span>
-                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0">Dram</span>
-                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0">Fantastik</span>
-                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0 hidden lg:inline">Macera</span>
-                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0 hidden xl:inline">Komedi</span>
-                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0 hidden 2xl:inline">Romantik</span>
-                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-gray-100 text-gray-600 rounded-full flex-shrink-0 hidden md:inline">+2</span>
+              {/* Türler - Dinamik */}
+              <div className="flex items-center gap-1 md:gap-2 w-full md:w-44 lg:w-52">
+                {/* Mobilde görünen türler (3 tane) */}
+                {animeGenres.slice(0, 3).map((genre) => (
+                  <span 
+                    key={genre.id} 
+                    className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0"
+                  >
+                    {genre.name}
+                  </span>
+                ))}
+                
+                {/* lg breakpoint'inde görünen 4. tür */}
+                {animeGenres.slice(3, 4).map((genre) => (
+                  <span 
+                    key={genre.id} 
+                    className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0 hidden lg:inline"
+                  >
+                    {genre.name}
+                  </span>
+                ))}
+                
+                {/* xl breakpoint'inde görünen 5. tür */}
+                {animeGenres.slice(4, 5).map((genre) => (
+                  <span 
+                    key={genre.id} 
+                    className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0 hidden xl:inline"
+                  >
+                    {genre.name}
+                  </span>
+                ))}
+                
+                {/* 2xl breakpoint'inde görünen 6. tür */}
+                {animeGenres.slice(5, 6).map((genre) => (
+                  <span 
+                    key={genre.id} 
+                    className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0 hidden 2xl:inline"
+                  >
+                    {genre.name}
+                  </span>
+                ))}
+                
+                {/* Mobilde +N sayacı (3. türden sonrası) */}
+                {animeGenres.length > 3 && (
+                  <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-gray-100 text-gray-600 rounded-full flex-shrink-0 lg:hidden">
+                    +{animeGenres.length - 3}
+                  </span>
+                )}
+                
+                {/* lg breakpoint'inde +N sayacı (4. türden sonrası) */}
+                {animeGenres.length > 4 && (
+                  <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-gray-100 text-gray-600 rounded-full flex-shrink-0 hidden lg:inline xl:hidden">
+                    +{animeGenres.length - 4}
+                  </span>
+                )}
+                
+                {/* xl breakpoint'inde +N sayacı (5. türden sonrası) */}
+                {animeGenres.length > 5 && (
+                  <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-gray-100 text-gray-600 rounded-full flex-shrink-0 hidden xl:inline 2xl:hidden">
+                    +{animeGenres.length - 5}
+                  </span>
+                )}
+                
+                {/* 2xl breakpoint'inde +N sayacı (6. türden sonrası) */}
+                {animeGenres.length > 6 && (
+                  <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-gray-100 text-gray-600 rounded-full flex-shrink-0 hidden 2xl:inline">
+                    +{animeGenres.length - 6}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -97,7 +162,7 @@ export function AnimeListItem({ anime }: AnimeListItemProps) {
                 </div>
                 <div className="flex items-center gap-0.5 md:gap-1 text-xs text-gray-500">
                   <span className="text-xs">🔥</span>
-                  <span className="font-medium text-xs">272612</span>
+                  <span className="font-medium text-xs">{anime.popularity?.toLocaleString() || 'N/A'}</span>
                 </div>
               </div>
 

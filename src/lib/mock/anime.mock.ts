@@ -1,6 +1,61 @@
 import { AnimeSeries, AnimeType, AnimeStatus } from '@prisma/client';
 import { AnimeSeason, AnimeSource, AnimeCountryOfOrigin } from '@/lib/types/constants';
 
+// Mock anime-genre relationships
+export const mockAnimeGenres = [
+  // Attack on Titan genres
+  { animeSeriesId: '1', genreId: '1' }, // Action
+  { animeSeriesId: '1', genreId: '2' }, // Drama
+  { animeSeriesId: '1', genreId: '3' }, // Fantasy
+  { animeSeriesId: '1', genreId: '4' }, // Supernatural
+  { animeSeriesId: '1', genreId: '5' }, // Historical
+  { animeSeriesId: '1', genreId: '6' }, // Horror
+  
+  // Demon Slayer genres
+  { animeSeriesId: '2', genreId: '1' }, // Action
+  { animeSeriesId: '2', genreId: '3' }, // Fantasy
+  { animeSeriesId: '2', genreId: '4' }, // Supernatural
+  { animeSeriesId: '2', genreId: '7' }, // Adventure
+  { animeSeriesId: '2', genreId: '8' }, // Comedy
+  
+  // Jujutsu Kaisen genres
+  { animeSeriesId: '3', genreId: '1' }, // Action
+  { animeSeriesId: '3', genreId: '3' }, // Fantasy
+  { animeSeriesId: '3', genreId: '4' }, // Supernatural
+  { animeSeriesId: '3', genreId: '9' }, // Mystery
+  { animeSeriesId: '3', genreId: '10' }, // Psychological
+  
+  // One Piece genres
+  { animeSeriesId: '4', genreId: '1' }, // Action
+  { animeSeriesId: '4', genreId: '7' }, // Adventure
+  { animeSeriesId: '4', genreId: '8' }, // Comedy
+  { animeSeriesId: '4', genreId: '3' }, // Fantasy
+  { animeSeriesId: '4', genreId: '12' }, // Martial Arts
+  
+  // My Hero Academia genres
+  { animeSeriesId: '5', genreId: '1' }, // Action
+  { animeSeriesId: '5', genreId: '8' }, // Comedy
+  { animeSeriesId: '5', genreId: '13' }, // Superhero
+  { animeSeriesId: '5', genreId: '14' }, // School Life
+  { animeSeriesId: '5', genreId: '3' }, // Fantasy
+  
+  // Death Note genres
+  { animeSeriesId: '6', genreId: '2' }, // Drama
+  { animeSeriesId: '6', genreId: '9' }, // Mystery
+  { animeSeriesId: '6', genreId: '10' }, // Psychological
+  { animeSeriesId: '6', genreId: '4' }, // Supernatural
+  { animeSeriesId: '6', genreId: '25' }, // Thriller
+];
+
+// Helper function to get genres for an anime
+export function getAnimeGenres(animeSeriesId: string) {
+  const genreIds = mockAnimeGenres
+    .filter(ag => ag.animeSeriesId === animeSeriesId)
+    .map(ag => ag.genreId);
+  
+  return mockGenres.filter(genre => genreIds.includes(genre.id));
+}
+
 export const mockAnimes: AnimeSeries[] = [
   {
     id: '1',
