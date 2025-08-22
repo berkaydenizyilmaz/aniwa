@@ -35,7 +35,7 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
     <div className="space-y-4">
       {/* Temel Filtreler */}
       <div className="flex items-center justify-between">
-        <div className="flex flex-wrap gap-4 items-center">
+        <div className="flex flex-wrap gap-6 items-center">
           {/* Search - Kısaltılmış */}
           <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
