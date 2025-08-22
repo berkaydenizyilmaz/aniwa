@@ -48,69 +48,73 @@ export function AnimeListItem({ anime }: AnimeListItemProps) {
       <Card
         className="cursor-pointer overflow-hidden p-0 rounded-sm transition-transform duration-200 hover:scale-[1.02] border-b border-gray-100"
       >
-                 <div className="flex h-24">
-           {/* Cover Image */}
-           <div className="relative w-16 h-20 flex-shrink-0 ml-4 my-2">
-             <Image
-               src={anime.coverImage || '/images/placeholder-anime.jpg'}
-               alt={anime.title}
-               fill
-               className="object-cover rounded"
-             />
-           </div>
+        <div className="flex h-30 md:h-24">
+          {/* Cover Image */}
+          <div className="relative w-12 h-16 md:w-16 md:h-20 flex-shrink-0 ml-2 md:ml-4 my-2">
+            <Image
+              src={anime.coverImage || '/images/placeholder-anime.jpg'}
+              alt={anime.title}
+              fill
+              className="object-cover rounded"
+            />
+          </div>
 
-           {/* Content */}
-           <div className="flex-1 flex items-center justify-between px-6 py-3">
-             {/* Sol taraf - Başlıklar, Türler */}
-             <div className="flex items-center gap-8">
-               {/* Başlıklar */}
-               <div className="min-w-0 w-48">
-                 <h3 className="font-medium text-gray-900 truncate">
-                   {mainTitle}
-                 </h3>
-                 {subTitle && (
-                   <p className="text-sm text-gray-500 truncate">
-                     {subTitle}
-                   </p>
-                 )}
-               </div>
+          {/* Content */}
+          <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between px-3 md:px-6 py-2 md:py-3">
+            {/* Sol taraf - Başlıklar, Türler */}
+            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 lg:gap-8 mb-2 md:mb-0">
+              {/* Başlıklar */}
+              <div className="min-w-0 w-full md:w-40 lg:w-48">
+                <h3 className="font-medium text-gray-900 truncate text-sm md:text-base leading-tight">
+                  {mainTitle}
+                </h3>
+                {subTitle && (
+                  <p className="text-xs md:text-sm text-gray-500 truncate leading-tight">
+                    {subTitle}
+                  </p>
+                )}
+              </div>
 
-               {/* Türler */}
-               <div className="flex items-center gap-2 w-40">
-                 <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">Aksiyon</span>
-                 <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">Dram</span>
-                 <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">Fantastik</span>
-               </div>
-             </div>
+              {/* Türler - Mobilde daha kompakt */}
+              <div className="flex items-center gap-1 md:gap-2 w-full md:w-32 lg:w-40 overflow-hidden">
+                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0">Aksiyon</span>
+                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0">Dram</span>
+                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0">Fantastik</span>
+                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0 hidden lg:inline">Macera</span>
+                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0 hidden xl:inline">Komedi</span>
+                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-red-100 text-red-800 rounded-full flex-shrink-0 hidden 2xl:inline">Romantik</span>
+                <span className="px-1.5 py-0.5 md:px-2 md:py-1 text-xs bg-gray-100 text-gray-600 rounded-full flex-shrink-0 hidden md:inline">+2</span>
+              </div>
+            </div>
 
-             {/* Sağ taraf - Puan, Tip/Bölüm ve Yıl/Durum */}
-             <div className="flex items-center gap-8">
-               {/* Puan & Popülerlik */}
-               <div className="flex flex-col items-center w-20">
-                 <div className="flex items-center gap-1 text-green-600">
-                   <span>⭐</span>
-                   <span className="font-medium">{anime.averageScore?.toFixed(1) || 'N/A'}</span>
-                 </div>
-                 <div className="flex items-center gap-1 text-xs text-gray-500">
-                   <span>🔥</span>
-                   <span className="font-medium">272612</span>
-                 </div>
-               </div>
+            {/* Sağ taraf - Puan, Tip/Bölüm ve Yıl/Durum */}
+            <div className="flex items-center justify-between md:gap-4 lg:gap-6 min-w-0">
+              {/* Puan & Popülerlik */}
+              <div className="flex flex-col items-center w-12 md:w-14 lg:w-16 flex-shrink-0">
+                <div className="flex items-center gap-0.5 md:gap-1 text-green-600">
+                  <span className="text-xs md:text-base">⭐</span>
+                  <span className="font-medium text-xs md:text-base">{anime.averageScore?.toFixed(1) || 'N/A'}</span>
+                </div>
+                <div className="flex items-center gap-0.5 md:gap-1 text-xs text-gray-500">
+                  <span className="text-xs">🔥</span>
+                  <span className="font-medium text-xs">272612</span>
+                </div>
+              </div>
 
-               {/* Tip & Bölüm */}
-               <div className="flex flex-col items-center w-20">
-                 <span className="text-gray-900">{anime.type === 'TV' ? 'TV Dizisi' : anime.type}</span>
-                 <span className="text-xs text-gray-400">{anime.episodes} bölüm</span>
-               </div>
+              {/* Tip & Bölüm */}
+              <div className="flex flex-col items-center w-12 md:w-14 lg:w-16 flex-shrink-0">
+                <span className="text-gray-900 text-xs md:text-sm leading-tight text-center">{anime.type === 'TV' ? 'TV Dizisi' : anime.type}</span>
+                <span className="text-xs text-gray-400 leading-tight text-center">{anime.episodes} bölüm</span>
+              </div>
 
-               {/* Yıl & Durum */}
-               <div className="flex flex-col items-center w-20">
-                 <span className="text-gray-900">{anime.seasonYear}</span>
-                 <span className="text-xs text-gray-400">{anime.status === 'RELEASING' ? 'Devam Ediyor' : 'Tamamlandı'}</span>
-               </div>
-             </div>
-           </div>
-         </div>
+              {/* Yıl & Durum */}
+              <div className="flex flex-col items-center w-12 md:w-14 lg:w-16 flex-shrink-0">
+                <span className="text-gray-900 text-xs md:text-sm leading-tight text-center">{anime.seasonYear}</span>
+                <span className="text-xs text-gray-400 leading-tight text-center">{anime.status === 'RELEASING' ? 'Devam Ediyor' : 'Tamamlandı'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </Card>
     </div>
   );
