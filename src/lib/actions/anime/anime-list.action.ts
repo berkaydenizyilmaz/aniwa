@@ -3,7 +3,8 @@
 import { animeListFiltersSchema, animeRelationsSchema, type AnimeListFiltersInput, type AnimeRelationsInput } from '@/lib/schemas/anime-list.schema';
 import { 
   getAnimesWithFiltersBusiness, 
-  getAnimeRelationsBusiness 
+  getAnimeRelationsBusiness,
+  getFilterOptionsBusiness
 } from '@/lib/services/business/anime/anime-list.business';
 import { revalidatePath } from 'next/cache';
 import { handleServerActionError, type ServerActionResponse } from '@/lib/utils/server-action-error-handler';
@@ -50,6 +51,24 @@ export async function getAnimeRelations(data: AnimeRelationsInput): Promise<Serv
   } catch (error) {
     handleServerActionError(error, {
       actionName: 'getAnimeRelations'
+    });
+  }
+}
+
+// Filtreleme seçeneklerini getir
+export async function getFilterOptions(): Promise<ServerActionResponse> {
+  try {
+    // Business logic'i kullan
+    const result = await getFilterOptionsBusiness();
+
+    return {
+      success: true,
+      data: result.data
+    };
+
+  } catch (error) {
+    handleServerActionError(error, {
+      actionName: 'getFilterOptions'
     });
   }
 }

@@ -12,6 +12,9 @@ import {
 import { findAnimeGenresBySeriesIdDB } from '@/lib/services/db/animeGenre.db';
 import { findAnimeStudiosBySeriesIdDB } from '@/lib/services/db/animeStudio.db';
 import { findAnimeTagsBySeriesIdDB } from '@/lib/services/db/animeTag.db';
+import { findAllGenresDB } from '@/lib/services/db/genre.db';
+import { findAllTagsDB } from '@/lib/services/db/tag.db';
+import { findAllStudiosDB } from '@/lib/services/db/studio.db';
 import { logger } from '@/lib/utils/logger';
 import { EVENTS_DOMAIN } from '@/lib/constants';
 import { ApiResponse } from '@/lib/types/api';
@@ -133,42 +136,22 @@ export async function getAnimeRelationsBusiness(
   data: AnimeRelationsInput
 ): Promise<ApiResponse<AnimeRelationsResponse>> {
   try {
-    const result: AnimeRelationsResponse = {
-      genres: [],
-      studios: [],
-      tags: []
-    };
+    const { animeId } = data;
 
-    // Genre'leri getir
-    if (data.includeGenres) {
-      const animeGenres = await findAnimeGenresBySeriesIdDB(data.animeId);
-      result.genres = animeGenres.map(ag => ({
-        id: ag.genre.id,
-        name: ag.genre.name
-      }));
-    }
-
-    // Studio'ları getir
-    if (data.includeStudios) {
-      const animeStudios = await findAnimeStudiosBySeriesIdDB(data.animeId);
-      result.studios = animeStudios.map(as => ({
-        id: as.studio.id,
-        name: as.studio.name
-      }));
-    }
-
-    // Tag'leri getir
-    if (data.includeTags) {
-      const animeTags = await findAnimeTagsBySeriesIdDB(data.animeId);
-      result.tags = animeTags.map(at => ({
-        id: at.tag.id,
-        name: at.tag.name
-      }));
-    }
+    // Paralel olarak tüm ilişkili verileri getir
+    const [genres, studios, tags] = await Promise.all([
+      findAnimeGenresBySeriesIdDB(animeId),
+      findAnimeStudiosBySeriesIdDB(animeId),
+      findAnimeTagsBySeriesIdDB(animeId)
+    ]);
 
     return {
       success: true,
-      data: result
+      data: {
+        genres: genres.map(g => ({ id: g.genre.id, name: g.genre.name })),
+        studios: studios.map(s => ({ id: s.studio.id, name: s.studio.name })),
+        tags: tags.map(t => ({ id: t.tag.id, name: t.tag.name }))
+      }
     };
 
   } catch (error) {
@@ -178,10 +161,44 @@ export async function getAnimeRelationsBusiness(
     
     await logger.error(
       EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
-      'Anime ilişkili veriler getirme sırasında beklenmedik hata',
-      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', animeId: data.animeId }
+      'Anime ilişkili verileri getirme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata', data }
     );
     
-    throw new BusinessError('Anime ilişkili veriler alınamadı');
+    throw new BusinessError('Anime ilişkili verileri alınamadı');
+  }
+}
+
+// Filtreleme seçeneklerini getir
+export async function getFilterOptionsBusiness(): Promise<ApiResponse<any>> {
+  try {
+    // Tüm genre, tag ve studio'ları paralel olarak getir
+    const [genres, tags, studios] = await Promise.all([
+      findAllGenresDB(),
+      findAllTagsDB(),
+      findAllStudiosDB()
+    ]);
+
+    return {
+      success: true,
+      data: {
+        genres,
+        tags,
+        studios
+      }
+    };
+
+  } catch (error) {
+    if (error instanceof BusinessError || error instanceof DatabaseError) {
+      throw error;
+    }
+    
+    await logger.error(
+      EVENTS_DOMAIN.SYSTEM.BUSINESS_ERROR,
+      'Filtreleme seçenekleri getirme sırasında beklenmedik hata',
+      { error: error instanceof Error ? error.message : 'Bilinmeyen hata' }
+    );
+    
+    throw new BusinessError('Filtreleme seçenekleri alınamadı');
   }
 }

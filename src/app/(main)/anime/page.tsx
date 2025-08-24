@@ -8,6 +8,7 @@ import { AnimeGrid } from '@/components/modules/anime/anime-grid/anime-grid';
 import { Loading } from '@/components/ui/loading';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
+import { AnimeListFiltersInput } from '@/lib/schemas/anime-list.schema';
 
 export default function AnimePage() {
   const { 
@@ -33,8 +34,10 @@ export default function AnimePage() {
   }, [isError, error]);
 
   // Filtreleme değişikliği
-  const handleFiltersChange = (newFilters: any) => {
-    setFilters(newFilters);
+  const handleFiltersChange = (newFilters: Partial<AnimeListFiltersInput>) => {
+    // Mevcut filtreleri koru, yeni filtreleri ekle
+    const updatedFilters = { ...filters, ...newFilters };
+    setFilters(updatedFilters);
   };
 
   // Sıralama değişikliği

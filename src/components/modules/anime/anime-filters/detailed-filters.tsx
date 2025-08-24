@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSettings } from '@/lib/hooks/use-settings';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,10 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { X, Search, ChevronDown, ChevronUp } from 'lucide-react';
-import { mockStatuses, mockCountries, mockSources, mockTags } from '@/lib/mock/anime.mock';
+import { AnimeListFiltersInput } from '@/lib/schemas/anime-list.schema';
+import { getFilterOptions } from '@/lib/actions/anime/anime-list.action';
+import { toast } from 'sonner';
+import { ANIME_DOMAIN } from '@/lib/constants';
 import {
   Tooltip,
   TooltipContent,
@@ -18,7 +21,7 @@ import {
 } from '@/components/ui/tooltip';
 
 interface DetailedFiltersProps {
-  onFiltersChange: (filters: any) => void;
+  onFiltersChange: (filters: Partial<AnimeListFiltersInput>) => void;
 }
 
 export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
@@ -38,25 +41,77 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
 
   const { settings } = useSettings();
 
+  // Filtreleme seçenekleri
+  const [filterOptions, setFilterOptions] = useState({
+    genres: [],
+    tags: [],
+    studios: []
+  });
+  const [isLoadingOptions, setIsLoadingOptions] = useState(true);
+
+  // Filtreleme seçeneklerini yükle
+  useEffect(() => {
+    const loadFilterOptions = async () => {
+      try {
+        const result = await getFilterOptions();
+        if (result.success && result.data) {
+          setFilterOptions(result.data as {
+            genres: Array<{ id: string; name: string }>;
+            tags: Array<{ id: string; name: string; category: string; description: string }>;
+            studios: Array<{ id: string; name: string }>;
+          });
+        }
+      } catch (error) {
+        console.error('Filtreleme seçenekleri yüklenemedi:', error);
+        toast.error('Filtreleme seçenekleri yüklenemedi');
+      } finally {
+        setIsLoadingOptions(false);
+      }
+    };
+
+    loadFilterOptions();
+  }, []);
+
+  // Sabit seçenekler - constants'tan alınan
+  const statuses = Object.entries(ANIME_DOMAIN.UI.STATUS_LABELS).map(([value, label]) => ({
+    value,
+    label
+  }));
+
+  const countries = Object.entries(ANIME_DOMAIN.UI.COUNTRY_OF_ORIGIN_LABELS).map(([value, label]) => ({
+    value,
+    label
+  }));
+
+  const sources = Object.entries(ANIME_DOMAIN.UI.SOURCE_LABELS).map(([value, label]) => ({
+    value,
+    label
+  }));
+
   // Filter tags based on search
-  const filteredTags = mockTags.filter(tag => 
+  const filteredTags = filterOptions.tags.filter(tag => 
     tag.name.toLowerCase().includes(tagSearch.toLowerCase())
   );
 
   const handleFilterChange = () => {
-    const filters = {
-      status: status === 'all' ? undefined : status,
-      country: country === 'all' ? undefined : country,
-      source: source === 'all' ? undefined : source,
-      yearFrom: yearFrom ? parseInt(yearFrom) : undefined,
-      yearTo: yearTo ? parseInt(yearTo) : undefined,
-      episodesFrom: episodesFrom ? parseInt(episodesFrom) : undefined,
-      episodesTo: episodesTo ? parseInt(episodesTo) : undefined,
-      durationFrom: durationFrom ? parseInt(durationFrom) : undefined,
-      durationTo: durationTo ? parseInt(durationTo) : undefined,
-      showAdult: showAdult,
-      tags: selectedTags.length > 0 ? selectedTags : undefined
-    };
+    const filters: Partial<AnimeListFiltersInput> = {};
+    
+    if (status !== 'all') {
+      filters.status = status as any;
+    }
+    
+    if (yearFrom) {
+      filters.year = parseInt(yearFrom);
+    }
+    
+    if (showAdult !== undefined) {
+      filters.isAdult = showAdult;
+    }
+    
+    if (selectedTags.length > 0) {
+      filters.tags = selectedTags;
+    }
+    
     onFiltersChange(filters);
   };
 
@@ -90,7 +145,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tümü</SelectItem>
-              {mockStatuses.map((status) => (
+              {statuses.map((status) => (
                 <SelectItem key={status.value} value={status.value}>
                   {status.label}
                 </SelectItem>
@@ -111,7 +166,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tümü</SelectItem>
-              {mockCountries.map((country) => (
+              {countries.map((country) => (
                 <SelectItem key={country.value} value={country.value}>
                   {country.label}
                 </SelectItem>
@@ -132,7 +187,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tümü</SelectItem>
-              {mockSources.map((source) => (
+              {sources.map((source) => (
                 <SelectItem key={source.value} value={source.value}>
                   {source.label}
                 </SelectItem>
@@ -141,143 +196,79 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
           </Select>
         </div>
 
-        {/* Yetişkin İçerik (Sadece ayar açıksa göster) */}
-        {(settings as any)?.displayAdultContent && (
-          <div className="space-y-2">
-            <Label>Yetişkin İçerik</Label>
-            <div className="flex items-center space-x-2">
-              <Switch
-                checked={showAdult}
-                onCheckedChange={(checked) => {
-                  setShowAdult(checked);
-                  handleFilterChange();
-                }}
-              />
-              <span className="text-sm text-muted-foreground">
-                {showAdult ? 'Göster' : 'Gizle'}
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Aralık Filtreleri */}
-      <div className="space-y-4">
-        <h4 className="font-medium">Aralık Filtreleri</h4>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Yıl Aralığı */}
-          <div className="space-y-2">
-            <Label>Yıl Aralığı</Label>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Başlangıç"
-                value={yearFrom}
-                onChange={(e) => {
-                  setYearFrom(e.target.value);
-                  handleFilterChange();
-                }}
-                className="w-full bg-background"
-              />
-              <Input
-                placeholder="Bitiş"
-                value={yearTo}
-                onChange={(e) => {
-                  setYearTo(e.target.value);
-                  handleFilterChange();
-                }}
-                className="w-full bg-background"
-              />
-            </div>
-          </div>
-
-          {/* Bölüm Aralığı */}
-          <div className="space-y-2">
-            <Label>Bölüm Aralığı</Label>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Min"
-                value={episodesFrom}
-                onChange={(e) => {
-                  setEpisodesFrom(e.target.value);
-                  handleFilterChange();
-                }}
-                className="w-full bg-background"
-              />
-              <Input
-                placeholder="Max"
-                value={episodesTo}
-                onChange={(e) => {
-                  setEpisodesTo(e.target.value);
-                  handleFilterChange();
-                }}
-                className="w-full bg-background"
-              />
-            </div>
-          </div>
-
-          {/* Süre Aralığı */}
-          <div className="space-y-2">
-            <Label>Süre Aralığı (dk)</Label>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Min"
-                value={durationFrom}
-                onChange={(e) => {
-                  setDurationFrom(e.target.value);
-                  handleFilterChange();
-                }}
-                className="w-full bg-background"
-              />
-              <Input
-                placeholder="Max"
-                value={durationTo}
-                onChange={(e) => {
-                  setDurationTo(e.target.value);
-                  handleFilterChange();
-                }}
-                className="w-full bg-background"
-              />
-            </div>
+        {/* Yetişkin İçerik */}
+        <div className="space-y-2">
+          <Label>Yetişkin İçerik</Label>
+          <div className="flex items-center space-x-2">
+            <Switch
+              checked={showAdult}
+              onCheckedChange={(checked) => {
+                setShowAdult(checked);
+                handleFilterChange();
+              }}
+            />
+            <span className="text-sm text-muted-foreground">Göster</span>
           </div>
         </div>
       </div>
 
-      {/* Tag Seçimi */}
+      {/* Yıl Aralığı */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Yıl (Başlangıç)</Label>
+          <Input
+            type="number"
+            placeholder="2020"
+            value={yearFrom}
+            onChange={(e) => {
+              setYearFrom(e.target.value);
+              handleFilterChange();
+            }}
+            min={ANIME_DOMAIN.VALIDATION.YEAR.MIN}
+            max={ANIME_DOMAIN.VALIDATION.YEAR.MAX}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Yıl (Bitiş)</Label>
+          <Input
+            type="number"
+            placeholder="2023"
+            value={yearTo}
+            onChange={(e) => {
+              setYearTo(e.target.value);
+              handleFilterChange();
+            }}
+            min={ANIME_DOMAIN.VALIDATION.YEAR.MIN}
+            max={ANIME_DOMAIN.VALIDATION.YEAR.MAX}
+          />
+        </div>
+      </div>
+
+      {/* Etiketler */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <button
+          <Label>Etiketler</Label>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setShowTags(!showTags)}
-            className="flex items-center gap-2 text-left hover:text-primary transition-colors cursor-pointer"
           >
-            <h4 className="font-medium">
-              {showTags ? 'Etiketleri gizle' : 'Etiketleri göster'}
-            </h4>
-            {showTags ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-            {selectedTags.length > 0 && (
-              <span className="text-sm text-muted-foreground">
-                ({selectedTags.length} seçili)
-              </span>
-            )}
-          </button>
+            {showTags ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
         </div>
-        
-        {/* Seçili Taglar */}
+
+        {/* Seçili Etiketler */}
         {selectedTags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {selectedTags.map((tagId) => {
-              const tag = mockTags.find(t => t.id === tagId);
+              const tag = filterOptions.tags.find(t => t.id === tagId);
               return tag ? (
-                <Badge key={tagId} variant="secondary" className="flex items-center gap-1">
+                <Badge key={tagId} variant="secondary" className="gap-1">
                   {tag.name}
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 ml-1"
+                    className="h-auto p-0 hover:bg-transparent"
                     onClick={() => removeTag(tagId)}
                   >
                     <X className="h-3 w-3" />
@@ -288,62 +279,40 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
           </div>
         )}
 
-        {/* Tag Listesi - Açılır/Kapanır */}
+        {/* Etiket Seçimi */}
         {showTags && (
-          <div className="space-y-4">
-            {/* Tag Arama */}
+          <div className="space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Etiket ara..."
                 value={tagSearch}
                 onChange={(e) => setTagSearch(e.target.value)}
-                className="pl-10 bg-background"
+                className="pl-10"
               />
             </div>
 
-            <div className="max-h-48 overflow-y-auto">
-              {/* Tag Kategorileri */}
-              <TooltipProvider>
-                {Object.entries({
-                  DEMOGRAPHICS: { label: 'Hedef Kitle', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-                  THEMES: { label: 'Ana Temalar', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
-                  CONTENT: { label: 'İçerik Niteliği', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
-                  SETTING: { label: 'Ortam', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' },
-                  ELEMENTS: { label: 'Spesifik Öğeler', color: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' }
-                }).map(([category, config]) => {
-                  const categoryTags = filteredTags.filter(tag => tag.category === category);
-                  if (categoryTags.length === 0) return null;
-                  
-                  return (
-                    <div key={category} className="mb-4 last:mb-0">
-                      <h5 className="text-sm font-medium text-muted-foreground mb-2 px-1">
-                        {config.label}
-                      </h5>
-                      <div className="flex flex-wrap gap-1">
-                        {categoryTags.map((tag) => (
-                          <Tooltip key={tag.id}>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant={selectedTags.includes(tag.id) ? "default" : "outline"}
-                                size="sm"
-                                onClick={() => handleTagToggle(tag.id)}
-                                className={`h-6 px-2 text-xs min-w-fit ${selectedTags.includes(tag.id) ? config.color : ''}`}
-                              >
-                                {tag.name}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="hidden sm:block max-w-[200px]" side="top" sideOffset={8}>
-                              <p className="line-clamp-4">{(tag as any).description || `${tag.name} etiketi hakkında açıklama`}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </TooltipProvider>
-            </div>
+            <TooltipProvider>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 max-h-48 overflow-y-auto">
+                {filteredTags.map((tag) => (
+                  <Tooltip key={tag.id}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={selectedTags.includes(tag.id) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handleTagToggle(tag.id)}
+                        className="flex items-center gap-2 text-left hover:text-primary transition-colors cursor-pointer"
+                      >
+                        {tag.name}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{tag.description}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+            </TooltipProvider>
           </div>
         )}
       </div>
