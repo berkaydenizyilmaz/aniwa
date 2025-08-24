@@ -138,4 +138,33 @@ export async function countAnimeSeriesDB(
   } catch (error) {
     handleDatabaseError(error, 'Anime serisi sayma', { where });
   }
-} 
+}
+
+// Anime listesi getirme (filtreleme, sıralama, sayfalama ile)
+export async function getAnimeListWithFiltersDB(
+  where: Prisma.AnimeSeriesWhereInput,
+  skip: number,
+  take: number,
+  orderBy: Prisma.AnimeSeriesOrderByWithRelationInput,
+  include: Prisma.AnimeSeriesInclude,
+  client: PrismaClientOrTransaction = prisma
+) {
+  try {
+    const [animes, total] = await Promise.all([
+      client.animeSeries.findMany({
+        where,
+        skip,
+        take,
+        orderBy,
+        include
+      }),
+      client.animeSeries.count({ where })
+    ]);
+
+    return { animes, total };
+  } catch (error) {
+    handleDatabaseError(error, 'Anime listesi filtreleme', { where, skip, take, orderBy });
+  }
+}
+
+ 
