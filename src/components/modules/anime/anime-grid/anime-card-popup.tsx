@@ -3,9 +3,8 @@
 import { AnimeSeries } from '@prisma/client';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { ANIME_DOMAIN } from '@/lib/constants';
-import { useState, useEffect } from 'react';
-import { getAnimeRelations } from '@/lib/actions/anime/anime-list.action';
+import { getAnimeGenres } from '@/lib/mock/anime.mock';
+import { useMemo } from 'react';
 
 interface AnimeCardPopupProps {
   anime: AnimeSeries;
@@ -14,32 +13,9 @@ interface AnimeCardPopupProps {
 }
 
 export function AnimeCardPopup({ anime, isVisible, position }: AnimeCardPopupProps) {
-  const [animeGenres, setAnimeGenres] = useState<Array<{ id: string; name: string }>>([]);
-
   // Anime türlerini al
-  useEffect(() => {
-    if (isVisible) {
-      const loadGenres = async () => {
-        try {
-          const result = await getAnimeRelations({
-            animeId: anime.id,
-            includeGenres: true,
-            includeStudios: false,
-            includeTags: false
-          });
-          if (result.success && result.data) {
-            const animeRelations = result.data as { genres: Array<{ id: string; name: string }> };
-            setAnimeGenres(animeRelations.genres || []);
-          }
-        } catch (error) {
-          console.error('Anime türleri yüklenemedi:', error);
-        }
-      };
-
-      loadGenres();
-    }
-  }, [anime.id, isVisible]);
-
+  const animeGenres = useMemo(() => getAnimeGenres(anime.id), [anime.id]);
+  
   // Popup'ta maksimum 3 tür göster, kalanları +N ile göster
   const visibleGenres = animeGenres.slice(0, 3);
   const hiddenCount = animeGenres.length - 3;
@@ -66,7 +42,7 @@ export function AnimeCardPopup({ anime, isVisible, position }: AnimeCardPopupPro
       {/* Episode Info */}
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm text-gray-600">
-          {anime.episodes} Bölüm • {ANIME_DOMAIN.UI.STATUS_LABELS[anime.status] || anime.status}
+          {anime.episodes} Bölüm • {anime.status === 'RELEASING' ? 'Devam Ediyor' : 'Tamamlandı'}
         </span>
         <div className="flex items-center gap-1">
           <span className="text-sm">⭐</span>
@@ -77,21 +53,23 @@ export function AnimeCardPopup({ anime, isVisible, position }: AnimeCardPopupPro
       {/* Format & Type */}
       <div className="mb-3">
         <span className="text-sm text-gray-600">
-          {ANIME_DOMAIN.UI.TYPE_LABELS[anime.type] || anime.type} • {anime.duration} dk
+          {anime.type === 'TV' ? 'TV Dizisi' : anime.type} • {anime.duration} dk
         </span>
       </div>
 
       {/* Year & Season */}
       <div className="mb-4">
         <span className="text-sm text-gray-600">
-          {anime.seasonYear} • {anime.season ? ANIME_DOMAIN.UI.SEASON_LABELS[anime.season] : 'Bilinmiyor'}
+          {anime.seasonYear} • {anime.season === 'SPRING' ? 'İlkbahar' : 
+                              anime.season === 'SUMMER' ? 'Yaz' : 
+                              anime.season === 'FALL' ? 'Sonbahar' : 'Kış'}
         </span>
       </div>
 
       {/* Genre Tags - Dinamik */}
       <div className="flex flex-wrap gap-2">
         {visibleGenres.map((genre) => (
-          <span
+          <span 
             key={genre.id}
             className="px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded-full"
           >

@@ -1,19 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { mockGenres, mockYears, mockSeasons, mockFormats } from '@/lib/mock/anime.mock';
 import { DetailedFilters } from './detailed-filters';
-import { AnimeListFiltersInput } from '@/lib/schemas/anime-list.schema';
-import { Season, AnimeType } from '@prisma/client';
-import { getFilterOptions } from '@/lib/actions/anime/anime-list.action';
-import { toast } from 'sonner';
-import { ANIME_DOMAIN } from '@/lib/constants';
 
 interface AnimeFiltersProps {
-  onFiltersChange: (filters: Partial<AnimeListFiltersInput>) => void;
+  onFiltersChange: (filters: any) => void;
 }
 
 export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
@@ -23,57 +19,17 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
   const [season, setSeason] = useState('all');
   const [format, setFormat] = useState('all');
   const [showDetailedFilters, setShowDetailedFilters] = useState(false);
-  
-  // Filtreleme seçenekleri
-  const [filterOptions, setFilterOptions] = useState<{
-    genres: Array<{ id: string; name: string }>;
-    tags: Array<{ id: string; name: string; category: string; description: string }>;
-    studios: Array<{ id: string; name: string }>;
-  }>({
-    genres: [],
-    tags: [],
-    studios: []
-  });
-  const [isLoadingOptions, setIsLoadingOptions] = useState(true);
 
-  // Filtreleme seçeneklerini yükle
-  useEffect(() => {
-    const loadFilterOptions = async () => {
-      try {
-        const result = await getFilterOptions();
-        if (result.success && result.data) {
-          setFilterOptions(result.data as typeof filterOptions);
-        } else {
-          toast.error('Filtreleme seçenekleri yüklenemedi');
-        }
-      } catch (error) {
-        console.error('Filtreleme seçenekleri yüklenemedi:', error);
-        toast.error('Filtreleme seçenekleri yüklenemedi');
-      } finally {
-        setIsLoadingOptions(false);
-      }
+  const handleFilterChange = () => {
+    const filters = {
+      search,
+      genre: genre === 'all' ? undefined : genre,
+      year: year === 'all' ? undefined : parseInt(year),
+      season: season === 'all' ? undefined : season,
+      format: format === 'all' ? undefined : format
     };
-
-    loadFilterOptions();
-  }, []);
-
-  // Sabit seçenekler - constants'tan alınan
-  const years = Array.from(
-    { length: 30 }, // Son 30 yıl
-    (_, i) => new Date().getFullYear() - i
-  );
-
-  const seasons = Object.entries(ANIME_DOMAIN.UI.SEASON_LABELS).map(([value, label]) => ({
-    value,
-    label
-  }));
-
-  const formats = Object.entries(ANIME_DOMAIN.UI.TYPE_LABELS).map(([value, label]) => ({
-    value,
-    label
-  }));
-
-
+    onFiltersChange(filters);
+  };
 
   return (
     <div className="space-y-4">
@@ -88,10 +44,9 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                // Search özelliği backend'de henüz implementasyon olmadığından disabled
+                handleFilterChange();
               }}
               className="pl-10"
-              disabled
             />
           </div>
 
@@ -99,33 +54,17 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
           <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 w-full sm:w-auto">
             {/* Genres */}
             <Select value={genre === 'all' ? '' : genre} onValueChange={(value) => {
-              const newGenre = value || 'all';
-              setGenre(newGenre);
-              
-              // Filter güncelle
-              const filters: Partial<AnimeListFiltersInput> = {};
-              if (newGenre !== 'all') {
-                filters.genres = [newGenre];
-              }
-              if (year !== 'all') {
-                filters.year = parseInt(year);
-              }
-              if (season !== 'all') {
-                filters.season = season as Season;
-              }
-              if (format !== 'all') {
-                filters.type = format as AnimeType;
-              }
-              onFiltersChange(filters);
+              setGenre(value);
+              handleFilterChange();
             }}>
               <SelectTrigger className="w-full sm:w-[130px] md:w-[110px] rounded-sm">
-                <SelectValue placeholder={isLoadingOptions ? "Yükleniyor..." : "Tür"} />
+                <SelectValue placeholder="Tür" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
                 <SelectItem value="all">Tümü</SelectItem>
-                {filterOptions.genres.map((genreOption) => (
-                  <SelectItem key={genreOption.id} value={genreOption.id}>
-                    {genreOption.name}
+                {mockGenres.map((genre) => (
+                  <SelectItem key={genre.id} value={genre.id}>
+                    {genre.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -133,31 +72,15 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
 
             {/* Year */}
             <Select value={year === 'all' ? '' : year} onValueChange={(value) => {
-              const newYear = value || 'all';
-              setYear(newYear);
-              
-              // Filter güncelle
-              const filters: Partial<AnimeListFiltersInput> = {};
-              if (genre !== 'all') {
-                filters.genres = [genre];
-              }
-              if (newYear !== 'all') {
-                filters.year = parseInt(newYear);
-              }
-              if (season !== 'all') {
-                filters.season = season as Season;
-              }
-              if (format !== 'all') {
-                filters.type = format as AnimeType;
-              }
-              onFiltersChange(filters);
+              setYear(value);
+              handleFilterChange();
             }}>
               <SelectTrigger className="w-full sm:w-[120px] md:w-[100px] rounded-sm">
                 <SelectValue placeholder="Yıl" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
                 <SelectItem value="all">Tümü</SelectItem>
-                {years.map((yearOption) => (
+                {mockYears.map((yearOption) => (
                   <SelectItem key={yearOption} value={yearOption.toString()}>
                     {yearOption}
                   </SelectItem>
@@ -167,33 +90,17 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
 
             {/* Season */}
             <Select value={season === 'all' ? '' : season} onValueChange={(value) => {
-              const newSeason = value || 'all';
-              setSeason(newSeason);
-              
-              // Filter güncelle
-              const filters: Partial<AnimeListFiltersInput> = {};
-              if (genre !== 'all') {
-                filters.genres = [genre];
-              }
-              if (year !== 'all') {
-                filters.year = parseInt(year);
-              }
-              if (newSeason !== 'all') {
-                filters.season = newSeason as Season;
-              }
-              if (format !== 'all') {
-                filters.type = format as AnimeType;
-              }
-              onFiltersChange(filters);
+              setSeason(value);
+              handleFilterChange();
             }}>
               <SelectTrigger className="w-full sm:w-[120px] md:w-[100px]">
                 <SelectValue placeholder="Sezon" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
                 <SelectItem value="all">Tümü</SelectItem>
-                {seasons.map((seasonOption) => (
-                  <SelectItem key={seasonOption.value} value={seasonOption.value}>
-                    {seasonOption.label}
+                {mockSeasons.map((season) => (
+                  <SelectItem key={season.value} value={season.value}>
+                    {season.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -201,33 +108,17 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
 
             {/* Format */}
             <Select value={format === 'all' ? '' : format} onValueChange={(value) => {
-              const newFormat = value || 'all';
-              setFormat(newFormat);
-              
-              // Filter güncelle
-              const filters: Partial<AnimeListFiltersInput> = {};
-              if (genre !== 'all') {
-                filters.genres = [genre];
-              }
-              if (year !== 'all') {
-                filters.year = parseInt(year);
-              }
-              if (season !== 'all') {
-                filters.season = season as Season;
-              }
-              if (newFormat !== 'all') {
-                filters.type = newFormat as AnimeType;
-              }
-              onFiltersChange(filters);
+              setFormat(value);
+              handleFilterChange();
             }}>
               <SelectTrigger className="w-full sm:w-[120px] md:w-[100px]">
                 <SelectValue placeholder="Format" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
                 <SelectItem value="all">Tümü</SelectItem>
-                {formats.map((formatOption) => (
-                  <SelectItem key={formatOption.value} value={formatOption.value}>
-                    {formatOption.label}
+                {mockFormats.map((format) => (
+                  <SelectItem key={format.value} value={format.value}>
+                    {format.label}
                   </SelectItem>
                 ))}
               </SelectContent>
