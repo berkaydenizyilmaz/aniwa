@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface AnimeSortViewProps {
-  sortBy: 'popularity' | 'anilistAverageScore' | 'createdAt';
+  sortBy: 'popularity' | 'anilistAverageScore' | 'createdAt' | 'title';
   sortOrder: 'asc' | 'desc';
   viewMode: 'card' | 'list';
-  onSortChange: (sortBy: 'popularity' | 'anilistAverageScore' | 'createdAt', sortOrder: 'asc' | 'desc') => void;
+  onSortChange: (sortBy: 'popularity' | 'anilistAverageScore' | 'createdAt' | 'title', sortOrder: 'asc' | 'desc') => void;
   onViewModeChange: (viewMode: 'card' | 'list') => void;
 }
 
@@ -23,7 +23,8 @@ export function AnimeSortView({
   const sortOptions = [
     { value: 'popularity', label: 'Popülerlik' },
     { value: 'anilistAverageScore', label: 'Puan' },
-    { value: 'createdAt', label: 'Tarih' }
+    { value: 'createdAt', label: 'Tarih' },
+    { value: 'title', label: 'Başlık' }
   ];
 
   const handleSortChange = (newSortBy: string) => {

@@ -3,7 +3,7 @@
 import { Skeleton } from './skeleton';
 
 type LoadingProps = {
-  variant?: 'card' | 'inline' | 'page';
+  variant?: 'card' | 'inline' | 'page' | 'anime-grid';
   lines?: number;
 };
 
@@ -22,6 +22,19 @@ export function Loading({ variant = 'card', lines = 3 }: LoadingProps) {
           </span>
           Yükleniyor…
         </div>
+      </div>
+    );
+  }
+
+  if (variant === 'anime-grid') {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div key={i} className="space-y-3">
+            <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+        ))}
       </div>
     );
   }
