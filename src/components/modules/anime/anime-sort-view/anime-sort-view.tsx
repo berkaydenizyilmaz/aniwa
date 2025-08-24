@@ -3,12 +3,15 @@
 import { ArrowUpDown, Grid2X2, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ANIME_DOMAIN } from '@/lib/constants';
+
+type SortByType = 'popularity' | 'anilistAverageScore' | 'createdAt' | 'title';
 
 interface AnimeSortViewProps {
-  sortBy: 'popularity' | 'anilistAverageScore' | 'createdAt' | 'title';
+  sortBy: SortByType;
   sortOrder: 'asc' | 'desc';
   viewMode: 'card' | 'list';
-  onSortChange: (sortBy: 'popularity' | 'anilistAverageScore' | 'createdAt' | 'title', sortOrder: 'asc' | 'desc') => void;
+  onSortChange: (sortBy: SortByType, sortOrder: 'asc' | 'desc') => void;
   onViewModeChange: (viewMode: 'card' | 'list') => void;
 }
 
@@ -21,10 +24,10 @@ export function AnimeSortView({
 }: AnimeSortViewProps) {
   
   const sortOptions = [
-    { value: 'popularity', label: 'Popülerlik' },
-    { value: 'anilistAverageScore', label: 'Puan' },
-    { value: 'createdAt', label: 'Tarih' },
-    { value: 'title', label: 'Başlık' }
+    { value: ANIME_DOMAIN.LIST.SORT.OPTIONS.POPULARITY, label: 'Popülerlik' },
+    { value: ANIME_DOMAIN.LIST.SORT.OPTIONS.ANILIST_SCORE, label: 'Puan' },
+    { value: ANIME_DOMAIN.LIST.SORT.OPTIONS.CREATED_AT, label: 'Tarih' },
+    { value: ANIME_DOMAIN.LIST.SORT.OPTIONS.TITLE, label: 'Başlık' }
   ];
 
   const handleSortChange = (newSortBy: string) => {
@@ -33,7 +36,7 @@ export function AnimeSortView({
       onSortChange(sortBy, sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       // Yeni sıralama seçilirse varsayılan olarak desc
-      onSortChange(newSortBy as any, 'desc');
+      onSortChange(newSortBy as SortByType, 'desc');
     }
   };
 

@@ -15,7 +15,7 @@ interface AnimeCardPopupProps {
 export function AnimeCardPopup({ anime, isVisible, position }: AnimeCardPopupProps) {
   // Anime türlerini al
   const animeGenres = useMemo(() => getAnimeGenres(anime.id), [anime.id]);
-  
+
   // Popup'ta maksimum 3 tür göster, kalanları +N ile göster
   const visibleGenres = animeGenres.slice(0, 3);
   const hiddenCount = animeGenres.length - 3;
@@ -60,16 +60,16 @@ export function AnimeCardPopup({ anime, isVisible, position }: AnimeCardPopupPro
       {/* Year & Season */}
       <div className="mb-4">
         <span className="text-sm text-gray-600">
-          {anime.seasonYear} • {anime.season === 'SPRING' ? 'İlkbahar' : 
-                              anime.season === 'SUMMER' ? 'Yaz' : 
-                              anime.season === 'FALL' ? 'Sonbahar' : 'Kış'}
+          {anime.seasonYear} • {anime.season === 'SPRING' ? 'İlkbahar' :
+            anime.season === 'SUMMER' ? 'Yaz' :
+              anime.season === 'FALL' ? 'Sonbahar' : 'Kış'}
         </span>
       </div>
 
       {/* Genre Tags - Dinamik */}
       <div className="flex flex-wrap gap-2">
         {visibleGenres.map((genre) => (
-          <span 
+          <span
             key={genre.id}
             className="px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded-full"
           >

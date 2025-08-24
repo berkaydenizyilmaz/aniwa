@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSettings } from '@/lib/hooks/use-settings';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,23 +25,19 @@ interface DetailedFiltersProps {
 
 export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
   const [status, setStatus] = useState('all');
-  const [country, setCountry] = useState('all');
-  const [source, setSource] = useState('all');
   const [yearFrom, setYearFrom] = useState('');
   const [yearTo, setYearTo] = useState('');
-  const [episodesFrom, setEpisodesFrom] = useState('');
-  const [episodesTo, setEpisodesTo] = useState('');
-  const [durationFrom, setDurationFrom] = useState('');
-  const [durationTo, setDurationTo] = useState('');
   const [showAdult, setShowAdult] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showTags, setShowTags] = useState(false);
   const [tagSearch, setTagSearch] = useState('');
 
-  const { settings } = useSettings();
-
   // Filtreleme seçenekleri
-  const [filterOptions, setFilterOptions] = useState({
+  const [filterOptions, setFilterOptions] = useState<{
+    genres: Array<{ id: string; name: string }>;
+    tags: Array<{ id: string; name: string; category: string; description: string }>;
+    studios: Array<{ id: string; name: string }>;
+  }>({
     genres: [],
     tags: [],
     studios: []
@@ -55,11 +50,9 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
       try {
         const result = await getFilterOptions();
         if (result.success && result.data) {
-          setFilterOptions(result.data as {
-            genres: Array<{ id: string; name: string }>;
-            tags: Array<{ id: string; name: string; category: string; description: string }>;
-            studios: Array<{ id: string; name: string }>;
-          });
+          setFilterOptions(result.data as typeof filterOptions);
+        } else {
+          toast.error('Filtreleme seçenekleri yüklenemedi');
         }
       } catch (error) {
         console.error('Filtreleme seçenekleri yüklenemedi:', error);
@@ -78,53 +71,51 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
     label
   }));
 
-  const countries = Object.entries(ANIME_DOMAIN.UI.COUNTRY_OF_ORIGIN_LABELS).map(([value, label]) => ({
-    value,
-    label
-  }));
-
-  const sources = Object.entries(ANIME_DOMAIN.UI.SOURCE_LABELS).map(([value, label]) => ({
-    value,
-    label
-  }));
-
   // Filter tags based on search
   const filteredTags = filterOptions.tags.filter(tag => 
     tag.name.toLowerCase().includes(tagSearch.toLowerCase())
   );
 
-  const handleFilterChange = () => {
+  const updateFilters = (newStatus?: string, newYearFrom?: string, newYearTo?: string, newShowAdult?: boolean, newTags?: string[]) => {
     const filters: Partial<AnimeListFiltersInput> = {};
     
-    if (status !== 'all') {
-      filters.status = status as any;
+    const currentStatus = newStatus ?? status;
+    const currentYearFrom = newYearFrom ?? yearFrom;
+    const currentShowAdult = newShowAdult ?? showAdult;
+    const currentTags = newTags ?? selectedTags;
+    
+    if (currentStatus !== 'all') {
+      filters.status = currentStatus as any;
     }
     
-    if (yearFrom) {
-      filters.year = parseInt(yearFrom);
+    if (currentYearFrom) {
+      filters.year = parseInt(currentYearFrom);
     }
     
-    if (showAdult !== undefined) {
-      filters.isAdult = showAdult;
+    if (currentShowAdult !== undefined) {
+      filters.isAdult = currentShowAdult;
     }
     
-    if (selectedTags.length > 0) {
-      filters.tags = selectedTags;
+    if (currentTags.length > 0) {
+      filters.tags = currentTags;
     }
     
     onFiltersChange(filters);
   };
 
   const handleTagToggle = (tagId: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tagId) 
-        ? prev.filter(id => id !== tagId)
-        : [...prev, tagId]
-    );
+    const newTags = selectedTags.includes(tagId) 
+      ? selectedTags.filter(id => id !== tagId)
+      : [...selectedTags, tagId];
+    
+    setSelectedTags(newTags);
+    updateFilters(undefined, undefined, undefined, undefined, newTags);
   };
 
   const removeTag = (tagId: string) => {
-    setSelectedTags(prev => prev.filter(id => id !== tagId));
+    const newTags = selectedTags.filter(id => id !== tagId);
+    setSelectedTags(newTags);
+    updateFilters(undefined, undefined, undefined, undefined, newTags);
   };
 
   return (
@@ -132,64 +123,23 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
       <h3 className="font-medium text-lg">Ayrıntılı Filtreler</h3>
       
       {/* Temel Filtreler */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
         {/* Yayınlanma Durumu */}
         <div className="space-y-2">
           <Label>Yayınlanma Durumu</Label>
           <Select value={status} onValueChange={(value) => {
-            setStatus(value);
-            handleFilterChange();
+            const newStatus = value || 'all';
+            setStatus(newStatus);
+            updateFilters(newStatus);
           }}>
             <SelectTrigger className="w-full bg-background">
               <SelectValue placeholder="Durum" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tümü</SelectItem>
-              {statuses.map((status) => (
-                <SelectItem key={status.value} value={status.value}>
-                  {status.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Ülke */}
-        <div className="space-y-2">
-          <Label>Ülke</Label>
-          <Select value={country} onValueChange={(value) => {
-            setCountry(value);
-            handleFilterChange();
-          }}>
-            <SelectTrigger className="w-full bg-background">
-              <SelectValue placeholder="Ülke" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tümü</SelectItem>
-              {countries.map((country) => (
-                <SelectItem key={country.value} value={country.value}>
-                  {country.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Kaynak */}
-        <div className="space-y-2">
-          <Label>Kaynak</Label>
-          <Select value={source} onValueChange={(value) => {
-            setSource(value);
-            handleFilterChange();
-          }}>
-            <SelectTrigger className="w-full bg-background">
-              <SelectValue placeholder="Kaynak" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tümü</SelectItem>
-              {sources.map((source) => (
-                <SelectItem key={source.value} value={source.value}>
-                  {source.label}
+              {statuses.map((statusOption) => (
+                <SelectItem key={statusOption.value} value={statusOption.value}>
+                  {statusOption.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -204,7 +154,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
               checked={showAdult}
               onCheckedChange={(checked) => {
                 setShowAdult(checked);
-                handleFilterChange();
+                updateFilters(undefined, undefined, undefined, checked);
               }}
             />
             <span className="text-sm text-muted-foreground">Göster</span>
@@ -221,8 +171,9 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
             placeholder="2020"
             value={yearFrom}
             onChange={(e) => {
-              setYearFrom(e.target.value);
-              handleFilterChange();
+              const newYearFrom = e.target.value;
+              setYearFrom(newYearFrom);
+              updateFilters(undefined, newYearFrom);
             }}
             min={ANIME_DOMAIN.VALIDATION.YEAR.MIN}
             max={ANIME_DOMAIN.VALIDATION.YEAR.MAX}
@@ -235,8 +186,9 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
             placeholder="2023"
             value={yearTo}
             onChange={(e) => {
-              setYearTo(e.target.value);
-              handleFilterChange();
+              const newYearTo = e.target.value;
+              setYearTo(newYearTo);
+              updateFilters(undefined, undefined, newYearTo);
             }}
             min={ANIME_DOMAIN.VALIDATION.YEAR.MIN}
             max={ANIME_DOMAIN.VALIDATION.YEAR.MAX}
