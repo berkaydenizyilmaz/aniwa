@@ -8,6 +8,7 @@ import { handleServerActionError } from '@/lib/utils/server-action-error-handler
 import { AnimeListFilters } from '@/lib/schemas/anime-list.schema';
 import { ApiResponse } from '@/lib/types/api';
 import { AnimeListResponse, AnimeFilterOptionsResponse } from '@/lib/types/api/anime-list.api';
+import { ROUTES_DOMAIN } from '@/lib/constants';
 
 // Anime listesi getirme action'ı
 export async function getAnimeListAction(
@@ -17,14 +18,13 @@ export async function getAnimeListAction(
     const result = await getAnimeListBusiness(filters);
     
     // Cache'i temizle (gerekirse)
-    revalidatePath('/anime');
+    revalidatePath(ROUTES_DOMAIN.PAGES.ANIME);
     
     return result;
   } catch (error) {
     return handleServerActionError(
       error,
-      'Anime listesi getirme başarısız',
-      { filters: JSON.stringify(filters) }
+      { actionName: 'getAnimeList' }
     );
   }
 }
@@ -38,7 +38,7 @@ export async function getAnimeFilterOptionsAction(): Promise<ApiResponse<AnimeFi
   } catch (error) {
     return handleServerActionError(
       error,
-      'Filtre seçenekleri getirme başarısız'
+      { actionName: 'getAnimeFilterOptions' }
     );
   }
 }
