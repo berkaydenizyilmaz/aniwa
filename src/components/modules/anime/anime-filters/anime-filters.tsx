@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DetailedFilters } from './detailed-filters';
 import { AnimeListFiltersInput } from '@/lib/schemas/anime-list.schema';
+import { Season, AnimeType } from '@prisma/client';
 import { getFilterOptions } from '@/lib/actions/anime/anime-list.action';
 import { toast } from 'sonner';
 import { ANIME_DOMAIN } from '@/lib/constants';
@@ -110,10 +111,10 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
                 filters.year = parseInt(year);
               }
               if (season !== 'all') {
-                filters.season = season as any;
+                filters.season = season as Season;
               }
               if (format !== 'all') {
-                filters.type = format as any;
+                filters.type = format as AnimeType;
               }
               onFiltersChange(filters);
             }}>
@@ -144,10 +145,10 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
                 filters.year = parseInt(newYear);
               }
               if (season !== 'all') {
-                filters.season = season as any;
+                filters.season = season as Season;
               }
               if (format !== 'all') {
-                filters.type = format as any;
+                filters.type = format as AnimeType;
               }
               onFiltersChange(filters);
             }}>
@@ -178,10 +179,10 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
                 filters.year = parseInt(year);
               }
               if (newSeason !== 'all') {
-                filters.season = newSeason as any;
+                filters.season = newSeason as Season;
               }
               if (format !== 'all') {
-                filters.type = format as any;
+                filters.type = format as AnimeType;
               }
               onFiltersChange(filters);
             }}>
@@ -212,10 +213,10 @@ export function AnimeFilters({ onFiltersChange }: AnimeFiltersProps) {
                 filters.year = parseInt(year);
               }
               if (season !== 'all') {
-                filters.season = season as any;
+                filters.season = season as Season;
               }
               if (newFormat !== 'all') {
-                filters.type = newFormat as any;
+                filters.type = newFormat as AnimeType;
               }
               onFiltersChange(filters);
             }}>

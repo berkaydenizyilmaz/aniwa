@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { X, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { AnimeListFiltersInput } from '@/lib/schemas/anime-list.schema';
+import { AnimeStatus } from '@prisma/client';
 import { getFilterOptions } from '@/lib/actions/anime/anime-list.action';
 import { toast } from 'sonner';
 import { ANIME_DOMAIN } from '@/lib/constants';
@@ -85,7 +86,7 @@ export function DetailedFilters({ onFiltersChange }: DetailedFiltersProps) {
     const currentTags = newTags ?? selectedTags;
     
     if (currentStatus !== 'all') {
-      filters.status = currentStatus as any;
+      filters.status = currentStatus as AnimeStatus;
     }
     
     if (currentYearFrom) {

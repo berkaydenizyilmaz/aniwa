@@ -4,8 +4,9 @@ import { AnimeSeries, TitleLanguage, UserProfileSettings } from '@prisma/client'
 import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 import { useSettings } from '@/lib/hooks/use-settings';
-import { getAnimeGenres } from '@/lib/mock/anime.mock';
-import { useMemo } from 'react';
+import { ANIME_DOMAIN } from '@/lib/constants';
+import { useState, useEffect } from 'react';
+import { getAnimeRelations } from '@/lib/actions/anime/anime-list.action';
 
 interface AnimeListItemProps {
   anime: AnimeSeries;
@@ -13,12 +14,32 @@ interface AnimeListItemProps {
 
 export function AnimeListItem({ anime }: AnimeListItemProps) {
   const { settings } = useSettings();
+  const [animeGenres, setAnimeGenres] = useState<Array<{ id: string; name: string }>>([]);
   
   // Kullanıcı tercihini al, yoksa default (romaji)
   const titlePreference = (settings as UserProfileSettings)?.titleLanguagePreference || TitleLanguage.ROMAJI;
   
   // Anime türlerini al
-  const animeGenres = useMemo(() => getAnimeGenres(anime.id), [anime.id]);
+  useEffect(() => {
+    const loadGenres = async () => {
+      try {
+        const result = await getAnimeRelations({
+          animeId: anime.id,
+          includeGenres: true,
+          includeStudios: false,
+          includeTags: false
+        });
+        if (result.success && result.data) {
+          const animeRelations = result.data as { genres: Array<{ id: string; name: string }> };
+          setAnimeGenres(animeRelations.genres || []);
+        }
+      } catch (error) {
+        console.error('Anime türleri yüklenemedi:', error);
+      }
+    };
+
+    loadGenres();
+  }, [anime.id]);
   
   // Başlık ve alt başlık belirleme fonksiyonu
   const getTitleDisplay = () => {
@@ -168,14 +189,18 @@ export function AnimeListItem({ anime }: AnimeListItemProps) {
 
               {/* Tip & Bölüm */}
               <div className="flex flex-col items-center w-12 sm:w-12 md:w-14 lg:w-16 flex-shrink-0">
-                <span className="text-gray-900 text-xs sm:text-xs md:text-sm leading-tight text-center">{anime.type === 'TV' ? 'TV Dizisi' : anime.type}</span>
+                <span className="text-gray-900 text-xs sm:text-xs md:text-sm leading-tight text-center">
+                  {ANIME_DOMAIN.UI.TYPE_LABELS[anime.type] || anime.type}
+                </span>
                 <span className="text-xs text-gray-400 leading-tight text-center">{anime.episodes} bölüm</span>
               </div>
 
               {/* Yıl & Durum */}
               <div className="flex flex-col items-center w-12 sm:w-12 md:w-14 lg:w-16 flex-shrink-0">
                 <span className="text-gray-900 text-xs sm:text-xs md:text-sm leading-tight text-center">{anime.seasonYear}</span>
-                <span className="text-xs text-gray-400 leading-tight text-center">{anime.status === 'RELEASING' ? 'Devam Ediyor' : 'Tamamlandı'}</span>
+                <span className="text-xs text-gray-400 leading-tight text-center">
+                  {ANIME_DOMAIN.UI.STATUS_LABELS[anime.status] || anime.status}
+                </span>
               </div>
             </div>
           </div>

@@ -16,10 +16,10 @@ export function AnimeCard({ anime }: AnimeCardProps) {
   const { settings } = useSettings();
   const [showPopup, setShowPopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-  
+
   // Kullanıcı tercihini al, yoksa default (romaji)
   const titlePreference = (settings as UserProfileSettings)?.titleLanguagePreference || TitleLanguage.ROMAJI;
-  
+
   // Başlık ve alt başlık belirleme fonksiyonu
   const getTitleDisplay = () => {
     switch (titlePreference) {
@@ -45,25 +45,25 @@ export function AnimeCard({ anime }: AnimeCardProps) {
         };
     }
   };
-  
+
   const { main: mainTitle, sub: subTitle } = getTitleDisplay();
 
   const handleMouseEnter = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const windowWidth = window.innerWidth;
-    
-         // Responsive popup genişlikleri - daha küçük
-     let popupWidth = 256; // w-64 = 256px (mobil)
-     if (windowWidth >= 1024) {
-       popupWidth = 320; // lg:w-80 = 320px (desktop)
-     } else if (windowWidth >= 640) {
-       popupWidth = 288; // sm:w-72 = 288px (tablet)
-     }
-    
+
+    // Responsive popup genişlikleri - daha küçük
+    let popupWidth = 256; // w-64 = 256px (mobil)
+    if (windowWidth >= 1024) {
+      popupWidth = 320; // lg:w-80 = 320px (desktop)
+    } else if (windowWidth >= 640) {
+      popupWidth = 288; // sm:w-72 = 288px (tablet)
+    }
+
     // Sağ tarafta yer var mı kontrol et
     const spaceOnRight = windowWidth - rect.right - popupWidth - 10;
     const spaceOnLeft = rect.left - popupWidth - 10;
-    
+
     let x: number;
     if (spaceOnRight >= 0) {
       // Sağ tarafta yer var
@@ -75,7 +75,7 @@ export function AnimeCard({ anime }: AnimeCardProps) {
       // Hiçbir tarafta yer yok, sağa yapıştır
       x = windowWidth - popupWidth - 10;
     }
-    
+
     setPopupPosition({
       x,
       y: rect.top
@@ -94,7 +94,7 @@ export function AnimeCard({ anime }: AnimeCardProps) {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-              {/* Cover Image */}
+        {/* Cover Image */}
         <div className="relative h-full">
           <Image
             src={anime.coverImage || '/images/placeholder-anime.jpg'}
@@ -107,31 +107,31 @@ export function AnimeCard({ anime }: AnimeCardProps) {
           <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-black/95 via-black/70 to-transparent pointer-events-none" />
 
           {/* Title */}
-                   <div className={cn(
+          <div className={cn(
             "absolute bottom-0 left-0 right-0 p-3 z-10",
             "transition-all duration-300 ease-in-out"
           )}>
-          <h3 className={cn(
-            "text-white font-medium line-clamp-2",
-            "text-base"
-          )}>
-            {mainTitle}
-          </h3>
+            <h3 className={cn(
+              "text-white font-medium line-clamp-2",
+              "text-base"
+            )}>
+              {mainTitle}
+            </h3>
 
-          {subTitle && (
-            <p className="text-white/70 text-xs mt-1 line-clamp-1">
-              {subTitle}
-            </p>
-          )}
+            {subTitle && (
+              <p className="text-white/70 text-xs mt-1 line-clamp-1">
+                {subTitle}
+              </p>
+            )}
+          </div>
         </div>
-      </div>
-    </Card>
-    
-    <AnimeCardPopup
-      anime={anime}
-      isVisible={showPopup}
-      position={popupPosition}
-    />
-  </div>
+      </Card>
+
+      <AnimeCardPopup
+        anime={anime}
+        isVisible={showPopup}
+        position={popupPosition}
+      />
+    </div>
   );
 }

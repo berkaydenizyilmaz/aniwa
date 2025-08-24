@@ -15,14 +15,14 @@ interface AnimeSortViewProps {
   onViewModeChange: (viewMode: 'card' | 'list') => void;
 }
 
-export function AnimeSortView({ 
-  sortBy, 
-  sortOrder, 
-  viewMode, 
-  onSortChange, 
-  onViewModeChange 
+export function AnimeSortView({
+  sortBy,
+  sortOrder,
+  viewMode,
+  onSortChange,
+  onViewModeChange
 }: AnimeSortViewProps) {
-  
+
   const sortOptions = [
     { value: ANIME_DOMAIN.LIST.SORT.OPTIONS.POPULARITY, label: 'Popülerlik' },
     { value: ANIME_DOMAIN.LIST.SORT.OPTIONS.ANILIST_SCORE, label: 'Puan' },
