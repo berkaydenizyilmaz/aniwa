@@ -36,6 +36,29 @@ export const ANIME_DOMAIN = {
     MAX_EPISODES_PER_PART: 999,
     DEFAULT_STATUS: 'RELEASING' as const,
   },
+
+  // List Rules
+  LIST: {
+    PAGINATION: {
+      DEFAULT_PAGE: 1,
+      DEFAULT_LIMIT: 20,
+      MAX_LIMIT: 50,
+      MIN_LIMIT: 1,
+    },
+    SORT: {
+      OPTIONS: {
+        POPULARITY: 'popularity',
+        ANILIST_SCORE: 'anilistAverageScore',
+        CREATED_AT: 'createdAt',
+        TITLE: 'title',
+      } as const,
+      DEFAULT: 'popularity' as const,
+      DEFAULT_ORDER: 'desc' as const,
+    },
+    FILTERS: {
+      DEFAULT_ADULT: false,
+    },
+  },
   
   // UI Presentation
   UI: {
@@ -65,9 +88,9 @@ export const ANIME_DOMAIN = {
     STATUS_COLORS: {
       FINISHED: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
       RELEASING: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      NOT_YET_RELEASED: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      NOT_YET_RELEASED: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
       CANCELLED: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-      HIATUS: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+      HIATUS: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
     },
     SEASON_LABELS: {
       WINTER: 'Kış',
