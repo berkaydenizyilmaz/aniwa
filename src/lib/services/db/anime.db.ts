@@ -138,4 +138,26 @@ export async function countAnimeSeriesDB(
   } catch (error) {
     handleDatabaseError(error, 'Anime serisi sayma', { where });
   }
+}
+
+// Anime serilerini filtreleme ile getirme (listeleme için)
+export async function findAnimesWithFiltersDB(
+  where?: Prisma.AnimeSeriesWhereInput,
+  skip?: number,
+  take?: number,
+  orderBy?: Prisma.AnimeSeriesOrderByWithRelationInput,
+  include?: Prisma.AnimeSeriesInclude,
+  client: PrismaClientOrTransaction = prisma
+): Promise<AnimeSeries[]> {
+  try {
+    return await client.animeSeries.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include,
+    });
+  } catch (error) {
+    handleDatabaseError(error, 'Anime serilerini filtreleme ile getirme', { where, skip, take, orderBy });
+  }
 } 
